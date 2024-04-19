@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Python Sinewave - Pelican Trial</title>
+        <meta charset="utf-8" />
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="./theme/static/css/style.css" rel="stylesheet" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    </head>
+
+    <body id="index" class="archive">
+        <div class="container">
+            <div class="header">
+                <ul class="nav nav-pills pull-right">
+                    <li class=""><a href=".">Home</a></li>
+                    <li><a href="./archives.html">Archives</a></li>
+                </ul>
+                <h3 class="text-muted"><a href=".">Pelican Trial</a></h3>
+				<h2 class="text-muted"></h2>
+             </div>
+<section id="content" class="article content">
+  <header>
+    <h2 class="entry-title">
+      <a href="./python-sinewave.html" rel="bookmark"
+         title="Permalink to Python Sinewave">Python Sinewave</a></h2>
+ 
+  </header>
+  
+     
+  <div class="entry-content">
+    <p>Python example for creatign and plotting a sinewave:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># coding: utf-8</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fs</span>   <span class="o">=</span> <span class="mi">48000</span>
+<span class="n">freq</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1">#Hz</span>
+<span class="n">amp</span>  <span class="o">=</span> <span class="mf">1.0</span> <span class="c1"># Linear Amplitude</span>
+<span class="n">t</span>    <span class="o">=</span> <span class="mi">100</span><span class="o">/</span><span class="n">fs</span> <span class="c1"># Seconds sample length</span>
+
+<span class="n">amp_db</span> <span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="kp">log10</span><span class="p">(</span><span class="n">amp</span><span class="p">)</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;sine_</span><span class="si">%d</span><span class="s1">Hz_</span><span class="si">%5.2f</span><span class="s1">_amp&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">freq</span><span class="p">,</span> <span class="n">amp_db</span><span class="p">)</span>
+<span class="n">label_name</span> <span class="o">=</span> <span class="s2">&quot;Sinewave </span><span class="si">%d</span><span class="s2">Hz </span><span class="si">%5.2f</span><span class="s2">dB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">amp_db</span><span class="p">)</span>
+
+<span class="c1">#samples = np.linspace(0, t, int(fs*t), endpoint=False)</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="kp">arange</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">fs</span><span class="p">)</span> <span class="o">/</span><span class="n">fs</span>
+
+<span class="n">signal</span> <span class="o">=</span><span class="n">amp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="kp">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">freq</span> <span class="o">*</span> <span class="n">samples</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label_name</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Sinewave&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Generates and saves this plot</p>
+<p><img alt="1kHz Sinewave" src="sine_1000Hz_ 0.00_amp.png" title="Generate Sinewave Plot"></p>
+  </div><!-- /.entry-content -->
+   <footer class="post-info text-muted">
+    Posted on <abbr class="published" title="2024-04-19T12:34:00+01:00">
+      Fri 19 April 2024
+    </abbr>
+    <address class="vcard author">
+      by <a class="url fn" href="./author/morganp.html">morganp</a>
+    </address> in <a href="./category/python.html">Python</a> Tagged <a href="./tag/python.html">python </a><a href="./tag/signal.html">signal </a>  </footer><!-- /.post-info -->
+</section>
+            <footer id="contentinfo" class="footer">
+                    <nav class="pull-right bottom-nav">
+                        <a href="http://lizard-spock.co.uk/pelican_test/None">RSS</a>
+                    </nav>
+                    <address id="about" class="vcard body">
+                    &copy; <a href=".">Pelican Trial</a> Proudly powered by <a href="http://getpelican.com/">Pelican</a>
+                    </address><!-- /#about -->
+            </footer><!-- /#contentinfo -->
+        </div><!-- container -->
+    </body>
+</html>
