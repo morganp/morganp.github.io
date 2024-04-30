@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Perforce Update files in a Shelve - Pelican Trial</title>
+        <meta charset="utf-8" />
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="./theme/static/css/style.css" rel="stylesheet" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    </head>
+
+    <body id="index" class="archive">
+        <div class="container">
+            <div class="header">
+                <ul class="nav nav-pills pull-right">
+                    <li class=""><a href=".">Home</a></li>
+                    <li><a href="./archives.html">Archives</a></li>
+                </ul>
+                <h3 class="text-muted"><a href=".">Pelican Trial</a></h3>
+				<h2 class="text-muted"></h2>
+             </div>
+<section id="content" class="article content">
+  <header>
+    <h2 class="entry-title">
+      <a href="./perforce-update-files-in-a-shelve.html" rel="bookmark"
+         title="Permalink to Perforce Update files in a Shelve">Perforce Update files in a Shelve</a></h2>
+ 
+  </header>
+  
+     
+  <div class="entry-content">
+    <p>Perforce can temporarily checkins of changes that you might want to share with others before fully commiting them to the code base. These P4 Shelves have some properties that seem undesirable for a revision control system. They are not imuttable. </p>
+<p>From there nature they are temporary but they can also be altered and maintain the same changelist number.</p>
+<p>Lets create file a.txt with some default content, and create a shelve.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">echo</span><span class="w"> </span><span class="s2">&quot;File a - line 1&quot;</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nv">a</span>.<span class="nv">txt</span>
+<span class="nv">p4</span><span class="w"> </span><span class="nv">add</span><span class="w"> </span><span class="nv">a</span>.<span class="nv">txt</span>
+<span class="nv">p4</span><span class="w"> </span><span class="nv">shelve</span><span class="w"> </span>...
+
+<span class="o">&gt;</span><span class="w"> </span><span class="nv">Change</span><span class="w"> </span><span class="mi">3265397</span><span class="w"> </span><span class="nv">created</span><span class="w"> </span><span class="nv">with</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nv">open</span><span class="w"> </span><span class="nv">file</span><span class="ss">(</span><span class="nv">s</span><span class="ss">)</span>.
+<span class="o">&gt;</span><span class="w"> </span><span class="nv">Shelving</span><span class="w"> </span><span class="nv">files</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">change</span><span class="w"> </span><span class="mi">3265397</span>.
+</code></pre></div>
+
+<p>Remeber the Changelist number for the shelve, we will refer to it as <change#>
+Solution based on <a href="https://stackoverflow.com/a/23109698/97073">this SO answer</a>.
+Now lets modify a and create a b.txt. </p>
+<div class="highlight"><pre><span></span><code><span class="nv">p4</span><span class="w"> </span><span class="nv">edit</span><span class="w"> </span><span class="nv">a</span>.<span class="nv">txt</span>
+<span class="nv">echo</span><span class="w"> </span><span class="s2">&quot;File a - line 2 after intial shelve&quot;</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nv">a</span>.<span class="nv">txt</span>
+<span class="nv">echo</span><span class="w"> </span><span class="s2">&quot;File b - line 1 Missed in first shelve&quot;</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nv">b</span>.<span class="nv">txt</span>
+<span class="nv">p4</span><span class="w"> </span><span class="nv">add</span><span class="w"> </span><span class="nv">b</span>.<span class="nv">txt</span>
+
+<span class="nv">p4</span><span class="w"> </span><span class="nv">reopen</span><span class="w"> </span><span class="o">-</span><span class="nv">c</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">change</span>#<span class="o">&gt;</span><span class="w"> </span><span class="nv">b</span>.<span class="nv">txt</span>
+
+<span class="o">&gt;</span><span class="w"> </span><span class="nv">b</span>.<span class="nv">txt</span><span class="sc">#1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">reopened</span><span class="c1">; change 3265397</span>
+
+<span class="nv">p4</span><span class="w"> </span><span class="nv">shelve</span><span class="w"> </span><span class="o">-</span><span class="nv">r</span><span class="w"> </span><span class="o">-</span><span class="nv">c</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">change</span>#<span class="o">&gt;</span>
+
+<span class="o">&gt;</span><span class="w"> </span><span class="nv">Shelving</span><span class="w"> </span><span class="nv">files</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">change</span><span class="w"> </span><span class="mi">3265397</span>.
+<span class="o">&gt;</span><span class="w"> </span><span class="nv">add</span><span class="w"> </span><span class="o">//</span>.<span class="o">/</span><span class="nv">a</span>.<span class="nv">txt</span><span class="sc">#1</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="nv">add</span><span class="w"> </span><span class="o">//</span>.<span class="o">/</span><span class="nv">b</span>.<span class="nv">txt</span><span class="sc">#1</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="nv">Change</span><span class="w"> </span><span class="mi">3265397</span><span class="w"> </span><span class="nv">files</span><span class="w"> </span><span class="nv">shelved</span>.
+</code></pre></div>
+  </div><!-- /.entry-content -->
+   <footer class="post-info text-muted">
+    Posted on <abbr class="published" title="2024-04-30T11:04:00+01:00">
+      Tue 30 April 2024
+    </abbr>
+    <address class="vcard author">
+      by <a class="url fn" href="./author/morganp.html">morganp</a>
+    </address> in <a href="./category/perforce.html">Perforce</a> Tagged   </footer><!-- /.post-info -->
+</section>
+            <footer id="contentinfo" class="footer">
+                    <nav class="pull-right bottom-nav">
+                        <a href="http://lizard-spock.co.uk/pelican_test/None">RSS</a>
+                    </nav>
+                    <address id="about" class="vcard body">
+                    &copy; <a href=".">Pelican Trial</a> Proudly powered by <a href="http://getpelican.com/">Pelican</a>
+                    </address><!-- /#about -->
+            </footer><!-- /#contentinfo -->
+        </div><!-- container -->
+    </body>
+</html>
