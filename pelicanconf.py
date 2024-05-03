@@ -4,12 +4,16 @@ import markdown
 
 AUTHOR = 'morganp'
 SITENAME = 'Pelican Trial'
-SITEURL = ''
+SITEURL = 'http://lizard-spock.co.uk/pelican_test'
 TIMEZONE = 'Europe/London'
 DEFAULT_LANG = 'en'
 
 PATH = 'content'
 OUTPUT_PATH = 'output'
+
+# When sub app of github url
+RELATIVE_URLS = True
+SUMMARY_MAX_LENGTH = 20
 
 # --------------8<---------------------
 # Theme
