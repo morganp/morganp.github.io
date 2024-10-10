@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Web Automation with Watir"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Automation Gem OS X Programming Ruby Web discuss_url: //177 url: //177/Web_Automation_with_Watir id: 177 Watir is a web testing framework …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/web-automation-with-watir.html" rel="bookmark"
+             title="Permalink to "Web Automation with Watir"">"Web Automation with Watir"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-06T13:30:06+01:00">
+                Published: Mon 06 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Automation</li>
+<li>Gem</li>
+<li>OS X</li>
+<li>Programming</li>
+<li>Ruby</li>
+<li>Web
+discuss_url: //177
+url: //177/Web_Automation_with_Watir
+id: 177</li>
+</ul>
+<hr>
+<p><a href="http://watir.com/">Watir</a> is a web testing framework implemented in ruby, but can be used for testing or automating any web service.</p>
+<div class="highlight"><pre><span></span><code>gem install watir-webdriver
+#or in your Gemfile
+gem &quot;watir-webdriver&quot;
+</code></pre></div>
+
+<h2>For Internet Explorer on Windows</h2>
+<div class="highlight"><pre><span></span><code>require &#39;watir&#39;
+browser = Watir::Browser.new :ie
+</code></pre></div>
+
+<h2>Firefox or Chrome</h2>
+<div class="highlight"><pre><span></span><code>require &#39;watir-webdriver&#39;
+browser = Watir::Browser.new :firefox
+# OR
+browser = Watir::Browser.new :chrome
+</code></pre></div>
+
+<p>For OS X and Automating chrome I had to install the chrome driver from <a href="http://code.google.com/p/chromedriver/downloads/list">chromedriver</a> or using <a href="http://mxcl.github.com/homebrew/">homebrew</a>.</p>
+<div class="highlight"><pre><span></span><code>brew install chromedriver
+</code></pre></div>
+
+<p>A simple script might be:</p>
+<div class="highlight"><pre><span></span><code>require &#39;watir-webdriver&#39;
+browser = Watir::Browser.new :chrome
+browser = Watir::Browser.start &#39;www.google.com&#39;
+puts browser.title
+browser.close
+</code></pre></div>
+
+<p>This launches a graphical browser and performs the actions requested.</p>
+<h1>Headless</h1>
+<p>There is a way to make these compatible with severs which do not have a graphics system, by installing the headless gem.</p>
+<div class="highlight"><pre><span></span><code>gem install watir-webdriver
+gem install headless
+#or in your Gemfile
+gem &quot;watir-webdriver&quot;
+gem &quot;healdess&quot;
+</code></pre></div>
+
+<p>The headless gem uses xvfb to perform graphical actions. If you are not on headless machine these will still be visible.</p>
+<div class="highlight"><pre><span></span><code>require &#39;watir-webdriver&#39;
+require &#39;headless&#39;
+
+headless = Headless.new
+headless.start
+
+browser = Watir::Browser.start &#39;www.google.com&#39;
+puts browser.title
+browser.close
+
+headless.destroy
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

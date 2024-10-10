@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Sinatra File Upload"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Programming Sinatra discuss_url: //23 url: //23/Sinatra_File_Upload id: 23 A simple Sinatra web app to upload a single file. Also …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/sinatra-file-upload.html" rel="bookmark"
+             title="Permalink to "Sinatra File Upload"">"Sinatra File Upload"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-01T07:54:03+01:00">
+                Published: Sat 01 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Programming</li>
+<li>Sinatra
+discuss_url: //23
+url: //23/Sinatra_File_Upload
+id: 23</li>
+</ul>
+<hr>
+<p>A simple Sinatra web app to upload a single file. Also available as a <a href="http://gist.github.com/386495">gist</a>, based on <a href="http://pastie.caboo.se/134681">http://pastie.caboo.se/134681</a></p>
+<div class="highlight"><pre><span></span><code>require<span class="w"> </span>&#39;rubygems&#39;
+require<span class="w"> </span>&#39;sinatra&#39;
+
+get<span class="w"> </span>&#39;/upload&#39;<span class="w"> </span>do
+<span class="w">   </span>erb<span class="w"> </span>&#39;<span class="nt">&lt;form</span><span class="w"> </span><span class="na">action=</span><span class="s">&quot;upload&quot;</span><span class="w"> </span><span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="w"> </span><span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span><span class="w"> </span><span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+<span class="w">   </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;file&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;uploaded_data&quot;</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;uploaded_data&quot;</span><span class="nt">&gt;</span>
+<span class="w">   </span><span class="nt">&lt;p&gt;&lt;input</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;submit&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;Continue&quot;</span><span class="nt">&gt;&lt;/p&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/form&gt;</span>&#39;
+end
+
+post<span class="w"> </span>&#39;/upload&#39;<span class="w"> </span>do
+<span class="w">   </span>FileUtils.mkdir_p(&#39;./Uploads/&#39;)
+<span class="w">   </span>FileUtils.mv(params[:uploaded_data][:tempfile].path,<span class="w"> </span>&quot;./Uploads/#{params[:uploaded_data][:filename]}&quot;)
+<span class="w">   </span>erb<span class="w"> </span>&#39;Upload<span class="w"> </span>Complete&#39;
+end
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

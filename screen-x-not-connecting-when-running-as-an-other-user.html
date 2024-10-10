@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"screen -x not connecting when running as an other user"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line OS X Screen discuss_url: //85 url: //85/screen_-x_not_connecting_when_running_as_an_other_user id: 85 I have been running into issues..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/screen-x-not-connecting-when-running-as-an-other-user.html" rel="bookmark"
+             title="Permalink to "screen -x not connecting when running as an other user"">"screen -x not connecting when running as an other user"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-30T13:06:42+00:00">
+                Published: Thu 30 December 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>OS X</li>
+<li>Screen
+discuss_url: //85
+url: //85/screen_-x_not_connecting_when_running_as_an_other_user
+id: 85</li>
+</ul>
+<hr>
+<p>I have been running into issues with screen when switching to another user:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>su<span class="w"> </span>otheruser
+&gt;<span class="w"> </span>password
+$<span class="w"> </span>screen<span class="w"> </span>-x
+&gt;<span class="w"> </span>Cannot<span class="w"> </span>open<span class="w"> </span>your<span class="w"> </span>terminal<span class="w"> </span><span class="s1">&#39;/dev/ttys002&#39;</span><span class="w"> </span>-<span class="w"> </span>please<span class="w"> </span>check.
+</code></pre></div>
+
+<p>From <a href="http://www.linuxquestions.org/questions/linux-general-1/problem-using-screen-cannot-open-your-terminal-dev-pts-0-please-check-338313/">this post</a> I have discovered that it was due to a permissions issue. </p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span>/dev/ttys002
+&gt;<span class="w"> </span>crw--w----<span class="w">  </span><span class="m">1</span><span class="w"> </span>user<span class="w">  </span>tty<span class="w">   </span><span class="m">16</span>,<span class="w">   </span><span class="m">2</span><span class="w"> </span>Dec<span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="m">23</span>:34<span class="w"> </span>/dev/ttys002
+</code></pre></div>
+
+<p>To fix I had to set other permissions.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>su<span class="w"> </span>otheruser
+$<span class="w"> </span>sudo<span class="w"> </span>chmod<span class="w"> </span>go+wr<span class="w"> </span>/dev/ttys002
+</code></pre></div>
+
+<p>You still have to su to the owners account and therefore it is still secure. ie user can not just connect to a /dev/ttys002 currently in use by otheruser.</p>
+<div class="highlight"><pre><span></span><code><span class="w"> </span>#<span class="nv">As</span><span class="w"> </span><span class="nv">user</span>,<span class="w"> </span><span class="nv">otheruser</span><span class="w"> </span><span class="nv">currently</span><span class="w"> </span><span class="nv">using</span><span class="w"> </span><span class="o">/</span><span class="nv">dev</span><span class="o">/</span><span class="nv">ttys002</span>
+<span class="w"> </span>$<span class="w"> </span><span class="nv">screen</span><span class="w"> </span><span class="o">-</span><span class="nv">x</span><span class="w"> </span><span class="o">/</span><span class="nv">dev</span><span class="o">/</span><span class="nv">ttys002</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="nv">Must</span><span class="w"> </span><span class="nv">run</span><span class="w"> </span><span class="nv">suid</span><span class="w"> </span><span class="nv">root</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">multiuser</span><span class="w"> </span><span class="nv">support</span>.
+</code></pre></div>
+
+<p>The issue has kept recurring and I have had to reset the permissions every time I wanted to connect. This could be Mac OS X specific but I edited the root crontab to fix.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>crontab<span class="w"> </span>-e
+<span class="c1"># Added the text below</span>
+<span class="c1"># MIN   HOUR   MDAY  MON  DOW   COMMAND </span>
+<span class="w">  </span><span class="m">0</span>,15,30,45<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>chmod<span class="w"> </span>o+wr<span class="w"> </span>/dev/ttys000
+<span class="w">  </span><span class="m">0</span>,15,30,45<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>chmod<span class="w"> </span>o+wr<span class="w"> </span>/dev/ttys001
+<span class="w">  </span><span class="m">0</span>,15,30,45<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>chmod<span class="w"> </span>o+wr<span class="w"> </span>/dev/ttys002
+<span class="w">  </span><span class="m">0</span>,15,30,45<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>chmod<span class="w"> </span>o+wr<span class="w"> </span>/dev/ttys003
+<span class="w">  </span><span class="m">0</span>,15,30,45<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>chmod<span class="w"> </span>o+wr<span class="w"> </span>/dev/ttys004
+<span class="w">  </span><span class="m">0</span>,15,30,45<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>chmod<span class="w"> </span>o+wr<span class="w"> </span>/dev/ttys005
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

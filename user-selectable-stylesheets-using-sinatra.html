@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"User selectable stylesheets (Using Sinatra)"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="CSS Design Programming SASS Sinatra Web discuss_url: //143 url: //143/User_selectable_stylesheets_%28Using_Sinatra%29 id: 143 Working on my site design …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/user-selectable-stylesheets-using-sinatra.html" rel="bookmark"
+             title="Permalink to "User selectable stylesheets (Using Sinatra)"">"User selectable stylesheets (Using Sinatra)"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-03-29T21:49:23+01:00">
+                Published: Thu 29 March 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>CSS</li>
+<li>Design</li>
+<li>Programming</li>
+<li>SASS</li>
+<li>Sinatra</li>
+<li>Web
+discuss_url: //143
+url: //143/User_selectable_stylesheets_%28Using_Sinatra%29
+id: 143</li>
+</ul>
+<hr>
+<p>Working on my site design I thought it would be nice to have user selectable stylesheets, say a black text on white background or white text on black background. Once I had this working in development mode I ran into the problem with the stylesheet being cached. </p>
+<p>In my implementation the user sets a cookie by visiting a url and being redirected back to the original page. The routing then returned different content for the /stylesheet/screen.css based on the cookie. </p>
+<p>From my <a href="http://www.sinatrarb.com/">Sinatra</a> routes:</p>
+<div class="highlight"><pre><span></span><code>get &#39;/set_css/:style&#39; do
+   ## Set style with /set_css/light?ref=/article
+  response.set_cookie(&quot;style&quot;, { :value =&gt; params[:style], :path =&gt; &#39;/&#39;} )
+
+  if params[:ref].nil? or params[:ref] == &#39;&#39; 
+    redirect &#39;/&#39;
+  else
+    redirect params[:ref]
+  end
+end
+</code></pre></div>
+
+<p>The CSS routes, using sass for rendering</p>
+<div class="highlight"><pre><span></span><code><span class="nx">get</span><span class="w"> </span><span class="err">&#39;</span><span class="o">/</span><span class="nx">stylesheets</span><span class="o">/</span><span class="nx">screen</span><span class="p">.</span><span class="nx">css</span><span class="err">&#39;</span><span class="w"> </span><span class="nx">do</span>
+<span class="w">  </span><span class="nx">content_type</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">text</span><span class="o">/</span><span class="nx">css</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="nx">charset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">utf</span><span class="o">-</span><span class="mi">8</span><span class="err">&#39;</span>
+<span class="w">  </span><span class="nx">response</span><span class="p">[</span><span class="err">&#39;</span><span class="nx">Expires</span><span class="err">&#39;</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">(</span><span class="nx">Time</span><span class="p">.</span><span class="nx">now</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">356</span><span class="p">).</span><span class="nx">httpdate</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">cookies</span><span class="p">[</span><span class="err">&#39;</span><span class="nx">style</span><span class="err">&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">light</span><span class="err">&#39;</span>
+<span class="w">    </span><span class="nx">sass</span><span class="p">(:</span><span class="s">&quot;stylesheets/light_screen&quot;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nx">sass</span><span class="p">(:</span><span class="s">&quot;stylesheets/dark_screen&quot;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="w">  </span><span class="nx">end</span>
+<span class="nx">end</span>
+</code></pre></div>
+
+<p>The problem mentioned earlier is that the header is set to cache the page for a year. This means that the user would need to force a full webpage refresh. This does not happen automatically using the route which sets the cookie and redirect.</p>
+<p>An easy solution to for this is using the cookie to directly load a different named stylesheet. Each stylesheet will get cached but they are different assets to the browser. For my web app I move the if statment into layouts.erb. </p>
+<p>Stylesheet routes back to:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">get</span><span class="w"> </span><span class="err">&#39;</span><span class="o">/</span><span class="nx">stylesheets</span><span class="o">/</span><span class="p">:</span><span class="nx">name</span><span class="p">.</span><span class="nx">css</span><span class="err">&#39;</span><span class="w"> </span><span class="nx">do</span>
+<span class="w">  </span><span class="nx">content_type</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">text</span><span class="o">/</span><span class="nx">css</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="nx">charset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">utf</span><span class="o">-</span><span class="mi">8</span><span class="err">&#39;</span>
+<span class="w">  </span><span class="nx">response</span><span class="p">[</span><span class="err">&#39;</span><span class="nx">Expires</span><span class="err">&#39;</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">(</span><span class="nx">Time</span><span class="p">.</span><span class="nx">now</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">356</span><span class="p">).</span><span class="nx">httpdate</span>
+<span class="w">  </span><span class="nx">sass</span><span class="p">(:</span><span class="s">&quot;stylesheets/#{params[:name]}&quot;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="nx">end</span>
+</code></pre></div>
+
+<p>Inside my layout.erb</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;head&gt;</span>
+<span class="w">  </span><span class="cp">&lt;%</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">[</span><span class="s1">&#39;style&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">&#39;light&#39;</span><span class="w"> </span><span class="cp">-%&gt;</span>
+<span class="w">  </span><span class="nt">&lt;link</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;/stylesheets/light_screen.css&quot;</span><span class="w"> </span><span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="w"> </span><span class="na">media=</span><span class="s">&quot;screen, projection&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="cp">&lt;%</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="cp">-%&gt;</span>
+<span class="w">  </span><span class="nt">&lt;link</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;/stylesheets/dark_screen.css&quot;</span><span class="w"> </span><span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="w"> </span><span class="na">media=</span><span class="s">&quot;screen, projection&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="cp">&lt;%</span><span class="w"> </span><span class="k">end</span><span class="w"> </span><span class="cp">-%&gt;</span>
+<span class="w"> </span><span class="nt">&lt;/head&gt;</span>
+</code></pre></div>
+
+<p>The style selection menu:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;ul&gt;</span>
+<span class="w">  </span><span class="nt">&lt;li&gt;&lt;a</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;/set_css/light?ref=</span><span class="cp">&lt;%=</span><span class="n">request</span><span class="o">.</span><span class="n">fullpath</span><span class="cp">%&gt;</span><span class="s">&quot;</span><span class="nt">&gt;</span>Light<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+<span class="w">  </span><span class="nt">&lt;li&gt;&lt;a</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;/set_css/dark?ref=</span><span class="cp">&lt;%=</span><span class="n">request</span><span class="o">.</span><span class="n">fullpath</span><span class="cp">%&gt;</span><span class="s">&quot;</span><span class="nt">&gt;</span>Dark<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

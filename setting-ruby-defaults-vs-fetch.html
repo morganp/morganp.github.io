@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Setting Ruby Defaults '||' vs 'fetch(){}'"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Performance Programming Ruby discuss_url: //129 url: //129/Setting_Ruby_Defaults_%27%7C%7C%27_vs_%27fetch%28%29%7B%7D%27 id: 129 …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/setting-ruby-defaults-vs-fetch.html" rel="bookmark"
+             title="Permalink to "Setting Ruby Defaults '||' vs 'fetch(){}'"">"Setting Ruby Defaults '||' vs 'fetch(){}'"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-11-09T17:29:10+00:00">
+                Published: Wed 09 November 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Performance</li>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //129
+url: //129/Setting_Ruby_Defaults_%27%7C%7C%27_vs_%27fetch%28%29%7B%7D%27
+id: 129</li>
+</ul>
+<hr>
+<p>There is a very good presentation <a href="http://avdi.org/talks/confident-code-rubymidwest-2011/">Confident Code</a> by <a href="http://avdi.org/">Avdi Grimm</a> author of <a href="http://exceptionalruby.com/">http://exceptionalruby.com/</a>. <a href="http://confreaks.net/videos/614-cascadiaruby2011-confident-code">Previously presented at Cascadia</a>.</p>
+<p>There are many points which I find interesting, the most interesting for me are the ones which I disagree with, probably due to not understanding them in full.</p>
+<p>I use to do this for setting defaults.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">def</span><span class="w"> </span><span class="nv">something</span><span class="ss">(</span><span class="w"> </span><span class="nv">a</span>,<span class="w"> </span><span class="nv">options</span><span class="o">=</span>{}<span class="w"> </span><span class="ss">)</span>
+<span class="w">  </span><span class="nv">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">options</span>[:<span class="nv">width</span>]
+<span class="w">  </span><span class="nv">width</span><span class="w"> </span><span class="o">||=</span><span class="w"> </span><span class="mi">40</span>
+<span class="k">end</span>
+</code></pre></div>
+
+<p>I had not realized that this could be shortened to:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">def</span><span class="w"> </span><span class="nv">something</span><span class="ss">(</span><span class="w"> </span><span class="nv">a</span>,<span class="w"> </span><span class="nv">options</span><span class="o">=</span>{}<span class="w"> </span><span class="ss">)</span>
+<span class="w">  </span><span class="nv">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">options</span>[:<span class="nv">width</span>]<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="mi">40</span>
+<span class="k">end</span>
+</code></pre></div>
+
+<p>Avdi recommends that you use fetch instead (see below) as this has one less comparison. It is actually a longer statement and at the end replaces || 40 with {40} both just as ambiguous to non ruby programmers. So I have a preference for neither based on readability.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">def</span><span class="w"> </span><span class="nv">something</span><span class="ss">(</span><span class="w"> </span><span class="nv">a</span>,<span class="w"> </span><span class="nv">options</span><span class="o">=</span>{}<span class="w"> </span><span class="ss">)</span>
+<span class="w">  </span><span class="nv">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">options</span>.<span class="nv">fetch</span><span class="ss">(</span>:<span class="nv">width</span><span class="ss">)</span><span class="w"> </span>{<span class="w"> </span><span class="mi">40</span><span class="w"> </span>}
+<span class="k">end</span>
+</code></pre></div>
+
+<p>Maybe the 'one less comparison' argument has some holding on execution time.
+NB: Tested with ruby 1.9.2-p290 </p>
+<p>The Test:</p>
+<div class="highlight"><pre><span></span><code>require &#39;benchmark&#39;
+
+def pipe options
+  width = options[:width]
+  width ||= 40
+  return width
+end
+
+def pipe_clean options
+  width = options[:width] || 40
+  return width
+end
+
+def fetch options
+  width = options.fetch(:width) { 40 }
+  return width
+end
+
+n = 100_000_000
+Benchmark.bmbm do |x|
+  options={}
+  x.report(&quot;options \\n ||= 40    :&quot;) { n.times { pipe(       options ) } }
+  x.report(&quot;options[] ||      40 :&quot;)  { n.times { pipe_clean( options ) } }
+  x.report(&quot;options.fetch() {40} :&quot;)  { n.times { fetch(      options ) } }
+end
+</code></pre></div>
+
+<p>The Results:</p>
+<div class="highlight"><pre><span></span><code>Rehearsal ----------------------------------------------------------------------
+options \n ||= 40    :  30.700000   0.000000  30.700000 ( 30.702585)
+options[] ||      40 :  28.480000   0.010000  28.490000 ( 28.492345)
+options.fetch() {40} :  38.720000   0.000000  38.720000 ( 38.731869)
+------------------------------------------------------------ total: 97.910000sec
+
+                                         user     system      total        real
+options \n ||= 40    :  30.490000   0.000000  30.490000 ( 30.494530)
+options[] ||      40 :  28.400000   0.000000  28.400000 ( 28.399310)
+options.fetch() {40} :  39.230000   0.000000  39.230000 ( 39.234303)
+</code></pre></div>
+
+<p>Since I am ambivalent to the 2 styles '||' vs 'fetch(){}' I think I will go with the 27% faster '||' version.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

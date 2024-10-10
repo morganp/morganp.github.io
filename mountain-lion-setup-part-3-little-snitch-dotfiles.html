@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Mountain Lion Setup, Part 3 : Little Snitch & Dotfiles"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Apple Command Line Mountain Lion discuss_url: //183 url: //183/Mountain_Lion_Setup%2C_Part_3_%3A_Little_Snitch_%26_Dotfiles id: 183 Little Snitch..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/mountain-lion-setup-part-3-little-snitch-dotfiles.html" rel="bookmark"
+             title="Permalink to "Mountain Lion Setup, Part 3 : Little Snitch & Dotfiles"">"Mountain Lion Setup, Part 3 : Little Snitch & Dotfiles"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T12:44:04+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Apple</li>
+<li>Command Line</li>
+<li>Mountain Lion
+discuss_url: //183
+url: //183/Mountain_Lion_Setup%2C_Part_3_%3A_Little_Snitch_%26_Dotfiles
+id: 183</li>
+</ul>
+<hr>
+<h2>Little Snitch</h2>
+<p>There is currently a preview (Beta) of [Little Snitch 3][littelsnitch3]. If you have not come across Little Snitch before it is a Third Party Firewall for OS X. When an application tries to make a network connection (connecting to the internet) it allerts you and allows the application to be blocked. Controllability is based on the application, the place it is connecting to and the port that it is connecting on. </p>
+<p>From Version 3 of Little Snitch we also get control of incoming connections. Version 3 is a free preview until September 15, 2012.</p>
+<p>Installation of Little Snitch requires a restart.</p>
+<h2>Dotfiles</h2>
+<p>For last few years I have ket [my dotfiles][dotfiles] (configuration files) on <a href="https://github.com/">github</a>.</p>
+<p>First create a new set of RSA keys (if on a new machine) from <code>/Applications/Utilities/Terminal.app</code>:</p>
+<div class="highlight"><pre><span></span><code>ssh-keygen -t rsa
+cat ~/.ssh/id_rsa.pub
+</code></pre></div>
+
+<p>Then copy this output and add it to your <a href="https://github.com/settings/ssh">github ssh keys</a>.</p>
+<p>if git is not installed <code>brew install git</code></p>
+<div class="highlight"><pre><span></span><code><span class="n">#Configure</span><span class="w"> </span><span class="n">Git</span><span class="w"> </span><span class="n">Globals</span>
+<span class="n">git</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">--</span><span class="k">global</span><span class="w"> </span><span class="k">user</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="ss">&quot;Your Name&quot;</span>
+<span class="n">git</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">--</span><span class="k">global</span><span class="w"> </span><span class="k">user</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="n">your</span><span class="nv">@email</span><span class="p">.</span><span class="n">com</span>
+<span class="err">#</span><span class="w"> </span><span class="k">Get</span><span class="w"> </span><span class="n">Dotfiles</span><span class="w"> </span><span class="n">Repo</span>
+<span class="n">cd</span><span class="w"> </span><span class="o">~</span>
+<span class="n">git</span><span class="w"> </span><span class="n">clone</span><span class="w"> </span><span class="n">git</span><span class="nv">@github</span><span class="p">.</span><span class="nl">com</span><span class="p">:</span><span class="n">morganp</span><span class="o">/</span><span class="n">dotfiles</span><span class="p">.</span><span class="n">git</span>
+</code></pre></div>
+
+<p>Add ssh to Little Snitch, Forever, Any Connection, Allow.</p>
+<p>Once the cloning of the repo has completed, I go into my dotfiles folder and run the installer.</p>
+<div class="highlight"><pre><span></span><code>cd ~/dotfiles 
+./install --all
+</code></pre></div>
+
+<p>There are 2 types of bash config, .bashrc and .bash_login.</p>
+<p>For consistency I change the .bash_login to just load the .bashrc</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span>[<span class="w"> </span><span class="o">-</span><span class="nv">f</span><span class="w"> </span>$<span class="nv">HOME</span><span class="o">/</span>.<span class="nv">bashrc</span><span class="w"> </span>]<span class="c1">; </span>
+<span class="k">then</span>
+<span class="w">  </span><span class="nv">source</span><span class="w"> </span>$<span class="nv">HOME</span><span class="o">/</span>.<span class="nv">bashrc</span><span class="w"> </span><span class="c1">; </span>
+<span class="nv">fi</span>
+</code></pre></div>
+
+<p>This may alter some of the things that RVM has put in place my github dotfiles include this but you need to make sure that included in your .basrc is :</p>
+<div class="highlight"><pre><span></span><code>[[ -s &quot;$HOME/.rvm/scripts/rvm&quot; ]] &amp;&amp; source &quot;$HOME/.rvm/scripts/rvm&quot; # Load RVM into a shell session <span class="gs">*as a function*</span>
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+</code></pre></div>
+
+<p>Lets also install Mac VIM for good measure:</p>
+<div class="highlight"><pre><span></span><code>brew install macvim
+</code></pre></div>
+
+<p>Adding Curl to Little Snitch, Forever, Any Connection, Allow.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

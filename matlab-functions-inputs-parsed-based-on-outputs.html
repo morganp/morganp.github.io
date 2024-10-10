@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Matlab: functions inputs parsed based on outputs"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Engineering tags: Matlab published: true It is quite common to detect how many input arguments have been passed to a …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/matlab-functions-inputs-parsed-based-on-outputs.html" rel="bookmark"
+             title="Permalink to "Matlab: functions inputs parsed based on outputs"">"Matlab: functions inputs parsed based on outputs"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-06-10T20:10:54+01:00">
+                Published: Wed 10 June 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Engineering
+tags:</li>
+<li>Matlab
+published: true</li>
+</ul>
+<hr>
+<p>It is quite common to detect how many input arguments have been passed to a function, using <code>nargin</code> (N arguments in).  Commonly used to set defaults for arguments not specified.</p>
+<div class="highlight"><pre><span></span><code><span class="k">function</span><span class="w"> </span>result<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">fun_name</span><span class="p">(</span>a,b,c<span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">nargin</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">1</span>
+<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;a must be supplied&#39;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">nargin</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">2</span>
+<span class="w">    </span><span class="n">b</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span>
+<span class="w">  </span><span class="k">end</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">nargin</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">3</span>
+<span class="w">    </span><span class="n">c</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="c">% ...</span>
+</code></pre></div>
+
+<p>However I just discovered <code>nargout</code> (N arguments out(.</p>
+<p>This allows the scripts to differentiate between:</p>
+<div class="highlight"><pre><span></span><code>x     = fun(a)
+[x,y] = fun(a)
+</code></pre></div>
+
+<p>Example 1:</p>
+<div class="highlight"><pre><span></span><code><span class="k">function</span><span class="w"> </span><span class="nf">[ varargout ] = nargout_test</span><span class="p">(</span> input_args <span class="p">)</span>
+<span class="w">  </span><span class="nb">disp</span><span class="p">([</span><span class="s">&#39;nargout : &#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">num2str</span><span class="p">(</span><span class="nb">nargout</span><span class="p">)])</span>
+
+<span class="w">  </span><span class="c">% Set outputs</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="nb">i</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="nb">nargout</span>
+<span class="w">    </span><span class="nb">varargout</span><span class="p">{</span><span class="nb">i</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+
+<p>Example 2, changing input args usage based on number of outputs:
+note the input keyword change to the input arguments <code>varargin</code> Variable argument in.</p>
+<div class="highlight"><pre><span></span><code><span class="k">function</span><span class="w"> </span><span class="nf">[ varargout ] = nargout_test</span><span class="p">(</span> varargin <span class="p">)</span>
+<span class="w">  </span><span class="nb">disp</span><span class="p">([</span><span class="s">&#39;nargin : &#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">num2str</span><span class="p">(</span><span class="nb">nargin</span><span class="p">)])</span>
+<span class="w">  </span><span class="nb">disp</span><span class="p">([</span><span class="s">&#39;nargout : &#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">num2str</span><span class="p">(</span><span class="nb">nargout</span><span class="p">)])</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">nargout</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;Too many output arguments&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">nargout</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="c">% single output first input means something</span>
+<span class="w">    </span><span class="nb">varargout</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">varargin</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">nargout</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="c">% two outputs first input means some thing else</span>
+<span class="w">    </span><span class="nb">varargout</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">varargin</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">varargin</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>
+<span class="w">    </span><span class="nb">varargout</span><span class="p">{</span><span class="mi">2</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">varargin</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">varargin</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="k">end</span>
+</code></pre></div>
+
+<p>A good example is the <a href="http://uk.mathworks.com/matlabcentral/fileexchange/13792-the-dc-blocking-filter/">dcblock script by J M De Freitas</a>.</p>
+<p>Which has this syntax:</p>
+<div class="highlight"><pre><span></span><code><span class="o">%</span><span class="w"> </span><span class="n">SYNTAX</span><span class="w">    </span><span class="o">[</span><span class="n">a</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dcblock</span><span class="p">(</span><span class="n">Fc</span><span class="p">);</span><span class="w">  </span>
+<span class="o">%</span><span class="w">           </span><span class="o">[</span><span class="n">a</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dcblock</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span><span class="n">fs</span><span class="p">);</span><span class="w">  </span>
+<span class="o">%</span><span class="w">           </span><span class="o">[</span><span class="n">aQ</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dcblock</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span><span class="n">fs</span><span class="p">,</span><span class="n">B</span><span class="p">);</span><span class="w">  </span>
+<span class="o">%</span><span class="w">           </span><span class="o">[</span><span class="n">Fc,fc</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dcblock</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">fs</span><span class="p">);</span><span class="w">  </span>
+<span class="o">%</span><span class="w">           </span><span class="n">dcblock</span><span class="p">(</span><span class="n">Fc</span><span class="p">)</span><span class="w">  </span>
+<span class="o">%</span><span class="w">           </span><span class="n">dcblock</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span><span class="n">fs</span><span class="p">)</span><span class="w">  </span>
+<span class="o">%</span><span class="w">           </span><span class="n">dcblock</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span><span class="n">fs</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

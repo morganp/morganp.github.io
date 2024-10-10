@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Recent issue with building Gems"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Gem Programming Ruby discuss_url: //105 url: //105/Recent_issue_with_building_Gems id: 105 When running gem build on a new library I have …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/recent-issue-with-building-gems.html" rel="bookmark"
+             title="Permalink to "Recent issue with building Gems"">"Recent issue with building Gems"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-05-07T23:25:34+01:00">
+                Published: Sat 07 May 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Gem</li>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //105
+url: //105/Recent_issue_with_building_Gems
+id: 105</li>
+</ul>
+<hr>
+<p>When running gem build on a new library I have been working on I started getting the following error:</p>
+<div class="highlight"><pre><span></span><code>[ruby_svg_light.gemspec] isn&#39;t a Gem::Specification (Rake::FileTask instead).
+ERROR:  While executing gem ... (NoMethodError)
+    undefined method `mark_version&#39; for nil:NilClass
+</code></pre></div>
+
+<p>It was from a gemspec similar to that below</p>
+<div class="highlight"><pre><span></span><code><span class="nx">require</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">rake</span><span class="o">/</span><span class="nx">gempackagetask</span><span class="err">&#39;</span>
+
+<span class="nx">NAME</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;ruby_svg_light&quot;</span><span class="w"> </span>
+<span class="nx">Dir</span><span class="p">.</span><span class="nx">chdir</span><span class="p">(</span><span class="w"> </span><span class="err">&#39;</span><span class="p">.</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="nx">require</span><span class="w"> </span><span class="nx">NAME</span>
+<span class="nx">Dir</span><span class="p">.</span><span class="nx">chdir</span><span class="p">(</span><span class="w"> </span><span class="err">&#39;</span><span class="p">.</span><span class="o">/</span><span class="p">..</span><span class="o">/</span><span class="err">&#39;</span><span class="p">)</span>
+
+<span class="nx">spec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">Gem</span><span class="o">::</span><span class="nx">Specification</span><span class="p">.</span><span class="nx">new</span><span class="w"> </span><span class="nx">do</span><span class="w"> </span><span class="o">|</span><span class="nx">s</span><span class="o">|</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">name</span><span class="w">         </span><span class="p">=</span><span class="w"> </span><span class="nx">NAME</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">version</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="nx">RubySVGLight</span><span class="o">::</span><span class="nx">VERSION</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">platform</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="nx">Gem</span><span class="o">::</span><span class="nx">Platform</span><span class="o">::</span><span class="nx">RUBY</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">summary</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">Basic</span><span class="w"> </span><span class="nx">Helper</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">creating</span><span class="w"> </span><span class="nx">SVG</span><span class="w"> </span><span class="nx">Files</span><span class="err">&#39;</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">homepage</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">http</span><span class="p">:</span><span class="c1">//amaras-tech.co.uk/software/RubySVGLight&#39;</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">authors</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;Morgan Prior&quot;</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">email</span><span class="w">        </span><span class="p">=</span><span class="w"> </span><span class="nx">NAME</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;_gem@amaras-tech.co.uk&quot;</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">description</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="o">%</span><span class="p">{</span><span class="nx">A</span><span class="w"> </span><span class="nx">basic</span><span class="w"> </span><span class="kn">library</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">building</span><span class="w"> </span><span class="nx">SVG</span><span class="w"> </span><span class="nx">files</span><span class="p">.</span><span class="w"> </span><span class="nx">Not</span><span class="w"> </span><span class="nx">all</span><span class="w"> </span><span class="nx">properties</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="nx">SVG</span><span class="w"> </span><span class="nx">are</span><span class="w"> </span><span class="nx">supported</span><span class="p">}</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="nx">Dir</span><span class="p">.</span><span class="nx">glob</span><span class="p">(</span><span class="s">&quot;LICENSE.rtf&quot;</span><span class="p">)]</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="o">+=</span><span class="w"> </span><span class="nx">Dir</span><span class="p">.</span><span class="nx">glob</span><span class="p">(</span><span class="s">&quot;examples/*&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="o">+=</span><span class="w"> </span><span class="nx">Dir</span><span class="p">.</span><span class="nx">glob</span><span class="p">(</span><span class="s">&quot;lib/**/*&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="o">+=</span><span class="w"> </span><span class="nx">Dir</span><span class="p">.</span><span class="nx">glob</span><span class="p">(</span><span class="s">&quot;spec/*&quot;</span><span class="p">)</span><span class="w"> </span>
+<span class="nx">end</span>
+<span class="nx">Rake</span><span class="o">::</span><span class="nx">GemPackageTask</span><span class="p">.</span><span class="nx">new</span><span class="p">(</span><span class="nx">spec</span><span class="p">).</span><span class="nx">define</span>
+</code></pre></div>
+
+<p>The Fix was to change to this (Removing Rake::GemPackageTask):</p>
+<div class="highlight"><pre><span></span><code><span class="nx">NAME</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;ruby_svg_light&quot;</span>
+<span class="nx">Dir</span><span class="p">.</span><span class="nx">chdir</span><span class="p">(</span><span class="w"> </span><span class="err">&#39;</span><span class="p">.</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="nx">require</span><span class="w"> </span><span class="nx">NAME</span>
+<span class="nx">Dir</span><span class="p">.</span><span class="nx">chdir</span><span class="p">(</span><span class="w"> </span><span class="err">&#39;</span><span class="p">.</span><span class="o">/</span><span class="p">..</span><span class="o">/</span><span class="err">&#39;</span><span class="p">)</span>
+
+<span class="nx">Gem</span><span class="o">::</span><span class="nx">Specification</span><span class="p">.</span><span class="nx">new</span><span class="w"> </span><span class="nx">do</span><span class="w"> </span><span class="o">|</span><span class="nx">s</span><span class="o">|</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">name</span><span class="w">         </span><span class="p">=</span><span class="w"> </span><span class="nx">NAME</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">version</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="nx">RubySVGLight</span><span class="o">::</span><span class="nx">VERSION</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">platform</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="nx">Gem</span><span class="o">::</span><span class="nx">Platform</span><span class="o">::</span><span class="nx">RUBY</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">summary</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">Basic</span><span class="w"> </span><span class="nx">Helper</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">creating</span><span class="w"> </span><span class="nx">SVG</span><span class="w"> </span><span class="nx">Files</span><span class="err">&#39;</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">homepage</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">http</span><span class="p">:</span><span class="c1">//amaras-tech.co.uk/software/RubySVGLight&#39;</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">authors</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;Morgan Prior&quot;</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">email</span><span class="w">        </span><span class="p">=</span><span class="w"> </span><span class="nx">NAME</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;_gem@amaras-tech.co.uk&quot;</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">description</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="o">%</span><span class="p">{</span><span class="nx">A</span><span class="w"> </span><span class="nx">basic</span><span class="w"> </span><span class="kn">library</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">building</span><span class="w"> </span><span class="nx">SVG</span><span class="w"> </span><span class="nx">files</span><span class="p">.</span><span class="w"> </span><span class="nx">Not</span><span class="w"> </span><span class="nx">all</span><span class="w"> </span><span class="nx">properties</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="nx">SVG</span><span class="w"> </span><span class="nx">are</span><span class="w"> </span><span class="nx">supported</span><span class="p">}</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="nx">Dir</span><span class="p">.</span><span class="nx">glob</span><span class="p">(</span><span class="s">&quot;LICENSE.rtf&quot;</span><span class="p">)]</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="o">+=</span><span class="w"> </span><span class="nx">Dir</span><span class="p">.</span><span class="nx">glob</span><span class="p">(</span><span class="s">&quot;examples/*&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="o">+=</span><span class="w"> </span><span class="nx">Dir</span><span class="p">.</span><span class="nx">glob</span><span class="p">(</span><span class="s">&quot;lib/**/*&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="o">+=</span><span class="w"> </span><span class="nx">Dir</span><span class="p">.</span><span class="nx">glob</span><span class="p">(</span><span class="s">&quot;spec/*&quot;</span><span class="p">)</span>
+<span class="nx">end</span>
+</code></pre></div>
+
+<p>It looks like the new format if for the gemspec is to return a Gem::Specification rather than run the task. I do not know when this change happened.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

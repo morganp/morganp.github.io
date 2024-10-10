@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Monkey Patch Octopress"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Web Octopress Ruby Based on post_filters by imathis. First Move the original method out the way with alias_method then create …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/monkey-patch-octopress.html" rel="bookmark"
+             title="Permalink to "Monkey Patch Octopress"">"Monkey Patch Octopress"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-02-18T19:46:55+00:00">
+                Published: Tue 18 February 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Web</li>
+<li>Octopress</li>
+<li>Ruby</li>
+</ul>
+<hr>
+<p>Based on <a href="https://github.com/imathis/octopress/blob/master/plugins/post_filters.rb">post_filters by imathis</a>.</p>
+<p>First Move the original method out the way with <code>alias_method</code>  then create a new method with the original name, calling the original now aliased method if required.</p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span> <span class="n">Jekyll</span>
+  <span class="k">class</span> <span class="n">URL</span>
+    <span class="n">alias_method</span> :<span class="n">old_sanitize_url</span>, :<span class="n">sanitize_url</span>
+    <span class="n">def</span> <span class="n">sanitize_url</span>(<span class="n">in_url</span>)
+      <span class="n">old_sanitize_url</span>(<span class="n">in_url</span>).<span class="n">downcase</span>
+    <span class="nb">end</span>
+  <span class="nb">end</span>
+<span class="nb">end</span>
+</code></pre></div>
+
+<p>This was used to build my <a href="https://github.com/morganp/octopress_url_downcase">Octopress plugin octopress_url_downcase</a>.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

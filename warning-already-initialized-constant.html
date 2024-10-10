@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"warning: already initialized constant"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line Programming Ruby discuss_url: //123 url: //123/warning%3A_already_initialized_constant id: 123 Do you some times see: FileUtils.rb:93 …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/warning-already-initialized-constant.html" rel="bookmark"
+             title="Permalink to "warning: already initialized constant"">"warning: already initialized constant"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-10-06T00:57:30+01:00">
+                Published: Thu 06 October 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //123
+url: //123/warning%3A_already_initialized_constant
+id: 123</li>
+</ul>
+<hr>
+<p>Do you some times see:</p>
+<div class="highlight"><pre><span></span><code><span class="n">FileUtils</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">93</span><span class="p">:</span><span class="w"> </span><span class="n">warning</span><span class="p">:</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="n">constant</span><span class="w"> </span><span class="n">OPT_TABLE</span>
+<span class="n">FileUtils</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">1176</span><span class="p">:</span><span class="w"> </span><span class="n">warning</span><span class="p">:</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="n">constant</span><span class="w"> </span><span class="n">S_IF_DOOR</span>
+<span class="n">FileUtils</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">1406</span><span class="p">:</span><span class="w"> </span><span class="n">warning</span><span class="p">:</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="n">constant</span><span class="w"> </span><span class="n">DIRECTORY_TERM</span>
+<span class="n">FileUtils</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">1408</span><span class="p">:</span><span class="w"> </span><span class="n">warning</span><span class="p">:</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="n">constant</span><span class="w"> </span><span class="n">SYSCASE</span>
+<span class="n">FileUtils</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">1527</span><span class="p">:</span><span class="w"> </span><span class="n">warning</span><span class="p">:</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="n">constant</span><span class="w"> </span><span class="n">LOW_METHODS</span>
+<span class="n">FileUtils</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">1533</span><span class="p">:</span><span class="w"> </span><span class="n">warning</span><span class="p">:</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="n">constant</span><span class="w"> </span><span class="n">METHODS</span>
+</code></pre></div>
+
+<p>After quite some searching I discovered the cause of these errors. require is clever it only allows you to require each file once.</p>
+<div class="highlight"><pre><span></span><code>ruby-1.9.2-p290 :001 &gt; require &#39;fileutils&#39;
+ =&gt; true 
+ruby-1.9.2-p290 :002 &gt; require &#39;fileutils&#39;
+ =&gt; false
+</code></pre></div>
+
+<p>However it is not case sensitive.</p>
+<div class="highlight"><pre><span></span><code>ruby-1.9.2-p290 :003 &gt; require &#39;FileUtils&#39;
+.... 
+=&gt; true
+</code></pre></div>
+
+<p>So if you accidentally include FileUtils this is the same as reopening the module and re-declaring the constants a second time. you should always require the lowercase version. you can <a href="http://www.ruby-forum.com/topic/123026">include the camelcase</a> version for mixins. </p>
+<p>If you are getting this during development of a program you could do something like :</p>
+<div class="highlight"><pre><span></span><code>grep -Rn &quot;require &#39;FileUtils&#39;&quot; ~/Code
+</code></pre></div>
+
+<p>Incase the error seems to be coming from a file other than fileutils.rb it is likely that tehre is a camelcase version of it being included somewhere, try searching for it be modifying the above command.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

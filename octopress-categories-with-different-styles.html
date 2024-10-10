@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Octopress categories with different styles"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Tech tags: Programming Octopress published: true As I use the code blocks for ingredient lists on my recipe pages I …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/octopress-categories-with-different-styles.html" rel="bookmark"
+             title="Permalink to "Octopress categories with different styles"">"Octopress categories with different styles"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-06-14T08:24:01+01:00">
+                Published: Sat 14 June 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Tech
+tags:</li>
+<li>Programming</li>
+<li>Octopress
+published: true</li>
+</ul>
+<hr>
+<p>As I use the code blocks for ingredient lists on my recipe pages I wanted to 
+have a different style, lighter background instead of black.</p>
+<p>I currently manually set a different layout in the _post header:</p>
+<div class="highlight"><pre><span></span><code><span class="n">layout</span><span class="o">:</span><span class="w"> </span><span class="n">post</span>
+<span class="n">categories</span><span class="o">:</span><span class="w"> </span>
+<span class="o">-</span><span class="w"> </span><span class="n">Tech</span>
+
+<span class="n">layout</span><span class="o">:</span><span class="w"> </span><span class="n">recipe</span>
+<span class="n">categories</span><span class="o">:</span><span class="w"> </span>
+<span class="o">-</span><span class="w"> </span><span class="n">Cooking</span>
+</code></pre></div>
+
+<!-- more -->
+
+<p>The layout will then look for a matching layout in <code>source/_layouts</code></p>
+<p>Manually create your new layout (instructions from top level Octopress site):</p>
+<div class="highlight"><pre><span></span><code>cp source/_layouts/post.html source/_layouts/recipe.html
+</code></pre></div>
+
+<p>Edit <code>source/_layouts/recipe.html</code> changing the role to <code>recipe</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="o">---</span>
+<span class="nv">layout</span>:<span class="w"> </span><span class="nv">default</span>
+<span class="nv">single</span>:<span class="w"> </span><span class="nv">true</span>
+<span class="o">---</span>
+
+<span class="o">&lt;</span><span class="nv">div</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nv">article</span><span class="w"> </span><span class="nv">class</span><span class="o">=</span><span class="s2">&quot;hentry&quot;</span><span class="w"> </span><span class="nv">role</span><span class="o">=</span><span class="s2">&quot;recipe&quot;</span><span class="o">&gt;</span>
+<span class="w">  </span>\{\<span class="o">%</span><span class="w"> </span><span class="k">include</span><span class="w"> </span><span class="nv">article</span>.<span class="nv">html</span><span class="w"> </span>\<span class="o">%</span>\}
+<span class="w">  </span><span class="o">&lt;</span><span class="nv">footer</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="o">&lt;</span><span class="nv">p</span><span class="w"> </span><span class="nv">class</span><span class="o">=</span><span class="s2">&quot;meta&quot;</span><span class="o">&gt;</span>
+</code></pre></div>
+
+<p>This will now pick up the styling that <code>post</code> also gets but we can target our modifications to <code>article[role="recipe"]</code>.
+For custom stylings apply changes in to the relevant file in <code>sass/custom/</code>.</p>
+<p>To modify the background colour of a code block<br>
+<code>sass/custom/_styles.scss</code> add:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Customise the recipe layout</span>
+<span class="n">article</span><span class="p">[</span><span class="n">role</span><span class="p">=</span><span class="s">&quot;recipe&quot;</span><span class="p">]</span><span class="w"> </span><span class="n">pre</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">background</span><span class="o">-</span><span class="nb">color</span><span class="p">:</span><span class="w"> </span><span class="no">$</span><span class="n">sidebar</span><span class="o">-</span><span class="n">bg</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>NB: <code>$sidebar-bg</code> is defined in <code>sass/base/_theme.scss</code></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

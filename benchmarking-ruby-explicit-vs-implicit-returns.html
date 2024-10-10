@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Benchmarking Ruby, explicit vs implicit returns"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Programming Ruby discuss_url: //128 url: //128/Benchmarking_Ruby%2C_explicit_vs_implicit_returns id: 128 Back in 2009 barkingiguana wrote about..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/benchmarking-ruby-explicit-vs-implicit-returns.html" rel="bookmark"
+             title="Permalink to "Benchmarking Ruby, explicit vs implicit returns"">"Benchmarking Ruby, explicit vs implicit returns"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-10-26T09:12:29+01:00">
+                Published: Wed 26 October 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //128
+url: //128/Benchmarking_Ruby%2C_explicit_vs_implicit_returns
+id: 128</li>
+</ul>
+<hr>
+<p>Back in 2009 <a href="http://barkingiguana.com/2009/11/11/returning-explicitly-is-slower/">barkingiguana</a> wrote about how explicit returns <code>'return "String"'</code> was slower than an implicit return, ie just letting the last value get returned. The test was performed on ruby 1.8.6 and I thought I would just check with ruby 1.9.2-p290 to see if this still held true.</p>
+<p>The test I ran:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">require</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">benchmark</span><span class="err">&#39;</span>
+
+<span class="nx">def</span><span class="w"> </span><span class="nx">explicit</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;TEST&quot;</span>
+<span class="nx">end</span>
+
+<span class="nx">def</span><span class="w"> </span><span class="nx">implicit</span>
+<span class="w">  </span><span class="s">&quot;TEST&quot;</span>
+<span class="nx">end</span>
+
+<span class="nx">def</span><span class="w"> </span><span class="nx">explicit_non_eval</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">TEST</span><span class="err">&#39;</span>
+<span class="nx">end</span>
+
+<span class="nx">def</span><span class="w"> </span><span class="nx">implicit_non_eval</span>
+<span class="w">  </span><span class="err">&#39;</span><span class="nx">TEST</span><span class="err">&#39;</span>
+<span class="nx">end</span>
+
+<span class="nx">def</span><span class="w"> </span><span class="nx">explicit_symbol</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">:</span><span class="nx">TEST</span>
+<span class="nx">end</span>
+
+<span class="nx">def</span><span class="w"> </span><span class="nx">implicit_symbol</span>
+<span class="w">  </span><span class="p">:</span><span class="nx">TEST</span>
+<span class="nx">end</span>
+
+<span class="nx">n</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">100</span><span class="nx">_000_000</span>
+<span class="nx">Benchmark</span><span class="p">.</span><span class="nx">bmbm</span><span class="w"> </span><span class="nx">do</span><span class="w"> </span><span class="o">|</span><span class="nx">x</span><span class="o">|</span>
+<span class="w">  </span><span class="nx">x</span><span class="p">.</span><span class="nx">report</span><span class="p">(</span><span class="s">&quot;Explicit \&quot;\&quot;     return&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">n</span><span class="p">.</span><span class="nx">times</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">explicit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="nx">x</span><span class="p">.</span><span class="nx">report</span><span class="p">(</span><span class="s">&quot;Implicit \&quot;\&quot;     return&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">n</span><span class="p">.</span><span class="nx">times</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">implicit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="nx">x</span><span class="p">.</span><span class="nx">report</span><span class="p">(</span><span class="s">&quot;Explicit &#39;&#39;     return&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">n</span><span class="p">.</span><span class="nx">times</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">explicit_non_eval</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="nx">x</span><span class="p">.</span><span class="nx">report</span><span class="p">(</span><span class="s">&quot;Implicit &#39;&#39;     return&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">n</span><span class="p">.</span><span class="nx">times</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">implicit_non_eval</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="nx">x</span><span class="p">.</span><span class="nx">report</span><span class="p">(</span><span class="s">&quot;Explicit symbol return&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">n</span><span class="p">.</span><span class="nx">times</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">explicit_symbol</span><span class="w">   </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="nx">x</span><span class="p">.</span><span class="nx">report</span><span class="p">(</span><span class="s">&quot;Implicit symbol return&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">n</span><span class="p">.</span><span class="nx">times</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">implicit_symbol</span><span class="w">   </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="nx">end</span>
+</code></pre></div>
+
+<p>the results</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Rehearsal</span><span class="w"> </span><span class="o">----------------------------------------------------------</span>
+<span class="nv">Explicit</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w">     </span><span class="k">return</span><span class="w">  </span><span class="mi">37</span>.<span class="mi">810000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">37</span>.<span class="mi">810000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">37</span>.<span class="mi">889241</span><span class="ss">)</span>
+<span class="nv">Implicit</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w">     </span><span class="k">return</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">300000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">300000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">36</span>.<span class="mi">310153</span><span class="ss">)</span>
+<span class="nv">Explicit</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w">     </span><span class="k">return</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">460000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">460000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">36</span>.<span class="mi">476939</span><span class="ss">)</span>
+<span class="nv">Implicit</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w">     </span><span class="k">return</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">520000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">010000</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">530000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">36</span>.<span class="mi">541361</span><span class="ss">)</span>
+<span class="nv">Explicit</span><span class="w"> </span><span class="nv">symbol</span><span class="w"> </span><span class="k">return</span><span class="w">  </span><span class="mi">14</span>.<span class="mi">330000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">14</span>.<span class="mi">330000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">14</span>.<span class="mi">352004</span><span class="ss">)</span>
+<span class="nv">Implicit</span><span class="w"> </span><span class="nv">symbol</span><span class="w"> </span><span class="k">return</span><span class="w">  </span><span class="mi">14</span>.<span class="mi">330000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">14</span>.<span class="mi">330000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">14</span>.<span class="mi">322934</span><span class="ss">)</span>
+<span class="o">-----------------------------------------------</span><span class="w"> </span><span class="nv">total</span>:<span class="w"> </span><span class="mi">175</span>.<span class="mi">760000</span><span class="nv">sec</span>
+
+<span class="w">                             </span><span class="nv">user</span><span class="w">     </span><span class="nv">system</span><span class="w">      </span><span class="nv">total</span><span class="w">        </span><span class="nv">real</span>
+<span class="nv">Explicit</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w">     </span><span class="k">return</span><span class="w">  </span><span class="mi">37</span>.<span class="mi">620000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">37</span>.<span class="mi">620000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">37</span>.<span class="mi">680337</span><span class="ss">)</span>
+<span class="nv">Implicit</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w">     </span><span class="k">return</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">480000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">480000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">36</span>.<span class="mi">504694</span><span class="ss">)</span>
+<span class="nv">Explicit</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w">     </span><span class="k">return</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">560000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">560000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">36</span>.<span class="mi">574798</span><span class="ss">)</span>
+<span class="nv">Implicit</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w">     </span><span class="k">return</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">100000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">010000</span><span class="w">  </span><span class="mi">36</span>.<span class="mi">110000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">36</span>.<span class="mi">111328</span><span class="ss">)</span>
+<span class="nv">Explicit</span><span class="w"> </span><span class="nv">symbol</span><span class="w"> </span><span class="k">return</span><span class="w">  </span><span class="mi">14</span>.<span class="mi">770000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">14</span>.<span class="mi">770000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">14</span>.<span class="mi">812874</span><span class="ss">)</span>
+<span class="nv">Implicit</span><span class="w"> </span><span class="nv">symbol</span><span class="w"> </span><span class="k">return</span><span class="w">  </span><span class="mi">14</span>.<span class="mi">710000</span><span class="w">   </span><span class="mi">0</span>.<span class="mi">000000</span><span class="w">  </span><span class="mi">14</span>.<span class="mi">710000</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="mi">14</span>.<span class="mi">829556</span><span class="ss">)</span>
+</code></pre></div>
+
+<p>For me the difference I see in the results between implicit and explicit returns is negligible. I also prefer the explicit return in all but the simplest of methods, as it is much easier to see what value gets returned and at which point the programmer want the method to exit. It also helps to minimize the side effects of re-factoring.</p>
+<p><a href="http://barkingiguana.com/2009/11/11/returning-explicitly-is-slower/">Barkingiguana</a> seems to prefer the implicit style which is possibly more idiomatic ruby, but I personally find that it adds ambiguity to the code for beginners to intermediate rubyists.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"GitHub command line tools with static paths"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Ruby Programming discuss_url: //35 url: //35/GitHub_command_line_tools_with_static_paths id: 35 I have written a few command line tools in ruby which …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/github-command-line-tools-with-static-paths.html" rel="bookmark"
+             title="Permalink to "GitHub command line tools with static paths"">"GitHub command line tools with static paths"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-04T23:19:58+01:00">
+                Published: Fri 04 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Ruby</li>
+<li>Programming
+discuss_url: //35
+url: //35/GitHub_command_line_tools_with_static_paths
+id: 35</li>
+</ul>
+<hr>
+<p>I have written a few command line tools in ruby which I use to perform file system maintenance. Mainly sorting files and applying standard renames, because the the folders I want to sort are always in the same location I do not want to have to remember to run the command in the correct directory so I add the paths explicitly. This creates a problem with uploading to <a href="http://github.com/morganp">GitHub</a> as other people would then need to modify the script. </p>
+<p>Here is a short example of how you can get around it using Environment Variables</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/usr/bin/env ruby</span>
+<span class="c1">## Command Line tools can now be portable while working on static folders.</span>
+
+<span class="k">if</span><span class="w"> </span><span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;MEDIA_FOLDER&#39;</span><span class="o">].</span><span class="n">nil?</span>
+<span class="w">   </span><span class="nb">puts</span><span class="w"> </span><span class="s2">&quot;Add this to ~/.bashrc&quot;</span>
+<span class="w">   </span><span class="nb">puts</span><span class="w"> </span><span class="s2">&quot;Or Windows variables&quot;</span>
+<span class="w">   </span><span class="nb">puts</span><span class="w"> </span><span class="s2">&quot;export MEDIA_FOLDER=&#39;[</span><span class="se">\&quot;</span><span class="s2">/user/name/Movies</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">/user/name/TV Shows</span><span class="se">\&quot;</span><span class="s2">]&#39;&quot;</span>
+<span class="k">else</span>
+<span class="w">   </span><span class="nb">puts</span><span class="w"> </span><span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;MEDIA_FOLDER&#39;</span><span class="o">]</span>
+<span class="k">end</span>
+</code></pre></div></td></tr></table></div>
+
+<p>NB: when using the variables remember that it is a string and not an array. Convert to ruby Array by calling eval on it.</p>
+<div class="highlight"><pre><span></span><code>eval(ENV[&#39;TEMP_FILES&#39;]).each do |x|
+   puts x
+end
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

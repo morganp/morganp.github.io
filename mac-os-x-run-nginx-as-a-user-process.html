@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Mac OS X run nginx as a user process"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="nginx Web discuss_url: //32 url: //32/Mac_OS_X_run_nginx_as_a_user_process id: 32 I do not like having to use sudo to run development …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/mac-os-x-run-nginx-as-a-user-process.html" rel="bookmark"
+             title="Permalink to "Mac OS X run nginx as a user process"">"Mac OS X run nginx as a user process"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-11T12:51:49+01:00">
+                Published: Tue 11 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>nginx</li>
+<li>Web
+discuss_url: //32
+url: //32/Mac_OS_X_run_nginx_as_a_user_process
+id: 32</li>
+</ul>
+<hr>
+<p>I do not like having to use sudo to run development servers for testing web applications. sudo should be reserved for commands that really need that level of privilege. After <a href="http://amaras-tech.co.uk/people/morgan/article/26">installing passenger and nginx</a> on Mac OS X Snow Leopard I had trouble getting nginx to run without sudo.</p>
+<p>NB: sudo runs the command with superuser privileges ie things that could break your system if you do not know what you are doing, or typo a command so should be used sparingly.</p>
+<p>if you have been running with sudo stop the service</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>nginx<span class="w"> </span>-s<span class="w"> </span>stop
+</code></pre></div>
+
+<p>find and remove the log files for me this is:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>~/bin/nginx/logs/*
+</code></pre></div>
+
+<p>Assuming nginx is on your path (if not you must know its location) to find its location you can try which ie:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>which<span class="w"> </span>nginx
+</code></pre></div>
+
+<p>A few changes to the default config file:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">vim</span><span class="w"> </span><span class="o">~/</span><span class="nx">bin</span><span class="o">/</span><span class="nx">nginx</span><span class="o">/</span><span class="nx">conf</span><span class="o">/</span><span class="nx">nginx</span><span class="p">.</span><span class="nx">conf</span>
+
+<span class="err">#</span><span class="nx">user</span><span class="w"> </span><span class="nx">morgy</span><span class="p">;</span><span class="w"> </span><span class="err">#</span><span class="p">&lt;</span><span class="o">--</span><span class="w"> </span><span class="nx">comment</span><span class="w"> </span><span class="nx">out</span><span class="w"> </span><span class="nx">when</span><span class="w"> </span><span class="nx">running</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="nx">process</span>
+<span class="nx">worker_processes</span><span class="w">  </span><span class="mi">1</span><span class="p">;</span>
+
+<span class="nx">http</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="nx">passenger_root</span><span class="w"> </span><span class="o">/</span><span class="nx">path</span><span class="o">/</span><span class="nx">ruby</span><span class="o">-</span><span class="nx">ee</span><span class="o">-</span><span class="m m-Double">1.8.7</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">ruby</span><span class="o">/</span><span class="nx">gems</span><span class="o">/</span><span class="m m-Double">1.8</span><span class="o">/</span><span class="nx">gems</span><span class="o">/</span><span class="nx">passenger</span><span class="o">-</span><span class="m m-Double">2.2.11</span><span class="p">;</span>
+<span class="w">   </span><span class="nx">passenger_ruby</span><span class="w"> </span><span class="o">/</span><span class="nx">path</span><span class="o">/</span><span class="nx">ruby</span><span class="o">-</span><span class="nx">ee</span><span class="o">-</span><span class="m m-Double">1.8.7</span><span class="o">/</span><span class="nx">bin</span><span class="o">/</span><span class="nx">ruby</span><span class="p">;</span>
+
+<span class="w">   </span><span class="nx">include</span><span class="w">       </span><span class="nx">mime</span><span class="p">.</span><span class="nx">types</span><span class="p">;</span>
+<span class="w">   </span><span class="nx">default_type</span><span class="w">  </span><span class="nx">application</span><span class="o">/</span><span class="nx">octet</span><span class="o">-</span><span class="nx">stream</span><span class="p">;</span>
+
+<span class="w">   </span><span class="nx">client_max_body_size</span><span class="w"> </span><span class="mi">20</span><span class="nx">M</span><span class="p">;</span>
+
+<span class="w">   </span><span class="nx">server</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">listen</span><span class="w">       </span><span class="mi">8080</span><span class="p">;</span><span class="w"> </span><span class="err">#</span><span class="p">&lt;</span><span class="o">--</span><span class="w"> </span><span class="nx">superuser</span><span class="w"> </span><span class="nx">only</span><span class="w"> </span><span class="nx">has</span><span class="w"> </span><span class="nx">acess</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">80</span>
+<span class="w">      </span><span class="nx">server_name</span><span class="w">  </span><span class="nx">localhost</span><span class="p">,</span><span class="w"> </span><span class="nx">www</span><span class="p">.</span><span class="nx">localhost</span><span class="p">;</span>
+<span class="w">      </span><span class="nx">passenger_enabled</span><span class="w"> </span><span class="nx">on</span><span class="p">;</span>
+<span class="w">      </span><span class="nx">root</span><span class="w"> </span><span class="o">/</span><span class="nx">your</span><span class="o">/</span><span class="nx">path</span><span class="o">/</span><span class="nx">public</span><span class="p">;</span><span class="w">   </span><span class="err">#</span><span class="w"> </span><span class="p">&lt;</span><span class="o">---</span><span class="w"> </span><span class="nx">be</span><span class="w"> </span><span class="nx">sure</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">point</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">public</span><span class="err">&#39;</span><span class="p">!</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>That is all I had to do to get nginx working without sudo</p>
+<div class="highlight"><pre><span></span><code><span class="o">$</span><span class="w"> </span><span class="n">nginx</span>
+<span class="o">$</span><span class="w"> </span><span class="n">nginx</span><span class="w"> </span><span class="o">-</span><span class="n">s</span><span class="w"> </span><span class="n">reload</span>
+</code></pre></div>
+
+<p>Just point your browser to localhost:8080 or 127.0.0.1:8080 </p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

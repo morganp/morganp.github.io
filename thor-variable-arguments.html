@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Thor Variable Arguments"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Ruby Command Line Thor is a Ruby Gem, which allows you to build command line applications which accept commands, in …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/thor-variable-arguments.html" rel="bookmark"
+             title="Permalink to "Thor Variable Arguments"">"Thor Variable Arguments"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-01T19:39:19+01:00">
+                Published: Tue 01 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Ruby</li>
+<li>Command Line</li>
+</ul>
+<hr>
+<p><a href="http://whatisthor.com/">Thor</a> is a Ruby Gem, which allows you to build command line applications which accept commands, in the same way <code>git</code> accepts <code>add</code> as a command.</p>
+<p>The Helloworld example :</p>
+<div class="highlight"><pre><span></span><code><span class="nv">require</span><span class="w"> </span><span class="s2">&quot;thor&quot;</span>
+
+<span class="nv">class</span><span class="w"> </span><span class="nv">MyCLI</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">Thor</span>
+<span class="w">  </span><span class="nv">desc</span><span class="w"> </span><span class="s2">&quot;hello NAME&quot;</span>,<span class="w"> </span><span class="s2">&quot;say hello to NAME&quot;</span>
+<span class="w">  </span><span class="nv">def</span><span class="w"> </span><span class="nv">hello</span><span class="ss">(</span><span class="nv">name</span><span class="ss">)</span>
+<span class="w">    </span><span class="nv">puts</span><span class="w"> </span><span class="s2">&quot;Hello #{name}&quot;</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+<span class="nv">MyCLI</span>.<span class="nv">start</span><span class="ss">(</span><span class="nv">ARGV</span><span class="ss">)</span>
+</code></pre></div>
+
+<p>The help and single input.  </p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ruby<span class="w"> </span>thor_test.rb<span class="w"> </span><span class="nb">help</span><span class="w"> </span>hello
+&gt;<span class="w"> </span>Usage:
+&gt;<span class="w">  </span>thor_test.rb<span class="w"> </span>hello<span class="w"> </span>NAME
+&gt;
+&gt;<span class="w"> </span>say<span class="w"> </span>hello<span class="w"> </span>to<span class="w"> </span>NAME
+
+
+$<span class="w"> </span>ruby<span class="w"> </span>thor_test.rb<span class="w"> </span>Hello<span class="w"> </span>a
+&gt;<span class="w"> </span>Hello<span class="w"> </span>a
+</code></pre></div>
+
+<p>Now with multiple, inputs: </p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ruby<span class="w"> </span>thor_test.rb<span class="w"> </span>Hello<span class="w"> </span>a<span class="w"> </span>b
+&gt;<span class="w"> </span>thor_test.rb<span class="w"> </span>hello<span class="w"> </span>requires<span class="w"> </span>at<span class="w"> </span>least<span class="w"> </span><span class="m">1</span><span class="w"> </span>argument:<span class="w"> </span><span class="s2">&quot;thor_test.rb hello NAME”.</span>
+</code></pre></div>
+
+<p>Not really what you want if you were building a command like <code>git add</code> when you
+would want all following arguments as inputs.</p>
+<p>To accept a variable number of arguments is not Thor specific but a standard 
+ruby idiom. A splat in front of your variable ie <code>*name</code>.</p>
+<div class="highlight"><pre><span></span><code>require &quot;thor&quot;
+
+class MyCLI &lt; Thor
+  desc &quot;hello NAME&quot;, &quot;say hello to NAME&quot;
+  def hello(*name)
+    puts &quot;Hello #{name * “ &quot;}&quot;
+  end
+end
+MyCLI.start(ARGV)
+
+$ ruby thor_test.rb Hello a b
+<span class="k">&gt; </span><span class="ge">Hello a b</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

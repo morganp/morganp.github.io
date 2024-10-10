@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Suppressing Warnings in Ruby Scripts"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line Programming Ruby discuss_url: //130 url: //130/Suppressing_Warnings_in_Ruby_Scripts id: 130 Suppressing warnings is usually a bad..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/suppressing-warnings-in-ruby-scripts.html" rel="bookmark"
+             title="Permalink to "Suppressing Warnings in Ruby Scripts"">"Suppressing Warnings in Ruby Scripts"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-12-02T10:13:29+00:00">
+                Published: Fri 02 December 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //130
+url: //130/Suppressing_Warnings_in_Ruby_Scripts
+id: 130</li>
+</ul>
+<hr>
+<p>Suppressing warnings is usually a bad idea but if you understand the risk and want to carry on regardless. When ruby to call a script then the warning level can be set via:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ruby<span class="w"> </span>-W0<span class="w"> </span>./script.rb
+$<span class="w"> </span>ruby<span class="w"> </span>-W1<span class="w"> </span>./script.rb
+$<span class="w"> </span>ruby<span class="w"> </span>-W2<span class="w"> </span>./script.rb
+</code></pre></div>
+
+<p>Where 0=silence, 1=medium, 2=verbose</p>
+<p>In an executable with a shebang line this is a little harder. This is the method I have found:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/usr/bin/env ruby</span>
+<span class="c1">##                      $VERBOSE</span>
+<span class="c1">## -W0  NO Warnings     nil</span>
+<span class="c1">## -W1  Quiet           false</span>
+<span class="c1">## -W2  Verbose         true</span>
+<span class="k">BEGIN</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="vg">$VERBOSE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kp">nil</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">#Rest of ruby script</span>
+</code></pre></div></td></tr></table></div>
+
+<p>The script can then be called directly with the warning level set:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>executable_ruby_script
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

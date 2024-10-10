@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Bash script get current script directory"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Automation Command Line CSS Programming discuss_url: //147 url: //147/Bash_script_get_current_script_directory id: 147 Sometime a script needs to..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/bash-script-get-current-script-directory.html" rel="bookmark"
+             title="Permalink to "Bash script get current script directory"">"Bash script get current script directory"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-07T13:45:37+01:00">
+                Published: Sat 07 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Automation</li>
+<li>Command Line</li>
+<li>CSS</li>
+<li>Programming
+discuss_url: //147
+url: //147/Bash_script_get_current_script_directory
+id: 147</li>
+</ul>
+<hr>
+<p>Sometime a script needs to now the directory that it is executing from, the best solution for this is:</p>
+<div class="highlight"><pre><span></span><code>DIR=&quot;$(<span class="w"> </span>cd<span class="w"> </span>&quot;$(<span class="w"> </span>dirname<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">BASH_SOURCE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="cp">}</span>&quot;<span class="w"> </span>)&quot;<span class="w"> </span><span class="err">&amp;&amp;</span><span class="w"> </span>pwd<span class="w"> </span>)&quot;
+</code></pre></div>
+
+<p>Although the simpler version below should work for most cases the version above is preferred for shell portability.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">DIR</span><span class="o">=</span>`<span class="k">dirname</span><span class="w"> </span><span class="mh">$0</span>`
+</code></pre></div>
+
+<p>The usage of this could be for creating shell scripts that a user can double click to execute or drag on to the terminal to execute, as the working directory could change. Uses the scripts folder means that if a user copies the script to a new project it will work in the new project rather than having absolute paths to the old project. </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+
+<span class="nv">DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="w"> </span>dirname<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">BASH_SOURCE</span><span class="p">[0]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">pwd</span><span class="w"> </span><span class="k">)</span><span class="s2">&quot;</span>
+<span class="nv">CSS_COLLATION</span><span class="o">=</span><span class="nv">$DIR</span>/screen.css
+
+<span class="c1">#Clean File</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$CSS_COLLATION</span>
+
+<span class="c1">#Append CSS</span>
+cat<span class="w"> </span><span class="nv">$DIR</span>/reset.css<span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CSS_COLLATION</span>
+cat<span class="w"> </span><span class="nv">$DIR</span>/960.css<span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CSS_COLLATION</span>
+</code></pre></div></td></tr></table></div>
+
+<p><a href="http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in">From StackOverflow</a></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

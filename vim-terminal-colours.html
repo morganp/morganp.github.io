@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Vim Terminal Colours"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line Vim discuss_url: //160 url: //160/Vim_Terminal_Colours id: 160 I use the ir_black for vim (MacVim mainly). Recently have …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/vim-terminal-colours.html" rel="bookmark"
+             title="Permalink to "Vim Terminal Colours"">"Vim Terminal Colours"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-11T19:55:25+01:00">
+                Published: Fri 11 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>Vim
+discuss_url: //160
+url: //160/Vim_Terminal_Colours
+id: 160</li>
+</ul>
+<hr>
+<p>I use the <a href="http://blog.infinitered.com/entries/show/8">ir_black</a> for vim (<a href="http://code.google.com/p/macvim/">MacVim</a> mainly). Recently have been doing a lot of work in the terminal over ssh and have constantly been having to switch colouscheme to dessert, just to see the text properly.</p>
+<div class="highlight"><pre><span></span><code>:colorscheme desert
+</code></pre></div>
+
+<p>The vimrc Which I had copied from some one else used:</p>
+<div class="highlight"><pre><span></span><code>&quot; 8 Colours Modified to 16 Colors
+if &amp;term =~ &quot;xterm&quot;
+  if has(&quot;terminfo&quot;)
+    set t_Co=16
+    set t_Sf=^[[3%pl%dm
+    set t_Sb=^[[4%pl%dm
+  else
+    set t_Co=16
+    set t_Sf=^[[3%dm
+    set t_Sb=^[[4%dm
+  endif
+endif
+</code></pre></div>
+
+<p>It turns out that if I had realised this came from: <code>:help xterm-color</code> and read it. For 16 colours it recommends:</p>
+<div class="highlight"><pre><span></span><code>&quot; 16 Colours
+if &amp;term =~ &quot;xterm&quot;
+  if has(&quot;terminfo&quot;)
+    set t_Co=16
+    set t_AB=%?%p1%{8}%&lt;%t%p1%{40}%+%e%p1%{92}%+%;%dm
+    set t_AF=%?%p1%{8}%&lt;%t%p1%{30}%+%e%p1%{82}%+%;%dm
+  else
+    set t_Co=16
+    set t_Sf=%dm
+    set t_Sb=%dm
+  endif
+endif
+</code></pre></div>
+
+<p>Which is now working well. It also recommends some things for 256 colour but that just filled my terminal with Color escape codes. </p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

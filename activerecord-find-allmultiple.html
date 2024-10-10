@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Activerecord Find All/Multiple"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Active Record Ruby discuss_url: //91 url: //91/Activerecord_Find_All%2FMultiple id: 91 Using Tags (An active record model) to find tags …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/activerecord-find-allmultiple.html" rel="bookmark"
+             title="Permalink to "Activerecord Find All/Multiple"">"Activerecord Find All/Multiple"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-19T06:31:03+00:00">
+                Published: Sat 19 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Active Record</li>
+<li>Ruby
+discuss_url: //91
+url: //91/Activerecord_Find_All%2FMultiple
+id: 91</li>
+</ul>
+<hr>
+<p>Using Tags (An active record model) to find tags by the tag property:</p>
+<div class="highlight"><pre><span></span><code>Tag.find_by_tag(&quot;Ruby&quot;)
+Ruby
+
+Tag.find_by_tag([&quot;Ruby&quot;, &quot;Gem&quot;])
+Ruby
+</code></pre></div>
+
+<p>That did not return what I expected, find_ returns one object by default. first_ last_ or all_ modifiers can be used. So to find multiple tags by the same property:</p>
+<div class="highlight"><pre><span></span><code>Tag.find_all_by_tag([&quot;Ruby&quot;, &quot;Gem&quot;]) 
+Ruby
+Gem
+</code></pre></div>
+
+<p>Again with slightly less active record magic:<br>
+Note the = ? for singular items and IN (?) for a list of items.</p>
+<div class="highlight"><pre><span></span><code>Tag.find(:all, :conditions =&gt; [&quot;tag = ?&quot;, &quot;Ruby&quot;])
+Ruby
+
+Tag.find(:all, :conditions =&gt; [&quot;tag IN (?)&quot;, [&quot;Ruby&quot;, &quot;Gem&quot;]])
+Ruby
+Gem
+</code></pre></div>
+
+<p>More info can be read on <a href="http://lenary.co.uk/guides/active_record_querying.html#dynamic-finders">Rails Guides</a>.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

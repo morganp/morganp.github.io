@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Converting flat structure into a nested structure"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Programming Ruby discuss_url: //200 url: //200/Converting_flat_structure_into_a_nested_structure id: 200 Given a flat hierarchy of data comprising..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/converting-flat-structure-into-a-nested-structure.html" rel="bookmark"
+             title="Permalink to "Converting flat structure into a nested structure"">"Converting flat structure into a nested structure"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-10-03T20:11:12+01:00">
+                Published: Wed 03 October 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //200
+url: //200/Converting_flat_structure_into_a_nested_structure
+id: 200</li>
+</ul>
+<hr>
+<p>Given a flat hierarchy of data comprising level and a label, aim to nest the lower level of objects in to the parents.</p>
+<p>Example data: </p>
+<div class="highlight"><pre><span></span><code>  0, &#39;a&#39;
+  1, &#39;b&#39;
+  2, &#39;c&#39;
+  2, &#39;d&#39;
+  1, &#39;e&#39;
+  2, &#39;f&#39;
+</code></pre></div>
+
+<p>Converted to a structure similar to:</p>
+<div class="highlight"><pre><span></span><code>a
++b
+|+c
+|+d
++e
+ +f
+</code></pre></div>
+
+<h2>An Unoptimised Solution</h2>
+<p>A simple object, which allows adding child objects</p>
+<div class="highlight"><pre><span></span><code>Thing = Struct.new(:level, :label, :children)
+class Thing
+  def add_child (child)
+    children &lt;&lt; child
+  end
+end
+</code></pre></div>
+
+<p>The data:</p>
+<div class="highlight"><pre><span></span><code>list =
+[ Thing.new(0, &quot;a&quot;, []),
+  Thing.new(1, &quot;b&quot;, []),
+  Thing.new(2, &quot;c&quot;, []),
+  Thing.new(2, &quot;d&quot;, []),
+  Thing.new(1, &quot;e&quot;, []),
+  Thing.new(2, &quot;f&quot;, [])
+]
+</code></pre></div>
+
+<p>My approach is to find the lowest children and fold them in to the parent above it. The first step is a method to calculate the nesting depth. </p>
+<div class="highlight"><pre><span></span><code>def lowest_level( list )
+  level = 0
+  list.each do |obj|
+    level = obj.level if obj.level &gt; level
+  end
+  return level
+end
+
+puts &quot;Lowest Level is #{lowest_level( list )}&quot;
+=&gt; Lowest Level is 2
+</code></pre></div>
+
+<p>The main part of the solution now is to loop over the list, adding the object at the lowest_level to its parent, then removing it from its original position. The parent object is defined as being in the position before with a level 1 above the current node. </p>
+<div class="highlight"><pre><span></span><code>      current_fold = lowest_level( list )
+
+      list.each_with_index do |thing, index|
+        # Identify if on a lowest leaf which can be folded
+        if ( ( thing.level == current_fold ) &amp;&amp; (list[index-1].level == current_fold-1))
+          list[index-1].add_child( thing )
+          list.delete_at(index)
+        end
+      end
+</code></pre></div>
+
+<p>The main performance issue I have with this solution is it requires an iteration for every object at the same level wiith the same parent. ie 1222 would take 3 iterations to fold the 2s, 122212 would still take 3 iterations.</p>
+<p>The loop in full:</p>
+<div class="highlight"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">fold_list</span><span class="p">(</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">)</span>
+<span class="w">  </span><span class="c1">## Clone data for immutable operation</span>
+<span class="w">  </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Marshal</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">Marshal</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">))</span>
+<span class="w">  </span><span class="n">fold_list</span><span class="o">!</span><span class="p">(</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">)</span>
+<span class="n">end</span>
+
+<span class="n">def</span><span class="w"> </span><span class="n">fold_list</span><span class="o">!</span><span class="p">(</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">)</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">lowest_level</span><span class="p">(</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="n">do</span>
+<span class="w">    </span><span class="c1">#Find Current lowest Level and fold</span>
+<span class="w">    </span><span class="n">current_fold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lowest_level</span><span class="p">(</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="w"> </span><span class="n">current_fold</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">lowest_level</span><span class="p">(</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="n">do</span>
+<span class="w">      </span><span class="n">list</span><span class="o">.</span><span class="n">each_with_index</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="o">|</span><span class="n">thing</span><span class="p">,</span><span class="w"> </span><span class="n">index</span><span class="o">|</span>
+<span class="w">        </span><span class="c1"># Identify if on a lowest leaf which can be folded</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">thing</span><span class="o">.</span><span class="n">level</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">current_fold</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">list</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">level</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">current_fold</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">          </span><span class="n">list</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="w"> </span><span class="n">thing</span><span class="w"> </span><span class="p">)</span>
+<span class="w">          </span><span class="n">list</span><span class="o">.</span><span class="n">delete_at</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+<span class="w">        </span><span class="n">end</span>
+<span class="w">      </span><span class="n">end</span>
+<span class="w">    </span><span class="n">end</span>
+<span class="w">  </span><span class="n">end</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">list</span>
+<span class="n">end</span>
+
+<span class="n">require</span><span class="w"> </span><span class="s1">&#39;pp&#39;</span>
+<span class="n">pp</span><span class="w">  </span><span class="n">fold_list</span><span class="p">(</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">)</span>
+</code></pre></div>
+
+<p>The result, showing the folding:</p>
+<div class="highlight"><pre><span></span><code>[#&lt;struct Thing
+  level=0,
+  label=&quot;a&quot;,
+  children=
+   [#&lt;struct Thing
+     level=1,
+     label=&quot;b&quot;,
+     children=
+      [#&lt;struct Thing level=2, label=&quot;c&quot;, children=[]&gt;,
+       #&lt;struct Thing level=2, label=&quot;d&quot;, children=[]&gt;]&gt;,
+    #&lt;struct Thing
+     level=1,
+     label=&quot;e&quot;,
+     children=[#&lt;struct Thing level=2, label=&quot;f&quot;, children=[]&gt;]&gt;]&gt;]
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

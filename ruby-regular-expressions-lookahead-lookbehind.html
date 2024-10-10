@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Ruby Regular Expressions Lookahead / Lookbehind"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Gem Programming Ruby Regex discuss_url: //68 url: //68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind id: 68 I recently discovered a feature of..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/ruby-regular-expressions-lookahead-lookbehind.html" rel="bookmark"
+             title="Permalink to "Ruby Regular Expressions Lookahead / Lookbehind"">"Ruby Regular Expressions Lookahead / Lookbehind"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-07T01:39:28+01:00">
+                Published: Tue 07 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Gem</li>
+<li>Programming</li>
+<li>Ruby</li>
+<li>Regex
+discuss_url: //68
+url: //68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind
+id: 68</li>
+</ul>
+<hr>
+<p>I recently discovered a feature of regular expressions called lookahead. This means for a match the lookahead must exist but it does not become part of the matched string.
+NB: (group) print first group with \1</p>
+<div class="highlight"><pre><span></span><code>&quot;123456&quot;.gsub(/(\d\d\d)/, &#39;\1,&#39;)
+123,456,
+</code></pre></div>
+
+<p>Now with lookahead</p>
+<div class="highlight"><pre><span></span><code>&quot;123456&quot;.gsub(/(\d\d\d)(?=\d)/, &#39;\1,&#39;)
+123,456
+</code></pre></div>
+
+<p>There are 2 types of lookahead</p>
+<div class="highlight"><pre><span></span><code>match (?=x)
+not-match (?!x)
+</code></pre></div>
+
+<p>Ruby 1.8.x does not support these by default but by using <a href="http://oniguruma.rubyforge.org/">Oniguruma</a> which is the default regex engine in Ruby 1.9.x you can also use lookbehind expressions.</p>
+<div class="highlight"><pre><span></span><code>match (?&lt;=x)
+not-match (?&lt;!x)
+</code></pre></div>
+
+<p>Example not using lookbehind</p>
+<div class="highlight"><pre><span></span><code> &quot;http://h:5/&quot;.gsub(/:/,&#39;=&gt;&#39;)
+ http=&gt;//h=&gt;5/
+</code></pre></div>
+
+<p>With Not lookbehind</p>
+<div class="highlight"><pre><span></span><code>&quot;http://h:5/&quot;.gsub(/(?&lt;!http):/,&#39;=&gt;&#39;)
+ http://h=&gt;5/
+</code></pre></div>
+
+<p>More info on <a href="http://www.regular-expressions.info/lookaround.html">Lookarounds</a></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

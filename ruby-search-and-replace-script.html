@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Ruby Search and Replace Script."</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Automation Command Line Programming Ruby discuss_url: //125 url: //125/Ruby_Search_and_Replace_Script. id: 125 A small standalone script that..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/ruby-search-and-replace-script.html" rel="bookmark"
+             title="Permalink to "Ruby Search and Replace Script."">"Ruby Search and Replace Script."</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-10-25T12:06:36+01:00">
+                Published: Tue 25 October 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Automation</li>
+<li>Command Line</li>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //125
+url: //125/Ruby_Search_and_Replace_Script.
+id: 125</li>
+</ul>
+<hr>
+<p>A small standalone script that search through a file doing text substitutions.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/usr/bin/env ruby</span>
+<span class="c1"># Usage $ ruby_search_and_replace.rb file_to_update.txt</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">update_file</span><span class="p">(</span><span class="w"> </span><span class="n">file_name</span><span class="w"> </span><span class="p">)</span>
+<span class="w">  </span><span class="nb">puts</span><span class="w"> </span><span class="s2">&quot;Updating : </span><span class="si">#{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="o">::</span><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="w"> </span><span class="n">file_name</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rb&quot;</span><span class="p">){</span><span class="w"> </span><span class="o">|</span><span class="n">f</span><span class="o">|</span><span class="w"> </span><span class="vi">@contents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">  </span><span class="c1">## Replace Renamed thing here</span>
+<span class="w">  </span><span class="c1">#@contents.gsub!(&quot;search&quot;,&quot;replace&quot;)</span>
+
+<span class="w">  </span><span class="o">::</span><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="w"> </span><span class="n">file_name</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;w&quot;</span><span class="w"> </span><span class="p">){</span><span class="w"> </span><span class="o">|</span><span class="n">f</span><span class="o">|</span><span class="w"> </span><span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="w"> </span><span class="vi">@contents</span><span class="w"> </span><span class="p">}</span>
+<span class="k">end</span>
+
+<span class="k">if</span><span class="w"> </span><span class="vg">$0</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="bp">__FILE__</span>
+<span class="w">  </span><span class="c1">#If file is called directly execute</span>
+<span class="w">  </span><span class="n">update_file</span><span class="p">(</span><span class="w"> </span><span class="o">::</span><span class="no">File</span><span class="o">.</span><span class="n">absolute_path</span><span class="p">(</span><span class="w"> </span><span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></td></tr></table></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

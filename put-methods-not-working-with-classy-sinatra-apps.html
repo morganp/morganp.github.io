@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Put methods not working with Classy Sinatra apps"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Ruby Sinatra discuss_url: //80 url: //80/Put_methods_not_working_with_Classy_Sinatra_apps id: 80 Since moving to Classy Sinatra applications I..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/put-methods-not-working-with-classy-sinatra-apps.html" rel="bookmark"
+             title="Permalink to "Put methods not working with Classy Sinatra apps"">"Put methods not working with Classy Sinatra apps"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-11T05:38:06+00:00">
+                Published: Sat 11 December 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Ruby</li>
+<li>Sinatra
+discuss_url: //80
+url: //80/Put_methods_not_working_with_Classy_Sinatra_apps
+id: 80</li>
+</ul>
+<hr>
+<p>Since moving to Classy Sinatra applications I have not been able to get put and delete methods to work correctly. This is because sinatra/base does not include the rack method override 'stuff'.</p>
+<div class="highlight"><pre><span></span><code>require<span class="w"> </span>&#39;rubygems&#39;
+require<span class="w"> </span>&#39;sinatra/base&#39;
+module<span class="w"> </span>MyModule
+<span class="w">  </span>class<span class="w"> </span>MyApp<span class="w"> </span><span class="nt">&lt; Sinatra::Base</span>
+<span class="w">    </span><span class="err">use</span><span class="w"> </span><span class="err">Rack::MethodOverride</span><span class="w"> </span><span class="err">##&lt;--</span><span class="w"> </span><span class="err">Required</span><span class="w"> </span><span class="err">for</span><span class="w"> </span><span class="err">put</span><span class="w"> </span><span class="err">delete</span>
+
+<span class="w">    </span><span class="err">get</span><span class="w"> </span><span class="err">&#39;/&#39;</span><span class="w"> </span><span class="err">do</span>
+<span class="w">    </span><span class="err">&#39;&lt;form</span><span class="w"> </span><span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="w"> </span><span class="na">action=</span><span class="s">&quot;/&quot;</span><span class="nt">&gt;</span>&#39;<span class="w"> </span>+<span class="w"> </span>
+<span class="w">    </span>&#39;<span class="w">  </span><span class="nt">&lt;input</span><span class="w">  </span><span class="na">type=</span><span class="s">&quot;hidden&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;_method&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;put&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>&#39;<span class="w"> </span>+
+<span class="w">    </span>&#39;<span class="w">  </span><span class="nt">&lt;button</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;submit&quot;</span><span class="nt">&gt;</span><span class="w"> </span>Test<span class="w"> </span>PUT<span class="nt">&lt;/button&gt;&lt;br</span><span class="w">  </span><span class="nt">/&gt;</span>&#39;<span class="w"> </span>+
+<span class="w">    </span>&#39;<span class="nt">&lt;/form&gt;</span>&#39;
+<span class="w">    </span>end
+
+<span class="w">    </span>put<span class="w"> </span>&#39;/&#39;<span class="w"> </span>do
+<span class="w">      </span>&#39;PUT<span class="w"> </span>works&#39;
+<span class="w">    </span>end
+<span class="w">  </span>end
+end
+
+if<span class="w"> </span>$0<span class="w"> </span>==<span class="w"> </span>__FILE__
+<span class="w">  </span>MyModule::MyApp.run!
+end
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

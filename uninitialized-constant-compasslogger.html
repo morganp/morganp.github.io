@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"uninitialized constant Compass::Logger"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Active Record Automation Compass Database Gem Migrations Programming Sinatra Sequel discuss_url: //112 url:..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/uninitialized-constant-compasslogger.html" rel="bookmark"
+             title="Permalink to "uninitialized constant Compass::Logger"">"uninitialized constant Compass::Logger"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-23T20:21:03+01:00">
+                Published: Thu 23 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Active Record</li>
+<li>Automation</li>
+<li>Compass</li>
+<li>Database</li>
+<li>Gem</li>
+<li>Migrations</li>
+<li>Programming</li>
+<li>Sinatra</li>
+<li>Sequel
+discuss_url: //112
+url: //112/uninitialized_constant_Compass%3A%3ALogger
+id: 112</li>
+</ul>
+<hr>
+<p>Working on a joint project an error started showing up when trying to perform migrations.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rake<span class="w"> </span>db:migrate<span class="w"> </span><span class="nv">VERSION</span><span class="o">=</span><span class="m">0</span>
+&gt;rake<span class="w"> </span>aborted!
+&gt;uninitialized<span class="w"> </span>constant<span class="w"> </span>Compass::Logger
+</code></pre></div>
+
+<p>The Solution was to add a line to the rake file, to correctly load Compass::Logger, still no idea why rake needed it.</p>
+<div class="highlight"><pre><span></span><code>require &#39;compass/logger&#39;
+</code></pre></div>
+
+<p>Another thing to check might be that compass is being loaded before classes which use it. An issue that can happen in Sinatra and Rails apps.</p>
+<p>Example Gemfile (for <a href="http://gembundler.com/">Bundler</a>)</p>
+<div class="highlight"><pre><span></span><code><span class="n">source</span><span class="w"> </span><span class="o">:</span><span class="n">rubygems</span>
+
+<span class="n">gem</span><span class="w"> </span><span class="s1">&#39;rails&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;3.0.9&#39;</span>
+
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;compass&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;haml-rails&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;pg&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;jquery-rails&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;omniauth&quot;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;~&gt; 0.2.5&#39;</span>
+
+<span class="n">group</span><span class="w"> </span><span class="o">:</span><span class="n">test</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;capybara&quot;</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;factory_girl_rails&quot;</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;test-unit&quot;</span>
+<span class="n">end</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

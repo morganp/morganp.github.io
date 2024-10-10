@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Name Spacing in Matlab"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Matlab Programming A typical work flow in Matlab involves a folder filled with scripts and functions. Over time this folder …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/name-spacing-in-matlab.html" rel="bookmark"
+             title="Permalink to "Name Spacing in Matlab"">"Name Spacing in Matlab"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-09-12T19:51:19+00:00">
+                Published: Thu 12 September 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Matlab</li>
+<li>Programming</li>
+</ul>
+<hr>
+<p>A typical work flow in Matlab involves a folder filled with scripts and functions.
+Over time this folder grows until it becomes completely unmaintainable and 
+dependencies between scripts can not be tracked.</p>
+<p>The next step is to group the related functions into folders in maintainable
+collections. They can then be added to the scripts that require them by adding to 
+Matlabs search path via:</p>
+<div class="highlight"><pre><span></span><code>addpath(&#39;../collection_of_functions_a/&#39;);
+addpath(&#39;../collection_of_functions_b/&#39;);
+</code></pre></div>
+
+<p>The main issue I have with this is that of name spacing when working with third
+party functions or developing your own it would be easy to override other functions
+even internal ones. For toolbox developers it is hard to known all the function names 
+from matlabs toolboxes. After a name collision which one is picked up is 
+dependent on the path order. Other languages often use name spacing to avoid these
+name conflicts.</p>
+<p>Since MATLAB Version 7.6 <a href="http://www.mathworks.co.uk/help/matlab/matlab_oop/scoping-classes-with-packages.html">Packages</a> have been available for just this, adding
+name spacing to classes, but it also works for raw (plain) functions.</p>
+<p>To create a package, as before place functions in a folder, start the folder name
+with a <code>+</code>, ie <code>+mypkg</code> then you have created package mypkg.</p>
+<p>To use the package functions in a script they must be <a href="http://www.mathworks.co.uk/help/matlab/ref/import.html">imported</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mypkg.</span><span class="o">*</span>
+
+<span class="o">%%</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="n">function_x</span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mypkg</span><span class="o">.</span><span class="n">function_x</span><span class="p">()</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+
+<p>As packages themselves can not be on the path you have to <a href="http://www.mathworks.co.uk/help/matlab/matlab_env/files-and-folders-that-matlab-accesses.html">make the parent folder accessible</a>.</p>
+<p>If you have a folder containing a lot of packages then this is quite useful.
+Add one folder to path then import the required packages.</p>
+<p>If the packages are being independently maintained then it is likely that they
+all have separate hierarchy (I think this is good from a development point of 
+view). To avoid adding unnecessary items to your search path I would recommend a
+hierarchy of:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">Top_level_package</span>
+<span class="w">  </span><span class="nx">function</span>
+<span class="w">  </span><span class="o">+</span><span class="nx">my_pkg</span>
+<span class="w">    </span><span class="nx">function_x</span><span class="p">.</span><span class="nx">m</span>
+<span class="w">    </span><span class="nx">function_y</span><span class="p">.</span><span class="nx">m</span>
+<span class="w">  </span><span class="nx">test</span>
+<span class="w">    </span><span class="nx">run_test_function_x</span><span class="p">.</span><span class="nx">m</span>
+<span class="w">    </span><span class="nx">run_test_function_y</span><span class="p">.</span><span class="nx">m</span>
+</code></pre></div>
+
+<p>run_test_function_x.m :</p>
+<div class="highlight"><pre><span></span><code><span class="n">addpath</span><span class="p">(</span><span class="s1">&#39;../function/&#39;</span><span class="p">);</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">my_pkg.function_x</span>
+
+<span class="o">%%</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">function_x</span>
+<span class="o">%</span><span class="w"> </span><span class="o">...</span>
+</code></pre></div>
+
+<p>The downside of this is that every package needs an <code>addpath</code> and <code>import</code>.
+Which you will have unless all your packages live under one parent directory.</p>
+<p>An excerpt from <a href="http://www.mathworks.co.uk/help/matlab/matlab_env/what-is-the-matlab-search-path.html">What is in the Matlab Search Path</a>:</p>
+<blockquote>
+<p>The userpath folder is first on the search path, above the folders supplied by
+MathWorks. By default, MATLAB adds the userpath folder to the search path at
+startup. Therefore, the userpath is convenient for storing files where MATLAB
+can access them.</p>
+<p>The userpath consists of a primary path, and on Macintosh and UNIX® platforms,
+it also contains a secondary path. The primary path is only one folder, but the
+secondary path can contain multiple folders.</p>
+</blockquote>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

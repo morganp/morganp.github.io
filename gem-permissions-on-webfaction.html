@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"gem permissions on WebFaction"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line Gem Programming Ruby WebFaction discuss_url: //89 url: //89/gem_permissions_on_WebFaction id: 89 After making a few updates to my …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/gem-permissions-on-webfaction.html" rel="bookmark"
+             title="Permalink to "gem permissions on WebFaction"">"gem permissions on WebFaction"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-12T14:10:56+00:00">
+                Published: Sat 12 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>Gem</li>
+<li>Programming</li>
+<li>Ruby</li>
+<li>WebFaction
+discuss_url: //89
+url: //89/gem_permissions_on_WebFaction
+id: 89</li>
+</ul>
+<hr>
+<p>After making a few updates to my site I decided to upgrade the version of sinatra I was using in my web faction account. for some reason I started getting these errors:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>update<span class="w"> </span>sinatra
+Updating<span class="w"> </span>installed<span class="w"> </span>gems
+Updating<span class="w"> </span>sinatra
+ERROR:<span class="w">  </span>While<span class="w"> </span>executing<span class="w"> </span>gem<span class="w"> </span>...<span class="w"> </span><span class="o">(</span>Gem::FilePermissionError<span class="o">)</span>
+<span class="w">    </span>You<span class="w"> </span>don<span class="err">&#39;</span>t<span class="w"> </span>have<span class="w"> </span>write<span class="w"> </span>permissions<span class="w"> </span>into<span class="w"> </span>the<span class="w"> </span>/usr/local/ruby1.8.7ee/lib/ruby/gems/1.8<span class="w"> </span>directory.
+</code></pre></div>
+
+<p>This error was resolved by adding this line to my ~/.gemrc file (create it if it does not exist)</p>
+<div class="highlight"><pre><span></span><code> gemhome: /home/webfaction-username/.gem/ruby/1.8
+</code></pre></div>
+
+<p>The results of gem env before and after fix:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>./gem<span class="w"> </span>env
+RubyGems<span class="w"> </span>Environment:
+<span class="w">  </span>-<span class="w"> </span>RUBYGEMS<span class="w"> </span>VERSION:<span class="w"> </span><span class="m">1</span>.3.7
+<span class="w">  </span>-<span class="w"> </span>RUBY<span class="w"> </span>VERSION:<span class="w"> </span><span class="m">1</span>.8.7<span class="w"> </span><span class="o">(</span><span class="m">2009</span>-12-24<span class="w"> </span>patchlevel<span class="w"> </span><span class="m">248</span><span class="o">)</span><span class="w"> </span><span class="o">[</span>i686-linux<span class="o">]</span>
+<span class="w">  </span>-<span class="w"> </span>INSTALLATION<span class="w"> </span>DIRECTORY:<span class="w"> </span>/usr/local/ruby1.8.7ee/lib/ruby/gems/1.8
+<span class="w">  </span>-<span class="w"> </span>RUBY<span class="w"> </span>EXECUTABLE:<span class="w"> </span>/usr/local/ruby1.8.7ee/bin/ruby
+<span class="w">  </span>-<span class="w"> </span>EXECUTABLE<span class="w"> </span>DIRECTORY:<span class="w"> </span>/usr/local/ruby1.8.7ee/bin
+<span class="w">  </span>-<span class="w"> </span>RUBYGEMS<span class="w"> </span>PLATFORMS:
+<span class="w">    </span>-<span class="w"> </span>ruby
+<span class="w">    </span>-<span class="w"> </span>x86-linux
+<span class="w">  </span>-<span class="w"> </span>GEM<span class="w"> </span>PATHS:
+<span class="w">     </span>-<span class="w"> </span>/usr/local/ruby1.8.7ee/lib/ruby/gems/1.8
+<span class="w">     </span>-<span class="w"> </span>/home/webfaction-user/.gem/ruby/1.8
+<span class="w">  </span>-<span class="w"> </span>GEM<span class="w"> </span>CONFIGURATION:
+<span class="w">     </span>-<span class="w"> </span>:update_sources<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="nb">true</span>
+<span class="w">     </span>-<span class="w"> </span>:verbose<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="nb">true</span>
+<span class="w">     </span>-<span class="w"> </span>:benchmark<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="nb">false</span>
+<span class="w">     </span>-<span class="w"> </span>:backtrace<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="nb">false</span>
+<span class="w">     </span>-<span class="w"> </span>:bulk_threshold<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="m">1000</span>
+<span class="w">     </span>-<span class="w"> </span>:sources<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span><span class="s2">&quot;http://rubygems.org&quot;</span>,<span class="w"> </span><span class="s2">&quot;http://gems.github.com&quot;</span><span class="o">]</span>
+<span class="w">     </span>-<span class="w"> </span><span class="s2">&quot;gem&quot;</span><span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="s2">&quot;--no-ri --no-rdoc&quot;</span>
+<span class="w">  </span>-<span class="w"> </span>REMOTE<span class="w"> </span>SOURCES:
+<span class="w">     </span>-<span class="w"> </span>http://rubygems.org
+<span class="w">     </span>-<span class="w"> </span>http://gems.github.com
+</code></pre></div>
+
+<p>After fix</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>~/webapps/passenger/gems/bin/gem<span class="w"> </span>env
+RubyGems<span class="w"> </span>Environment:
+<span class="w">  </span>-<span class="w"> </span>RUBYGEMS<span class="w"> </span>VERSION:<span class="w"> </span><span class="m">1</span>.3.7
+<span class="w">  </span>-<span class="w"> </span>RUBY<span class="w"> </span>VERSION:<span class="w"> </span><span class="m">1</span>.8.7<span class="w"> </span><span class="o">(</span><span class="m">2009</span>-12-24<span class="w"> </span>patchlevel<span class="w"> </span><span class="m">248</span><span class="o">)</span><span class="w"> </span><span class="o">[</span>i686-linux<span class="o">]</span>
+<span class="w">  </span>-<span class="w"> </span>INSTALLATION<span class="w"> </span>DIRECTORY:<span class="w"> </span>/home/webfaction-user/.gem/ruby/1.8
+<span class="w">  </span>-<span class="w"> </span>RUBY<span class="w"> </span>EXECUTABLE:<span class="w"> </span>/usr/local/ruby1.8.7ee/bin/ruby
+<span class="w">  </span>-<span class="w"> </span>EXECUTABLE<span class="w"> </span>DIRECTORY:<span class="w"> </span>/home/webfaction-user/.gem/ruby/1.8/bin
+<span class="w">  </span>-<span class="w"> </span>RUBYGEMS<span class="w"> </span>PLATFORMS:
+<span class="w">    </span>-<span class="w"> </span>ruby
+<span class="w">    </span>-<span class="w"> </span>x86-linux
+<span class="w">  </span>-<span class="w"> </span>GEM<span class="w"> </span>PATHS:
+<span class="w">     </span>-<span class="w"> </span>/home/webfaction-user/.gem/ruby/1.8
+<span class="w">     </span>-<span class="w"> </span>/usr/local/ruby1.8.7ee/lib/ruby/gems/1.8
+<span class="w">  </span>-<span class="w"> </span>GEM<span class="w"> </span>CONFIGURATION:
+<span class="w">     </span>-<span class="w"> </span>:update_sources<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="nb">true</span>
+<span class="w">     </span>-<span class="w"> </span>:verbose<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="nb">true</span>
+<span class="w">     </span>-<span class="w"> </span>:benchmark<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="nb">false</span>
+<span class="w">     </span>-<span class="w"> </span>:backtrace<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="nb">false</span>
+<span class="w">     </span>-<span class="w"> </span>:bulk_threshold<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="m">1000</span>
+<span class="w">     </span>-<span class="w"> </span>:sources<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span><span class="s2">&quot;http://rubygems.org&quot;</span>,<span class="w"> </span><span class="s2">&quot;http://gems.github.com&quot;</span><span class="o">]</span>
+<span class="w">     </span>-<span class="w"> </span><span class="s2">&quot;gem&quot;</span><span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="s2">&quot;--no-ri --no-rdoc&quot;</span>
+<span class="w">     </span>-<span class="w"> </span><span class="s2">&quot;gemhome&quot;</span><span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="s2">&quot;/home/webfaction-user/.gem/ruby/1.8&quot;</span>
+<span class="w">  </span>-<span class="w"> </span>REMOTE<span class="w"> </span>SOURCES:
+<span class="w">     </span>-<span class="w"> </span>http://rubygems.org
+<span class="w">     </span>-<span class="w"> </span>http://gems.github.com
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

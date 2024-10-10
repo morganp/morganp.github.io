@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Ruby Arrays, Part 1"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Programming Ruby discuss_url: //108 url: //108/Ruby_Arrays%2C_Part_1 id: 108 Some uses of Arrays that were not apparent at first …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/ruby-arrays-part-1.html" rel="bookmark"
+             title="Permalink to "Ruby Arrays, Part 1"">"Ruby Arrays, Part 1"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-05-23T23:37:26+01:00">
+                Published: Mon 23 May 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //108
+url: //108/Ruby_Arrays%2C_Part_1
+id: 108</li>
+</ul>
+<hr>
+<p>Some uses of Arrays that were not apparent at first.</p>
+<h2>Enumeration</h2>
+<p><a href="http://ruby-doc.org/core/classes/Array.html#M000231">each</a> is the basic enumerator method but there is also <a href="http://ruby-doc.org/core/classes/Enumerable.html#M001511">each_with_index</a> (and for hashes <a href="http://ruby-doc.org/core/classes/Hash.html#M000741">each_pair</a>)</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="err">&#39;</span>a&#39;<span class="p">,</span> <span class="err">&#39;</span>b&#39;<span class="p">,</span> <span class="err">&#39;</span>c&#39;<span class="p">,</span> <span class="err">&#39;</span>d&#39;<span class="p">]</span><span class="o">.</span>each <span class="p">{</span><span class="err">|</span>item<span class="err">|</span> puts item <span class="p">}</span>
+<span class="p">[</span><span class="err">&#39;</span>a&#39;<span class="p">,</span> <span class="err">&#39;</span>b&#39;<span class="p">,</span> <span class="err">&#39;</span>c&#39;<span class="p">,</span> <span class="err">&#39;</span>d&#39;<span class="p">]</span><span class="o">.</span>each_with_index <span class="p">{</span><span class="err">|</span>item<span class="p">,</span>index<span class="err">|</span> puts <span class="s2">&quot;#{index}:#{item}&quot;</span> <span class="p">}</span>
+<span class="p">{:</span><span class="ss">a</span><span class="o">=&gt;</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="ss">b</span><span class="o">=&gt;</span><span class="mi">2</span><span class="p">}</span><span class="o">.</span>each_pair <span class="p">{</span><span class="err">|</span>key<span class="p">,</span>value<span class="err">|</span> puts <span class="s2">&quot;#{key}=&gt;#{value}&quot;</span> <span class="p">}</span>
+</code></pre></div>
+
+<h2>Sorting</h2>
+<p>Sort is very easy with ruby if you want a basic sort [4,5,3,2,7].sort will do. However sorting by any key is possible using sort_by. Sort_by performs a <a href="http://amaras-tech.co.uk/people/morgan/article/98">Schwartzian Transform</a></p>
+<div class="highlight"><pre><span></span><code>[&#39;a&#39;,&#39;B&#39;,&#39;D&#39;,&#39;c&#39;].sort
+<span class="gh">#</span>=&gt; [&quot;B&quot;, &quot;D&quot;, &quot;a&quot;, &quot;c&quot;]
+[&#39;a&#39;,&#39;B&#39;,&#39;D&#39;,&#39;c&#39;].sort_by {|x| x.downcase }
+<span class="gh">#</span>=&gt; [&quot;a&quot;, &quot;B&quot;, &quot;c&quot;, &quot;D&quot;]
+</code></pre></div>
+
+<h2>Return Arrays</h2>
+<p>When you want an array, map modifies the contents of each element:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="w"> </span><span class="p">{</span><span class="o">|</span><span class="n">i</span><span class="o">|</span><span class="w"> </span><span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="w"> </span><span class="p">}</span>
+<span class="c1">#=&gt; [2,4,6,8]</span>
+<span class="c1"># or with any enumerable (Range)</span>
+<span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="w"> </span><span class="p">{</span><span class="o">|</span><span class="n">i</span><span class="o">|</span><span class="w"> </span><span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>select and reject can be used to select and remove elements from the enumerable, and return a new enumerable, they are immutable methods.</p>
+<div class="highlight"><pre><span></span><code>[0,1,2,3,4,5].select { |x| x &gt; 2 }
+#=&gt; [3,4,5]
+[0,1,2,3,4,5].reject { |x| x &lt; 3 }
+#=&gt; [3,4,5]
+</code></pre></div>
+
+<p>select! and reject! (bang operators) modify the existing enumerable. They have more natural names that I think should be used when appropriate, keep_if and delete_if.</p>
+<div class="highlight"><pre><span></span><code>[0,1,2,3,4,5].keep_if { |x| x &gt; 2 }
+<span class="gh">#</span>=&gt; [3,4,5]
+[0,1,2,3,4,5].delete_if { |x| x &lt; 3 }
+<span class="gh">#</span>=&gt; [3,4,5]
+</code></pre></div>
+
+<h2>Reduction to a Single Value</h2>
+<p>inject can be called on any enumerable object, it iterates over each item with an accumulator.</p>
+<div class="highlight"><pre><span></span><code>[1,2,3,4].inject {|memory, item| memory * (item+1) }
+</code></pre></div>
+
+<p>For basic operations there is the reduce method which can be used for summing and multiplying out the arrays.</p>
+<p>Sum:</p>
+<div class="highlight"><pre><span></span><code> [1,2,3,4].reduce :+
+</code></pre></div>
+
+<p>Multiply:</p>
+<div class="highlight"><pre><span></span><code>[1,2,3,4].reduce :*
+</code></pre></div>
+
+<h2>Booleans</h2>
+<p><a href="http://ruby-doc.org/core/classes/Enumerable.html#M001510">include?</a> is used to check if the array contains the supplied object.</p>
+<div class="highlight"><pre><span></span><code>[<span class="s1">&#39;a&#39;</span>,<span class="s1">&#39;b&#39;</span>,<span class="s1">&#39;c&#39;</span>].<span class="k">include</span>?<span class="ss">(</span><span class="w"> </span><span class="s1">&#39;b&#39;</span><span class="w"> </span><span class="ss">)</span>
+#<span class="o">=&gt;</span><span class="w"> </span><span class="nv">true</span>
+</code></pre></div>
+
+<p><a href="http://ruby-doc.org/core/classes/Enumerable.html#M001499">all?</a> and <a href="http://ruby-doc.org/core/classes/Enumerable.html#M001500">any?</a> can be used to check if the array matches against given criteria.</p>
+<div class="highlight"><pre><span></span><code>[1,2,3,4].any?{|x| x &gt; 3 }
+#=&gt; true
+[1,2,3,4].all?{|x| x &gt; 3 }
+#=&gt; false
+[1,2,3,4].any?{|x| x &gt; 5 }
+#=&gt; false
+[1,2,3,4].all?{|x| x &gt; 0 }
+#=&gt; true
+</code></pre></div>
+
+<p>I often use <a href="http://ruby-doc.org/core/classes/Enumerable.html#M001500">any?</a> with an array of regular expressions to match a string to any item.</p>
+<div class="highlight"><pre><span></span><code><span class="n">text</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;one&quot;</span>
+<span class="n">search</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">/</span><span class="n">one</span><span class="o">/</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="n">two</span><span class="o">/</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="n">three</span><span class="o">/</span><span class="p">]</span>
+<span class="n">found</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">search</span><span class="p">.</span><span class="n">any</span><span class="o">?</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">|</span><span class="n">regexp</span><span class="o">|</span><span class="w"> </span><span class="n">text</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="w"> </span><span class="n">regexp</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="p">#</span><span class="o">=&gt;</span><span class="w"> </span><span class="n">true</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

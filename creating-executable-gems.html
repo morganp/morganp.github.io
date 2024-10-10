@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Creating executable gems"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Gem Programming Ruby discuss_url: //43 url: //43/Creating_executable_gems id: 43 This is not necessarily the correct way of creating executable …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/creating-executable-gems.html" rel="bookmark"
+             title="Permalink to "Creating executable gems"">"Creating executable gems"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-21T08:43:48+01:00">
+                Published: Mon 21 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Gem</li>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //43
+url: //43/Creating_executable_gems
+id: 43</li>
+</ul>
+<hr>
+<p>This is not necessarily the correct way of creating executable gems but a method which worked for me.</p>
+<p>Assuming we are working in folder just for this gem we need a structure like this:</p>
+<div class="highlight"><pre><span></span><code>my_gem/
+   my_gem.gemspec
+   bin/
+      my_gem #&lt;-script with no file extension
+   lib/
+      my_gem.rb #&lt;- Actual class file
+</code></pre></div>
+
+<p>my_gem.gemspec</p>
+<div class="highlight"><pre><span></span><code><span class="nx">require</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">rake</span><span class="o">/</span><span class="nx">gempackagetask</span><span class="err">&#39;</span>
+<span class="nx">spec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">Gem</span><span class="o">::</span><span class="nx">Specification</span><span class="p">.</span><span class="nx">new</span><span class="w"> </span><span class="nx">do</span><span class="w"> </span><span class="o">|</span><span class="nx">s</span><span class="o">|</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">name</span><span class="w">         </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">my_gem</span><span class="err">&#39;</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">version</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="m m-Double">0.0.1</span><span class="err">&#39;</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">platform</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="nx">Gem</span><span class="o">::</span><span class="nx">Platform</span><span class="o">::</span><span class="nx">RUBY</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">summary</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">Report</span><span class="w"> </span><span class="nx">memory</span><span class="w"> </span><span class="nx">usage</span><span class="w"> </span><span class="nx">on</span><span class="w"> </span><span class="nx">Mac</span><span class="w"> </span><span class="nx">OS</span><span class="w"> </span><span class="nx">X</span><span class="p">,</span><span class="w"> </span><span class="nx">Linux</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="nx">Unix</span><span class="p">.</span><span class="err">&#39;</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">homepage</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">http</span><span class="p">:</span><span class="c1">//amaras-tech.co.uk/software/memory_usage&#39;</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">authors</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;Morgan Prior&quot;</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">email</span><span class="w">        </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;memory_usage_gem@amaras-tech.co.uk&quot;</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">description</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;Reports memory used by all current user processes&quot;</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">files</span><span class="w">        </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="err">&#39;</span><span class="nx">bin</span><span class="o">/</span><span class="nx">my_gem</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">lib</span><span class="o">/</span><span class="nx">my_gem</span><span class="p">.</span><span class="nx">rb</span><span class="err">&#39;</span><span class="p">]</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">bindir</span><span class="w">       </span><span class="p">=</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">bin</span><span class="err">&#39;</span><span class="w">   </span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">executables</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="err">&#39;</span><span class="nx">my_gem</span><span class="err">&#39;</span><span class="p">]</span>
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">has_rdoc</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="w">   </span><span class="nx">s</span><span class="p">.</span><span class="nx">post_install_message</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;To use &#39;my_gem&#39; as a standalone application your gems folder must be on your path&quot;</span><span class="w">   </span>
+<span class="nx">end</span>
+<span class="nx">Rake</span><span class="o">::</span><span class="nx">GemPackageTask</span><span class="p">.</span><span class="nx">new</span><span class="p">(</span><span class="nx">spec</span><span class="p">).</span><span class="nx">define</span>
+</code></pre></div>
+
+<p>bin/my_gem</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/usr/bin/env ruby</span>
+
+<span class="nb">require</span><span class="w"> </span><span class="s1">&#39;rubygems&#39;</span>
+<span class="nb">require</span><span class="w"> </span><span class="s1">&#39;my_gem&#39;</span>
+
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">MyGem</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">ARGV</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">report</span>
+</code></pre></div></td></tr></table></div>
+
+<p>lib/my_gem.rb</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="n">MyGem</span>
+<span class="w">    </span><span class="n">#Any</span><span class="w"> </span><span class="n">command</span><span class="w"> </span><span class="n">Line</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="k">are</span><span class="w"> </span><span class="n">passed</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="k">array</span><span class="w"> </span><span class="n">argv</span>
+<span class="w">    </span><span class="err">#</span><span class="w"> </span><span class="n">You</span><span class="w"> </span><span class="n">cannot</span><span class="w"> </span><span class="n">have</span><span class="w"> </span><span class="n">arguments</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">CONSTANTS</span><span class="w"> </span><span class="n">plus</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">was</span><span class="w"> </span>
+<span class="w">    </span><span class="err">#</span><span class="w"> </span><span class="n">ARGV</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">would</span><span class="w"> </span><span class="n">clash</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">built</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">ARGV</span><span class="p">.</span>
+<span class="w">    </span><span class="n">def</span><span class="w"> </span><span class="k">initialize</span><span class="p">(</span><span class="n">argv</span><span class="o">=[</span><span class="n">&quot;&quot;</span><span class="o">]</span><span class="p">)</span>
+<span class="w">      </span><span class="nv">@msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;HelloWorld!&quot;</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="n">def</span><span class="w"> </span><span class="n">report</span>
+<span class="w">       </span><span class="n">puts</span><span class="w"> </span><span class="nv">@msg</span><span class="p">.</span><span class="n">to_s</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w"> </span><span class="k">end</span>
+</code></pre></div>
+
+<p>Then :</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>build<span class="w"> </span>my_gem.gemspec
+</code></pre></div>
+
+<p>and you can test the install via:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>install<span class="w"> </span>my_gem-0.0.1.gem
+</code></pre></div>
+
+<p>Test then uninstall:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>uninstall<span class="w"> </span>my_gem
+</code></pre></div>
+
+<p>Push to RubyGems:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>push<span class="w"> </span>my_gem-0.0.1.gem
+</code></pre></div>
+
+<p>Then install from ruby Gem:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>install<span class="w"> </span>my_gem
+</code></pre></div>
+
+<p>Done, Remember to replace 'my_gem' with a unique but relevant name.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

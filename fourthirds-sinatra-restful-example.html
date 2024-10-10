@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"FourThirds Sinatra RESTful example"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Programming Ruby Sinatra discuss_url: //4 url: //4/FourThirds_Sinatra_RESTful_example id: 4 This is an example of efficient use of views in …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/fourthirds-sinatra-restful-example.html" rel="bookmark"
+             title="Permalink to "FourThirds Sinatra RESTful example"">"FourThirds Sinatra RESTful example"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Programming</li>
+<li>Ruby</li>
+<li>Sinatra
+discuss_url: //4
+url: //4/FourThirds_Sinatra_RESTful_example
+id: 4</li>
+</ul>
+<hr>
+<p>This is an example of efficient use of views in <a href="http://www.sinatrarb.com">Sinatra</a> covering RESTful actions. This is a copy of my <a href="http://github.com/morganp/FourThirds/">original post on GitHub</a>. Data will retrieved and modified from a database using ORMs, I have a set of lessons and answers you can follow if you wish to <a href="http://github.com/morganp/Code-Dojo/tree/master/ORM/">learn more about</a> this.</p>
+<p>The basic layout of a Sinatra application is:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">app</span>.<span class="nv">rb</span><span class="w">     </span>#<span class="nv">Contains</span><span class="w"> </span><span class="nv">Routes</span>,<span class="w"> </span><span class="nv">Controller</span><span class="w"> </span><span class="nv">and</span><span class="w"> </span><span class="nv">ORM</span><span class="w"> </span><span class="nv">Models</span>
+<span class="nv">config</span>.<span class="nv">ru</span><span class="w">  </span>#<span class="nv">Contains</span><span class="w"> </span><span class="nv">Information</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">rack</span><span class="w"> </span><span class="nv">web</span><span class="w"> </span><span class="nv">server</span>
+<span class="nv">db</span><span class="o">/</span><span class="nv">data</span>.<span class="nv">db</span><span class="w"> </span>#<span class="nv">The</span><span class="w"> </span><span class="nv">Database</span>
+<span class="nv">public</span><span class="o">/</span><span class="w">    </span>#<span class="nv">Static</span><span class="w"> </span><span class="nv">non</span><span class="w"> </span><span class="nv">template</span><span class="w"> </span><span class="nv">data</span>.
+<span class="nv">views</span><span class="o">/</span><span class="w">     </span>#<span class="nv">ERB</span>,<span class="w"> </span><span class="nv">HAML</span><span class="w"> </span><span class="nv">etc</span><span class="w"> </span><span class="nv">web</span><span class="w"> </span><span class="nv">page</span><span class="w"> </span><span class="nv">templates</span>
+<span class="nv">views</span><span class="o">/</span><span class="nv">layout</span>.<span class="nv">erb</span><span class="w"> </span>#<span class="nv">The</span><span class="w"> </span><span class="nv">default</span><span class="w"> </span><span class="nv">structural</span><span class="w"> </span><span class="nv">template</span><span class="w"> </span><span class="nv">applied</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">all</span><span class="w"> </span><span class="nv">ERB</span><span class="w"> </span><span class="nv">pages</span>
+</code></pre></div>
+
+<p>Gem is Rubys package management system. They do not install automatically so you do need to install them first. Check what you already have by running:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>list
+</code></pre></div>
+
+<p>I have (shortened list) versions:</p>
+<div class="highlight"><pre><span></span><code>activerecord (2.3.5)
+activeresource (2.3.5)
+activesupport (2.3.5)
+sequel (3.8.0, 3.7.0)
+sinatra (0.9.6, 0.9.4)
+sqlite3-ruby (1.2.5)
+</code></pre></div>
+
+<p>For this example you will need:</p>
+<div class="highlight"><pre><span></span><code>gem install sequel
+gem install activerecord
+gem install sinatra
+gem install sqlite3-ruby
+</code></pre></div>
+
+<p>To run this example you should be able to:</p>
+<div class="highlight"><pre><span></span><code>cd ~/your/local/code/dir
+git clone http://github.com/morganp/FourThirds.git 
+cd FourThirds 
+<span class="gh">#</span>Initialise SQLite3 Database
+ruby init_db.rb
+<span class="gh">#</span>Run app on Webrick access via http://127.0.0.1:4567/
+ruby app.rb
+</code></pre></div>
+
+<p>This should be accessible on <a href="http://127.0.0.1:4567/">http://127.0.0.1:4567/</a></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

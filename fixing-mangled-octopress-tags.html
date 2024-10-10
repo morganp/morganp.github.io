@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Fixing Mangled Octopress Tags"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Octopress Command Line When creating my blog I have been inconsistent with the tag command line, Command line and Command …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/fixing-mangled-octopress-tags.html" rel="bookmark"
+             title="Permalink to "Fixing Mangled Octopress Tags"">"Fixing Mangled Octopress Tags"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-01T20:59:40+01:00">
+                Published: Tue 01 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Octopress</li>
+<li>Command Line</li>
+</ul>
+<hr>
+<p>When creating my blog I have been inconsistent with the tag <code>command line</code>, <code>Command line</code> and
+<code>Command Line</code> the case in-sensitvities are not picked up in Octopress generation. To some
+extent my <a href="">Downcase plugin</a> hides these differences. The tags page only lists those with full
+downcase, but handles all other mixed case tags.</p>
+<p>This has lead to some posts dropping off the tag listing, which are just not accessible this way.</p>
+<p>The easy fix is to standardise my use of the tag.</p>
+<p>First investigate: List posts containing the downcased version:</p>
+<div class="highlight"><pre><span></span><code>grep -R &#39;\- command line&#39; *
+</code></pre></div>
+
+<p>Correct all :</p>
+<div class="highlight"><pre><span></span><code><span class="n">find</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">_posts</span><span class="w"> </span><span class="o">-</span><span class="n">type</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">-</span><span class="n">print0</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">xargs</span><span class="w"> </span><span class="o">-</span><span class="n">I</span><span class="err">{}</span><span class="w"> </span><span class="n">sed</span><span class="w"> </span><span class="o">-</span><span class="n">i</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="s1">&#39;s/\- [Cc]ommand [Ll]ine/\- Command Line/g&#39;</span><span class="w"> </span><span class="err">{}</span>
+</code></pre></div>
+
+<p><code>find</code> outputs all files in folder ‘./‘ Actually had some trouble rerunning this find command so simplified it to :</p>
+<div class="highlight"><pre><span></span><code><span class="n">ls</span><span class="w"> </span><span class="n">source</span><span class="o">/</span><span class="n">_posts</span><span class="cm">/*.markdown | xargs -I{} sed -i &#39;&#39; &#39;s/\- [Cc]ommand [Ll]ine/\- Command Line/g&#39; {}</span>
+</code></pre></div>
+
+<p><strong>xargs</strong> option <code>i{}</code> takes the input argument and repeats it in the following command where the
+<code>{}</code> are placed. <code>find</code> has a built in <code>-exec</code> option but using xargs allows the first <code>find</code>
+command to be replaced with <code>grep</code> or <code>ls</code> if required.</p>
+<p><strong>Sed</strong> options </p>
+<ol>
+<li><code>g</code> Replace all the instances</li>
+<li><code>-i ‘’</code> Edits inplace without appending a new file extension.</li>
+</ol>
+<p>On a Mavericks the default see does not support case insensitive search,
+therefore I have enclosed the first letter of each word with options for lower and upper case.</p>
+<p>After performing the updates the tag text is updated to <code>Command Line</code> and the url is
+<a href="/tag/command-line/"><code>tag/command-line/</code></a>, which lists all of the tagged posts. </p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

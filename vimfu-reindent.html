@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Vimfu Reindent"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Programming Vim discuss_url: //101 url: //101/Vimfu_Reindent id: 101 The latest addition to my .vimrc below, allows ;g to smart …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/vimfu-reindent.html" rel="bookmark"
+             title="Permalink to "Vimfu Reindent"">"Vimfu Reindent"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-19T19:55:19+01:00">
+                Published: Tue 19 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Programming</li>
+<li>Vim
+discuss_url: //101
+url: //101/Vimfu_Reindent
+id: 101</li>
+</ul>
+<hr>
+<p>The latest addition to <a href="https://github.com/morganp/dotfiles/blob/master/dotfiles/.vimrc#L197">my .vimrc</a> below, allows ;g to smart indent the current file. It is the same as gg=G but returning you to the same position. </p>
+<p>Update based on Recommendations from <a href="http://drewneil.com/">Drew Neil</a> and <a href="http://technotales.wordpress.com/2010/03/31/preserve-a-vim-function-that-keeps-your-state/">Jonathan Palardy</a>, a more generic pereserving state function, which can be mapped to a key sequence with specific commands.</p>
+<div class="highlight"><pre><span></span><code><span class="k">function</span><span class="nf">! Preserve</span><span class="p">(</span>command<span class="p">)</span>
+<span class="w">  </span><span class="s">&quot; Preparation: save last search, and cursor position.</span>
+<span class="s">  let _s=@/</span>
+<span class="s">  let l = line(&quot;</span><span class="p">.</span><span class="s">&quot;)</span>
+<span class="s">  let c = col(&quot;</span><span class="p">.</span><span class="s">&quot;)</span>
+<span class="s">  &quot;</span><span class="w"> </span><span class="n">Do</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">business</span><span class="p">:</span>
+<span class="w">  </span><span class="n">execute</span><span class="w"> </span><span class="n">a</span><span class="p">:</span><span class="n">command</span>
+<span class="w">  </span><span class="s">&quot; Clean up: restore previous search history, and cursor position</span>
+<span class="s">  let @/=_s</span>
+<span class="s">  call cursor(l, c)</span>
+<span class="s">endfunction</span>
+
+<span class="s">&quot;</span><span class="w"> </span><span class="n">SmartIndent</span><span class="w"> </span><span class="n">keeping</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="n">position</span>
+<span class="n">map</span><span class="w"> </span><span class="p">;</span><span class="n">g</span><span class="w"> </span><span class="s">:call</span><span class="w"> </span><span class="s">Preserve(&quot;normal!</span><span class="w"> </span><span class="s">gg=G&quot;)&lt;CR&gt;</span>
+</code></pre></div>
+
+<p>If this does not work for a particular file type you use you probably need to look at getting a *.syntax file for your language.</p>
+<h2>My Original Method</h2>
+<div class="highlight"><pre><span></span><code><span class="k">function</span><span class="nf">! Indent</span><span class="p">()</span>
+<span class="w">  </span><span class="s">&quot; Capture Current Line</span>
+<span class="s">  let currentline_num = line(&quot;</span><span class="p">.</span><span class="s">&quot;)</span>
+<span class="s">  let currentcol_num = virtcol(&#39;.&#39;)</span>
+
+<span class="s">  &quot;</span><span class="w"> </span><span class="n">Reindent</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="nb">start</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="k">end</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">file</span>
+<span class="w">   </span><span class="n">normal</span>!<span class="w"> </span><span class="n">gg</span><span class="p">=</span><span class="n">G</span>
+
+<span class="w">   </span><span class="s">&quot; Restore Current Line and column</span>
+<span class="s">   exe &#39;normal &#39;.currentline_num.&#39;G&#39;.currentcol_num.&#39;|&#39;</span>
+<span class="s">endfunction</span>
+
+<span class="s">&quot;</span><span class="n">assign</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="p">;</span><span class="n">g</span><span class="w"> </span><span class="s">in</span><span class="w"> </span><span class="s">normal</span><span class="w"> </span><span class="s">mode</span>
+<span class="n">map</span><span class="w"> </span><span class="p">;</span><span class="n">g</span><span class="w"> </span><span class="s">:call</span><span class="w"> </span><span class="s">Indent()&lt;CR&gt;</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

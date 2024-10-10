@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Sinatra application in ./lib and views, public routes not working"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Heroku Programming Rack Ruby Sinatra Web WebFaction discuss_url: //149 url:..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/sinatra-application-in-lib-and-views-public-routes-not-working.html" rel="bookmark"
+             title="Permalink to "Sinatra application in ./lib and views, public routes not working"">"Sinatra application in ./lib and views, public routes not working"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-20T23:26:34+01:00">
+                Published: Fri 20 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Heroku</li>
+<li>Programming</li>
+<li>Rack</li>
+<li>Ruby</li>
+<li>Sinatra</li>
+<li>Web</li>
+<li>WebFaction
+discuss_url: //149
+url: //149/Sinatra_application_in_.%2Flib_and_views%2C_public_routes_not_working
+id: 149</li>
+</ul>
+<hr>
+<p>I have been setting up my recent Sinatra projects with a standard ruby project layout putting all of the application code within a lib folder. When running locally I have been cding in to the lib folder and just running: </p>
+<div class="highlight"><pre><span></span><code>ruby app.rb
+</code></pre></div>
+
+<p>I often found that when deploying (WebFaction or Heroku) that I had to make several attempts to get the config.ru correct. I then found that thin can load and run using the config.ru.</p>
+<div class="highlight"><pre><span></span><code>thin start --port 4567 -R config.ru
+</code></pre></div>
+
+<p>Which worked until I tried it on a non trivial application which used (erb) templates and then I started seeing these errors, when viewing 127:0.0.1:4567</p>
+<div class="highlight"><pre><span></span><code>Errno::ENOENT at /
+No such file or directory - ./views/home.erb
+file: template.rb location: binread line: 67
+</code></pre></div>
+
+<p>The problem is that we are now a level above where we use to be, not sure whay this has never been a problem in production before. </p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span> <span class="n">AnotherWebApp</span>
+  <span class="n">VERSION</span> = <span class="s">&#39;0.0.1&#39;</span>
+  <span class="k">class</span> <span class="n">App</span> &lt; <span class="n">Sinatra::Base</span>
+    <span class="k">use</span> <span class="n">Rack::MethodOverride</span>
+    <span class="c1">#set :public_folder, &quot;public&quot; # &lt;-- Old version</span>
+    <span class="n">set</span> :<span class="n">public_folder</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/public&quot;</span>   <span class="c1"># &lt;-- New Version</span>
+
+    <span class="c1"># Older ersions of Thin/Sinatra May require</span>
+    <span class="n">set</span> :<span class="n">public</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/public&quot;</span>              <span class="c1"># &lt;-- public changed to public_folder in newer release</span>
+    <span class="n">set</span> :<span class="n">views</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/views&quot;</span>                <span class="c1"># &lt;-- Need to set View</span>
+
+    <span class="nb">get</span> <span class="s">&#39;/&#39;</span> <span class="nb">do</span>
+      <span class="n">erb</span> :<span class="n">home</span>
+    <span class="nb">end</span>
+
+  <span class="nb">end</span>
+<span class="nb">end</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

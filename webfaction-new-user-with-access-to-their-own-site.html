@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Webfaction new user with access to their own site"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="WebFaction discuss_url: //21 url: //21/Webfaction_new_user_with_access_to_their_own_site id: 21 With Webfaction you can create new users with..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/webfaction-new-user-with-access-to-their-own-site.html" rel="bookmark"
+             title="Permalink to "Webfaction new user with access to their own site"">"Webfaction new user with access to their own site"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-28T09:24:58+01:00">
+                Published: Wed 28 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>WebFaction
+discuss_url: //21
+url: //21/Webfaction_new_user_with_access_to_their_own_site
+id: 21</li>
+</ul>
+<hr>
+<p>With <a href="http://www.webfaction.com/?affiliate=morgy">Webfaction</a> you can create new users with there own home area but there is no straight forward way to host their site.</p>
+<p>There is a posted method where the site is hosted in YOUR home/webapps directory, but that requires you reset your permissions every time you create a new site and if you forget there could be a security hole.</p>
+<p>Hosting the site in THEIR home directory requires you to set permissions in there directory so YOU can see it. This is much safer if all goes wrong the site does not have permission to be displayed rather than compromising your new site.</p>
+<p>Create new user with bash login via with <a href="http://panel.webfaction.com">Web interface</a> </p>
+<p>set password, as this can be tricky getting a random string a cheat is to do:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">echo</span><span class="w"> </span><span class="s2">&quot;some random string&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nv">md5</span>
+</code></pre></div>
+
+<p>Choose 8 or more characters for the password.</p>
+<p>SSH login as normal </p>
+<div class="highlight"><pre><span></span><code><span class="n">ssh</span><span class="w"> </span><span class="k">user</span><span class="nv">@user</span><span class="p">.</span><span class="n">webfactional</span><span class="p">.</span><span class="n">com</span>
+</code></pre></div>
+
+<p>then</p>
+<div class="highlight"><pre><span></span><code>su new_user
+cd ~
+mkdir myweb.com
+</code></pre></div>
+
+<p>then set  </p>
+<div class="highlight"><pre><span></span><code>setfacl -m u:nginx:rx ~
+setfacl -R -m u:nginx:rx myweb.com/
+
+setfacl -m u:apache:rx ~
+setfacl -R -m u:apache:rx myweb.com/
+
+setfacl -m u:Your_Username:rx ~
+setfacl -R -m u:Your_Username:rx myweb.com/
+</code></pre></div>
+
+<p>Back to <a href="http://www.webfaction.com/?affiliate=morgy">webfaction</a> main control panel and create a new app ( symbolic link to PHP/static )</p>
+<p>The info section for this needs to be:
+/home/new_user/myweb.com</p>
+<p>NB: currently only works with apache not nginx</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

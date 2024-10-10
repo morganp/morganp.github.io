@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Sinatra Heroku and config.ru"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line Heroku Programming Rack Ruby Sinatra discuss_url: //78 url: //78/Sinatra_Heroku_and_config.ru id: 78 Rack applications often require a …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/sinatra-heroku-and-configru.html" rel="bookmark"
+             title="Permalink to "Sinatra Heroku and config.ru"">"Sinatra Heroku and config.ru"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-11-03T16:43:22+00:00">
+                Published: Wed 03 November 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>Heroku</li>
+<li>Programming</li>
+<li>Rack</li>
+<li>Ruby</li>
+<li>Sinatra
+discuss_url: //78
+url: //78/Sinatra_Heroku_and_config.ru
+id: 78</li>
+</ul>
+<hr>
+<p>Rack applications often require a config.ru for deployment. The standard config.ru for classic sinatra applications is well documented:</p>
+<div class="highlight"><pre><span></span><code>require &#39;app&#39;
+run Sinatra::Application
+</code></pre></div>
+
+<p>The requirments for classy apps is not very well documented, currently I use this on heroku:</p>
+<div class="highlight"><pre><span></span><code>#<span class="k">For</span><span class="w"> </span><span class="nv">Ruby</span><span class="w"> </span><span class="mi">1</span>.<span class="mi">8</span>.<span class="mi">7</span><span class="w"> </span><span class="ss">(</span><span class="nv">the</span><span class="w"> </span><span class="mi">1</span>.<span class="mi">9</span>.<span class="mi">2</span><span class="w"> </span><span class="nv">version</span><span class="w"> </span><span class="nv">should</span><span class="w"> </span><span class="nv">also</span><span class="w"> </span><span class="nv">work</span><span class="ss">)</span><span class="w"> </span><span class="nv">on</span><span class="w"> </span><span class="nv">Heroku</span>
+<span class="nv">require</span><span class="w"> </span><span class="s1">&#39;app&#39;</span>
+<span class="nv">run</span><span class="w"> </span><span class="nv">MyModule</span>::<span class="nv">MyApp</span>
+</code></pre></div>
+
+<p>After trying Ruby 1.9.2 I had to add ./ to my app require. The current directory has been removed from the load path adding ./ removes the problem because it explicitly defines the path.</p>
+<div class="highlight"><pre><span></span><code>#<span class="k">For</span><span class="w"> </span><span class="nv">Ruby</span><span class="w"> </span><span class="mi">1</span>.<span class="mi">9</span>.<span class="mi">2</span><span class="w"> </span><span class="nv">on</span><span class="w"> </span><span class="nv">Heroku</span>
+<span class="nv">require</span><span class="w"> </span><span class="s1">&#39;./app&#39;</span>
+<span class="nv">run</span><span class="w"> </span><span class="nv">MyModule</span>::<span class="nv">MyApp</span>
+</code></pre></div>
+
+<p>For a sinatra Application which may look like:</p>
+<div class="highlight"><pre><span></span><code>require &#39;sinatra/base&#39;
+module MyModule
+  class MyApp &lt; Sinatra::Base
+    get &#39;/&#39; do
+      &#39;HelloWorld!&#39;
+    end
+  end
+end
+
+<span class="gh">#</span>if file called directly launch app (ie ruby my_app.rb)
+if $0 == __FILE__
+  MyModule::MyApp.run!
+end
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

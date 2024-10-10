@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"rake aborted! undefined method `info' for nil:NilClass"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Heroku Migrations Ruby Sinatra discuss_url: //79 url: //79/rake_aborted%21_undefined_method_%60info%27_for_nil%3ANilClass id: 79 I am currently..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/rake-aborted-undefined-method-info-for-nilnilclass.html" rel="bookmark"
+             title="Permalink to "rake aborted! undefined method `info' for nil:NilClass"">"rake aborted! undefined method `info' for nil:NilClass"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-11-04T11:24:05+00:00">
+                Published: Thu 04 November 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Heroku</li>
+<li>Migrations</li>
+<li>Ruby</li>
+<li>Sinatra
+discuss_url: //79
+url: //79/rake_aborted%21_undefined_method_%60info%27_for_nil%3ANilClass
+id: 79</li>
+</ul>
+<hr>
+<p>I am currently switching between runing migrations locally on an sqlite3 database and postgres for production on Heroku.</p>
+<p>When switching back to a local sqlite3 I got this error when running the migration.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rake<span class="w"> </span>db:migrate
+
+<span class="o">(</span><span class="k">in</span><span class="w"> </span>/Users/path/to/top/level<span class="o">)</span>
+**<span class="w"> </span>Invoke<span class="w"> </span>db:migrate<span class="w"> </span><span class="o">(</span>first_time<span class="o">)</span>
+**<span class="w"> </span>Invoke<span class="w"> </span>environment<span class="w"> </span><span class="o">(</span>first_time<span class="o">)</span>
+**<span class="w"> </span>Execute<span class="w"> </span>environment
+**<span class="w"> </span>Execute<span class="w"> </span>db:migrate
+rake<span class="w"> </span>aborted!
+undefined<span class="w"> </span>method<span class="w"> </span><span class="sb">`</span>info<span class="err">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>nil:NilClass
+</code></pre></div>
+
+<p>The error I found through <a href="http://stackoverflow.com/questions/1719212/undefined-method-info-for-nilnilclass-when-running-active-record-migration">Stackoverflow</a> was that I had not defined a logger.</p>
+<p>My rakefile.rb for sinatra applications to run activerecord migrations.</p>
+<div class="highlight"><pre><span></span><code>require &#39;rubygems&#39;
+require &#39;rake&#39;
+require &#39;active_record&#39;
+
+namespace :db do
+  desc &quot;Migrate the database through scripts in db/migrate. Target specific version with VERSION=x&quot;
+  task :migrate =&gt; :environment do
+    ActiveRecord::Migrator.migrate(&#39;db/migrate&#39;, ENV[&quot;VERSION&quot;] ? ENV[&quot;VERSION&quot;].to_i : nil )
+  end
+end
+
+task :environment do
+  ActiveRecord::Base.establish_connection(
+    :adapter =&gt; &#39;sqlite3&#39;,
+    :database =&gt; &#39;db/local.db&#39;
+  )
+  ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;a&#39;))
+
+ # ActiveRecord::Base.establish_connection(
+ #     :adapter  =&gt; &#39;postgresql&#39;,
+ #     :host     =&gt; &#39;host&#39;,
+ #     :username =&gt; &#39;user&#39;,
+ #     :password =&gt; &#39;pass&#39;,
+ #     :database =&gt; &#39;db&#39;
+ # )
+
+end
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

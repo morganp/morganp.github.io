@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Vim: Status line"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Vim discuss_url: //244 url: //244/Vim%3A_Status_line id: 244 Deciding to see if I could make my vim status line …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/vim-status-line.html" rel="bookmark"
+             title="Permalink to "Vim: Status line"">"Vim: Status line"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-12-17T19:04:42+00:00">
+                Published: Tue 17 December 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Vim
+discuss_url: //244
+url: //244/Vim%3A_Status_line
+id: 244</li>
+</ul>
+<hr>
+<p>Deciding to see if I could make my vim status line a bit more practical for myself. I decided to try having the modification '[+]' warning as the first thing on the line. I do not want the rest of the line jumping about when it changes from empty to +, using min widths that should be no problem:</p>
+<div class="highlight"><pre><span></span><code>&quot; m is the [+] when modified
+set statusline=-%-01h-%10m-%-01r
+</code></pre></div>
+
+<p>This becomes empty except the  '- - -' when no flags are set, from :help statusline </p>
+<blockquote>
+<p>When all items in a group becomes an empty string (i.e. flags that are
+not set) and a minwid is not set for the group, the whole group will
+become empty.  This will make a group like the following disappear
+completely from the statusline when none of the flags are set. &gt;
+         :set statusline=...%(\ [%M%R%H]%)...</p>
+</blockquote>
+<p><a href="http://got-ravings.blogspot.co.uk/2008/08/vim-pr0n-making-statuslines-that-own.html">The answer (source)</a></p>
+<div class="highlight"><pre><span></span><code><span class="nv">You</span><span class="w"> </span><span class="nv">can</span><span class="w"> </span><span class="nv">also</span><span class="w"> </span><span class="nv">group</span><span class="w"> </span><span class="nv">several</span><span class="w"> </span><span class="nv">items</span><span class="w"> </span><span class="nv">together</span><span class="w"> </span><span class="nv">and</span><span class="w"> </span><span class="nv">apply</span><span class="w"> </span><span class="nv">formatting</span><span class="w"> </span>
+<span class="nv">to</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">group</span><span class="w"> </span><span class="nv">as</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">whole</span>.<span class="w"> </span><span class="nv">To</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nv">this</span>,<span class="w"> </span><span class="nv">use</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="o">%</span><span class="ss">(</span>...<span class="o">%</span><span class="ss">)</span><span class="w"> </span><span class="nv">syntax</span>.<span class="w"> </span>
+<span class="k">For</span><span class="w"> </span><span class="nv">example</span>:<span class="w"> </span><span class="o">%</span><span class="mi">20</span><span class="ss">(</span><span class="o">%</span><span class="nv">l</span><span class="o">/%</span><span class="nv">L</span><span class="o">%</span><span class="ss">)</span><span class="w"> </span><span class="nv">would</span><span class="w"> </span><span class="nv">display</span><span class="o">&lt;</span><span class="nv">current</span><span class="o">-</span><span class="nv">line</span><span class="o">&gt;/&lt;</span><span class="nv">total</span><span class="o">-</span><span class="nv">lines</span><span class="o">&gt;</span><span class="w"> </span>
+<span class="nv">at</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">minimum</span><span class="w"> </span><span class="nv">width</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="nv">characters</span>.
+</code></pre></div>
+
+<p>Winner: create a group with %width( ... %)</p>
+<div class="highlight"><pre><span></span><code>&quot; m is the [+] when modified
+set statusline=%10(-%h-%m-%r%)
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

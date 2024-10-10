@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Finding Tracks not in iTunes"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Apple Automation Audio discuss_url: //134 url: //134/Finding_Tracks_not_in_iTunes id: 134 After switching my Audio ripper (Max) accidentally to 'AAC Low …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/finding-tracks-not-in-itunes.html" rel="bookmark"
+             title="Permalink to "Finding Tracks not in iTunes"">"Finding Tracks not in iTunes"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-01-14T18:19:45+00:00">
+                Published: Sat 14 January 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Apple</li>
+<li>Automation</li>
+<li>Audio
+discuss_url: //134
+url: //134/Finding_Tracks_not_in_iTunes
+id: 134</li>
+</ul>
+<hr>
+<p>After switching my Audio ripper (<a href="http://sbooth.org/Max">Max</a>) accidentally to 'AAC Low Delay' rather than plain 'AAC' I realised too late after about 20-30cd rips that they were not appearing in iTunes.</p>
+<p>I also convert to flac to converting to the correct format from source is still relatively easy. Finding which track are in my iTunes folder but not in the iTunes library is a little bit more tricky. Well it was going to be until I found <a href="http://dougscripts.com/itunes/scripts/ss.php?sp=musicfolderfilesnotadded2">this Dougs Script</a>. </p>
+<p>I did not have to instal any script for this just ran the app insdie the download for 'Music Folder Files Not Added v3.0'. My iTune folder is in the default location so I just had to press 'find' and it took around a minute to list all the music tracks I had but iTunes had not added to its library.</p>
+<p>Working my way through the list recreating the tracks in the correct AAC format, just adding the 'iTunes Music' folder to iTunes after every ablum fix and hitting 'find' in Dougs app to refresh the list.  </p>
+<p>Easy, almsot got a ruby version of it working but only got so far:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">gem</span><span class="w"> </span><span class="nx">install</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">itunes</span><span class="o">-</span><span class="kn">library</span><span class="err">&#39;</span>
+</code></pre></div>
+
+<p>The Script:</p>
+<div class="highlight"><pre><span></span><code><span class="n">require</span><span class="w"> </span><span class="s1">&#39;itunes/library&#39;</span>
+
+<span class="n">path</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="w"> </span><span class="s2">&quot;~/Music/iTunes/iTunes Music&quot;</span><span class="w"> </span><span class="p">)</span>
+<span class="n">itunes_lib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="w"> </span><span class="s2">&quot;~/Music/iTunes/iTunes Library.xml&quot;</span><span class="w"> </span><span class="p">)</span>
+<span class="n">library</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">ITunes</span><span class="p">::</span><span class="n">Library</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="w"> </span><span class="n">itunes_lib</span><span class="w"> </span><span class="p">)</span>
+
+<span class="n">puts</span><span class="w">  </span><span class="s2">&quot;#{library.music.tracks.size} Tracks have been loaded&quot;</span>
+
+<span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="w"> </span><span class="n">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;**&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;*.m4a&#39;</span><span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="p">)</span>
+
+<span class="n">files</span><span class="o">.</span><span class="n">each</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="o">|</span><span class="n">music_file</span><span class="o">|</span>
+<span class="w">  </span><span class="n">music_file_nice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">music_file</span><span class="o">.</span><span class="n">dup</span>
+<span class="w">  </span><span class="n">music_file</span><span class="o">.</span><span class="n">gsub</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;%20&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">music_file</span><span class="o">.</span><span class="n">gsub</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;%231&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="c1">#music_file.gsub!(&#39;´&#39;, &#39;%C2%B4&#39;)</span>
+
+<span class="w">  </span><span class="c1">#This comes last so it the # does not get replace</span>
+<span class="w">  </span><span class="n">music_file</span><span class="o">.</span><span class="n">gsub</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
+
+<span class="w">  </span><span class="c1">#Correcting filename prefix / location</span>
+<span class="w">  </span><span class="n">music_file</span><span class="o">.</span><span class="n">gsub</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39;/Users/morgy/Music&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;file://localhost/Volumes/Queeg500TimeM&#39;</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="c1">#found = library.music.tracks.keep_if { |t| t.to_hash[&#39;Location&#39;] == music_file }</span>
+<span class="w">  </span><span class="n">library</span><span class="o">.</span><span class="n">music</span><span class="o">.</span><span class="n">tracks</span><span class="o">.</span><span class="n">each</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">|</span><span class="n">t</span><span class="o">|</span><span class="w"> </span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">t</span><span class="o">.</span><span class="n">to_hash</span><span class="p">[</span><span class="s1">&#39;Location&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">music_file</span>
+<span class="w">      </span><span class="n">found</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span>
+<span class="w">    </span><span class="n">end</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="n">found</span><span class="o">.</span><span class="n">empty</span><span class="err">?</span><span class="w"> </span>
+<span class="w">    </span><span class="n">puts</span>
+<span class="w">    </span><span class="n">puts</span><span class="w"> </span><span class="s2">&quot;MISSING #{music_file_nice}&quot;</span>
+<span class="w">  </span><span class="n">end</span>
+
+<span class="n">end</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

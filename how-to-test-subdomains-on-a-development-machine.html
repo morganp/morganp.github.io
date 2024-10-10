@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"How to test subdomains on a development machine"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Web nginx discuss_url: //28 url: //28/How_to_test_subdomains_on_a_development_machine id: 28 I recently documented how I installed Ruby Enterprise..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/how-to-test-subdomains-on-a-development-machine.html" rel="bookmark"
+             title="Permalink to "How to test subdomains on a development machine"">"How to test subdomains on a development machine"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-08T05:04:51+01:00">
+                Published: Sat 08 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Web</li>
+<li>nginx
+discuss_url: //28
+url: //28/How_to_test_subdomains_on_a_development_machine
+id: 28</li>
+</ul>
+<hr>
+<p>I recently documented how I <a href="http://amaras-tech.co.uk/people/morgan/article/26">installed Ruby Enterprise and nginx on Mac OS X</a>. Here we see how to make subdomains work on your local development machine using <a href="http://nginx.org/">nginx</a>. These instructions should be relevant for most unix based systems. </p>
+<p>Why use subdomains. On shared hosts like <a href="http://www.webfaction.com?affiliate=morgy">webfaction</a> it is more efficient to serve images, downloads, etc from a nginx server rather than run them through your web application, like rails, sinatra, etc.</p>
+<p>First modify you hosts file, adding in all the subdomains you need.   </p>
+<div class="highlight"><pre><span></span><code><span class="o">$</span><span class="w"> </span><span class="n">vim</span><span class="w"> </span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">hosts</span>
+
+<span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="w">     </span><span class="n">localhost</span>
+<span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="w">     </span><span class="n">downloads</span><span class="o">.</span><span class="n">localhost</span>
+</code></pre></div>
+
+<p>Then modify the nginx.config file, making it listen for the new subdomains.</p>
+<div class="highlight"><pre><span></span><code><span class="n">http</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">   </span><span class="n">server</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">listen</span><span class="w">       </span><span class="mi">80</span><span class="p">;</span>
+<span class="w">      </span><span class="n">server_name</span><span class="w">  </span><span class="n">localhost</span><span class="p">;</span>
+<span class="w">      </span><span class="n">passenger_enabled</span><span class="w"> </span><span class="n">on</span><span class="p">;</span>
+<span class="w">      </span><span class="n">root</span><span class="w"> </span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">Shared</span><span class="o">/</span><span class="n">Code</span><span class="o">/</span><span class="n">Amaras</span><span class="o">-</span><span class="n">Site</span><span class="o">/</span><span class="n">public</span><span class="p">;</span><span class="w">   </span><span class="c1"># &lt;--- be sure to point to &#39;public&#39;!</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="w">   </span><span class="n">server</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">listen</span><span class="w"> </span><span class="mi">80</span><span class="p">;</span>
+<span class="w">      </span><span class="n">server_name</span><span class="w"> </span><span class="n">downloads</span><span class="o">.</span><span class="n">localhost</span><span class="p">;</span>
+<span class="w">      </span><span class="n">root</span><span class="w">  </span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">Shared</span><span class="o">/</span><span class="n">Code</span><span class="o">/</span><span class="n">Amaras</span><span class="o">-</span><span class="n">Site</span><span class="o">/</span><span class="n">Uploads</span><span class="p">;</span><span class="w"> </span><span class="c1"># &lt;-- Not a Rack application just plain static files</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>NB: to find the location of your nginx.conf file:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>find<span class="w"> </span>/<span class="w"> </span>-iname<span class="w"> </span><span class="s2">&quot;nginx.conf&quot;</span>
+</code></pre></div>
+
+<p>Start or restart the nginx server</p>
+<div class="highlight"><pre><span></span><code><span class="o">$</span><span class="w"> </span><span class="n">sudo</span><span class="w"> </span><span class="o">~/</span><span class="n">bin</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">nginx</span>
+<span class="o">$</span><span class="w"> </span><span class="n">sudo</span><span class="w"> </span><span class="o">~/</span><span class="n">bin</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">nginx</span><span class="w"> </span><span class="o">-</span><span class="n">s</span><span class="w"> </span><span class="n">reload</span>
+</code></pre></div>
+
+<p>For portability in Sinatra applications I refer to subdomains using this method:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;%</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="o">.</span><span class="n">env</span><span class="o">[</span><span class="s2">&quot;HTTP_HOST&quot;</span><span class="o">]</span><span class="w"> </span><span class="cp">%&gt;</span>
+<span class="nt">&lt;a</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;http://downloads.</span><span class="cp">&lt;%=</span><span class="n">url</span><span class="cp">%&gt;</span><span class="s">/something&quot;</span><span class="nt">&gt;</span>link<span class="w"> </span>to<span class="w"> </span>subdomain<span class="nt">&lt;/a&gt;</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

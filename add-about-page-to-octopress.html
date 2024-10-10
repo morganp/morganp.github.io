@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Add about page to Octopress"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line Octopress Programming Web discuss_url: //222 url: //222/Add_about_page_to_Octopress id: 222 To add static about page to octopress blog …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/add-about-page-to-octopress.html" rel="bookmark"
+             title="Permalink to "Add about page to Octopress"">"Add about page to Octopress"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-05-19T08:41:53+01:00">
+                Published: Sun 19 May 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>Octopress</li>
+<li>Programming</li>
+<li>Web
+discuss_url: //222
+url: //222/Add_about_page_to_Octopress
+id: 222</li>
+</ul>
+<hr>
+<p>To add  static about page to octopress blog, assuming that octopress has been already setup:</p>
+<p>Create the page from the command line:</p>
+<div class="highlight"><pre><span></span><code>rake new_page[&quot;about&quot;]
+</code></pre></div>
+
+<p>You can now edit the page at ./source/about/index.markdown which should look like:</p>
+<div class="highlight"><pre><span></span><code>---
+layout: page
+title: &quot;about&quot; 
+date: 2013-05-19 09:04
+comments: true
+sharing: true
+footer: true
+---
+</code></pre></div>
+
+<p>Add the link to the site navigation menu.</p>
+<p>Edit source/_includes/custom/navigation.html from :</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;ul</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;main-navigation&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;li&gt;&lt;a</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">root_url</span> <span class="cp">}}</span><span class="s">/&quot;</span><span class="nt">&gt;</span>Blog<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+<span class="w">  </span><span class="nt">&lt;li&gt;&lt;a</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">root_url</span> <span class="cp">}}</span><span class="s">/blog/archives&quot;</span><span class="nt">&gt;</span>Archives<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</code></pre></div>
+
+<p>To (adding about link):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;ul</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;main-navigation&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;li&gt;&lt;a</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">root_url</span> <span class="cp">}}</span><span class="s">/about&quot;</span><span class="nt">&gt;</span>About<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+<span class="w">  </span><span class="nt">&lt;li&gt;&lt;a</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">root_url</span> <span class="cp">}}</span><span class="s">/&quot;</span><span class="nt">&gt;</span>Blog<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+<span class="w">  </span><span class="nt">&lt;li&gt;&lt;a</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">root_url</span> <span class="cp">}}</span><span class="s">/blog/archives&quot;</span><span class="nt">&gt;</span>Archives<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

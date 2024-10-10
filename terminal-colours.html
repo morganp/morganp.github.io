@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Terminal Colours"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line Programming Vim discuss_url: //226 url: //226/Terminal_Colours id: 226 I have decided to clean up my vim colorschemes …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/terminal-colours.html" rel="bookmark"
+             title="Permalink to "Terminal Colours"">"Terminal Colours"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-07-12T19:16:31+01:00">
+                Published: Fri 12 July 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>Programming</li>
+<li>Vim
+discuss_url: //226
+url: //226/Terminal_Colours
+id: 226</li>
+</ul>
+<hr>
+<p>I have decided to clean up my vim colorschemes. I have been using ir_black for sometime but it does not look the same as others who use it. I think I was forcing it into 256 or 16 color mode.</p>
+<p>Some vim command line on some terminals looked awful and I had to switch to another colorscheme just so I could see the text.</p>
+<p>I have decided to pick an 8,16,256 and full color scheme and load them automatically, rather than trying to find a colorscheme which degraded gracefully, they just never seemed to do it that well.</p>
+<p>From <a href="http://blog.sanctum.geek.nz/tag/xterm-256color/">sanctum.geek.nz</a> I discovered the <code>tput colors</code> command. Vims <code>&amp;t_Co</code> will reflect this value.  But it only reflects the calling terminals capabilities, so calling gvim or mvim from an 8 bit color terminal your &amp;t_Co will still be 8.</p>
+<p>After some trouble getting the 8 colour scheme to work posted a question on <a href="http://superuser.com/questions/604589/vim-non-gui-background-will-not-go-white">superuser</a>. </p>
+<p>The main solution seems to be to append your TERM envar with -256color to force 256 Colour detection.  I was originally hesitant to blindly apply 256 color to any system I may be working on, but I think it would be rare to come across a terminal that does not support 256 colors these days. This would also have to be a system/network where I have already set-up my dotfiles.</p>
+<p>Adding -256color to term makes tput return 256 and makes vim t_Co 256 as well.
+For csh:</p>
+<div class="highlight"><pre><span></span><code><span class="k">setenv</span><span class="w"> </span><span class="nv">TERM</span><span class="w"> </span>$<span class="nv">TERM</span><span class="o">-</span><span class="mi">256</span><span class="nv">color</span>
+</code></pre></div>
+
+<p>For a bit more protection you should stop multiple -256colors being appended i.e. stop xterm-256color-256color if called from bash with 256color extension already applied.</p>
+<div class="highlight"><pre><span></span><code>if ($TERM =~ <span class="gs">*256color*</span>) then
+  #Already 256color
+else
+  setenv TERM $TERM-256color
+endif
+</code></pre></div>
+
+<p>For Bash:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">[[</span><span class="w"> </span><span class="s2">&quot;$TERM&quot;</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">*</span><span class="mi">256</span><span class="n">color</span><span class="o">*</span><span class="w"> </span><span class="p">]]</span>
+<span class="n">then</span>
+<span class="w">  </span><span class="k">export</span><span class="w"> </span><span class="n">TERM</span><span class="o">=$</span><span class="n">TERM</span><span class="o">-</span><span class="mi">256</span><span class="n">color</span>
+<span class="n">fi</span>
+</code></pre></div>
+
+<p>Using a <a href="https://github.com/wardi/xterm_colour_chart">python script</a> you can display color charts in the terminal. It should be clear if 256 colors is not working, you would only see 16 colour blocks.</p>
+<p><a href="http://flickr.com/gp/morgan_prior/45kh8P"> <img alt="colour block" src="http://farm6.staticflickr.com/5542/9272025578_7a86fc474c_n.jpg"> </a></p>
+<p>After all of this instead of getting my vim colour schemes to degrade gracefully I force everything into 256 colours mode. Which I think is actually ok and I get to use better colour schemes all/more of the time.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"bash scripts and cron"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Command Line Programming discuss_url: //103 url: //103/bash_scripts_and_cron id: 103 I have not fully read it but it looks like …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/bash-scripts-and-cron.html" rel="bookmark"
+             title="Permalink to "bash scripts and cron"">"bash scripts and cron"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-28T20:01:13+01:00">
+                Published: Thu 28 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Command Line</li>
+<li>Programming
+discuss_url: //103
+url: //103/bash_scripts_and_cron
+id: 103</li>
+</ul>
+<hr>
+<p>I have not fully read it but it looks like this is a <a href="http://mywiki.wooledge.org/BashGuide">good guide to bash scripting</a>. A few things that normally catch me out trying to load modules inside a script, but they fail with:</p>
+<div class="highlight"><pre><span></span><code>&gt; module: command not found
+</code></pre></div>
+
+<p>This is due to the module system not being loaded. For Linux/Unix systems adding the 3rd line below should fix the issue.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+
+.<span class="w"> </span>/usr/share/modules/init/bash
+module<span class="w"> </span>load<span class="w"> </span>something
+</code></pre></div></td></tr></table></div>
+
+<p>NB: Not sure how to do this on Mac OS X</p>
+<p>The Second bash scripting issue that trips me up is when adding to cron.</p>
+<p>cron or crontab is a way to run scripts at regular intervals, however by default it runs in a minimal environment. This means that a script which executes correctly in your terminal may not work as expected when entered in cron.</p>
+<h2>Solution 1</h2>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="nb">source</span><span class="w"> </span>~/.bashrc
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;The rest of the script&quot;</span>
+</code></pre></div></td></tr></table></div>
+
+<p>Sourcing your bashrc in the script while this works it requires the script to be written based on how it will be deployed. Solution 2 fixes the crontab for the environment it will run in.</p>
+<h2>Solution 2</h2>
+<p>edit the crontab </p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>crontab<span class="w"> </span>-e
+</code></pre></div>
+
+<p>From this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">*</span> * <span class="gs">* *</span> * /path/to/script
+</code></pre></div>
+
+<p>to this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">*</span> * <span class="gs">* *</span> * /bin/bash -l -c &#39;/path/to/script&#39;
+</code></pre></div>
+
+<p>-l loads the full environment<br>
+-c tells bash that there is a script to execute</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

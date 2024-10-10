@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"#vim toggle between last 2 edited buffers"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Vim discuss_url: //187 url: //187/%23vim_toggle_between_last_2_edited_buffers id: 187 ctrl-6 Demo For the example we will create 3 new temp files …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/vim-toggle-between-last-2-edited-buffers.html" rel="bookmark"
+             title="Permalink to "#vim toggle between last 2 edited buffers"">"#vim toggle between last 2 edited buffers"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-29T11:22:06+01:00">
+                Published: Wed 29 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Vim
+discuss_url: //187
+url: //187/%23vim_toggle_between_last_2_edited_buffers
+id: 187</li>
+</ul>
+<hr>
+<div class="highlight"><pre><span></span><code>ctrl-6
+</code></pre></div>
+
+<h1>Demo</h1>
+<p>For the example we will create 3 new temp files and then open them in vim.</p>
+<div class="highlight"><pre><span></span><code>touch vim_test1.txt
+touch vim_test2.txt
+touch vim_test3.txt
+vim vim_test*
+</code></pre></div>
+
+<p>From with in vim</p>
+<div class="highlight"><pre><span></span><code>:ls 
+1 %a   &quot;vim_test1.txt&quot;                line 2
+2      &quot;vim_test2.txt&quot;                line 0
+3      &quot;vim_test3.txt&quot;                line 0
+</code></pre></div>
+
+<p>Buffer 1 is active (%a) if we jump to buffer 3 </p>
+<div class="highlight"><pre><span></span><code>:b3
+:ls
+1 #    &quot;vim_test1.txt&quot;                line 2
+2      &quot;vim_test2.txt&quot;                line 0
+3 %a   &quot;vim_test3.txt&quot;                line 2
+</code></pre></div>
+
+<p>Buffer 3 is active (%a) and 3 is previous edited buffer. ctrl-6 will switch these around. Toggling the active buffer between the two.</p>
+<div class="highlight"><pre><span></span><code>ctrl-6
+:ls
+1 %a   &quot;vim_test1.txt&quot;                line 2
+2      &quot;vim_test2.txt&quot;                line 0
+3 #    &quot;vim_test3.txt&quot;                line 2 
+ctrl-6
+:ls
+1 #    &quot;vim_test1.txt&quot;                line 2
+2      &quot;vim_test2.txt&quot;                line 0
+3 %a   &quot;vim_test3.txt&quot;                line 2
+</code></pre></div>
+
+<p>To scroll through the buffers in order:</p>
+<div class="highlight"><pre><span></span><code><span class="nl">:bn</span><span class="w"> </span><span class="ss">(</span><span class="k">Next</span><span class="w"> </span><span class="nv">Buffer</span><span class="ss">)</span>
+<span class="nl">:bp</span><span class="w"> </span><span class="ss">(</span><span class="nv">Previous</span><span class="w"> </span><span class="nv">Buffer</span><span class="ss">)</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

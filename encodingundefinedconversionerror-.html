@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Encoding::UndefinedConversionError - "</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Programming Ruby SASS Sinatra Web discuss_url: //146 url: //146/Encoding%3A%3AUndefinedConversionError_-_ id: 146 Are you running into the following …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/encodingundefinedconversionerror-.html" rel="bookmark"
+             title="Permalink to "Encoding::UndefinedConversionError - "">"Encoding::UndefinedConversionError - "</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-04T20:37:01+01:00">
+                Published: Wed 04 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Programming</li>
+<li>Ruby</li>
+<li>SASS</li>
+<li>Sinatra</li>
+<li>Web
+discuss_url: //146
+url: //146/Encoding%3A%3AUndefinedConversionError_-_
+id: 146</li>
+</ul>
+<hr>
+<p>Are you running into the following error</p>
+<div class="highlight"><pre><span></span><code>Encoding::UndefinedConversionError - &quot;\xE2&quot; from ASCII-8BIT to UTF-8:
+</code></pre></div>
+
+<p>If you are using Ruby and SASS for your stylesheets then it might help to start your stylesheets with:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">@charset</span><span class="w"> </span><span class="ss">&quot;UTF-8&quot;</span>
+</code></pre></div>
+
+<p>In my main sinatra app I had</p>
+<div class="highlight"><pre><span></span><code><span class="nx">before</span><span class="w"> </span><span class="nx">do</span>
+<span class="w">  </span><span class="nx">content_type</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">text</span><span class="o">/</span><span class="nx">html</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="nx">charset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">utf</span><span class="o">-</span><span class="mi">8</span><span class="err">&#39;</span>
+<span class="nx">end</span>
+
+<span class="nx">get</span><span class="w"> </span><span class="err">&#39;</span><span class="o">/</span><span class="kd">base</span><span class="p">.</span><span class="nx">css</span><span class="err">&#39;</span><span class="w"> </span><span class="nx">do</span>
+<span class="w">  </span><span class="nx">sass</span><span class="w"> </span><span class="p">:</span><span class="err">&#39;</span><span class="nx">stylesheets</span><span class="o">/</span><span class="kd">base</span><span class="err">&#39;</span>
+<span class="nx">end</span>
+</code></pre></div>
+
+<p>Now the before route forces it to be utf-8 so stylesheets/base.sass also needs a charset defining:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">@charset</span><span class="w"> </span><span class="ss">&quot;UTF-8&quot;</span>
+
+<span class="n">body</span>
+<span class="w">  </span><span class="nl">font</span><span class="p">:</span>
+<span class="w">    </span><span class="nl">family</span><span class="p">:</span><span class="w"> </span><span class="n">Helvetica</span><span class="p">,</span><span class="w"> </span><span class="n">Arial</span><span class="p">,</span><span class="w"> </span><span class="n">sans</span><span class="o">-</span><span class="n">serif</span>
+
+<span class="n">#head</span>
+<span class="w">  </span><span class="nl">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="nl">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="n">em</span>
+<span class="w">  </span><span class="n">background</span><span class="o">-</span><span class="nl">color</span><span class="p">:</span><span class="w"> </span><span class="n">#ccc</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

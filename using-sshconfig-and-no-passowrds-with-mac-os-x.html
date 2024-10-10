@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Using ~/.ssh/config and no passowrds with Mac OS X"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Automation Command Line OS X discuss_url: //117 url: //117/Using_%7E%2F.ssh%2Fconfig_and_no_passowrds_with_Mac_OS_X id: 117 Using ssh to securely …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/using-sshconfig-and-no-passowrds-with-mac-os-x.html" rel="bookmark"
+             title="Permalink to "Using ~/.ssh/config and no passowrds with Mac OS X"">"Using ~/.ssh/config and no passowrds with Mac OS X"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-14T21:56:03+01:00">
+                Published: Thu 14 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Automation</li>
+<li>Command Line</li>
+<li>OS X
+discuss_url: //117
+url: //117/Using_%7E%2F.ssh%2Fconfig_and_no_passowrds_with_Mac_OS_X
+id: 117</li>
+</ul>
+<hr>
+<p>Using ssh to securely connect with servers from the terminal is pretty easy. set up a public key and a private key using:</p>
+<div class="highlight"><pre><span></span><code>ssh-keygen -t rsa
+</code></pre></div>
+
+<p>This should save them in ~/.ssh/</p>
+<p>However you may want separate keys for work, for home servers and other services like a web server or github. the ~/.ssh/config file is a way to specify a list of possible keys to use and associate them with a host name. I when using this initially Mac OS X always prompted me for my identity file password. instead of acting password-less.</p>
+<p>For OS X it looks like you have to add a few more options to get the same behaviour as without the .ssh/config :</p>
+<div class="highlight"><pre><span></span><code>Host *
+  RSAAuthentication yes
+  PasswordAuthentication yes
+  ChallengeResponseAuthentication no
+  IdentityFile ~/.ssh/id_rsa
+</code></pre></div>
+
+<p>Adding more Identity files the first passing will be used</p>
+<div class="highlight"><pre><span></span><code>Host *
+  RSAAuthentication yes
+  PasswordAuthentication yes
+  ChallengeResponseAuthentication no
+  IdentityFile ~/.ssh/id_rsa
+  IdentityFile ~/.ssh/id_rsa_work
+  IdentityFile ~/.ssh/id_rsa_github
+</code></pre></div>
+
+<p>Multiple Identities, using known identity for known location.</p>
+<div class="highlight"><pre><span></span><code>Host <span class="gs">*.work.com</span>
+<span class="gs">  IdentityFile ~/.ssh/id_rsa</span>
+
+<span class="gs">Host *</span>.github.com
+  IdentityFile ~/.ssh/id_rsa_github
+
+Host *
+  RSAAuthentication yes
+  PasswordAuthentication yes
+  ChallengeResponseAuthentication no
+  IdentityFile ~/.ssh/id_rsa
+</code></pre></div>
+
+<p>For more info try looking at <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=ssh_config">the man page</a>, from your terminal:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>man<span class="w"> </span>ssh_config
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

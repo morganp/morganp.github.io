@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Active Record attributes simplify update and create."</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Active Record Programming discuss_url: //61 url: //61/Active_Record__attributes_simplify_update_and_create. id: 61 In Active Record when updating..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/active-record-attributes-simplify-update-and-create.html" rel="bookmark"
+             title="Permalink to "Active Record attributes simplify update and create."">"Active Record  attributes simplify update and create."</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-13T02:13:17+01:00">
+                Published: Fri 13 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Active Record</li>
+<li>Programming
+discuss_url: //61
+url: //61/Active_Record__attributes_simplify_update_and_create.
+id: 61</li>
+</ul>
+<hr>
+<p>In Active Record when updating records I used to have an very manual process to this some thing like:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">@todo</span><span class="p">.</span><span class="n">done</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="o">[</span><span class="n">&#39;post&#39;</span><span class="o">][</span><span class="n">&#39;done&#39;</span><span class="o">]</span>
+<span class="nv">@todo</span><span class="p">.</span><span class="k">desc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="o">[</span><span class="n">&#39;post&#39;</span><span class="o">][</span><span class="n">&#39;desc&#39;</span><span class="o">]</span>
+<span class="nv">@todo</span><span class="p">.</span><span class="k">save</span>
+</code></pre></div>
+
+<p>Model of Todo with boolean done and text description field. </p>
+<p>This can be done in a more maintainable fashion with:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">@todo</span><span class="p">.</span><span class="n">update_attributes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="o">[</span><span class="n">&#39;post&#39;</span><span class="o">]</span>
+</code></pre></div>
+
+<p>This does pose the security concern that the form (which transmits params['post']) could be hacked to add id fields or such like that you may get unwanted manipulation of the table.</p>
+<p>To solve this there is a attr_accessible which specifies fields allowed to be updated by the .attributes . while this might seem now like there is no benefit as if we run a migration to add an extra column we also need to update the Active Record model. While this is true we only need to update the model once and create/new  and update methods should benefit from this.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="n">Todo</span> &lt; <span class="n">ActiveRecord::Base</span>
+<span class="nb">end</span>
+</code></pre></div>
+
+<p>Becomes </p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="n">Todo</span> &lt; <span class="n">ActiveRecord::Base</span>
+   <span class="n">attr_accessible</span> :<span class="n">done</span>
+   <span class="n">attr_accessible</span> :<span class="n">desc</span>
+<span class="nb">end</span>
+</code></pre></div>
+
+<h2>Summary:</h2>
+<div class="highlight"><pre><span></span><code><span class="nv">@customer</span><span class="p">.</span><span class="n">update_attributes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="ss">&quot;description&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="ss">&quot;Jolly fellow&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;credit_rating&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="ss">&quot;Superb&quot;</span><span class="w"> </span><span class="err">}</span>
+</code></pre></div>
+
+<p>same as:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">@customer</span><span class="p">.</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;Jolly fellow&quot;</span>
+<span class="nv">@customer</span><span class="p">.</span><span class="n">credit_rating</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;Superb&quot;</span>
+<span class="nv">@customer</span><span class="p">.</span><span class="k">save</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

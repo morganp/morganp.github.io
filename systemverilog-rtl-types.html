@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"SystemVerilog: RTL Types"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Engineering tags: Verilog Programming reg and wire were the original synthesisable types. Wires are constantly assigned and regs are evaluated …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/systemverilog-rtl-types.html" rel="bookmark"
+             title="Permalink to "SystemVerilog: RTL Types"">"SystemVerilog: RTL Types"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-03-26T20:08:34+00:00">
+                Published: Thu 26 March 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Engineering
+tags:</li>
+<li>Verilog</li>
+<li>Programming</li>
+</ul>
+<hr>
+<p><code>reg</code> and <code>wire</code> were the original synthesisable types. Wires are constantly assigned and regs are evaluated at particular points, the advantage here is for the simulator to make optimisations.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">wire</span><span class="w"> </span><span class="n">w_data</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">w_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+
+<span class="c1">// Same function as above using reg</span>
+<span class="kt">reg</span><span class="w"> </span><span class="n">r_data</span><span class="p">;</span>
+<span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="o">*</span><span class="w"> </span>
+<span class="w">  </span><span class="n">r_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+
+<p>A common mistake when learning Verilog is to assume the reg type implies a register in hardware. The earlier optimisation for the simulator can be done through the context of its usage.</p>
+<p>This introduces <code>logic</code> which can be used in place of wire and reg.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">logic</span><span class="w">  </span><span class="n">w_data</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">w_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+
+<span class="c1">// Same function as above using reg</span>
+<span class="kt">logic</span><span class="w"> </span><span class="n">r_data</span><span class="p">;</span>
+<span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="o">*</span><span class="w"> </span>
+<span class="w">  </span><span class="n">r_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+
+<p>The type <code>bit</code> and <code>byte</code> have also been created that can only hold 2 states 0 or 1 no x or z. <code>byte</code> implies <code>bit [7:0]</code>. Using these types offers a small speed improvement but I would recommend not using them in RTL as your verification may miss uninitialized values or critical resets.</p>
+<p>The usage of <code>bit</code> and <code>byte</code> would be more common in testbench components, but can lead to issues in case of having to drive x's to stimulate data corruption and recovery.</p>
+<hr>
+<p><strong>Update</strong></p>
+<p>At the time of writing I was under the impression that <code>logic</code> could not be used for tristate, I am unable to find the original paper that I based this on. Until further updates, comments or edits, I revoke my assertion that <em>logic can not be used to create tri-state lines</em>.</p>
+<hr>
+<p>The <code>tri</code> type has been added, for explicitly defining a tri-state line. It is based on the properties of a <code>wire</code>, <code>logic</code> is based on the properties of a <code>reg</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">tri</span><span class="w"> </span><span class="n">t_data</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">t_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">drive</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">1</span><span class="p">&#39;</span><span class="n">bz</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+
+<p>If you no longer have to support backwards compatibility Verilog then I would recommend switching to using <code>logic</code> and <code>tri</code>. Using <code>logic</code> aids re-factoring and and <code>tri</code>  reflects the design intent of a tristate line.</p>
+<p>Originally posted as a<a href="http://stackoverflow.com/a/13285242/97073"> SO answer</a>.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

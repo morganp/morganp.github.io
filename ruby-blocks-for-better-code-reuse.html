@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>"Ruby Blocks for better code reuse"</title>
+                        <link rel="stylesheet" href="http://lizard-spock.co.uk/pelican_test/theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="Programming Ruby discuss_url: //121 url: //121/Ruby_Blocks_for_better_code_reuse id: 121 While working on some disk space / folder structure..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="http://lizard-spock.co.uk/pelican_test/">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/outdoors.html">Outdoors</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/perforce.html">Perforce</a></li>
+                                                <li class="active"><a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a></li>
+                                                <li><a href="http://lizard-spock.co.uk/pelican_test/category/python.html">Python</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="http://lizard-spock.co.uk/pelican_test/ruby-blocks-for-better-code-reuse.html" rel="bookmark"
+             title="Permalink to "Ruby Blocks for better code reuse"">"Ruby Blocks for better code reuse"</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-30T13:51:28+01:00">
+                Published: Sat 30 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="http://lizard-spock.co.uk/pelican_test/author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="http://lizard-spock.co.uk/pelican_test/category/posts.html">posts</a>.</p>
+        
+</footer><!-- /.post-info -->        <ul>
+<li>Programming</li>
+<li>Ruby
+discuss_url: //121
+url: //121/Ruby_Blocks_for_better_code_reuse
+id: 121</li>
+</ul>
+<hr>
+<p>While working on some disk space / folder structure scripts I had several functions which hierarchically search the disk then performed some custom function. When refactoring the code I realised that the specific functions could be contained in a block and passed to a generic search method.</p>
+<p>This is one of the original functions</p>
+<div class="highlight"><pre><span></span><code>def search_folder( folder )
+  sub_folders = Dir.glob( folder + &#39;*/&#39;)
+  sub_files   = Dir.glob( folder + &#39;*.*&#39;)
+
+  ## Recursive
+  sub_folders.each do |sub_folder|
+    search_folder( sub_folder )
+  end
+
+  sub_files.each do | sub_file |
+   if sub_file.match(/\.rar$/)
+    puts sub_file    
+    end
+  end
+end
+</code></pre></div>
+
+<p>Refactored to take a block</p>
+<div class="highlight"><pre><span></span><code>def search_folder( folder, &amp;block )
+
+  sub_folders = Dir.glob( folder + &#39;*/&#39;)
+  sub_files   = Dir.glob( folder + &#39;*.*&#39;)
+
+  ## Recursive
+  sub_folders.each do |sub_folder|
+    search_folder( sub_folder, &amp;block )
+  end
+
+  sub_files.each do | sub_file |
+    yield(sub_file)
+  end
+end
+</code></pre></div>
+
+<p>And where the original method was called replace with:</p>
+<div class="highlight"><pre><span></span><code>search_folder( folder ) do |file|
+  if file.match(/\.rar$/)
+     puts file
+  end
+end
+</code></pre></div>
+
+<h2>Encapsulate with Modules</h2>
+<p>Wrapping the generic methods up into a module and calling local methods from the block.</p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span><span class="w"> </span><span class="n">GenericStuff</span>
+
+<span class="w">  </span><span class="n">def</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">search_folder</span><span class="p">(</span><span class="w"> </span><span class="n">folder</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">block</span><span class="w"> </span><span class="p">)</span>
+<span class="w">    </span><span class="n">sub_folders</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dir</span><span class="p">.</span><span class="n">glob</span><span class="p">(</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;*/&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">sub_files</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">Dir</span><span class="p">.</span><span class="n">glob</span><span class="p">(</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;*.*&#39;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="err">##</span><span class="w"> </span><span class="k">Recursive</span>
+<span class="w">    </span><span class="n">sub_folders</span><span class="p">.</span><span class="k">each</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="o">|</span><span class="n">sub_folder</span><span class="o">|</span>
+<span class="w">      </span><span class="n">search_folder</span><span class="p">(</span><span class="w"> </span><span class="n">sub_folder</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">block</span><span class="w"> </span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="n">sub_files</span><span class="p">.</span><span class="k">each</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">sub_file</span><span class="w"> </span><span class="o">|</span>
+<span class="w">      </span><span class="n">yield</span><span class="p">(</span><span class="n">sub_file</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+
+
+<span class="n">def</span><span class="w"> </span><span class="k">limit</span>
+<span class="w">  </span><span class="nv">@count</span><span class="w"> </span><span class="o">||=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">  </span><span class="n">puts</span><span class="w"> </span><span class="ss">&quot;Count is &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">@count</span><span class="p">.</span><span class="n">to_s</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nv">@count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="k">exit</span><span class="p">(</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="p">)</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="w">  </span><span class="nv">@count</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span>
+<span class="k">end</span>
+
+<span class="err">#</span><span class="w"> </span><span class="k">Call</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">generic</span><span class="w"> </span><span class="k">method</span><span class="p">,</span><span class="w"> </span><span class="n">block</span><span class="w"> </span><span class="n">calls</span><span class="w"> </span><span class="k">local</span><span class="w"> </span><span class="k">method</span>
+<span class="n">folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;/&#39;</span><span class="w">    </span>
+<span class="nl">GenericStuff</span><span class="p">:</span><span class="err">:</span><span class="n">search_folder</span><span class="p">(</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="o">|</span><span class="k">file</span><span class="o">|</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="k">file</span><span class="p">.</span><span class="k">match</span><span class="p">(</span><span class="o">/</span><span class="err">\</span><span class="p">.</span><span class="n">rar</span><span class="err">$</span><span class="o">/</span><span class="p">)</span>
+<span class="w">    </span><span class="k">limit</span>
+<span class="w">    </span><span class="n">puts</span><span class="w"> </span><span class="k">file</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
