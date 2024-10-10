@@ -18,7 +18,7 @@ SUMMARY_MAX_LENGTH = 20
 # --------------8<---------------------
 # Theme
 
-THEME = 'simple-bootstrap'
+#THEME = 'simple-bootstrap'
 # https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3
 
 # --------------8<---------------------
@@ -31,7 +31,7 @@ READERS = {'html': None}
 # inside the directory content/
 # The contents of img/ will be available at 
 # {{ SITEURL }}/img
-STATIC_PATHS = ['img']
+STATIC_PATHS = ['images']
 
 # If we want to create static pages,
 # we should put them in content/pages
