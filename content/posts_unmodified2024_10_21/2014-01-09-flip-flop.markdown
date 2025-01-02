@@ -1,0 +1,64 @@
+---
+layout: post
+title: "flip-flop"
+date: 2014-01-09 19:15:10 +0000
+comments: true
+categories: Engineering
+tags:
+- Electronics
+- Design
+---
+
+A flip-flop (D-Type) is essentially 2 latches in series with the enable to one inverted.
+This stops the flip-flop from being transparent or open as a single latch can be.
+
+For ASIC design it is recommended that all flip-flops use active low asynchronous resets. 
+This is often connected to the power on reset circuit and retimed on to the rising edge of the clock at the top level of the chip.
+
+In Verilog a D-Type flip-flop can be implied with the following logic.  
+NB: the reg implies nothing about the flip-flop only that data is assigned inside an always block.
+
+    reg [1:0] data; 
+    always @(posedge clk or negedge rst_n) begin
+      if (~rst_n) begin
+        data <= 'b0;
+      end
+      else begin
+        data <= new_data;
+      end
+    end
+
+If your flow supports the use of SystemVerilog, use of the `always_comb`, `always_latch` and `always_ff` are recommended. 
+the rules for sensitivity lists are a little stricter to minimize RTL to gates mismatch. 
+The added benefit is that it allows the designer to be clear about design intent. 
+Using the logic type also removes confusion about reg implying flip-flops and allows code refacoring with out having to switch types.
+
+    logic [1:0] data; 
+    always_ff @(posedge clk or negedge rst_n) begin
+      if (~rst_n) begin
+        data <= 'b0;
+      end
+      else begin
+        data <= new_data;
+      end
+    end
+    
+With a Synchronous Reset:
+
+    logic [1:0] data; 
+    always_ff @(posedge clk) begin
+      if (~rst_n) begin
+        data <= 'b0;
+      end
+      else begin
+        data <= new_data;
+      end
+    end
+
+No Reset:
+
+    logic [1:0] data; 
+    always_ff @(posedge clk) begin
+      data <= new_data;
+    end
+

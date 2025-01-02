@@ -41,6 +41,11 @@ PAGE_PATHS = ['pages']
 # we should put them in content/posts
 ARTICLE_PATHS = ['posts']
 
+
+## Adding template pages creating /tag/index.html from tags.html
+TEMPLATE_PAGES = {'tags.html':       'tag/index.html',
+                  'categories.html': 'category/index.html'}
+
 # -------------8<----------------------
 # Add an app with multiple files
 #
@@ -61,7 +66,8 @@ TEMPLATE_PAGES['data.json']   = 'app/data.json'
 # --------------8<---------------------
 # idk just some dumb stuff
 
-DISPLAY_PAGES_ON_MENU = False
+# ./content/pages/*.md become links in menu
+DISPLAY_PAGES_ON_MENU = True
 FEED_ALL_ATOM = None
 CATEGORY_FEED_ATOM = None
 TRANSLATION_FEED_ATOM = None
