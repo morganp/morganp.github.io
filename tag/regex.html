@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Regex</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku">"Sinatra ActiveRecord DB config on Heroku"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2011-06-22T10:04:48+01:00">
+                Published: Wed 22 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/database.html">Database</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/regex.html">Regex</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sequel.html">Sequel</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info --><p>To make an automatic <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html">ActiveRecord</a> database connection using ENV['DATABASE_URL'] The following snippet can be used:</p>
+<p>From <a href="http://apidock.com/rails/v3.2.1/ActiveRecord/Base/establish_connection/class">ActiveRecord 3.2.1</a> connections can be made with :</p>
+<div class="highlight"><pre><span></span><code>ActiveRecord::Base.establish_connection(ENV[&quot;DATABASE_URL&quot;])
+</code></pre></div>
+
+<p>At some stage My first example also stopped working, Heroku have this example on there pages:</p>
+<div class="highlight"><pre><span></span><code>  db = URI.parse(ENV[&#39;DATABASE_URL&#39;] || &#39;postgres://localhost/mydb&#39;)
+
+  ActiveRecord::Base.establish_connection(
+    :adapter  =&gt; db.scheme == &#39;postgres&#39; ? &#39;postgresql&#39; : db.scheme,
+    :host     =&gt; db.host,
+    :port     =&gt; db.port,
+    :username =&gt; db.user,
+    :password =&gt; db.password,
+    :database =&gt; db.path[1..-1],
+    :encoding =&gt; &#39;utf8&#39;
+  )
+</code></pre></div>
+
+<p>My original example for parsing the env variable and making he DB connection.</p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span> <span class="n">ExampleSinatra</span>
+  <span class="k">class</span> <span class="n">App</span> &lt; <span class="n">Sinatra::Base</span>
+    <span class="k">use</span> <span class="n">Rack::MethodOverride</span>
+    <span class="n">set</span> :<span class="n">public</span>, <span class="s">&quot;public&quot;</span>
+
+    <span class="n">configure</span> :<span class="n">production</span> <span class="nb">do</span>
+      <span class="n">db</span> = <span class="n">ENV</span>[<span class="s">&quot;DATABASE_URL&quot;</span>]
+      <span class="k">if</span> <span class="n">db</span>.<span class="nb">match</span>(<span class="sr">/postgres:\/\/(.*):(.*)@(.*)\/(.*)/</span>) 
+        <span class="n">username</span> = <span class="nv">$1</span>
+        <span class="n">password</span> = <span class="nv">$2</span>
+        <span class="n">hostname</span> = <span class="nv">$3</span>
+        <span class="n">database</span> = <span class="nv">$4</span>
+
+        <span class="n">ActiveRecord::Base</span>.<span class="n">establish_connection</span>(
+          :<span class="n">adapter</span>  =&gt; <span class="s">&#39;postgresql&#39;</span>,
+          :<span class="n">host</span>     =&gt; <span class="n">hostname</span>,
+          :<span class="n">username</span> =&gt; <span class="n">username</span>,
+          :<span class="n">password</span> =&gt; <span class="n">password</span>,
+          :<span class="n">database</span> =&gt; <span class="n">database</span>
+        )
+      <span class="nb">end</span>
+    <span class="nb">end</span>
+  <span class="nb">end</span>
+<span class="nb">end</span>
+<span class="k">if</span> <span class="nv">$0</span> == <span class="n">__FILE__</span>
+  <span class="n">ExampleSinatra::App</span>.<span class="nb">run</span>!
+<span class="nb">end</span>
+</code></pre></div>
+
+<p>From Heroku connecting using <a href="http://sequel.rubyforge.org/">Sequel</a> or <a href="http://datamapper.org/">Datamapper</a> is a little simpler:</p>
+<div class="highlight"><pre><span></span><code>Sequel.connect(ENV[&#39;DATABASE_URL&#39;] || &#39;sqlite://my.db&#39;)
+DataMapper.setup(:default, ENV[&#39;DATABASE_URL&#39;] || &#39;sqlite3://my.db&#39;)
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind" rel="bookmark"
+                               title="Permalink to "Ruby Regular Expressions Lookahead / Lookbehind"">"Ruby Regular Expressions Lookahead / Lookbehind"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-07T01:39:28+01:00">
+                Published: Tue 07 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/regex.html">Regex</a> </p>        
+</footer><!-- /.post-info -->                        <p>I recently discovered a feature of regular expressions called lookahead. This means for a match the lookahead must exist but …</p>
+                        <a class="readmore" href="..///68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

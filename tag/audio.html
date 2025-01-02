@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Audio</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///134/Finding_Tracks_not_in_iTunes">"Finding Tracks not in iTunes"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2012-01-14T18:19:45+00:00">
+                Published: Sat 14 January 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/audio.html">Audio</a> </p>        
+</footer><!-- /.post-info --><p>After switching my Audio ripper (<a href="http://sbooth.org/Max">Max</a>) accidentally to 'AAC Low Delay' rather than plain 'AAC' I realised too late after about 20-30cd rips that they were not appearing in iTunes.</p>
+<p>I also convert to flac to converting to the correct format from source is still relatively easy. Finding which track are in my iTunes folder but not in the iTunes library is a little bit more tricky. Well it was going to be until I found <a href="http://dougscripts.com/itunes/scripts/ss.php?sp=musicfolderfilesnotadded2">this Dougs Script</a>. </p>
+<p>I did not have to instal any script for this just ran the app insdie the download for 'Music Folder Files Not Added v3.0'. My iTune folder is in the default location so I just had to press 'find' and it took around a minute to list all the music tracks I had but iTunes had not added to its library.</p>
+<p>Working my way through the list recreating the tracks in the correct AAC format, just adding the 'iTunes Music' folder to iTunes after every ablum fix and hitting 'find' in Dougs app to refresh the list.  </p>
+<p>Easy, almsot got a ruby version of it working but only got so far:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">gem</span><span class="w"> </span><span class="nx">install</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">itunes</span><span class="o">-</span><span class="kn">library</span><span class="err">&#39;</span>
+</code></pre></div>
+
+<p>The Script:</p>
+<div class="highlight"><pre><span></span><code><span class="n">require</span><span class="w"> </span><span class="s1">&#39;itunes/library&#39;</span>
+
+<span class="n">path</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="w"> </span><span class="s2">&quot;~/Music/iTunes/iTunes Music&quot;</span><span class="w"> </span><span class="p">)</span>
+<span class="n">itunes_lib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="w"> </span><span class="s2">&quot;~/Music/iTunes/iTunes Library.xml&quot;</span><span class="w"> </span><span class="p">)</span>
+<span class="n">library</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">ITunes</span><span class="p">::</span><span class="n">Library</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="w"> </span><span class="n">itunes_lib</span><span class="w"> </span><span class="p">)</span>
+
+<span class="n">puts</span><span class="w">  </span><span class="s2">&quot;#{library.music.tracks.size} Tracks have been loaded&quot;</span>
+
+<span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="w"> </span><span class="n">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;**&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;*.m4a&#39;</span><span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="p">)</span>
+
+<span class="n">files</span><span class="o">.</span><span class="n">each</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="o">|</span><span class="n">music_file</span><span class="o">|</span>
+<span class="w">  </span><span class="n">music_file_nice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">music_file</span><span class="o">.</span><span class="n">dup</span>
+<span class="w">  </span><span class="n">music_file</span><span class="o">.</span><span class="n">gsub</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;%20&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">music_file</span><span class="o">.</span><span class="n">gsub</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;%231&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="c1">#music_file.gsub!(&#39;´&#39;, &#39;%C2%B4&#39;)</span>
+
+<span class="w">  </span><span class="c1">#This comes last so it the # does not get replace</span>
+<span class="w">  </span><span class="n">music_file</span><span class="o">.</span><span class="n">gsub</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
+
+<span class="w">  </span><span class="c1">#Correcting filename prefix / location</span>
+<span class="w">  </span><span class="n">music_file</span><span class="o">.</span><span class="n">gsub</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39;/Users/morgy/Music&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;file://localhost/Volumes/Queeg500TimeM&#39;</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="c1">#found = library.music.tracks.keep_if { |t| t.to_hash[&#39;Location&#39;] == music_file }</span>
+<span class="w">  </span><span class="n">library</span><span class="o">.</span><span class="n">music</span><span class="o">.</span><span class="n">tracks</span><span class="o">.</span><span class="n">each</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">|</span><span class="n">t</span><span class="o">|</span><span class="w"> </span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">t</span><span class="o">.</span><span class="n">to_hash</span><span class="p">[</span><span class="s1">&#39;Location&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">music_file</span>
+<span class="w">      </span><span class="n">found</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span>
+<span class="w">    </span><span class="n">end</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="n">found</span><span class="o">.</span><span class="n">empty</span><span class="err">?</span><span class="w"> </span>
+<span class="w">    </span><span class="n">puts</span>
+<span class="w">    </span><span class="n">puts</span><span class="w"> </span><span class="s2">&quot;MISSING #{music_file_nice}&quot;</span>
+<span class="w">  </span><span class="n">end</span>
+
+<span class="n">end</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///49/OS_X_iTunes_play_.ogg_videos" rel="bookmark"
+                               title="Permalink to "OS X iTunes play .ogg videos"">"OS X iTunes play .ogg videos"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-06T09:18:22+01:00">
+                Published: Tue 06 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/audio.html">Audio</a> <a href="../tag/itunes.html">iTunes</a> <a href="../tag/ogg.html">Ogg</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://pragmatic.tv">Pragmatic TV</a> release there screen casts in iPod, Quicktime and Theora Ogg formats. Since Theora Ogg seems to be the …</p>
+                        <a class="readmore" href="..///49/OS_X_iTunes_play_.ogg_videos">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///37/M4B_Audiobooks_on_Android" rel="bookmark"
+                               title="Permalink to "M4B Audiobooks on Android"">"M4B Audiobooks on Android"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-07T11:15:46+01:00">
+                Published: Mon 07 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/audio.html">Audio</a> <a href="../tag/itunes.html">iTunes</a> <a href="../tag/audiobook.html">Audiobook</a> <a href="../tag/android.html">Android</a> </p>        
+</footer><!-- /.post-info -->                        <p>The *.m4b extension is used for audiobooks on the iTunes Store and is a convenient (if you have an iPod …</p>
+                        <a class="readmore" href="..///37/M4B_Audiobooks_on_Android">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///31/Add_HTTP_%28web%29_control_over_your_InfaRed_devices" rel="bookmark"
+                               title="Permalink to "Add HTTP (web) control over your InfaRed devices"">"Add HTTP (web) control over your InfaRed devices"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-11T01:49:48+01:00">
+                Published: Tue 11 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/audio.html">Audio</a> <a href="../tag/web.html">Web</a> <a href="../tag/automation.html">Automation</a> </p>        
+</footer><!-- /.post-info -->                        <p>Using the new <a href="http://www.keene.co.uk/electronic/keene-electronics/keene-ir-anywhere-ir-over-ip-module-%28128-code%29/KIRA128.html">IR ANYWHERE IR OVER IP MODULE</a> you can send web requests that get turned into standard consumer …</p>
+                        <a class="readmore" href="..///31/Add_HTTP_%28web%29_control_over_your_InfaRed_devices">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///17/iTunes_play_FLAC_on_OS_X" rel="bookmark"
+                               title="Permalink to "iTunes play FLAC on OS X"">"iTunes play FLAC on OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-18T07:33:36+01:00">
+                Published: Sun 18 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/itunes.html">iTunes</a> <a href="../tag/flac.html">FLAC</a> <a href="../tag/audio.html">Audio</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://code.google.com/p/flukeformac/">Fluke for mac</a> can be used to get iTunes playing <a href="http://flac.sourceforge.net/">FLAC</a> audio files. However it is currently broken for Snow …</p>
+                        <a class="readmore" href="..///17/iTunes_play_FLAC_on_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

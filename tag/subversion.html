@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Subversion</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///141/SVN_multi-line_comments_on_the_command_line_">"SVN multi-line comments on the command line "</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2012-03-28T13:32:53+01:00">
+                Published: Wed 28 March 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/subversion.html">Subversion</a> </p>        
+</footer><!-- /.post-info --><p>Answer:</p>
+<div class="highlight"><pre><span></span><code>svn commit -m $&#39;Line 1 \nLine 2&#39;
+</code></pre></div>
+
+<h2>The Problem</h2>
+<p>Committing to subversion on the command line and using escaped line returns for multi line comments:</p>
+<div class="highlight"><pre><span></span><code>svn commit -m $&#39;Line 1 \nLine 2&#39;
+</code></pre></div>
+
+<p>svn log will show some thing like </p>
+<div class="highlight"><pre><span></span><code><span class="nb">------------------------------------------------------------------------</span>
+<span class="c">r1 | user | 2012</span><span class="nb">-</span><span class="c">03</span><span class="nb">-</span><span class="c">28 13:37:48 </span><span class="nb">+</span><span class="c">0100 (Wed</span><span class="nt">,</span><span class="c"> 28 Mar 2012) | 1 lines</span>
+
+<span class="c">Line 1 \nLine 2</span>
+</code></pre></div>
+
+<p>Answer originally posted on <a href="http://serverfault.com/questions/148917/use-linefeed-or-carriage-return-in-subversion-commit-message-from-the-command-li">ServerFault</a>. Strings contained in \'\' should not be interpreted by the command line but:</p>
+<div class="highlight"><pre><span></span><code>svn commit -m &quot;Line 1 \nLine 2&quot;
+</code></pre></div>
+
+<p>Shows the same errors. Starting the comment with a $ does seem to fix it.</p>
+<div class="highlight"><pre><span></span><code>svn commit -m $&#39;Line 1 \nLine 2&#39;
+</code></pre></div>
+
+<p>Will give:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">------------------------------------------------------------------------</span>
+<span class="c">r1 | user | 2012</span><span class="nb">-</span><span class="c">03</span><span class="nb">-</span><span class="c">28 13:37:48 </span><span class="nb">+</span><span class="c">0100 (Wed</span><span class="nt">,</span><span class="c"> 28 Mar 2012) | 1 lines</span>
+
+<span class="c">Line 1 </span>
+<span class="c">Line 2</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

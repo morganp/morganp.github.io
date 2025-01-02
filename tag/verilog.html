@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Verilog</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../systemverilog-rtl-types.html">"SystemVerilog: RTL Types"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2015-03-26T20:08:34+00:00">
+                Published: Thu 26 March 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/verilog.html">Verilog</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info --><p><code>reg</code> and <code>wire</code> were the original synthesisable types. Wires are constantly assigned and regs are evaluated at particular points, the advantage here is for the simulator to make optimisations.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">wire</span><span class="w"> </span><span class="n">w_data</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">w_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+
+<span class="c1">// Same function as above using reg</span>
+<span class="kt">reg</span><span class="w"> </span><span class="n">r_data</span><span class="p">;</span>
+<span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="o">*</span><span class="w"> </span>
+<span class="w">  </span><span class="n">r_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+
+<p>A common mistake when learning Verilog is to assume the reg type implies a register in hardware. The earlier optimisation for the simulator can be done through the context of its usage.</p>
+<p>This introduces <code>logic</code> which can be used in place of wire and reg.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">logic</span><span class="w">  </span><span class="n">w_data</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">w_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+
+<span class="c1">// Same function as above using reg</span>
+<span class="kt">logic</span><span class="w"> </span><span class="n">r_data</span><span class="p">;</span>
+<span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="o">*</span><span class="w"> </span>
+<span class="w">  </span><span class="n">r_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+
+<p>The type <code>bit</code> and <code>byte</code> have also been created that can only hold 2 states 0 or 1 no x or z. <code>byte</code> implies <code>bit [7:0]</code>. Using these types offers a small speed improvement but I would recommend not using them in RTL as your verification may miss uninitialized values or critical resets.</p>
+<p>The usage of <code>bit</code> and <code>byte</code> would be more common in testbench components, but can lead to issues in case of having to drive x's to stimulate data corruption and recovery.</p>
+<hr>
+<p><strong>Update</strong></p>
+<p>At the time of writing I was under the impression that <code>logic</code> could not be used for tristate, I am unable to find the original paper that I based this on. Until further updates, comments or edits, I revoke my assertion that <em>logic can not be used to create tri-state lines</em>.</p>
+<hr>
+<p>The <code>tri</code> type has been added, for explicitly defining a tri-state line. It is based on the properties of a <code>wire</code>, <code>logic</code> is based on the properties of a <code>reg</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">tri</span><span class="w"> </span><span class="n">t_data</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">t_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">drive</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">1</span><span class="p">&#39;</span><span class="n">bz</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+
+<p>If you no longer have to support backwards compatibility Verilog then I would recommend switching to using <code>logic</code> and <code>tri</code>. Using <code>logic</code> aids re-factoring and and <code>tri</code>  reflects the design intent of a tristate line.</p>
+<p>Originally posted as a<a href="http://stackoverflow.com/a/13285242/97073"> SO answer</a>.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-define-if-not-defined.html" rel="bookmark"
+                               title="Permalink to "Verilog: define if not defined"">"Verilog: define if not defined"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-03-26T19:45:10+00:00">
+                Published: Thu 26 March 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/verilog.html">Verilog</a> </p>        
+</footer><!-- /.post-info -->                        <p>To set a default define option while allowing it to be overridden from the command line.</p>
+<div class="highlight"><pre><span></span><code><span class="sb">`ifndef mode_sel</span>
+<span class="sb">  `</span>define mode_sel …</code></pre></div>
+                        <a class="readmore" href="../verilog-define-if-not-defined.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-shm-waveforms.html" rel="bookmark"
+                               title="Permalink to "Verilog: shm waveforms"">"Verilog: shm waveforms"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-03-26T19:38:29+00:00">
+                Published: Thu 26 March 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/verilog.html">Verilog</a> </p>        
+</footer><!-- /.post-info -->                        <p>The best practice is to use a tcl file:</p>
+<p>shm.tcl </p>
+<div class="highlight"><pre><span></span><code>database -open waves -shm
+probe -create your_top_level -depth all …</code></pre></div>
+                        <a class="readmore" href="../verilog-shm-waveforms.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-timeformat.html" rel="bookmark"
+                               title="Permalink to "Verilog Timeformat"">"Verilog Timeformat"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-03-26T19:21:25+00:00">
+                Published: Thu 26 March 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/verilog.html">Verilog</a> </p>        
+</footer><!-- /.post-info -->                        <p>Time can be displayed during simulation using <code>%t</code>.</p>
+<div class="highlight"><pre><span></span><code>$display(&quot;%t&quot;, $realtime);
+</code></pre></div>
+
+<p>Timeformat is used to control the way (<code>%t</code>) this …</p>
+                        <a class="readmore" href="../verilog-timeformat.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../systemverilog-constrained-random.html" rel="bookmark"
+                               title="Permalink to "SystemVerilog: Constrained Random"">"SystemVerilog: Constrained Random"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-02-18T17:01:56+00:00">
+                Published: Wed 18 February 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/verilog.html">Verilog</a> <a href="../tag/systemverilog.html">SystemVerilog</a> <a href="../tag/verification.html">Verification</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>A minimal example of constrained random to constraining a 4 bit value to 0 to 11 when randomised.</p>
+<div class="highlight"><pre><span></span><code><span class="n">module</span><span class="w"> </span><span class="n">tb …</span></code></pre></div>
+                        <a class="readmore" href="../systemverilog-constrained-random.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-thermometer-code.html" rel="bookmark"
+                               title="Permalink to "Verilog: Thermometer Code"">"Verilog: Thermometer Code"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-02-18T16:51:43+00:00">
+                Published: Wed 18 February 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/verilog.html">Verilog</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>Efficiently create a <a href="http://en.wikipedia.org/wiki/Unary_coding">thermometer code</a> in verilog:</p>
+<div class="highlight"><pre><span></span><code><span class="n">localparam</span><span class="w"> </span><span class="n">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">;</span>
+
+<span class="k">function</span><span class="w"> </span><span class="o">[</span><span class="n">M-1:0</span><span class="o">]</span><span class="w"> </span><span class="n">therm_code</span><span class="p">;</span>
+<span class="w">  </span><span class="k">input</span><span class="w">    </span><span class="o">[</span><span class="n">$clog2(M):0</span><span class="o">]</span><span class="w"> </span><span class="n">val</span><span class="p">;</span>
+<span class="w">  </span><span class="k">begin …</span></code></pre></div>
+                        <a class="readmore" href="../verilog-thermometer-code.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-calculate-primes.html" rel="bookmark"
+                               title="Permalink to "Verilog: Calculate primes"">"Verilog: Calculate primes"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-12-20T07:28:41+00:00">
+                Published: Sat 20 December 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/math.html">Math</a> <a href="../tag/verilog.html">Verilog</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on my answer to <a href="http://stackoverflow.com/q/27461173/97073">this SO Question</a>.</p>
+<p><strong><a href="http://www.mathsisfun.com/definitions/prime-number.html">Definition of Prime</a>:</strong></p>
+<blockquote>
+<p>A Prime Number can be divided evenly only by …</p></blockquote>
+                        <a class="readmore" href="../verilog-calculate-primes.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-timeout.html" rel="bookmark"
+                               title="Permalink to "Verilog: Timeout"">"Verilog: Timeout"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-06-14T08:08:26+01:00">
+                Published: Sat 14 June 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/verilog.html">Verilog</a> </p>        
+</footer><!-- /.post-info -->                        <p>To wait for a maximum of <code>10ns</code> for positive edge on clk then carry on with simulation.</p>
+<div class="highlight"><pre><span></span><code><span class="n">fork</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">wait_or_timeout</span>
+<span class="w">  </span><span class="n">begin …</span></code></pre></div>
+                        <a class="readmore" href="../verilog-timeout.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-importing-envvar.html" rel="bookmark"
+                               title="Permalink to "Verilog importing envvar"">"Verilog importing envvar"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-03T18:22:00+01:00">
+                Published: Thu 03 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/verilog.html">Verilog</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on a <a href="http://stackoverflow.com/a/15103561/97073">Stackoverflow answer</a>, to import environment variables into Verilog you can use:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;DPI-C&quot;</span><span class="w"> </span><span class="n">function</span><span class="w"> </span><span class="n">string</span><span class="w"> </span><span class="n">getenv</span><span class="p">(</span><span class="nb">input …</span></code></pre></div>
+                        <a class="readmore" href="../verilog-importing-envvar.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../display-without-a-line-return.html" rel="bookmark"
+                               title="Permalink to "$display without a line return"">"$display without a line return"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-01T17:49:43+00:00">
+                Published: Sat 01 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/verilog.html">Verilog</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>In Verilog to output to stdout without a line return use <code>$write();</code></p>
+<p>Equivalent statements :</p>
+<div class="highlight"><pre><span></span><code>$write(&quot;\n&quot;);
+$display(&quot;&quot;);
+</code></pre></div>
+                        <a class="readmore" href="../display-without-a-line-return.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../navigate-verilog-with-vim.html" rel="bookmark"
+                               title="Permalink to "Navigate Verilog with VIM"">"Navigate Verilog with VIM"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-06-04T21:08:39+00:00">
+                Published: Tue 04 June 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> <a href="../tag/verilog.html">Verilog</a> </p>        
+</footer><!-- /.post-info -->                        <h1>Using <code>gf</code></h1>
+<p>In your vimrc</p>
+<div class="highlight"><pre><span></span><code>&quot; gf goto_file, automatically add search for these file extensions
+:set suffixesadd+=.v
+:set suffixesadd+=.sv …</code></pre></div>
+                        <a class="readmore" href="../navigate-verilog-with-vim.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../tasks-using-absolute-delays.html" rel="bookmark"
+                               title="Permalink to Tasks Using Absolute Delays">Tasks Using Absolute Delays</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-02T00:10:10+00:00">
+                Published: Fri 02 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/verification.html">Verification</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/systemverilog.html">SystemVerilog</a> </p>        
+</footer><!-- /.post-info -->                        <p>As previously mentioned SystemVerilog introduced abolute delays in the form of <code>#1s;</code>, <code>#1ms</code>, <code>#1us</code>, <code>#1ns</code>.
+Using these as values passed …</p>
+                        <a class="readmore" href="../tasks-using-absolute-delays.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

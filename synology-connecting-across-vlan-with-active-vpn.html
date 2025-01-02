@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Synology Connecting Across VLAN with active VPN</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+    <meta name="description" content="When a Synology NAS creates a VPN connection it overides the default gateway, except for devices listed as contained within …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="./category/cooking.html">Cooking</a></li>
+                                                <li><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/garden.html">Garden</a></li>
+                                                <li><a href="./category/home.html">Home</a></li>
+                                                <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/python.html">Python</a></li>
+                                                <li class="active"><a href="./category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./synology-connecting-across-vlan-with-active-vpn.html" rel="bookmark"
+             title="Permalink to Synology Connecting Across VLAN with active VPN">Synology Connecting Across VLAN with active VPN</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-16T11:30:00+01:00">
+                Published: Wed 16 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/tech.html">Tech</a>.</p>
+<p>tags: <a href="./tag/synology.html">Synology</a> <a href="./tag/networking.html">networking</a> <a href="./tag/vlan.html">VLAN</a> <a href="./tag/vpn.html">VPN</a> </p>        
+</footer><!-- /.post-info -->        <p>When a Synology NAS creates a VPN connection it overides the default gateway, except for devices listed as contained within its subnet. According to the <a href="https://community.synology.com/enu/forum/1/post/138785">a post</a> on the synology forum even if the subnet is changed to 255.255.0.0 it will not see devices on another VLAN. It feels like a subnet mask of 255.255.255.0 is hardcoded.</p>
+<p>For Allowing my Synology NAS to create a VPN connection and see device on my VLANS I had to add a <em>static route</em> defining a gatweway for the VLAN IP/subnet.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Network</span><span class="w"> </span><span class="nv">Destination</span>:<span class="w"> </span><span class="mi">192</span>.<span class="mi">168</span>.<span class="mi">107</span>.<span class="mi">0</span><span class="w">  </span>#<span class="w"> </span><span class="nv">This</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">VLAN</span><span class="w"> </span><span class="mi">107</span>
+<span class="nv">Netmask</span><span class="w">            </span>:<span class="w"> </span><span class="mi">255</span>.<span class="mi">255</span>.<span class="mi">255</span>.<span class="mi">0</span><span class="w">  </span>#<span class="w"> </span><span class="nv">Standard</span><span class="w"> </span><span class="nv">netmask</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">VLAN</span>
+<span class="nv">Gateway</span><span class="w">            </span>:<span class="w"> </span><span class="mi">192</span>.<span class="mi">168</span>.<span class="mi">100</span>.<span class="mi">1</span><span class="w">  </span>#<span class="w"> </span><span class="nv">Gateway</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">Synology</span><span class="w"> </span><span class="nv">NASs</span><span class="w"> </span><span class="nv">VLAN</span>
+<span class="nv">Interface</span><span class="w">          </span>:<span class="w"> </span><span class="nv">physical</span><span class="w"> </span><span class="nv">interface</span><span class="w"> </span><span class="nv">that</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">Synology</span><span class="w"> </span><span class="nv">NAS</span><span class="w"> </span><span class="nv">uses</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="k">connect</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">VLAN</span>
+</code></pre></div>
+
+<p><img alt="screen grab of route" src="/images/Tech/Synology_static_route.png"></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

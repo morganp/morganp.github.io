@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Memory</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///158/Ubuntu%2C_formatting_a_3TB_drive">"Ubuntu, formatting a 3TB drive"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2012-05-03T21:34:20+01:00">
+                Published: Thu 03 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/ubuntu.html">Ubuntu</a> </p>        
+</footer><!-- /.post-info --><p>I started off following <a href="https://help.ubuntu.com/community/InstallingANewHardDrive">the ubuntu guide for installing a new drive</a>, which uses fdsik to create the partitions how ever after formatting and mounting I ran <code>df -h</code>:</p>
+<div class="highlight"><pre><span></span><code>Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdb1       2.0T   28G  1.9T   2% /mnt/kryten/disk5
+</code></pre></div>
+
+<h2>Which is not 3TB</h2>
+<p>I then found <a href="http://www.cyberciti.biz/tips/fdisk-unable-to-create-partition-greater-2tb.html">this article</a> which worked in the long run not sure if I typo'd a command but similar to <a href="http://archlinuxarm.org/forum/viewtopic.php?t=1935&amp;p=10490">this other user</a> I had to run through the commands a second time for them to work.</p>
+<p>To start with use <code>parted</code> instead of fdisk, this allows the gpt partition table that fdisk does not.</p>
+<div class="highlight"><pre><span></span><code><span class="ss">(</span><span class="nv">parted</span><span class="ss">)</span><span class="w"> </span><span class="nv">mklabel</span><span class="w"> </span><span class="nv">gpt</span><span class="w"> </span>
+<span class="nv">Warning</span>:<span class="w"> </span><span class="nv">The</span><span class="w"> </span><span class="nv">existing</span><span class="w"> </span><span class="nv">disk</span><span class="w"> </span><span class="nv">label</span><span class="w"> </span><span class="nv">on</span><span class="w"> </span><span class="o">/</span><span class="nv">dev</span><span class="o">/</span><span class="nv">sdb</span><span class="w"> </span><span class="nv">will</span><span class="w"> </span><span class="nv">be</span><span class="w"> </span><span class="nv">destroyed</span><span class="w"> </span><span class="nv">and</span><span class="w"> </span><span class="nv">all</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="nv">on</span>
+<span class="nv">this</span><span class="w"> </span><span class="nv">disk</span><span class="w"> </span><span class="nv">will</span><span class="w"> </span><span class="nv">be</span><span class="w"> </span><span class="nv">lost</span>.<span class="w"> </span><span class="k">Do</span><span class="w"> </span><span class="nv">you</span><span class="w"> </span><span class="nv">want</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="k">continue</span>?
+<span class="nv">Yes</span><span class="o">/</span><span class="nv">No</span>?<span class="w"> </span><span class="nv">yes</span><span class="w">    </span>
+<span class="ss">(</span><span class="nv">parted</span><span class="ss">)</span><span class="w"> </span><span class="nv">unit</span><span class="w"> </span><span class="nv">TB</span><span class="w"> </span>
+<span class="ss">(</span><span class="nv">parted</span><span class="ss">)</span><span class="w"> </span><span class="nv">mkpart</span><span class="w"> </span><span class="nv">primary</span><span class="w"> </span><span class="mi">0</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w"> </span><span class="mi">3</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w">                                     </span>
+<span class="nv">Warning</span>:<span class="w"> </span><span class="nv">You</span><span class="w"> </span><span class="nv">requested</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">partition</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="mi">0</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="mi">3</span>.<span class="mi">00</span><span class="nv">TB</span>.<span class="w">                 </span>
+<span class="nv">The</span><span class="w"> </span><span class="nv">closest</span><span class="w"> </span><span class="nv">location</span><span class="w"> </span><span class="nv">we</span><span class="w"> </span><span class="nv">can</span><span class="w"> </span><span class="nv">manage</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="mi">0</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="mi">0</span>.<span class="mi">00</span><span class="nv">TB</span>.
+<span class="nv">Is</span><span class="w"> </span><span class="nv">this</span><span class="w"> </span><span class="nv">still</span><span class="w"> </span><span class="nv">acceptable</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">you</span>?
+<span class="nv">Yes</span><span class="o">/</span><span class="nv">No</span>?<span class="w"> </span><span class="nv">yes</span>
+</code></pre></div>
+
+<p>basically after this point it showed up as a few KB after formatting, tried it again and it seemed to work much better.</p>
+<div class="highlight"><pre><span></span><code><span class="ss">(</span><span class="nv">parted</span><span class="ss">)</span><span class="w"> </span><span class="nv">mklabel</span><span class="w"> </span><span class="nv">gpt</span><span class="w">                                                       </span>
+<span class="nv">Warning</span>:<span class="w"> </span><span class="nv">The</span><span class="w"> </span><span class="nv">existing</span><span class="w"> </span><span class="nv">disk</span><span class="w"> </span><span class="nv">label</span><span class="w"> </span><span class="nv">on</span><span class="w"> </span><span class="o">/</span><span class="nv">dev</span><span class="o">/</span><span class="nv">sdb</span><span class="w"> </span><span class="nv">will</span><span class="w"> </span><span class="nv">be</span><span class="w"> </span><span class="nv">destroyed</span><span class="w"> </span><span class="nv">and</span><span class="w"> </span><span class="nv">all</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="nv">on</span>
+<span class="nv">this</span><span class="w"> </span><span class="nv">disk</span><span class="w"> </span><span class="nv">will</span><span class="w"> </span><span class="nv">be</span><span class="w"> </span><span class="nv">lost</span>.<span class="w"> </span><span class="k">Do</span><span class="w"> </span><span class="nv">you</span><span class="w"> </span><span class="nv">want</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="k">continue</span>?
+<span class="nv">Yes</span><span class="o">/</span><span class="nv">No</span>?<span class="w"> </span><span class="nv">yes</span><span class="w">                                                               </span>
+<span class="ss">(</span><span class="nv">parted</span><span class="ss">)</span><span class="w"> </span><span class="nv">unit</span><span class="w"> </span><span class="nv">TB</span><span class="w">                                                          </span>
+<span class="ss">(</span><span class="nv">parted</span><span class="ss">)</span><span class="w"> </span><span class="nv">mkpart</span><span class="w"> </span><span class="nv">primary</span><span class="w"> </span><span class="mi">0</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w"> </span><span class="mi">3</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w">                                     </span>
+<span class="ss">(</span><span class="nv">parted</span><span class="ss">)</span><span class="w"> </span><span class="nv">print</span><span class="w">                                                            </span>
+<span class="nv">odel</span>:<span class="w"> </span><span class="nv">Unknown</span><span class="w"> </span><span class="ss">(</span><span class="nv">unknown</span><span class="ss">)</span>
+<span class="nv">Disk</span><span class="w"> </span><span class="o">/</span><span class="nv">dev</span><span class="o">/</span><span class="nv">sdb1</span>:<span class="w"> </span><span class="mi">3001</span><span class="nv">GB</span>
+<span class="nv">Sector</span><span class="w"> </span><span class="nv">size</span><span class="w"> </span><span class="ss">(</span><span class="nv">logical</span><span class="o">/</span><span class="nv">physical</span><span class="ss">)</span>:<span class="w"> </span><span class="mi">512</span><span class="nv">B</span><span class="o">/</span><span class="mi">4096</span><span class="nv">B</span>
+<span class="nv">Partition</span><span class="w"> </span><span class="nv">Table</span>:<span class="w"> </span><span class="k">loop</span>
+
+<span class="nv">Number</span><span class="w">  </span><span class="nv">Start</span><span class="w">   </span><span class="k">End</span><span class="w">     </span><span class="nv">Size</span><span class="w">    </span><span class="nv">File</span><span class="w"> </span><span class="nv">system</span><span class="w">  </span><span class="nv">Name</span><span class="w">     </span><span class="nv">Flags</span>
+<span class="mi">1</span><span class="w">      </span><span class="mi">0</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w">  </span><span class="mi">3</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w">  </span><span class="mi">3</span>.<span class="mi">00</span><span class="nv">TB</span><span class="w">               </span><span class="nv">primary</span>
+
+<span class="ss">(</span><span class="nv">parted</span><span class="ss">)</span><span class="w"> </span><span class="nv">quit</span><span class="w">                                                             </span>
+<span class="nv">Information</span>:<span class="w"> </span><span class="nv">You</span><span class="w"> </span><span class="nv">may</span><span class="w"> </span><span class="nv">need</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">update</span><span class="w"> </span><span class="o">/</span><span class="nv">etc</span><span class="o">/</span><span class="nv">fstab</span>.
+</code></pre></div>
+
+<h2>Format</h2>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>mkfs.ext4<span class="w"> </span>/dev/sdb1
+<span class="nv">$sudo</span><span class="w"> </span>parted<span class="w"> </span>/dev/sdb1
+<span class="o">(</span>parted<span class="o">)</span><span class="w"> </span>print
+Model:<span class="w"> </span>Unknown<span class="w"> </span><span class="o">(</span>unknown<span class="o">)</span>
+Disk<span class="w"> </span>/dev/sdb1:<span class="w"> </span>3001GB<span class="w"> </span>
+Sector<span class="w"> </span>size<span class="w"> </span><span class="o">(</span>logical/physical<span class="o">)</span>:<span class="w"> </span>512B/4096B
+Partition<span class="w"> </span>Table:<span class="w"> </span>loop
+
+Number<span class="w">  </span>Start<span class="w">  </span>End<span class="w">     </span>Size<span class="w">    </span>File<span class="w"> </span>system<span class="w">  </span>Flags
+<span class="m">1</span><span class="w">      </span><span class="m">0</span>.00B<span class="w">  </span>3001GB<span class="w">  </span>3001GB<span class="w">  </span>ext4
+</code></pre></div>
+
+<h2>Reduce Reserved Space</h2>
+<p>By default 5% is reserved for the root to stop the driving becoming unusable when full, for data and not the main OS drive this does not matter too much, and 5% was decided when drives where much small. 5% of 3TB is 150 GB, way too much.  Turn this down to 1% with:</p>
+<div class="highlight"><pre><span></span><code>sudo tune2fs -m 1 /dev/sdb1
+</code></pre></div>
+
+<h2>Mount</h2>
+<div class="highlight"><pre><span></span><code>sudo mkdir /mnt/kryten/disk5 
+sudo mount /dev/sdb1 /mnt/kryten/disk5
+</code></pre></div>
+
+<h2>Find UUID</h2>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>blkid
+/dev/sda1:<span class="w"> </span><span class="nv">UUID</span><span class="o">=</span><span class="s2">&quot;c41cba49-bd3a-41d7-961c-b4ad45d48ed1&quot;</span><span class="w"> </span><span class="nv">TYPE</span><span class="o">=</span><span class="s2">&quot;ext4&quot;</span><span class="w"> </span>
+/dev/sdb1:<span class="w"> </span><span class="nv">UUID</span><span class="o">=</span><span class="s2">&quot;d822c6af-9802-4d00-8de8-61f1653a854a&quot;</span><span class="w"> </span><span class="nv">TYPE</span><span class="o">=</span><span class="s2">&quot;ext4&quot;</span><span class="w"> </span>
+/dev/sdc1:<span class="w"> </span><span class="nv">UUID</span><span class="o">=</span><span class="s2">&quot;59a61ceb-fee3-460a-97c5-e9f115776daf&quot;</span><span class="w"> </span><span class="nv">TYPE</span><span class="o">=</span><span class="s2">&quot;ext4&quot;</span><span class="w"> </span>
+/dev/sdc5:<span class="w"> </span><span class="nv">UUID</span><span class="o">=</span><span class="s2">&quot;80f9c384-9a5a-4563-921a-5c25628e1b2e&quot;</span><span class="w"> </span><span class="nv">TYPE</span><span class="o">=</span><span class="s2">&quot;swap&quot;</span>
+</code></pre></div>
+
+<h2>Update /etc/fstab</h2>
+<div class="highlight"><pre><span></span><code>$<span class="nv">sudo</span><span class="w"> </span><span class="nv">vim</span><span class="w"> </span><span class="o">/</span><span class="nv">etc</span><span class="o">/</span><span class="nv">fstab</span>
+
+#<span class="o">/</span><span class="nv">dev</span><span class="o">/</span><span class="nv">sdb1</span><span class="w"> </span><span class="mi">3</span><span class="nv">TB</span><span class="w"> </span><span class="nv">drive</span><span class="w"> </span><span class="nv">replacing</span><span class="w"> </span><span class="mi">1</span>.<span class="mi">5</span><span class="nv">TB</span><span class="w"> </span><span class="nv">old</span><span class="w"> </span><span class="nv">UUID</span><span class="w"> </span><span class="nv">Below</span>
+<span class="nv">UUID</span><span class="o">=</span><span class="nv">d822c6af</span><span class="o">-</span><span class="mi">9802</span><span class="o">-</span><span class="mi">4</span><span class="nv">d00</span><span class="o">-</span><span class="mi">8</span><span class="nv">de8</span><span class="o">-</span><span class="mi">61</span><span class="nv">f1653a854a</span><span class="w">     </span><span class="o">/</span><span class="nv">mnt</span><span class="o">/</span><span class="nv">kryten</span><span class="o">/</span><span class="nv">disk4</span><span class="w"> </span><span class="nv">ext4</span><span class="w"> </span><span class="nv">rw</span>,<span class="nv">auto</span>,<span class="nv">user</span>,<span class="k">exec</span>,<span class="nv">async</span>,<span class="nv">errors</span><span class="o">=</span><span class="nv">remount</span><span class="o">-</span><span class="nv">ro</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">1</span>
+#<span class="nv">UUID</span><span class="o">=</span><span class="nv">c41cba49</span><span class="o">-</span><span class="nv">bd3a</span><span class="o">-</span><span class="mi">41</span><span class="nv">d7</span><span class="o">-</span><span class="mi">961</span><span class="nv">c</span><span class="o">-</span><span class="nv">b4ad45d48ed1</span><span class="w">    </span><span class="o">/</span><span class="nv">mnt</span><span class="o">/</span><span class="nv">kryten</span><span class="o">/</span><span class="nv">disk4</span><span class="w"> </span><span class="nv">ext4</span><span class="w"> </span><span class="nv">rw</span>,<span class="nv">auto</span>,<span class="nv">user</span>,<span class="k">exec</span>,<span class="nv">async</span>,<span class="nv">errors</span><span class="o">=</span><span class="nv">remount</span><span class="o">-</span><span class="nv">ro</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">1</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///98/Schwartzian_Transform" rel="bookmark"
+                               title="Permalink to "Schwartzian Transform"">"Schwartzian Transform"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-08T10:37:44+01:00">
+                Published: Fri 08 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/memory.html">Memory</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/perl.html">Perl</a> </p>        
+</footer><!-- /.post-info -->                        <p>I recently heard about the Schwartzian transform, which is a sorting idiom from perl. It allows an array of objects …</p>
+                        <a class="readmore" href="..///98/Schwartzian_Transform">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///87/Mac_mini_%28mid_2010%29_8GB_memory_upgrade" rel="bookmark"
+                               title="Permalink to "Mac mini (mid 2010) 8GB memory upgrade"">"Mac mini (mid 2010) 8GB memory upgrade"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-02T08:30:24+00:00">
+                Published: Wed 02 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/memory.html">Memory</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> </p>        
+</footer><!-- /.post-info -->                        <p>Finally got my mac mini to accept the 8GB kit I bought from <a href="http://www.crucial.com/uk/">Crucial</a> for £74 (apple upgrade is £409 …</p>
+                        <a class="readmore" href="..///87/Mac_mini_%28mid_2010%29_8GB_memory_upgrade">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///69/Amazon_Drops_EC2_Web_Service_Prices" rel="bookmark"
+                               title="Permalink to "Amazon Drops EC2 Web Service Prices"">"Amazon Drops EC2 Web Service Prices"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-09T02:24:49+01:00">
+                Published: Thu 09 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>The new <a href="http://aws.amazon.com/ec2/#pricing">EC2-Pricing</a> also includes a new Micro service. This micro service is intended for small apps servicing tens of …</p>
+                        <a class="readmore" href="..///69/Amazon_Drops_EC2_Web_Service_Prices">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///57/Benchmark_your_website_for_load_times." rel="bookmark"
+                               title="Permalink to "Benchmark your website for load times."">"Benchmark your website for load times."</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-27T16:09:53+01:00">
+                Published: Tue 27 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/nginx.html">nginx</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/webfaction.html">WebFaction</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been wondering how to do this for a while and accidentally discovered it while perusing <a href="http://docs.heroku.com/performance">this heroku page …</a></p>
+                        <a class="readmore" href="..///57/Benchmark_your_website_for_load_times.">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///42/gem_install_memory_usage" rel="bookmark"
+                               title="Permalink to "gem install memory_usage"">"gem install memory_usage"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-17T13:01:14+01:00">
+                Published: Thu 17 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Just released my first gem <a href="http://rubygems.org/gems/memory_usage">'memory_usage'</a> Version 0.0.1.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>install<span class="w"> </span>memory_usage
+</code></pre></div>
+
+<p>Assuming the gems folder has been set-up …</p>
+                        <a class="readmore" href="..///42/gem_install_memory_usage">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///39/MacBook_Power_Consumption" rel="bookmark"
+                               title="Permalink to "MacBook Power Consumption"">"MacBook Power Consumption"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-14T10:18:29+01:00">
+                Published: Mon 14 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/power.html">Power</a> <a href="../tag/vlc.html">VLC</a> </p>        
+</footer><!-- /.post-info -->                        <p>MacBook3,1 (2007) Intel Core 2 Duo 2.2GHz Hard drive and memory upgraded to 320GB and 4GB</p>
+<p>Graphics GMA …</p>
+                        <a class="readmore" href="..///39/MacBook_Power_Consumption">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - RVM</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///182/Mountain_Lion_Setup%2C_Part_2_Homebrew_%26_RVM">"Mountain Lion Setup, Part 2 Homebrew & RVM"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T11:34:57+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> </p>        
+</footer><!-- /.post-info --><p>Following on from <a href="http://amaras-tech.co.uk/article/180">Macbook Pro Setup</a>, Now it is time to install some of the command line tools.</p>
+<p>I have install XCode 4.4 and the command line tools, this allows brew to compile code, the compiler will then get replaced using homebrew to allow ruby compilation.</p>
+<p>Alternatively install <a href="https://github.com/kennethreitz/osx-gcc-installer/">osx-gcc-installer</a> instead of XCode to get home brew running.</p>
+<h2><a href="http://mxcl.github.com/homebrew/">Homebrew</a></h2>
+<p>From <code>/Applications/Utilities/Terminal.app</code></p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ruby<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-fsSkL<span class="w"> </span>raw.github.com/mxcl/homebrew/go<span class="o">)</span>
+</code></pre></div>
+
+<p>Which should run a look some thing like:</p>
+<div class="highlight"><pre><span></span><code><span class="o">==&gt;</span><span class="w"> </span><span class="n">This</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">install</span><span class="p">:</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">brew</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Formula</span><span class="o">/...</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Homebrew</span><span class="o">/...</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">man</span><span class="o">/</span><span class="n">man1</span><span class="o">/</span><span class="n">brew</span><span class="o">.</span><span class="mi">1</span>
+
+<span class="n">Press</span><span class="w"> </span><span class="n">enter</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="k">continue</span>
+<span class="o">==&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">sudo</span><span class="w"> </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">mkdir</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span>
+<span class="n">Password</span><span class="p">:</span>
+<span class="o">==&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">sudo</span><span class="w"> </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">chmod</span><span class="w"> </span><span class="n">g</span><span class="o">+</span><span class="n">rwx</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span>
+<span class="o">==&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">sudo</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">chgrp</span><span class="w"> </span><span class="n">admin</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span>
+<span class="o">==&gt;</span><span class="w"> </span><span class="n">Downloading</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">Installing</span><span class="w"> </span><span class="n">Homebrew</span><span class="o">...</span>
+<span class="k">remote</span><span class="p">:</span><span class="w"> </span><span class="n">Counting</span><span class="w"> </span><span class="n">objects</span><span class="p">:</span><span class="w"> </span><span class="mi">76442</span><span class="p">,</span><span class="w"> </span><span class="n">done</span><span class="o">.</span>
+<span class="k">remote</span><span class="p">:</span><span class="w"> </span><span class="n">Compressing</span><span class="w"> </span><span class="n">objects</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="o">%</span><span class="w"> </span><span class="p">(</span><span class="mi">36866</span><span class="o">/</span><span class="mi">36866</span><span class="p">),</span><span class="w"> </span><span class="n">done</span><span class="o">.</span>
+<span class="k">remote</span><span class="p">:</span><span class="w"> </span><span class="n">Total</span><span class="w"> </span><span class="mi">76442</span><span class="w"> </span><span class="p">(</span><span class="n">delta</span><span class="w"> </span><span class="mi">52004</span><span class="p">),</span><span class="w"> </span><span class="n">reused</span><span class="w"> </span><span class="mi">60755</span><span class="w"> </span><span class="p">(</span><span class="n">delta</span><span class="w"> </span><span class="mi">38765</span><span class="p">)</span>
+<span class="n">Receiving</span><span class="w"> </span><span class="n">objects</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="o">%</span><span class="w"> </span><span class="p">(</span><span class="mi">76442</span><span class="o">/</span><span class="mi">76442</span><span class="p">),</span><span class="w"> </span><span class="mf">10.90</span><span class="w"> </span><span class="n">MiB</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mf">1.02</span><span class="w"> </span><span class="n">MiB</span><span class="o">/</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">done</span><span class="o">.</span>
+<span class="n">Resolving</span><span class="w"> </span><span class="n">deltas</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="o">%</span><span class="w"> </span><span class="p">(</span><span class="mi">52004</span><span class="o">/</span><span class="mi">52004</span><span class="p">),</span><span class="w"> </span><span class="n">done</span><span class="o">.</span>
+<span class="n">From</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">mxcl</span><span class="o">/</span><span class="n">homebrew</span>
+<span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">branch</span><span class="w">            </span><span class="k">master</span><span class="w">     </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">FETCH_HEAD</span>
+<span class="o">==&gt;</span><span class="w"> </span><span class="n">Installation</span><span class="w"> </span><span class="n">successful</span><span class="o">!</span>
+<span class="n">You</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="err">`</span><span class="n">brew</span><span class="w"> </span><span class="n">doctor</span><span class="s1">&#39; *before* you install anything.</span>
+<span class="n">Now</span><span class="w"> </span><span class="n">type</span><span class="p">:</span><span class="w"> </span><span class="n">brew</span><span class="w"> </span><span class="n">help</span>
+</code></pre></div>
+
+<p>Run :</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>brew<span class="w"> </span>doctor
+&gt;<span class="w"> </span>Your<span class="w"> </span>system<span class="w"> </span>is<span class="w"> </span>raring<span class="w"> </span>to<span class="w"> </span>brew
+</code></pre></div>
+
+<p>Test Brew by installing <a href="http://en.wikipedia.org/wiki/Wget">wget</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="o">$</span><span class="w"> </span><span class="n">brew</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="n">wget</span>
+<span class="o">==&gt;</span><span class="w"> </span><span class="n">Downloading</span><span class="w"> </span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ftpmirror</span><span class="o">.</span><span class="n">gnu</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">wget</span><span class="o">/</span><span class="n">wget</span><span class="o">-</span><span class="mf">1.14</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+<span class="c1">######################################################################## 100.0%</span>
+<span class="o">==&gt;</span><span class="w"> </span><span class="o">./</span><span class="n">configure</span><span class="w"> </span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">debug</span><span class="w"> </span><span class="o">--</span><span class="n">prefix</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">wget</span><span class="o">/</span><span class="mf">1.14</span><span class="w"> </span><span class="o">--</span><span class="n">sysconfdir</span><span class="o">=/</span><span class="n">usr</span>
+<span class="o">==&gt;</span><span class="w"> </span><span class="n">make</span><span class="w"> </span><span class="n">install</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">wget</span><span class="o">/</span><span class="mf">1.14</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="n">files</span><span class="p">,</span><span class="w"> </span><span class="mi">676</span><span class="n">K</span><span class="p">,</span><span class="w"> </span><span class="n">built</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mi">39</span><span class="w"> </span><span class="n">seconds</span>
+</code></pre></div>
+
+<h2><a href="https://rvm.io/rvm/install/">RVM</a></h2>
+<p>We need to update the compiler to a gcc compatible with ruby as XCode4.2+ does not play well with others.</p>
+<div class="highlight"><pre><span></span><code>brew update
+brew install libksba
+brew tap homebrew/dupes
+brew install autoconf automake apple-gcc42
+rvm pkg install openssl
+</code></pre></div>
+
+<p>List available Rubies</p>
+<div class="highlight"><pre><span></span><code>rvm list known
+</code></pre></div>
+
+<p>Install 1.9.3 head</p>
+<div class="highlight"><pre><span></span><code>rvm install 1.9.3
+</code></pre></div>
+
+<p>Make ruby 1.9.3 the default</p>
+<div class="highlight"><pre><span></span><code>rvm use 1.9.3 --default
+</code></pre></div>
+
+<p>Clean up brew and rvm (Remove temp files and source code used to compile executables)</p>
+<div class="highlight"><pre><span></span><code>brew cleanup -s
+rm -rf `brew --cache`
+rvm cleanup all
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///148/Update_your_RVM_Ruby_and_migrate_gemsets" rel="bookmark"
+                               title="Permalink to "Update your RVM Ruby and migrate gemsets"">"Update your RVM Ruby and migrate gemsets"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-20T22:08:43+01:00">
+                Published: Fri 20 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> </p>        
+</footer><!-- /.post-info -->                        <p>Update RVM</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rvm<span class="w"> </span>get<span class="w"> </span>head
+</code></pre></div>
+
+<p>List current versions, and all versions </p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rvm<span class="w"> </span>list
+$<span class="w"> </span>rvm<span class="w"> </span>list<span class="w"> </span>known
+</code></pre></div>
+
+<p>Select the version you …</p>
+                        <a class="readmore" href="..///148/Update_your_RVM_Ruby_and_migrate_gemsets">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///118/Get_latest_Ruby_1.9.2_build_with_RVM" rel="bookmark"
+                               title="Permalink to "Get latest Ruby 1.9.2 build with RVM"">"Get latest Ruby 1.9.2 build with RVM"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-16T07:47:23+01:00">
+                Published: Sat 16 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> </p>        
+</footer><!-- /.post-info -->                        <p>Ruby 1.9.2-p290 released, if you have <a href="http://beginrescueend.com/">RVM</a> installed updating to the latest release is easy</p>
+<div class="highlight"><pre><span></span><code><span class="n">rvm</span><span class="w"> </span><span class="n">get</span><span class="w"> </span><span class="n">head …</span></code></pre></div>
+                        <a class="readmore" href="..///118/Get_latest_Ruby_1.9.2_build_with_RVM">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///99/Better_Open_Source_Project_Setup%2C_with_RVM_%26_Bundler" rel="bookmark"
+                               title="Permalink to "Better Open Source Project Setup, with RVM & Bundler"">"Better Open Source Project Setup, with RVM & Bundler"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-10T06:35:10+01:00">
+                Published: Sun 10 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/bundler.html">Bundler</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> <a href="../tag/open-source.html">Open Source</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on 'Raise the bar, lower the pressure' given by Durran Jordan at ScotRubyConf 2011.</p>
+<p>There has been some debate …</p>
+                        <a class="readmore" href="..///99/Better_Open_Source_Project_Setup%2C_with_RVM_%26_Bundler">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

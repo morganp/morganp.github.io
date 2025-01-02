@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Performance</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///163/Handle_www._and_no-www_for_better_google_juice">"Handle www. and no-www for better google juice"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2012-05-18T23:00:39+01:00">
+                Published: Fri 18 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/bundler.html">Bundler</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info --><p>There was an interesting post on hacker news recently, <a href="http://blog.safeshepherd.com/post/23218902229/google-just-nerfed-us-a-venture-backed-startup">safeshepherd suddenly fell off the google</a> for their own name. The <a href="http://news.ycombinator.com/item?id=3987935">comments</a> had some good answers especially the first by a google employee. </p>
+<p>The gist of it is that if you have https:// and http:// and www.domain.com and domain.com google sees 4 versions of you site. It will pick one of them as the main site each time it ranks your site. This can change every, effecting the ranking, as it looks like duplicated content.</p>
+<p>For Sinatra there is a nice bit of middle were called <a href="https://github.com/logicaltext/rack-no-www">rack-no-www</a> which adds the redirect for you.</p>
+<p>Add to you gem file</p>
+<div class="highlight"><pre><span></span><code>gem  &quot;rack-no-www&quot;,  &quot;~&gt; 0.0.2&quot;, :require =&gt; &#39;rack/no-www&#39;
+</code></pre></div>
+
+<p>Or just <code>gem install rack-no-www</code></p>
+<p>Usage in a basic Sinatra App (app.rb)</p>
+<div class="highlight"><pre><span></span><code><span class="nv">require</span><span class="w"> </span><span class="s1">&#39;sinatra&#39;</span>
+<span class="nv">require</span><span class="w"> </span><span class="s1">&#39;rack/no-www&#39;</span>
+
+<span class="nv">use</span><span class="w"> </span><span class="nv">Rack</span>::<span class="nv">NoWWW</span>
+
+<span class="nv">get</span><span class="w"> </span><span class="s1">&#39;/&#39;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="s1">&#39;Helloworld&#39;</span>
+<span class="k">end</span>
+</code></pre></div>
+
+<p>Run with <code>ruby app.rb</code> With web browser view localhost:4567. If that is working then you should find www.localhost:4567 redirects back to localhost:4567</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///155/Minify_your_HTML_from_Sinatra" rel="bookmark"
+                               title="Permalink to "Minify your HTML from Sinatra"">"Minify your HTML from Sinatra"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-26T15:13:49+01:00">
+                Published: Thu 26 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>There are gzip compression options available but when I looked at this a long time ago I found that the …</p>
+                        <a class="readmore" href="..///155/Minify_your_HTML_from_Sinatra">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///129/Setting_Ruby_Defaults_%27%7C%7C%27_vs_%27fetch%28%29%7B%7D%27" rel="bookmark"
+                               title="Permalink to "Setting Ruby Defaults '||' vs 'fetch(){}'"">"Setting Ruby Defaults '||' vs 'fetch(){}'"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-11-09T17:29:10+00:00">
+                Published: Wed 09 November 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>There is a very good presentation <a href="http://avdi.org/talks/confident-code-rubymidwest-2011/">Confident Code</a> by <a href="http://avdi.org/">Avdi Grimm</a> author of <a href="http://exceptionalruby.com/">http://exceptionalruby.com/</a>. <a href="http://confreaks.net/videos/614-cascadiaruby2011-confident-code">Previously presented at Cascadia …</a></p>
+                        <a class="readmore" href="..///129/Setting_Ruby_Defaults_%27%7C%7C%27_vs_%27fetch%28%29%7B%7D%27">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///98/Schwartzian_Transform" rel="bookmark"
+                               title="Permalink to "Schwartzian Transform"">"Schwartzian Transform"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-08T10:37:44+01:00">
+                Published: Fri 08 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/memory.html">Memory</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/perl.html">Perl</a> </p>        
+</footer><!-- /.post-info -->                        <p>I recently heard about the Schwartzian transform, which is a sorting idiom from perl. It allows an array of objects …</p>
+                        <a class="readmore" href="..///98/Schwartzian_Transform">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///92/ORM%28Activerecord%29_or_Ruby_Sort" rel="bookmark"
+                               title="Permalink to "ORM(Activerecord) or Ruby Sort"">"ORM(Activerecord) or Ruby Sort"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-20T02:19:17+00:00">
+                Published: Sun 20 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on an <a href="http://amaras-tech.co.uk/people/morgan/article/18">old Article</a> I wrote, investigating incase sensitive sorting performance.</p>
+<p>I have an active record model call Tag …</p>
+                        <a class="readmore" href="..///92/ORM%28Activerecord%29_or_Ruby_Sort">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///87/Mac_mini_%28mid_2010%29_8GB_memory_upgrade" rel="bookmark"
+                               title="Permalink to "Mac mini (mid 2010) 8GB memory upgrade"">"Mac mini (mid 2010) 8GB memory upgrade"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-02T08:30:24+00:00">
+                Published: Wed 02 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/memory.html">Memory</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> </p>        
+</footer><!-- /.post-info -->                        <p>Finally got my mac mini to accept the 8GB kit I bought from <a href="http://www.crucial.com/uk/">Crucial</a> for £74 (apple upgrade is £409 …</p>
+                        <a class="readmore" href="..///87/Mac_mini_%28mid_2010%29_8GB_memory_upgrade">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///86/My_Backup_Strategy" rel="bookmark"
+                               title="Permalink to "My Backup Strategy"">"My Backup Strategy"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-01-18T10:25:12+00:00">
+                Published: Tue 18 January 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/ubuntu.html">Ubuntu</a> </p>        
+</footer><!-- /.post-info -->                        <p>Considering various raid strategies I decided that Raid 5 would be too limiting and have previously found raid striping systems …</p>
+                        <a class="readmore" href="..///86/My_Backup_Strategy">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///69/Amazon_Drops_EC2_Web_Service_Prices" rel="bookmark"
+                               title="Permalink to "Amazon Drops EC2 Web Service Prices"">"Amazon Drops EC2 Web Service Prices"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-09T02:24:49+01:00">
+                Published: Thu 09 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>The new <a href="http://aws.amazon.com/ec2/#pricing">EC2-Pricing</a> also includes a new Micro service. This micro service is intended for small apps servicing tens of …</p>
+                        <a class="readmore" href="..///69/Amazon_Drops_EC2_Web_Service_Prices">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///66/Mac_OS_X_Harddrive_Spin_Down_Time" rel="bookmark"
+                               title="Permalink to "Mac OS X Harddrive Spin Down Time"">"Mac OS X Harddrive Spin Down Time"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-01T13:05:32+01:00">
+                Published: Wed 01 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/power.html">Power</a> </p>        
+</footer><!-- /.post-info -->                        <p>The Preferences menu in OS x give you the option to turn off Hard Disks whenever possible to save power …</p>
+                        <a class="readmore" href="..///66/Mac_OS_X_Harddrive_Spin_Down_Time">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///57/Benchmark_your_website_for_load_times." rel="bookmark"
+                               title="Permalink to "Benchmark your website for load times."">"Benchmark your website for load times."</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-27T16:09:53+01:00">
+                Published: Tue 27 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/nginx.html">nginx</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/webfaction.html">WebFaction</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been wondering how to do this for a while and accidentally discovered it while perusing <a href="http://docs.heroku.com/performance">this heroku page …</a></p>
+                        <a class="readmore" href="..///57/Benchmark_your_website_for_load_times.">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///44/Homebrew_package_management_for_Mac_OS_X" rel="bookmark"
+                               title="Permalink to "Homebrew package management for Mac OS X"">"Homebrew package management for Mac OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-22T07:45:14+01:00">
+                Published: Tue 22 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>Homebrew is a new package management system for Mac OS X. <a href="http://www.engineyard.com/blog/2010/homebrew-os-xs-missing-package-manager/">A good review/tutorial on EngineYard</a>.</p>
+<p>Update 20-August-2010<br>
+Then …</p>
+                        <a class="readmore" href="..///44/Homebrew_package_management_for_Mac_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///42/gem_install_memory_usage" rel="bookmark"
+                               title="Permalink to "gem install memory_usage"">"gem install memory_usage"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-17T13:01:14+01:00">
+                Published: Thu 17 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Just released my first gem <a href="http://rubygems.org/gems/memory_usage">'memory_usage'</a> Version 0.0.1.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>install<span class="w"> </span>memory_usage
+</code></pre></div>
+
+<p>Assuming the gems folder has been set-up …</p>
+                        <a class="readmore" href="..///42/gem_install_memory_usage">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///41/Save_space_on_your_Mac_by_going_Monolingual" rel="bookmark"
+                               title="Permalink to "Save space on your Mac by going Monolingual"">"Save space on your Mac by going Monolingual"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-16T10:43:30+01:00">
+                Published: Wed 16 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have just looked through <a href="http://www.minervity.com/features/designer_apps/10-useful-and-free-mac-apps-for-any-designer/">this list</a> of 10 free mac apps I have used most of them in the …</p>
+                        <a class="readmore" href="..///41/Save_space_on_your_Mac_by_going_Monolingual">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///39/MacBook_Power_Consumption" rel="bookmark"
+                               title="Permalink to "MacBook Power Consumption"">"MacBook Power Consumption"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-14T10:18:29+01:00">
+                Published: Mon 14 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/power.html">Power</a> <a href="../tag/vlc.html">VLC</a> </p>        
+</footer><!-- /.post-info -->                        <p>MacBook3,1 (2007) Intel Core 2 Duo 2.2GHz Hard drive and memory upgraded to 320GB and 4GB</p>
+<p>Graphics GMA …</p>
+                        <a class="readmore" href="..///39/MacBook_Power_Consumption">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///36/Ruby_parsing_torrent_files_for_meta_info" rel="bookmark"
+                               title="Permalink to "Ruby parsing torrent files for meta info"">"Ruby parsing torrent files for meta info"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-04T10:03:26+01:00">
+                Published: Fri 04 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/performance.html">Performance</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/bittorrent.html">BitTorrent</a> </p>        
+</footer><!-- /.post-info -->                        <p>There currently does not appear to be any really good torrent file parsers available via the gems system.</p>
+<p>rubytorrent seems …</p>
+                        <a class="readmore" href="..///36/Ruby_parsing_torrent_files_for_meta_info">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///26/Installing_Ruby_Enterprise_on_Mac_OS_X" rel="bookmark"
+                               title="Permalink to "Installing Ruby Enterprise on Mac OS X"">"Installing Ruby Enterprise on Mac OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-04T11:13:48+01:00">
+                Published: Tue 04 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/performance.html">Performance</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://www.rubyenterpriseedition.com/download.html">Download ruby enterprise</a> and follow instructions on page. The exact commands I used are:</p>
+<div class="highlight"><pre><span></span><code><span class="o">$</span><span class="w"> </span><span class="n">cd</span><span class="w"> </span><span class="o">~/</span><span class="n">bin</span>
+<span class="o">$</span><span class="w"> </span><span class="n">wget</span><span class="w"> </span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">rubyforge</span><span class="o">.</span><span class="n">org …</span></code></pre></div>
+                        <a class="readmore" href="..///26/Installing_Ruby_Enterprise_on_Mac_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///25/Ruby_Memory_Issue_on_Web_Faction" rel="bookmark"
+                               title="Permalink to "Ruby Memory Issue on Web Faction"">"Ruby Memory Issue on Web Faction"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-03T13:19:02+01:00">
+                Published: Mon 03 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>I while ago I made <a href="http://amaras-tech.co.uk/people/morgan/article/14">a post</a> about installing ruby 1.9 on my webfaction shared host. They then pointed …</p>
+                        <a class="readmore" href="..///25/Ruby_Memory_Issue_on_Web_Faction">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///6/Ruby_Performance_Measure" rel="bookmark"
+                               title="Permalink to "Ruby Performance Measure"">"Ruby Performance Measure"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/matlab.html">Matlab</a> <a href="../tag/performance.html">Performance</a> </p>        
+</footer><!-- /.post-info -->                        <p>Also available as a <a href="http://gist.github.com/342639">gist</a>. Very simple way of measuring execution time in seconds using Ruby</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4 …</span></pre></div></td></tr></table></div>
+                        <a class="readmore" href="..///6/Ruby_Performance_Measure">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Octopress</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../octopress-categories-with-different-styles.html">"Octopress categories with different styles"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2014-06-14T08:24:01+01:00">
+                Published: Sat 14 June 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/octopress.html">Octopress</a> </p>        
+</footer><!-- /.post-info --><p>As I use the code blocks for ingredient lists on my recipe pages I wanted to 
+have a different style, lighter background instead of black.</p>
+<p>I currently manually set a different layout in the _post header:</p>
+<div class="highlight"><pre><span></span><code><span class="n">layout</span><span class="o">:</span><span class="w"> </span><span class="n">post</span>
+<span class="n">Category</span><span class="o">:</span><span class="w"> </span>
+<span class="o">-</span><span class="w"> </span><span class="n">Tech</span>
+
+<span class="n">layout</span><span class="o">:</span><span class="w"> </span><span class="n">recipe</span>
+<span class="n">Category</span><span class="o">:</span><span class="w"> </span>
+<span class="o">-</span><span class="w"> </span><span class="n">Cooking</span>
+</code></pre></div>
+
+<!-- more -->
+
+<p>The layout will then look for a matching layout in <code>source/_layouts</code></p>
+<p>Manually create your new layout (instructions from top level Octopress site):</p>
+<div class="highlight"><pre><span></span><code>cp source/_layouts/post.html source/_layouts/recipe.html
+</code></pre></div>
+
+<p>Edit <code>source/_layouts/recipe.html</code> changing the role to <code>recipe</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="o">---</span>
+<span class="nv">layout</span>:<span class="w"> </span><span class="nv">default</span>
+<span class="nv">single</span>:<span class="w"> </span><span class="nv">true</span>
+<span class="o">---</span>
+
+<span class="o">&lt;</span><span class="nv">div</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nv">article</span><span class="w"> </span><span class="nv">class</span><span class="o">=</span><span class="s2">&quot;hentry&quot;</span><span class="w"> </span><span class="nv">role</span><span class="o">=</span><span class="s2">&quot;recipe&quot;</span><span class="o">&gt;</span>
+<span class="w">  </span>\{\<span class="o">%</span><span class="w"> </span><span class="k">include</span><span class="w"> </span><span class="nv">article</span>.<span class="nv">html</span><span class="w"> </span>\<span class="o">%</span>\}
+<span class="w">  </span><span class="o">&lt;</span><span class="nv">footer</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="o">&lt;</span><span class="nv">p</span><span class="w"> </span><span class="nv">class</span><span class="o">=</span><span class="s2">&quot;meta&quot;</span><span class="o">&gt;</span>
+</code></pre></div>
+
+<p>This will now pick up the styling that <code>post</code> also gets but we can target our modifications to <code>article[role="recipe"]</code>.
+For custom stylings apply changes in to the relevant file in <code>sass/custom/</code>.</p>
+<p>To modify the background colour of a code block<br>
+<code>sass/custom/_styles.scss</code> add:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Customise the recipe layout</span>
+<span class="n">article</span><span class="p">[</span><span class="n">role</span><span class="p">=</span><span class="s">&quot;recipe&quot;</span><span class="p">]</span><span class="w"> </span><span class="n">pre</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">background</span><span class="o">-</span><span class="nb">color</span><span class="p">:</span><span class="w"> </span><span class="no">$</span><span class="n">sidebar</span><span class="o">-</span><span class="n">bg</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>NB: <code>$sidebar-bg</code> is defined in <code>sass/base/_theme.scss</code></p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../fixing-mangled-octopress-tags.html" rel="bookmark"
+                               title="Permalink to "Fixing Mangled Octopress Tags"">"Fixing Mangled Octopress Tags"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-01T20:59:40+01:00">
+                Published: Tue 01 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/octopress.html">Octopress</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>When creating my blog I have been inconsistent with the tag <code>command line</code>, <code>Command line</code> and
+<code>Command Line</code> the case …</p>
+                        <a class="readmore" href="../fixing-mangled-octopress-tags.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../octopress-pages-and-custom-domain.html" rel="bookmark"
+                               title="Permalink to "Octopress, Pages and Custom Domain"">"Octopress, Pages and Custom Domain"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-04T18:19:25+00:00">
+                Published: Tue 04 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/octopress.html">Octopress</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>In your <code>sources</code> branch, which is the main branch for writing creating posts, create a <code>CNAME</code> file in the sources …</p>
+                        <a class="readmore" href="../octopress-pages-and-custom-domain.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../edit-octopress-posts.html" rel="bookmark"
+                               title="Permalink to "Edit Octopress Posts"">"Edit Octopress Posts"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-01T19:28:17+00:00">
+                Published: Sat 01 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/octopress.html">Octopress</a> <a href="../tag/vim.html">Vim</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>Creating new posts in Octopress is <code>rake new_post["Edit Posts"]</code> which outputs the created filename. </p>
+<p>Posts are prefixed with date …</p>
+                        <a class="readmore" href="../edit-octopress-posts.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../monkey-patch-octopress.html" rel="bookmark"
+                               title="Permalink to "Monkey Patch Octopress"">"Monkey Patch Octopress"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-02-18T19:46:55+00:00">
+                Published: Tue 18 February 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/web.html">Web</a> <a href="../tag/octopress.html">Octopress</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on <a href="https://github.com/imathis/octopress/blob/master/plugins/post_filters.rb">post_filters by imathis</a>.</p>
+<p>First Move the original method out the way with <code>alias_method</code>  then create a new method …</p>
+                        <a class="readmore" href="../monkey-patch-octopress.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///222/Add_about_page_to_Octopress" rel="bookmark"
+                               title="Permalink to "Add about page to Octopress"">"Add about page to Octopress"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-05-19T08:41:53+01:00">
+                Published: Sun 19 May 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/octopress.html">Octopress</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>To add  static about page to octopress blog, assuming that octopress has been already setup:</p>
+<p>Create the page from the …</p>
+                        <a class="readmore" href="..///222/Add_about_page_to_Octopress">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

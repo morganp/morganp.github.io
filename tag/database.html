@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Database</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///112/uninitialized_constant_Compass%3A%3ALogger">"uninitialized constant Compass::Logger"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2011-06-23T20:21:03+01:00">
+                Published: Thu 23 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/compass.html">Compass</a> <a href="../tag/database.html">Database</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/migrations.html">Migrations</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/sequel.html">Sequel</a> </p>        
+</footer><!-- /.post-info --><p>Working on a joint project an error started showing up when trying to perform migrations.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rake<span class="w"> </span>db:migrate<span class="w"> </span><span class="nv">VERSION</span><span class="o">=</span><span class="m">0</span>
+&gt;rake<span class="w"> </span>aborted!
+&gt;uninitialized<span class="w"> </span>constant<span class="w"> </span>Compass::Logger
+</code></pre></div>
+
+<p>The Solution was to add a line to the rake file, to correctly load Compass::Logger, still no idea why rake needed it.</p>
+<div class="highlight"><pre><span></span><code>require &#39;compass/logger&#39;
+</code></pre></div>
+
+<p>Another thing to check might be that compass is being loaded before classes which use it. An issue that can happen in Sinatra and Rails apps.</p>
+<p>Example Gemfile (for <a href="http://gembundler.com/">Bundler</a>)</p>
+<div class="highlight"><pre><span></span><code><span class="n">source</span><span class="w"> </span><span class="o">:</span><span class="n">rubygems</span>
+
+<span class="n">gem</span><span class="w"> </span><span class="s1">&#39;rails&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;3.0.9&#39;</span>
+
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;compass&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;haml-rails&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;pg&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;jquery-rails&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;omniauth&quot;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;~&gt; 0.2.5&#39;</span>
+
+<span class="n">group</span><span class="w"> </span><span class="o">:</span><span class="n">test</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;capybara&quot;</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;factory_girl_rails&quot;</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;test-unit&quot;</span>
+<span class="n">end</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku" rel="bookmark"
+                               title="Permalink to "Sinatra ActiveRecord DB config on Heroku"">"Sinatra ActiveRecord DB config on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-22T10:04:48+01:00">
+                Published: Wed 22 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/database.html">Database</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/regex.html">Regex</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sequel.html">Sequel</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>To make an automatic <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html">ActiveRecord</a> database connection using ENV['DATABASE_URL'] The following snippet can be used:</p>
+<p>From <a href="http://apidock.com/rails/v3.2.1/ActiveRecord/Base/establish_connection/class">ActiveRecord 3.2 …</a></p>
+                        <a class="readmore" href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///110/Ruby_script_connect_to_DB_using_database.yml" rel="bookmark"
+                               title="Permalink to "Ruby script connect to DB using database.yml"">"Ruby script connect to DB using database.yml"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-20T12:07:51+01:00">
+                Published: Mon 20 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/database.html">Database</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>To connect to a rails style DB config outside of the normal workflow, or using a database.yml in a …</p>
+                        <a class="readmore" href="..///110/Ruby_script_connect_to_DB_using_database.yml">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///109/Setting_up_PostgreSQL_on_OS_X" rel="bookmark"
+                               title="Permalink to "Setting up PostgreSQL on OS X"">"Setting up PostgreSQL on OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-20T11:35:31+01:00">
+                Published: Mon 20 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/database.html">Database</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>An old guide is written on the <a href="http://developer.apple.com/internet/opensource/postgres.htmlhttp://developer.apple.com/internet/opensource/postgres.html">Apple Developer Forum</a> however if you are using <a href="https://github.com/mxcl/homebrew">Homebrew</a> it is much simpler …</p>
+                        <a class="readmore" href="..///109/Setting_up_PostgreSQL_on_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

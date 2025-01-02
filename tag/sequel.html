@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Sequel</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///112/uninitialized_constant_Compass%3A%3ALogger">"uninitialized constant Compass::Logger"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2011-06-23T20:21:03+01:00">
+                Published: Thu 23 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/compass.html">Compass</a> <a href="../tag/database.html">Database</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/migrations.html">Migrations</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/sequel.html">Sequel</a> </p>        
+</footer><!-- /.post-info --><p>Working on a joint project an error started showing up when trying to perform migrations.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rake<span class="w"> </span>db:migrate<span class="w"> </span><span class="nv">VERSION</span><span class="o">=</span><span class="m">0</span>
+&gt;rake<span class="w"> </span>aborted!
+&gt;uninitialized<span class="w"> </span>constant<span class="w"> </span>Compass::Logger
+</code></pre></div>
+
+<p>The Solution was to add a line to the rake file, to correctly load Compass::Logger, still no idea why rake needed it.</p>
+<div class="highlight"><pre><span></span><code>require &#39;compass/logger&#39;
+</code></pre></div>
+
+<p>Another thing to check might be that compass is being loaded before classes which use it. An issue that can happen in Sinatra and Rails apps.</p>
+<p>Example Gemfile (for <a href="http://gembundler.com/">Bundler</a>)</p>
+<div class="highlight"><pre><span></span><code><span class="n">source</span><span class="w"> </span><span class="o">:</span><span class="n">rubygems</span>
+
+<span class="n">gem</span><span class="w"> </span><span class="s1">&#39;rails&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;3.0.9&#39;</span>
+
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;compass&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;haml-rails&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;pg&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;jquery-rails&quot;</span>
+<span class="n">gem</span><span class="w"> </span><span class="s2">&quot;omniauth&quot;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;~&gt; 0.2.5&#39;</span>
+
+<span class="n">group</span><span class="w"> </span><span class="o">:</span><span class="n">test</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;capybara&quot;</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;factory_girl_rails&quot;</span>
+<span class="w">  </span><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;test-unit&quot;</span>
+<span class="n">end</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku" rel="bookmark"
+                               title="Permalink to "Sinatra ActiveRecord DB config on Heroku"">"Sinatra ActiveRecord DB config on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-22T10:04:48+01:00">
+                Published: Wed 22 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/database.html">Database</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/regex.html">Regex</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sequel.html">Sequel</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>To make an automatic <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html">ActiveRecord</a> database connection using ENV['DATABASE_URL'] The following snippet can be used:</p>
+<p>From <a href="http://apidock.com/rails/v3.2.1/ActiveRecord/Base/establish_connection/class">ActiveRecord 3.2 …</a></p>
+                        <a class="readmore" href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///64/Error%3A_NoMethodError%3A_undefined_method_%60compact%27_for_nil%3ANilClass" rel="bookmark"
+                               title="Permalink to "Error: NoMethodError: undefined method `compact' for nil:NilClass"">"Error: NoMethodError: undefined method `compact' for nil:NilClass"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-21T07:20:40+01:00">
+                Published: Sat 21 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sequel.html">Sequel</a> </p>        
+</footer><!-- /.post-info -->                        <p>When running a sequel migration I kept getting this error: <br>
+<strong>Error: NoMethodError: undefined method `compact' for nil:NilClass</strong></p>
+<p>My setup …</p>
+                        <a class="readmore" href="..///64/Error%3A_NoMethodError%3A_undefined_method_%60compact%27_for_nil%3ANilClass">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///11/Sequel_ORM_Migrations" rel="bookmark"
+                               title="Permalink to "Sequel ORM Migrations"">"Sequel ORM Migrations"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-31T09:07:51+01:00">
+                Published: Wed 31 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/sequel.html">Sequel</a> <a href="../tag/migrations.html">Migrations</a> </p>        
+</footer><!-- /.post-info -->                        <p>Available as a <a href="http://gist.github.com/348121">gist</a> a Sequel Migration to rename a database column.</p>
+<div class="highlight"><pre><span></span><code><span class="gu">##</span> Command line to apply Migration
+<span class="gh">#</span>sequel -m ./db …</code></pre></div>
+                        <a class="readmore" href="..///11/Sequel_ORM_Migrations">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

@@ -1,0 +1,1145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Pelican Trial - Engineering</title><link href="http://lizard-spock.co.uk/pelican_test/" rel="alternate"></link><link href="http://lizard-spock.co.uk/pelican_test/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/pelican_test/</id><updated>2024-12-19T11:04:00+00:00</updated><entry><title>Adaptive Filter Theory Notes 1</title><link href="http://lizard-spock.co.uk/pelican_test/adaptive-filter-theory-notes-1.html" rel="alternate"></link><published>2024-12-19T11:04:00+00:00</published><updated>2024-12-19T11:04:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2024-12-19:/pelican_test/adaptive-filter-theory-notes-1.html</id><summary type="html">&lt;p&gt;Notes From Reading Adaptive Signal Theory (5th Ed) by Simon Haykin&lt;/p&gt;
+&lt;h2&gt;Three Basic Kinds Of Estimation&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Filtering  - Extraction of Current …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;Notes From Reading Adaptive Signal Theory (5th Ed) by Simon Haykin&lt;/p&gt;
+&lt;h2&gt;Three Basic Kinds Of Estimation&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Filtering  - Extraction of Current and previous information. RealTime operation.&lt;/li&gt;
+&lt;li&gt;Smoothing  - Data after the time of interest is used. Posteriori operation.&lt;/li&gt;
+&lt;li&gt;Prediction - forcasting for some time in the future. RealTime operation.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Filter optimization is useful to think of minimising the mean-square-error. &lt;/p&gt;
+&lt;p&gt;For stationary inputs the &lt;strong&gt;Wiener&lt;/strong&gt; filter is considered optimal in mean-square-error sense.&lt;/p&gt;
+&lt;p&gt;Plots of the mean-square value of the error signal versus the adjustable parameters of the linear filter is known as the &lt;strong&gt;error-performance-surface&lt;/strong&gt;. The min point on this is the Wiener solution.&lt;/p&gt;
+&lt;p&gt;Wiener Filter is no good with moving signals, or precense of noise. Kalman Filters are useful in this sitation.&lt;/p&gt;</content><category term="Engineering"></category><category term="DSP"></category></entry><entry><title>"Matlab: floating point checking equality"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-floating-point-checking-equality.html" rel="alternate"></link><published>2015-06-10T20:43:32+01:00</published><updated>2015-06-10T20:43:32+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-06-10:/pelican_test/matlab-floating-point-checking-equality.html</id><summary type="html">&lt;p&gt;As previously decribed &lt;a href="/blog/engineering/floating-point-arithmetic-is-not-associative/"&gt;floating point arithmetic is not associative&lt;/a&gt;. Which means it is very easy for floating point models not …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As previously decribed &lt;a href="/blog/engineering/floating-point-arithmetic-is-not-associative/"&gt;floating point arithmetic is not associative&lt;/a&gt;. Which means it is very easy for floating point models not to match even though they are performing the same arithmetic operations. In matlab we compare the results:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = 0.1 + 0.2 + 0.3 ;
+b = 0.1 + (0.2 + 0.3);
+
+isequal(a, b)
+&amp;gt; 0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;a &amp;amp; b are not equal, they are a least significant bit out, when comparing floating point numbers it is common to allow this amount of tolerance. Matlab anonymous functions can be used to create a new &lt;code&gt;isequal&lt;/code&gt; function which takes a tolerance value. Idea from &lt;a href="http://stackoverflow.com/questions/2202641/how-do-i-compare-all-elements-of-two-arrays"&gt;Stackoverflow&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;isequalAbs = @(x,y,tol) ( all(abs(x-y) &amp;lt;= tol ));
+floating_point_tol = 1e-15;
+
+isequalAbs(a, b, floating_point_tol)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Maths"></category><category term="Matlab"></category></entry><entry><title>"Matlab: linear progressions"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-linear-progressions.html" rel="alternate"></link><published>2015-06-10T20:19:05+01:00</published><updated>2015-06-10T20:19:05+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-06-10:/pelican_test/matlab-linear-progressions.html</id><summary type="html">&lt;p&gt;Progressions can be created using the &lt;a href="http://uk.mathworks.com/help/matlab/ref/colon.html"&gt;Colon&lt;/a&gt; operator&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;min   = 10
+max   = 100
+steps = 20
+
+step_size = (max-min)/steps
+
+i = min:step_size …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Progressions can be created using the &lt;a href="http://uk.mathworks.com/help/matlab/ref/colon.html"&gt;Colon&lt;/a&gt; operator&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;min   = 10
+max   = 100
+steps = 20
+
+step_size = (max-min)/steps
+
+i = min:step_size:max
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Alternatively &lt;a href="http://uk.mathworks.com/help/matlab/ref/linspace.html"&gt;linspace&lt;/a&gt; can be used:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;min   = 10
+max   = 100
+steps = 20
+
+i = linspace(min,max,steps)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This also allows for easily switching to a log scale using &lt;a href="http://uk.mathworks.com/help/matlab/ref/logspace.html"&gt;logspace&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Matlab: functions inputs parsed based on outputs"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-functions-inputs-parsed-based-on-outputs.html" rel="alternate"></link><published>2015-06-10T20:10:54+01:00</published><updated>2015-06-10T20:10:54+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-06-10:/pelican_test/matlab-functions-inputs-parsed-based-on-outputs.html</id><summary type="html">&lt;p&gt;It is quite common to detect how many input arguments have been passed to a function, using &lt;code&gt;nargin&lt;/code&gt; (N arguments …&lt;/p&gt;</summary><content type="html">&lt;p&gt;It is quite common to detect how many input arguments have been passed to a function, using &lt;code&gt;nargin&lt;/code&gt; (N arguments in).  Commonly used to set defaults for arguments not specified.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;result&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;fun_name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;a,b,c&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;nargin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;a must be supplied&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;nargin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;nargin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c"&gt;% ...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;However I just discovered &lt;code&gt;nargout&lt;/code&gt; (N arguments out(.&lt;/p&gt;
+&lt;p&gt;This allows the scripts to differentiate between:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;x     = fun(a)
+[x,y] = fun(a)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Example 1:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;[ varargout ] = nargout_test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; input_args &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;disp&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;nargout : &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;num2str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;nargout&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c"&gt;% Set outputs&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nb"&gt;nargout&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;varargout&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Example 2, changing input args usage based on number of outputs:
+note the input keyword change to the input arguments &lt;code&gt;varargin&lt;/code&gt; Variable argument in.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;[ varargout ] = nargout_test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; varargin &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;disp&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;nargin : &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;num2str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;nargin&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;disp&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;nargout : &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;num2str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;nargout&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;nargout&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Too many output arguments&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;nargout&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c"&gt;% single output first input means something&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;varargout&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varargin&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;nargout&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c"&gt;% two outputs first input means some thing else&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;varargout&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varargin&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varargin&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;varargout&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varargin&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varargin&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A good example is the &lt;a href="http://uk.mathworks.com/matlabcentral/fileexchange/13792-the-dc-blocking-filter/"&gt;dcblock script by J M De Freitas&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Which has this syntax:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SYNTAX&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dcblock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Fc&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dcblock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;fs&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;aQ&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dcblock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;fs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Fc,fc&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dcblock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;fs&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="n"&gt;dcblock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Fc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="n"&gt;dcblock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;fs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="n"&gt;dcblock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;fs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"SystemVerilog: RTL Types"</title><link href="http://lizard-spock.co.uk/pelican_test/systemverilog-rtl-types.html" rel="alternate"></link><published>2015-03-26T20:08:34+00:00</published><updated>2015-03-26T20:08:34+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-03-26:/pelican_test/systemverilog-rtl-types.html</id><summary type="html">&lt;p&gt;&lt;code&gt;reg&lt;/code&gt; and &lt;code&gt;wire&lt;/code&gt; were the original synthesisable types. Wires are constantly assigned and regs are evaluated at particular points, the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;code&gt;reg&lt;/code&gt; and &lt;code&gt;wire&lt;/code&gt; were the original synthesisable types. Wires are constantly assigned and regs are evaluated at particular points, the advantage here is for the simulator to make optimisations.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;wire&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;w_data&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;w_data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Same function as above using reg&lt;/span&gt;
+&lt;span class="kt"&gt;reg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;r_data&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;always&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;r_data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A common mistake when learning Verilog is to assume the reg type implies a register in hardware. The earlier optimisation for the simulator can be done through the context of its usage.&lt;/p&gt;
+&lt;p&gt;This introduces &lt;code&gt;logic&lt;/code&gt; which can be used in place of wire and reg.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;logic&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;w_data&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;w_data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Same function as above using reg&lt;/span&gt;
+&lt;span class="kt"&gt;logic&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;r_data&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;always&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;r_data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The type &lt;code&gt;bit&lt;/code&gt; and &lt;code&gt;byte&lt;/code&gt; have also been created that can only hold 2 states 0 or 1 no x or z. &lt;code&gt;byte&lt;/code&gt; implies &lt;code&gt;bit [7:0]&lt;/code&gt;. Using these types offers a small speed improvement but I would recommend not using them in RTL as your verification may miss uninitialized values or critical resets.&lt;/p&gt;
+&lt;p&gt;The usage of &lt;code&gt;bit&lt;/code&gt; and &lt;code&gt;byte&lt;/code&gt; would be more common in testbench components, but can lead to issues in case of having to drive x's to stimulate data corruption and recovery.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;At the time of writing I was under the impression that &lt;code&gt;logic&lt;/code&gt; could not be used for tristate, I am unable to find the original paper that I based this on. Until further updates, comments or edits, I revoke my assertion that &lt;em&gt;logic can not be used to create tri-state lines&lt;/em&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;The &lt;code&gt;tri&lt;/code&gt; type has been added, for explicitly defining a tri-state line. It is based on the properties of a &lt;code&gt;wire&lt;/code&gt;, &lt;code&gt;logic&lt;/code&gt; is based on the properties of a &lt;code&gt;reg&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;tri&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;t_data&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;t_data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;drive&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;?&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="p"&gt;&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;bz&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If you no longer have to support backwards compatibility Verilog then I would recommend switching to using &lt;code&gt;logic&lt;/code&gt; and &lt;code&gt;tri&lt;/code&gt;. Using &lt;code&gt;logic&lt;/code&gt; aids re-factoring and and &lt;code&gt;tri&lt;/code&gt;  reflects the design intent of a tristate line.&lt;/p&gt;
+&lt;p&gt;Originally posted as a&lt;a href="http://stackoverflow.com/a/13285242/97073"&gt; SO answer&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Verilog"></category><category term="Programming"></category></entry><entry><title>"Verilog: define if not defined"</title><link href="http://lizard-spock.co.uk/pelican_test/verilog-define-if-not-defined.html" rel="alternate"></link><published>2015-03-26T19:45:10+00:00</published><updated>2015-03-26T19:45:10+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-03-26:/pelican_test/verilog-define-if-not-defined.html</id><summary type="html">&lt;p&gt;To set a default define option while allowing it to be overridden from the command line.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;`ifndef mode_sel&lt;/span&gt;
+&lt;span class="sb"&gt;  `&lt;/span&gt;define mode_sel …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;To set a default define option while allowing it to be overridden from the command line.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;`ifndef mode_sel&lt;/span&gt;
+&lt;span class="sb"&gt;  `&lt;/span&gt;define mode_sel 0
+`endif
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The command line should override testbench defined options but this has proven unreliable.&lt;/p&gt;
+&lt;p&gt;command line to set value:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;irun -define mode_sel=1 ...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Verilog"></category></entry><entry><title>"Verilog: shm waveforms"</title><link href="http://lizard-spock.co.uk/pelican_test/verilog-shm-waveforms.html" rel="alternate"></link><published>2015-03-26T19:38:29+00:00</published><updated>2015-03-26T19:38:29+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-03-26:/pelican_test/verilog-shm-waveforms.html</id><summary type="html">&lt;p&gt;The best practice is to use a tcl file:&lt;/p&gt;
+&lt;p&gt;shm.tcl &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;database -open waves -shm
+probe -create your_top_level -depth all …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;The best practice is to use a tcl file:&lt;/p&gt;
+&lt;p&gt;shm.tcl &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;database -open waves -shm
+probe -create your_top_level -depth all -all -shm -database waves
+run 
+exit
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;run with :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;irun -access +r testcase.sv -input shm.tcl
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Alternatively the following can be added to the simulation:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;initial begin
+  $shm_open(&amp;quot;waves.shm&amp;quot;); $shm_probe(&amp;quot;AS&amp;quot;);
+end
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;run with &lt;code&gt;irun -access +r testcase.sv&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;NB: I have had trouble getting this last version to work, the tcl file method is more reliable.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Verilog"></category></entry><entry><title>"Verilog Timeformat"</title><link href="http://lizard-spock.co.uk/pelican_test/verilog-timeformat.html" rel="alternate"></link><published>2015-03-26T19:21:25+00:00</published><updated>2015-03-26T19:21:25+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-03-26:/pelican_test/verilog-timeformat.html</id><summary type="html">&lt;p&gt;Time can be displayed during simulation using &lt;code&gt;%t&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$display(&amp;quot;%t&amp;quot;, $realtime);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Timeformat is used to control the way (&lt;code&gt;%t&lt;/code&gt;) this …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Time can be displayed during simulation using &lt;code&gt;%t&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$display(&amp;quot;%t&amp;quot;, $realtime);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Timeformat is used to control the way (&lt;code&gt;%t&lt;/code&gt;) this is displayed:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;//$timeformat(unit#, prec#, &amp;quot;unit&amp;quot;, minwidth);&lt;/span&gt;
+&lt;span class="no"&gt;$&lt;/span&gt;&lt;span class="n"&gt;timeformat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot; ms&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// -3 and &amp;quot; ms&amp;quot; give useful display msg&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+&lt;li&gt;unit is the base that time is to be displayed in, from 0 to -15&lt;/li&gt;
+&lt;li&gt;precision is the number of decimal points to display.&lt;/li&gt;
+&lt;li&gt;"unit" is a string appended to the time, such as " ns".&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;minwidth is the minimum number of characters that will be displayed.&lt;/p&gt;
+&lt;p&gt;0 = 1 sec
+ -1 = 100 ms
+ -2 = 10 ms
+ -3 = 1 ms
+ -4 = 100 us
+ -5 = 10 us
+ -6 = 1 us
+ -7 = 100 ns
+ -8 = 10 ns
+ -9 = 1 ns
+-10 = 100 ps
+-11 = 10 ps
+-12 = 1 ps
+-13 = 100 fs
+-14 = 10 fs
+-15 = 1 fs&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Verilog"></category></entry><entry><title>"SystemVerilog: Constrained Random"</title><link href="http://lizard-spock.co.uk/pelican_test/systemverilog-constrained-random.html" rel="alternate"></link><published>2015-02-18T17:01:56+00:00</published><updated>2015-02-18T17:01:56+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-02-18:/pelican_test/systemverilog-constrained-random.html</id><summary type="html">&lt;p&gt;A minimal example of constrained random to constraining a 4 bit value to 0 to 11 when randomised.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tb …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;A minimal example of constrained random to constraining a 4 bit value to 0 to 11 when randomised.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tb&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;cr_example_t&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;rand&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;bit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;rand&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;bit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sel&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;constrain&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;c1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;sel&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;endclass&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;cr_example_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;cr_example&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;initial&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;begin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;test_program&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;cr_example&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randomise&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;display&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cr_example&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;display&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cr_example&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sel&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;finish&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;endmodule&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verilog"></category><category term="SystemVerilog"></category><category term="Verification"></category><category term="Programming"></category></entry><entry><title>"Verilog: Thermometer Code"</title><link href="http://lizard-spock.co.uk/pelican_test/verilog-thermometer-code.html" rel="alternate"></link><published>2015-02-18T16:51:43+00:00</published><updated>2015-02-18T16:51:43+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-02-18:/pelican_test/verilog-thermometer-code.html</id><summary type="html">&lt;p&gt;Efficiently create a &lt;a href="http://en.wikipedia.org/wiki/Unary_coding"&gt;thermometer code&lt;/a&gt; in verilog:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;localparam&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;M-1:0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;therm_code&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;input&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;$clog2(M):0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;begin …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Efficiently create a &lt;a href="http://en.wikipedia.org/wiki/Unary_coding"&gt;thermometer code&lt;/a&gt; in verilog:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;localparam&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;M-1:0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;therm_code&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;input&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;$clog2(M):0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nc"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;therm_code&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="n"&gt;endfunction&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Other methods which do not synthesis as well:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;therm_code  = (2**val) - 1;
+
+therm_code = ~({M{1&amp;#39;b1}} &amp;lt;&amp;lt; val);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verilog"></category><category term="Programming"></category></entry><entry><title>"Verilog: Calculate primes"</title><link href="http://lizard-spock.co.uk/pelican_test/verilog-calculate-primes.html" rel="alternate"></link><published>2014-12-20T07:28:41+00:00</published><updated>2014-12-20T07:28:41+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-12-20:/pelican_test/verilog-calculate-primes.html</id><summary type="html">&lt;p&gt;Based on my answer to &lt;a href="http://stackoverflow.com/q/27461173/97073"&gt;this SO Question&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href="http://www.mathsisfun.com/definitions/prime-number.html"&gt;Definition of Prime&lt;/a&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A Prime Number can be divided evenly only by …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;p&gt;Based on my answer to &lt;a href="http://stackoverflow.com/q/27461173/97073"&gt;this SO Question&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href="http://www.mathsisfun.com/definitions/prime-number.html"&gt;Definition of Prime&lt;/a&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A Prime Number can be divided evenly only by 1, or itself. 
+And it must be a whole number greater than 1.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;A simple method would be to iterate over numbers 2 to N, checking if it was divisible by all natural numbers greater than 2, and below the current value.&lt;/p&gt;
+&lt;p&gt;Once checked that it is not divisible by 2 there is not point checking for 4, 6, 8 etc. 
+Remembering the definition of prime all numbers that are not prime are integer multiples of prime. so we have reduced the amount of work involved in testing primality.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;parameter&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1000&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;
+&lt;span class="n"&gt;reg&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;31:0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;prime_number&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;0:N-1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Store&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;to&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;prime&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;numbers&lt;/span&gt;
+&lt;span class="k"&gt;integer&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;Result&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;primality&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;
+&lt;span class="k"&gt;integer&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Currently&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;looking&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;th prime &lt;/span&gt;
+&lt;span class="s1"&gt;integer          index    ; // Counts 1 to k, indexing previous primes &lt;/span&gt;
+&lt;span class="s1"&gt;integer          number_ut; // Number Under test&lt;/span&gt;
+
+&lt;span class="s1"&gt;reg        [1:0] state   ; &lt;/span&gt;
+&lt;span class="s1"&gt;localparam       S_INC   = 2&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;b01&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;localparam&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="n"&gt;S_CHECK&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;b10;&lt;/span&gt;
+
+&lt;span class="s1"&gt;initial begin&lt;/span&gt;
+&lt;span class="s1"&gt;  prime_number[0] = &amp;#39;&lt;/span&gt;&lt;span class="n"&gt;d2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;Preload&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;first&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Prime&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;state&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;S_CHECK&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="k"&gt;Check&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;first&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;number_ut&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;d3; // Number Under Test&lt;/span&gt;
+&lt;span class="s1"&gt;  k               = &amp;#39;&lt;/span&gt;&lt;span class="n"&gt;d1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;Position&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;preloaded&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;index&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;d0;&lt;/span&gt;
+&lt;span class="s1"&gt;  test            = &amp;#39;&lt;/span&gt;&lt;span class="n"&gt;d1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;always&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;clk&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;state&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;S_INC&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;number_ut&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;number_ut&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;state&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;S_CHECK&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;index&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;d0;&lt;/span&gt;
+&lt;span class="s1"&gt;    test      &amp;lt;= &amp;#39;&lt;/span&gt;&lt;span class="n"&gt;d1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Safe&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;default&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;state&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;S_CHECK&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Failed&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Prime&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;exact&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;divisor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;found&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;display&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;Reject %3d&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;number_ut&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="k"&gt;state&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;S_INC&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;index&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;Passed&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Prime&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;check&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="k"&gt;Use&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;so&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;that&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;is&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;number&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;is&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="n"&gt;nd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;etc&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;display&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;Found the %1d th Prime, it is %1d&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;number_ut&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;prime_number&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;number_ut&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="k"&gt;state&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;S_INC&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;number_ut&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;prime_number&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="k"&gt;index&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;index&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://www.edaplayground.com/x/BzX"&gt;Example on EDA Playground&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This is however just a programming exercise as the resulting hardware is likely substantially bigger than just implementing a look up table to the maxim number of primes you can fit in &lt;code&gt;prime_number&lt;/code&gt;. The look up table will also be ready from time zero and not need to recompute every time you power up.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Math"></category><category term="Verilog"></category></entry><entry><title>"Submit to SGE as if working locally"</title><link href="http://lizard-spock.co.uk/pelican_test/submit-to-sge-as-if-working-locally.html" rel="alternate"></link><published>2014-07-30T20:13:23+01:00</published><updated>2014-07-30T20:13:23+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-07-30:/pelican_test/submit-to-sge-as-if-working-locally.html</id><summary type="html">&lt;p&gt;Setting an alias in you .tcshrc&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;alias qrun &amp;#39;qrsh -V -noshell -cwd !*&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;or bash &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;alias qrun=&amp;#39;qrsh -V -noshell -cwd …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Setting an alias in you .tcshrc&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;alias qrun &amp;#39;qrsh -V -noshell -cwd !*&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;or bash &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;alias qrun=&amp;#39;qrsh -V -noshell -cwd !*&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Which makes submitting any script to the grid just:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;qrun helloworld.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Originally asked on &lt;a href="http://superuser.com/a/751162/42141"&gt;superuser&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="SGE"></category></entry><entry><title>"Simulink: Scroll wheel erratic behaviour"</title><link href="http://lizard-spock.co.uk/pelican_test/simulink-scroll-wheel-erratic-behaviour.html" rel="alternate"></link><published>2014-07-30T20:08:10+01:00</published><updated>2014-07-30T20:08:10+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-07-30:/pelican_test/simulink-scroll-wheel-erratic-behaviour.html</id><summary type="html">&lt;p&gt;On Mac OS X matlab behaves quite oddly with the track pad zooming
+in and out very quickly and erratically …&lt;/p&gt;</summary><content type="html">&lt;p&gt;On Mac OS X matlab behaves quite oddly with the track pad zooming
+in and out very quickly and erratically to remove this behaviour
+&lt;strong&gt;Disable Mouse Scroll Wheel Zoom Behavior&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;To disable the zoom behavior for the scroll wheel:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;File &amp;gt; 
+  Simulink Preferences &amp;gt; 
+    Editor Defaults &amp;gt; 
+      Scroll wheel controls zooming preference.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If you hold the Ctrl key and use the scroll wheel, the scroll wheel behavior is the opposite of how the preference is set. &lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/help/simulink/ug/zooming-block-diagrams.html"&gt;source&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Simulink"></category></entry><entry><title>"Matlab editor no tabs"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-editor-no-tabs.html" rel="alternate"></link><published>2014-07-30T20:04:15+01:00</published><updated>2014-07-30T20:04:15+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-07-30:/pelican_test/matlab-editor-no-tabs.html</id><summary type="html">&lt;p&gt;Matlab always use to open text files in tabs in the same editor window. When switching to 2014a documents started …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Matlab always use to open text files in tabs in the same editor window. When switching to 2014a documents started opening as separate windows.&lt;/p&gt;
+&lt;p&gt;It seems to have been a problem which &lt;a href="http://www.mathworks.co.uk/matlabcentral/answers/9587-editor-multiple-tabs"&gt;occasionally shows up for others&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Current solution is to dock the editor (ctrl-shift-D) , open multiple files (2 or more) then undock the group (ctrl-shift-U).&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Simulink: Globally set sample time"</title><link href="http://lizard-spock.co.uk/pelican_test/simulink-globally-set-sample-time.html" rel="alternate"></link><published>2014-07-30T20:01:49+01:00</published><updated>2014-07-30T20:01:49+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-07-30:/pelican_test/simulink-globally-set-sample-time.html</id><summary type="html">&lt;p&gt;To set each constant in a model to sample time -1:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;blks&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;find_system&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;dut&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;BlockType&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Constant&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="nt"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;length …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;To set each constant in a model to sample time -1:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;blks&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;find_system&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;dut&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;BlockType&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Constant&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="nt"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;length&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;blks&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;set_param&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;blks&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="err"&gt;i&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SampleTime&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-1&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/help/hdlcoder/ug/resource-sharing.html#btg_5ht-1"&gt;Source&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category><category term="Simulink"></category></entry><entry><title>"Simulink: list programmable block properties"</title><link href="http://lizard-spock.co.uk/pelican_test/simulink-list-programmable-block-properties.html" rel="alternate"></link><published>2014-07-30T20:00:28+01:00</published><updated>2014-07-30T20:00:28+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-07-30:/pelican_test/simulink-list-programmable-block-properties.html</id><summary type="html">&lt;p&gt;Select a block ie gain in Simulink then in Matlab type:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;get(gcbh)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This shows the list of properties which …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Select a block ie gain in Simulink then in Matlab type:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;get(gcbh)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This shows the list of properties which can be controlled from Matlab. TO change one for example changing the gain paramter from double to a 10 bit fixed point number (&lt;code&gt;sfix10_en9&lt;/code&gt;).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;set_param(gcbh, &amp;#39;ParamDataTypeStr&amp;#39;, &amp;#39;fixdt(1,10,9)&amp;#39;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/matlabcentral/newsreader/view_thread/306640"&gt;From Matlab Central&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Simulink"></category></entry><entry><title>"Matlab: Find all gain blocks"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-find-all-gain-blocks.html" rel="alternate"></link><published>2014-07-30T19:58:53+01:00</published><updated>2014-07-30T19:58:53+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-07-30:/pelican_test/matlab-find-all-gain-blocks.html</id><summary type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;find_system(&amp;#39;BlockType&amp;#39;, &amp;#39;Gain&amp;#39;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This will list all gain blocks in currently loaded models. to limit to a particulat model:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;find_system …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;find_system(&amp;#39;BlockType&amp;#39;, &amp;#39;Gain&amp;#39;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This will list all gain blocks in currently loaded models. to limit to a particulat model:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;find_system(&amp;#39;testharness&amp;#39;, &amp;#39;BlockType&amp;#39;, &amp;#39;Gain&amp;#39;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/help/simulink/slref/find_system.html"&gt;From Mathworks&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category><category term="Simulink"></category></entry><entry><title>"Floating Point Arithmetic is not Associative"</title><link href="http://lizard-spock.co.uk/pelican_test/floating-point-arithmetic-is-not-associative.html" rel="alternate"></link><published>2014-06-19T20:00:45+01:00</published><updated>2014-06-19T20:00:45+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-06-19:/pelican_test/floating-point-arithmetic-is-not-associative.html</id><summary type="html">&lt;p&gt;This can be shown with some easy examples:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;2 …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;This can be shown with some easy examples:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;%.20f&amp;#39;&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Display&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;with&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;fractional&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;places&lt;/span&gt;
+&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;%.20f&amp;#39;&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+
+&lt;span class="nv"&gt;ans&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;60000000000000008882&lt;/span&gt;
+
+&lt;span class="nv"&gt;ans&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;59999999999999997780&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Multiplication examples:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;c = 0.1 &lt;span class="gs"&gt;*  0.2 *&lt;/span&gt; 0.3 ;
+d = 0.1 &lt;span class="gs"&gt;* (0.2 *&lt;/span&gt; 0.3);
+
+sprintf(&amp;#39;%.20f&amp;#39;, c)
+sprintf(&amp;#39;%.20f&amp;#39;, d)
+
+ans =
+0.00600000000000000099
+
+ans =
+0.00600000000000000012
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;By default gcc will not rearrange equations for optimal performance as this would change the accuracy.
+The GCC flag &lt;code&gt;-ffast-math&lt;/code&gt; optimizes equations as if they were associative.&lt;/p&gt;
+&lt;p&gt;The examples shown here were found on &lt;a href="https://news.ycombinator.com/item?id=7479550"&gt;Hacker News&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Verilog: Timeout"</title><link href="http://lizard-spock.co.uk/pelican_test/verilog-timeout.html" rel="alternate"></link><published>2014-06-14T08:08:26+01:00</published><updated>2014-06-14T08:08:26+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-06-14:/pelican_test/verilog-timeout.html</id><summary type="html">&lt;p&gt;To wait for a maximum of &lt;code&gt;10ns&lt;/code&gt; for positive edge on clk then carry on with simulation.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;fork&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;wait_or_timeout&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;begin …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;To wait for a maximum of &lt;code&gt;10ns&lt;/code&gt; for positive edge on clk then carry on with simulation.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;fork&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;wait_or_timeout&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="n"&gt;ms&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;disable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;wait_or_timeout&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;clk&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;disable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;wait_or_timeout&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="n"&gt;join&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Often use to fail simulation if the expected signal does not occur,
+this stops simulation hanging and allows status reports to be generated.&lt;/p&gt;
+&lt;p&gt;Originally posted as &lt;a href="http://stackoverflow.com/a/12372233/97073"&gt;SO answer&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Verilog"></category></entry><entry><title>"Matlab Remove Elements from Array"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-remove-elements-from-array.html" rel="alternate"></link><published>2014-06-02T19:08:09+01:00</published><updated>2014-06-02T19:08:09+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-06-02:/pelican_test/matlab-remove-elements-from-array.html</id><summary type="html">&lt;p&gt;Removing elements based on index&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;A&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;10&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;1-D&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;array&lt;/span&gt;
+&lt;span class="nt"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;3&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;4&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;5&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;6&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;7&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;8&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;9 …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Removing elements based on index&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;A&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;10&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;1-D&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;array&lt;/span&gt;
+&lt;span class="nt"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;3&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;4&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;5&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;6&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;7&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;8&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;9&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;10&lt;/span&gt;
+
+&lt;span class="nt"&gt;ind&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;indices&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;to&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;be&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;removed&lt;/span&gt;
+&lt;span class="nt"&gt;A&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;ind&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cp"&gt;[]&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;remove&lt;/span&gt;
+
+&lt;span class="nt"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;3&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;5&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;6&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;8&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;9&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;10&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Based on &lt;a href="http://www.mathworks.co.uk/matlabcentral/newsreader/view_thread/1486880"&gt;Matlab Central&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Matlab: Formatting Strings"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-formatting-strings.html" rel="alternate"></link><published>2014-06-02T18:46:09+01:00</published><updated>2014-06-02T18:46:09+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-06-02:/pelican_test/matlab-formatting-strings.html</id><summary type="html">&lt;p&gt;The official documentation can be found on &lt;a href="http://www.mathworks.co.uk/help/matlab/matlab_prog/formatting-strings.html#bq0z8vc-6"&gt;mathworks&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To display a number with 3 Integer decimal places and 3 fraction …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The official documentation can be found on &lt;a href="http://www.mathworks.co.uk/help/matlab/matlab_prog/formatting-strings.html#bq0z8vc-6"&gt;mathworks&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To display a number with 3 Integer decimal places and 3 fraction places 
+&lt;code&gt;$f7.3&lt;/code&gt; 7 rather than 6 as need place for the decimal point.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;6.3-%6.3f-&amp;#39;&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;123&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="mi"&gt;6&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;123&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;
+
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;6.3-%6.3f-&amp;#39;&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;23&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="mi"&gt;6&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;23&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;
+
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;6.3-%6.3f-&amp;#39;&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="mi"&gt;6&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;-ve numbers&lt;/h2&gt;
+&lt;p&gt;If signed you need to leave space for -ve &lt;code&gt;$f8.3&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;7.3-%7.3f-&amp;#39;&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;123&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="mi"&gt;7&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="mi"&gt;123&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;
+
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;7.3-%7.3f-&amp;#39;&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;23&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="mi"&gt;7&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="mi"&gt;23&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;
+
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;8.3-%8.3f-&amp;#39;&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;23&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="mi"&gt;8&lt;/span&gt;.&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;23&lt;/span&gt;.&lt;span class="mi"&gt;678&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For reliable and consistent floating point displays use:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;%(fractional places + integer places + 2).(fractional places)f&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Matlab: Grid"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-grid.html" rel="alternate"></link><published>2014-05-28T19:49:38+01:00</published><updated>2014-05-28T19:49:38+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-28:/pelican_test/matlab-grid.html</id><summary type="html">&lt;p&gt;&lt;img alt="" src="/images/Engineering/matlab_grid/grid_on.png"&gt;&lt;/p&gt;
+&lt;p&gt;To add X and Y grids to plots :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;grid on;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;!-- more --&gt;
+
+&lt;p&gt;&lt;img alt="" src="/images/Engineering/matlab_grid/y_grid_on.png"&gt;&lt;/p&gt;
+&lt;p&gt;To add Y only grid:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;set(gca,&amp;#39;XGrid&amp;#39;,&amp;#39;off&amp;#39;,&amp;#39;YGrid …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="" src="/images/Engineering/matlab_grid/grid_on.png"&gt;&lt;/p&gt;
+&lt;p&gt;To add X and Y grids to plots :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;grid on;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;!-- more --&gt;
+
+&lt;p&gt;&lt;img alt="" src="/images/Engineering/matlab_grid/y_grid_on.png"&gt;&lt;/p&gt;
+&lt;p&gt;To add Y only grid:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;set(gca,&amp;#39;XGrid&amp;#39;,&amp;#39;off&amp;#39;,&amp;#39;YGrid&amp;#39;,&amp;#39;on&amp;#39;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="" src="/images/Engineering/matlab_grid/x_grid_on.png"&gt;&lt;/p&gt;
+&lt;p&gt;To add X only grid&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;set(gca,&amp;#39;XGrid&amp;#39;,&amp;#39;on&amp;#39;,&amp;#39;YGrid&amp;#39;,’off&amp;#39;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Matlab: Line Breaks in Strings"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-line-breaks-in-strings.html" rel="alternate"></link><published>2014-05-28T19:34:30+01:00</published><updated>2014-05-28T19:34:30+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-28:/pelican_test/matlab-line-breaks-in-strings.html</id><summary type="html">&lt;p&gt;Wrap strings with &lt;code&gt;sprintf&lt;/code&gt; to allow the &lt;code&gt;\n&lt;/code&gt; to be escaped correctly.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;disp&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;hello\nworld&amp;#39;&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;hello&lt;/span&gt;\&lt;span class="nv"&gt;nworld&lt;/span&gt;
+
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;disp&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;hello …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Wrap strings with &lt;code&gt;sprintf&lt;/code&gt; to allow the &lt;code&gt;\n&lt;/code&gt; to be escaped correctly.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;disp&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;hello\nworld&amp;#39;&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;hello&lt;/span&gt;\&lt;span class="nv"&gt;nworld&lt;/span&gt;
+
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;disp&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;hello\nworld&amp;#39;&lt;/span&gt;&lt;span class="ss"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;hello&lt;/span&gt;
+&lt;span class="nv"&gt;world&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Matlab: Listing field name values of a struct"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-listing-field-name-values-of-a-struct.html" rel="alternate"></link><published>2014-05-28T19:05:01+01:00</published><updated>2014-05-28T19:05:01+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-28:/pelican_test/matlab-listing-field-name-values-of-a-struct.html</id><summary type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;s = struct ;
+s(1).dat =‘a&amp;#39; ;
+s(1).freq=11 ;
+s(2).dat =‘b&amp;#39; ;
+s(2).freq=22 ;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Where:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;s …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;s = struct ;
+s(1).dat =‘a&amp;#39; ;
+s(1).freq=11 ;
+s(2).dat =‘b&amp;#39; ;
+s(2).freq=22 ;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Where:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;s(1)
+
+ans =
+
+     dat: &amp;#39;a&amp;#39;
+    freq: 11
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;How do you access [‘a’, ‘b’] and [11, 22]?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;[s.dat] , [s.freq]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;[]&lt;/code&gt; are really important here.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[s.freq]&lt;/span&gt;
+
+&lt;span class="na"&gt;ans&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;11    22&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://blogs.mathworks.com/loren/2007/04/19/vectorizing-access-to-an-array-of-structures/"&gt;Solution found on a Loren Post&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Matlab toolboxes with absolute path setup"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-toolboxes-with-absolute-path-setup.html" rel="alternate"></link><published>2014-05-07T18:22:48+01:00</published><updated>2014-05-07T18:22:48+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-07:/pelican_test/matlab-toolboxes-with-absolute-path-setup.html</id><summary type="html">&lt;p&gt;When a script or function is called with &lt;code&gt;run(./relative/path/script)&lt;/code&gt; the working directory is changed to the &lt;code&gt;./relative …&lt;/code&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;When a script or function is called with &lt;code&gt;run(./relative/path/script)&lt;/code&gt; the working directory is changed to the &lt;code&gt;./relative/path&lt;/code&gt;. This means &lt;code&gt;pwd&lt;/code&gt; it can be used to specify absolute paths:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;./&lt;/span&gt;&lt;span class="n"&gt;libs&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;example_toolbox&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;load_toolbox&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Which contains :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;addpath([pwd, &amp;#39;/function&amp;#39;]);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now  The path will contain &lt;code&gt;C:/ ... /libs/example_toolbox/function&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;As shown in the example this is useful for toolboxes etc which could be distributed with a top level script which adds the toolbox functions on to the path.&lt;/p&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Matlab: Array content check"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-array-content-check.html" rel="alternate"></link><published>2014-05-07T18:13:24+01:00</published><updated>2014-05-07T18:13:24+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-07:/pelican_test/matlab-array-content-check.html</id><summary type="html">&lt;p&gt;Checking if an Array contains a number:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;input = [1,2,3,4];
+check = 4;
+any(input==4)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Check if a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Checking if an Array contains a number:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;input = [1,2,3,4];
+check = 4;
+any(input==4)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Check if a number is contained in an array:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;input = 32;
+check = [32,64,128];
+any( check==input )
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Programming"></category><category term="Matlab"></category></entry><entry><title>"Matlab: Split Odd &amp; Even Array Elements"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-split-odd-even-array-elements.html" rel="alternate"></link><published>2014-05-07T17:58:33+01:00</published><updated>2014-05-07T17:58:33+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-07:/pelican_test/matlab-split-odd-even-array-elements.html</id><summary type="html">&lt;p&gt;Using Matlab to splitting data into odd and even samples.&lt;/p&gt;
+&lt;p&gt;A for loop approach:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;data_odd&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[];&lt;/span&gt;
+&lt;span class="n"&gt;data_even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[];&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nb"&gt;length …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Using Matlab to splitting data into odd and even samples.&lt;/p&gt;
+&lt;p&gt;A for loop approach:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;data_odd&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[];&lt;/span&gt;
+&lt;span class="n"&gt;data_even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[];&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nb"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;mod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c"&gt;%% disp(&amp;#39;odd&amp;#39;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;data_odd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;data_odd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c"&gt;%% disp(&amp;#39;even&amp;#39;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;data_even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;data_even&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Matlab approach using ranges to remap values:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;data_odd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;end&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="nt"&gt;data_even&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;end&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Ranges are composed of &lt;code&gt;start_index:step_size:end_index&lt;/code&gt;. If step_size is omitted, 1 is assumed.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;end&lt;/code&gt; has a special meaning when used inside an array, it is the position of the last element.
+To append to an array you could use &lt;code&gt;data(end+1) = append_value&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;No error or warning is triggered if the &lt;code&gt;end_index&lt;/code&gt; can not be reached with the given step size, which is why this works with &lt;code&gt;end&lt;/code&gt; as the stop point of both sides.&lt;/p&gt;
+&lt;h2&gt;Example&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;]&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;odd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;:&lt;span class="mi"&gt;2&lt;/span&gt;:&lt;span class="k"&gt;end&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;even&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;:&lt;span class="mi"&gt;2&lt;/span&gt;:&lt;span class="k"&gt;end&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+
+&lt;span class="nv"&gt;odd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;
+
+&lt;span class="nv"&gt;even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category><category term="Programming"></category></entry><entry><title>"Verilog importing envvar"</title><link href="http://lizard-spock.co.uk/pelican_test/verilog-importing-envvar.html" rel="alternate"></link><published>2014-04-03T18:22:00+01:00</published><updated>2014-04-03T18:22:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-04-03:/pelican_test/verilog-importing-envvar.html</id><summary type="html">&lt;p&gt;Based on a &lt;a href="http://stackoverflow.com/a/15103561/97073"&gt;Stackoverflow answer&lt;/a&gt;, to import environment variables into Verilog you can use:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;DPI-C&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;input …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Based on a &lt;a href="http://stackoverflow.com/a/15103561/97073"&gt;Stackoverflow answer&lt;/a&gt;, to import environment variables into Verilog you can use:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;DPI-C&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;input&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;env_name&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;top&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;initial&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;env = &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;HOME&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/FileName&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="n"&gt;endmodule&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verilog"></category><category term="Programming"></category></entry><entry><title>"Matlab: leading 0's"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-leading-0s.html" rel="alternate"></link><published>2014-03-25T20:52:35+00:00</published><updated>2014-03-25T20:52:35+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-25:/pelican_test/matlab-leading-0s.html</id><summary type="html">&lt;p&gt;For adding leading zeros to a number the following can be used for 4 decimal places with integer input:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;dat …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;For adding leading zeros to a number the following can be used for 4 decimal places with integer input:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;dat&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;sprintf&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;[&lt;span class="s1"&gt;&amp;#39;%4.4d&amp;#39;&lt;/span&gt;],&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;dat&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To make this programmable the following can be used:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dat       = 1;
+min_width = 4;
+sprintf([&amp;#39;%&amp;#39;,num2str(min_width),&amp;#39;.&amp;#39;, num2str(min_width),&amp;#39;d&amp;#39;], 1)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For string inputs you need:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dat       = &amp;#39;1&amp;#39;
+min_width = 4;
+sprintf([&amp;#39;%0&amp;#39;,num2str(6),&amp;#39;s&amp;#39;], dat)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category><category term="Programming"></category></entry><entry><title>"Matlab Wrapper Scripts"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-wrapper-scripts.html" rel="alternate"></link><published>2014-03-17T19:48:57+00:00</published><updated>2014-03-17T19:48:57+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-17:/pelican_test/matlab-wrapper-scripts.html</id><summary type="html">&lt;p&gt;To wrap a function with variable input arguments and pass them all on to the wrapped function.
+Based on a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;To wrap a function with variable input arguments and pass them all on to the wrapped function.
+Based on a &lt;a href="http://stackoverflow.com/questions/4895556/how-to-wrap-a-function-using-varargin-and-varargout"&gt;StackOverflow answer&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;varargout&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;wrapper&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; varargin &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;varargout&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nb"&gt;nargout&lt;/span&gt;&lt;span class="p"&gt;}]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;someFunction&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varargin&lt;/span&gt;&lt;span class="p"&gt;{:}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Used in the &lt;a href="https://github.com/Matlab-Toolbox/printf"&gt;printf toolbox&lt;/a&gt;: where we wrap fprint to print directly to stdout.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; varargin &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;fprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varargin&lt;/span&gt;&lt;span class="p"&gt;{:});&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category><category term="Programming"></category></entry><entry><title>"Matlab sort_by"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-sort_by.html" rel="alternate"></link><published>2014-03-17T18:55:11+00:00</published><updated>2014-03-17T18:55:11+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-17:/pelican_test/matlab-sort_by.html</id><summary type="html">&lt;p&gt;In ruby we can perform schwartzian transforms easily with the sort_by method. This allows sorting enumerators by any property.&lt;/p&gt;
+&lt;p&gt;For …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In ruby we can perform schwartzian transforms easily with the sort_by method. This allows sorting enumerators by any property.&lt;/p&gt;
+&lt;p&gt;For example to do a non case sensitive sort:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;some_array.sort_by { |x| x.downcase }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://blogs.mathworks.com/pick/2010/09/17/sorting-structure-arrays-based-on-fields/"&gt;Based on this Mathworks blog&lt;/a&gt;, I have ported the &lt;a href="http://www.mathworks.com/matlabcentral/fileexchange/28573-nested-sort-of-structure-arrays"&gt;Matlab central code&lt;/a&gt; to a &lt;a href="https://github.com/Matlab-Toolbox/nested_sort"&gt;Toolbox on Github&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;After Downloading the toolbox and adding the functions folder to your path.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;addpath(&amp;#39;../lib/nested_sort/function/&amp;#39;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Basic usage is:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;struct&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;num2cell&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;4&lt;/span&gt;&lt;span class="o"&gt;),&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;value&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="err"&gt;5,2,3,1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="nt"&gt;B&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;sortStruct&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;A&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;value&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;B is A sorted by 'value'.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Beyond the LSB"</title><link href="http://lizard-spock.co.uk/pelican_test/beyond-the-lsb.html" rel="alternate"></link><published>2014-03-13T19:07:42+00:00</published><updated>2014-03-13T19:07:42+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-13:/pelican_test/beyond-the-lsb.html</id><summary type="html">&lt;p&gt;If we truncate a number, that is to throw away the LSBs (least significant bits) we loose resolution.&lt;/p&gt;
+&lt;p&gt;A 4 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;If we truncate a number, that is to throw away the LSBs (least significant bits) we loose resolution.&lt;/p&gt;
+&lt;p&gt;A 4 bit number truncated to 2 bits: &lt;em&gt;numbers shown in binary (Base2).&lt;/em&gt;   &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;0100&lt;/span&gt;
+&lt;span class="mf"&gt;0101&lt;/span&gt;
+&lt;span class="mf"&gt;0110&lt;/span&gt;
+&lt;span class="mf"&gt;0111&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Would all become 01.&lt;/p&gt;
+&lt;h1&gt;Introducing Dither&lt;/h1&gt;
+&lt;p&gt;Effective dithering increase the accuracy beyond the LSB of the truncated values. 
+Consider a small fractional value rounded to an integer. Starting with 0.5 with 1 bit random dither:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Input  Dither Sum &amp;amp; truncate
+00.1   0.1    01
+00.1   0.0    00
+00.1   0.1    01
+00.1   0.0    00
+Average over 4 samples is 0.5
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If the value is below 0.5 this dither scheme will not work, as it would never
+round to a full integer.&lt;/p&gt;
+&lt;p&gt;So we increase the dither to 2 bits. Inputting a constant 0.25, Dither cycling
+through all possible values&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Input  Dither Sum &amp;amp; truncate
+00.01  0.00   00
+00.01  0.01   00
+00.01  0.10   00
+00.01  0.11   01
+Average of 4 Samples 0.25
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In the above example we have increased the resolution of the time averaged value
+by 2 bits.&lt;/p&gt;
+&lt;p&gt;For every doubling of the frequency we gain an effective LSB if dithered correctly.
+Adding more bits than &lt;code&gt;log2(oversampling rate)&lt;/code&gt; of dithering will not gain accuracy.
+Although it may help breakup tonal behaviour of a system.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Apply dither to the bits to be truncated. Apply enough bits of dither so it is
+possible for the LSB of the required resolution to effect the truncated value.&lt;/p&gt;
+&lt;p&gt;The increase in resolution is limited to &lt;code&gt;log2(oversampling rate)&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Further Reading:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.ece.rochester.edu/courses/ECE472/resources/Papers/Lipshitz_1992.pdf"&gt;Quanatization and Dither: A Theoretical Survey. LIPSHITZ, WANNAMAKER and VANDERKOOY&lt;/a&gt;  &lt;/p&gt;
+&lt;p&gt;&lt;a href="http://drewdaniels.com/dither.pdf"&gt;Resolution Below the Least Significant Bit in Digital Systems with Dither. VANDERKOOY and LIPSHITZ&lt;/a&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="LFSR"></category><category term="Random"></category></entry><entry><title>"Matlab Function Outputs"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-function-outputs.html" rel="alternate"></link><published>2014-03-08T08:02:27+00:00</published><updated>2014-03-08T08:02:27+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-08:/pelican_test/matlab-function-outputs.html</id><summary type="html">&lt;p&gt;Handling functions with extraneous leading outputs. For example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="err"&gt; [&lt;/span&gt;&lt;span class="nf"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dummy_function&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;endfunction&lt;/span&gt;
+
+
+&lt;span class="s"&gt;[a,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;b]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dummy_function …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Handling functions with extraneous leading outputs. For example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="err"&gt; [&lt;/span&gt;&lt;span class="nf"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dummy_function&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;endfunction&lt;/span&gt;
+
+
+&lt;span class="s"&gt;[a,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;b]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dummy_function&lt;/span&gt;
+
+&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;
+
+&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If &lt;code&gt;a&lt;/code&gt; is not required it can be replaced with a tilda &lt;code&gt;~&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;[~, b] = dummy_function
+
+b =
+    20
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category><category term="Programming"></category></entry><entry><title>"Matlab Shuffle Array"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-shuffle-array.html" rel="alternate"></link><published>2014-03-06T20:42:57+00:00</published><updated>2014-03-06T20:42:57+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-06:/pelican_test/matlab-shuffle-array.html</id><summary type="html">&lt;p&gt;To shuffle a:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a(randperm(length(a)))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = [10 2 5 20];
+a = a(randperm(length(a)))
+
+a =
+
+ 5 …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;To shuffle a:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a(randperm(length(a)))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = [10 2 5 20];
+a = a(randperm(length(a)))
+
+a =
+
+ 5    10     2    20
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/matlabcentral/newsreader/view_thread/239478"&gt;Source&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"OO Magic Bullet?"</title><link href="http://lizard-spock.co.uk/pelican_test/oo-magic-bullet.html" rel="alternate"></link><published>2014-03-01T20:04:06+00:00</published><updated>2014-03-01T20:04:06+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-01:/pelican_test/oo-magic-bullet.html</id><summary type="html">&lt;p&gt;I do not think that there are any magic bullets, best practises can minimise risk but you have to fully …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I do not think that there are any magic bullets, best practises can minimise risk but you have to fully understand the technique. You can not just switch from procedural code to wrapping everything in an object and claim statements like this from &lt;a href="http://www.mathworks.co.uk/company/newsletters/articles/introduction-to-object-oriented-programming-in-matlab.html"&gt;mathworks&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Because it was built using OO techniques, the application is now robust enough for others to use and maintain and can be integrated with related applications throughout an organization.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Sounds like Object-Oriented programming is a magic bullet to solve all you programming woes!&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"$display without a line return"</title><link href="http://lizard-spock.co.uk/pelican_test/display-without-a-line-return.html" rel="alternate"></link><published>2014-03-01T17:49:43+00:00</published><updated>2014-03-01T17:49:43+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-01:/pelican_test/display-without-a-line-return.html</id><content type="html">&lt;p&gt;In Verilog to output to stdout without a line return use &lt;code&gt;$write();&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Equivalent statements :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$write(&amp;quot;\n&amp;quot;);
+$display(&amp;quot;&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verilog"></category><category term="Programming"></category></entry><entry><title>"Object-Oriented Matlab"</title><link href="http://lizard-spock.co.uk/pelican_test/object-oriented-matlab.html" rel="alternate"></link><published>2014-02-28T19:58:53+00:00</published><updated>2014-02-28T19:58:53+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-02-28:/pelican_test/object-oriented-matlab.html</id><summary type="html">&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/help/matlab/matlab_oop/using-objects-to-write-data-to-a-file.html"&gt;Mathworks Article on Object-Oriented programming for Matlab&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A quick example of the syntax:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;classdef&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sads&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;properties&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;SampleRate&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;properties …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/help/matlab/matlab_oop/using-objects-to-write-data-to-a-file.html"&gt;Mathworks Article on Object-Oriented programming for Matlab&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A quick example of the syntax:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;classdef&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sads&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;properties&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;SampleRate&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;properties&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Dependent&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Frequency&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;methods&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Next&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;is&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;constructor&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;function&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;sads&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SampleRate&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Similar to structures but can not arbitrarily add new fields by assigning values to them.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/discovery/object-oriented-programming.html"&gt;Mathworks top level, introduction to OO programming for matlab&lt;/a&gt;.
+&lt;a href="http://www.mathworks.co.uk/help/matlab/object-oriented-programming.html"&gt;Links to other Mathworks OO articles&lt;/a&gt;. &lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Matlab: legend colours"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-legend-colours.html" rel="alternate"></link><published>2014-02-13T20:51:45+00:00</published><updated>2014-02-13T20:51:45+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-02-13:/pelican_test/matlab-legend-colours.html</id><summary type="html">&lt;p&gt;When plotting several lines in Matlab, I have become aware of how hard it was to see the colours in …&lt;/p&gt;</summary><content type="html">&lt;p&gt;When plotting several lines in Matlab, I have become aware of how hard it was to see the colours in the legend. Based &lt;a href="http://www.mathworks.co.uk/matlabcentral/newsreader/view_thread/267186"&gt;on this matlabcentral question&lt;/a&gt; I found an easy way to control the line thickness in the legend.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;plot(randn(100,1));
+hold on;
+plot(randn(100,1),&amp;#39;k&amp;#39;);
+
+
+[legh,objh,outh,outm] = legend(&amp;#39;First&amp;#39;,&amp;#39;Second&amp;#39;,&amp;#39;Location&amp;#39;,&amp;#39;Southeast&amp;#39;);
+set(objh,&amp;#39;linewidth&amp;#39;,2); %%&amp;lt;-- set legend line thickness to 2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Or just the following after you define your legend:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;% legend(&amp;#39;First&amp;#39;,&amp;#39;Second&amp;#39;,&amp;#39;Location&amp;#39;,&amp;#39;Southeast&amp;#39;);&lt;/span&gt;
+
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;legh&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;objh&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;outh&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;outm&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;legend&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="nb"&gt;set&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;objh&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;linewidth&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Matlab benchmarking"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-benchmarking.html" rel="alternate"></link><published>2014-02-12T20:55:42+00:00</published><updated>2014-02-12T20:55:42+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-02-12:/pelican_test/matlab-benchmarking.html</id><summary type="html">&lt;p&gt;In the following example we test the allocation speed of different types:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;samples_to_avg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10000&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;samples_to_avg&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;tic&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;t …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;In the following example we test the allocation speed of different types:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;samples_to_avg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10000&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;samples_to_avg&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;tic&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;int8&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;zeros&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;toc&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="n"&gt;avg_int8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;samples_to_avg&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;tic&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;zeros&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;toc&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;end&lt;/span&gt;
+&lt;span class="n"&gt;avg_double&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="nf"&gt;%int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;is&lt;/span&gt;
+&lt;span class="n"&gt;disp&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;int8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;pre&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;allocation&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;is&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;num2str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;avg_double&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;avg_int8&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;times&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;faster&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;than&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;doubles&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category><category term="Benchmark"></category></entry><entry><title>"Matlab remove values from array"</title><link href="http://lizard-spock.co.uk/pelican_test/matlab-remove-values-from-array.html" rel="alternate"></link><published>2014-02-11T21:21:44+00:00</published><updated>2014-02-11T21:21:44+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-02-11:/pelican_test/matlab-remove-values-from-array.html</id><summary type="html">&lt;h2&gt;- Matlab&lt;/h2&gt;
+&lt;p&gt;Remove all values of 3 from array&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = [1 2 3 4 3];
+a(any(a==3,1)) = []
+a …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;h2&gt;- Matlab&lt;/h2&gt;
+&lt;p&gt;Remove all values of 3 from array&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = [1 2 3 4 3];
+a(any(a==3,1)) = []
+a =
+     1     2     4
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Remove 2 or less from array&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = [1 2 3 4 3];
+a(any(a&amp;lt;=2,1)) = []
+a =
+     3     4     3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Remove values between 2 and 3&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = [1 2 3 4 3];
+a(any((a&amp;gt;=2)&amp;amp;(a&amp;lt;=3),1)) = []
+a =
+     1     4
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Based on &lt;a href="http://matlabnewbie.blogspot.co.uk/2011/11/remove-any-rows-that-contains-specific.html"&gt;examples from matlabnewbie&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Remove values (&lt;code&gt;12 &amp;amp; 13&lt;/code&gt;) based on a set (array):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;11&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;20&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="nt"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;setdiff&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;a&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;13&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nt"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;11&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;14&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;15&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;16&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;17&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;18&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;19&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;20&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category></entry><entry><title>"flip-flop"</title><link href="http://lizard-spock.co.uk/pelican_test/flip-flop.html" rel="alternate"></link><published>2014-01-09T19:15:10+00:00</published><updated>2014-01-09T19:15:10+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-01-09:/pelican_test/flip-flop.html</id><summary type="html">&lt;p&gt;A flip-flop (D-Type) is essentially 2 latches in series with the enable to one inverted.
+This stops the flip-flop from …&lt;/p&gt;</summary><content type="html">&lt;p&gt;A flip-flop (D-Type) is essentially 2 latches in series with the enable to one inverted.
+This stops the flip-flop from being transparent or open as a single latch can be.&lt;/p&gt;
+&lt;p&gt;For ASIC design it is recommended that all flip-flops use active low asynchronous resets. 
+This is often connected to the power on reset circuit and retimed on to the rising edge of the clock at the top level of the chip.&lt;/p&gt;
+&lt;p&gt;In Verilog a D-Type flip-flop can be implied with the following logic.&lt;br&gt;
+NB: the reg implies nothing about the flip-flop only that data is assigned inside an always block.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;reg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mh"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="k"&gt;always&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;@(&lt;/span&gt;&lt;span class="k"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;clk&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;or&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;negedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;rst_n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="n"&gt;rst_n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mb"&gt;&amp;#39;b0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_data&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If your flow supports the use of SystemVerilog, use of the &lt;code&gt;always_comb&lt;/code&gt;, &lt;code&gt;always_latch&lt;/code&gt; and &lt;code&gt;always_ff&lt;/code&gt; are recommended. 
+the rules for sensitivity lists are a little stricter to minimize RTL to gates mismatch. 
+The added benefit is that it allows the designer to be clear about design intent. 
+Using the logic type also removes confusion about reg implying flip-flops and allows code refacoring with out having to switch types.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;logic&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="nt"&gt;always_ff&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;@(&lt;/span&gt;&lt;span class="nt"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;clk&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;or&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;negedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;rst_n&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(~&lt;/span&gt;&lt;span class="nt"&gt;rst_n&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="nt"&gt;b0&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;new_data&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;end&lt;/span&gt;
+&lt;span class="nt"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;With a Synchronous Reset:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;logic&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="nt"&gt;always_ff&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;@(&lt;/span&gt;&lt;span class="nt"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;clk&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(~&lt;/span&gt;&lt;span class="nt"&gt;rst_n&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="nt"&gt;b0&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;end&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;new_data&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;end&lt;/span&gt;
+&lt;span class="nt"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;No Reset:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;logic&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="nt"&gt;always_ff&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;@(&lt;/span&gt;&lt;span class="nt"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;clk&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;new_data&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="nt"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Electronics"></category><category term="Design"></category></entry><entry><title>"Matlab repeat a matrix n times"</title><link href="//241/Matlab_repeat_a_matrix_n_times" rel="alternate"></link><published>2013-11-27T10:57:36+00:00</published><updated>2013-11-27T10:57:36+00:00</updated><author><name>morganp</name></author><id>tag:241,2013-11-27:/Matlab_repeat_a_matrix_n_times</id><summary type="html">&lt;p&gt;repmat(matrix, [repeat_y, repeat_x])&lt;/p&gt;
+&lt;p&gt;Horizontal&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;repmat([1 2 3],[1,4])
+
+ans =
+
+     1     2     3     1     2     3     1     2 …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;repmat(matrix, [repeat_y, repeat_x])&lt;/p&gt;
+&lt;p&gt;Horizontal&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;repmat([1 2 3],[1,4])
+
+ans =
+
+     1     2     3     1     2     3     1     2     3     1     2     3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Vertical&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;repmat([1; 2; 3],[4,1])
+
+ans =
+
+     1
+     2
+     3
+     1
+     2
+     3
+     1
+     2
+     3
+     1
+     2
+     3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Matlab setting Simulink simulation stop time"</title><link href="//238/Matlab_setting_Simulink_simulation_stop_time" rel="alternate"></link><published>2013-10-29T19:17:44+00:00</published><updated>2013-10-29T19:17:44+00:00</updated><author><name>morganp</name></author><id>tag:238,2013-10-29:/Matlab_setting_Simulink_simulation_stop_time</id><summary type="html">&lt;p&gt;Running the Simulink model model.mdl from matlab for a specified time: &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sim(&amp;#39;model&amp;#39;, stoptime)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Where stoptime is a number …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Running the Simulink model model.mdl from matlab for a specified time: &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sim(&amp;#39;model&amp;#39;, stoptime)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Where stoptime is a number. To mix with other options such eg. SimulationMode, things get a little trickier.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sim( &amp;#39;model&amp;#39;, &amp;#39;SimulationMode&amp;#39;, &amp;#39;normal&amp;#39;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;you would expect:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sim( &amp;#39;model&amp;#39;, &amp;#39;SimulationMode&amp;#39;, &amp;#39;normal&amp;#39;, &amp;#39;StopTime&amp;#39;, 1)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;but this results in :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Invalid setting in block_diagram &amp;#39;model&amp;#39; for parameter &amp;#39;StopTime&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The trick is that parameter, value pairs must be strings, what you actually need to do is:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sim( &amp;#39;model&amp;#39;, &amp;#39;SimulationMode&amp;#39;, &amp;#39;normal&amp;#39;, &amp;#39;StopTime&amp;#39;, num2str(1) )
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Or you can create an ParameterStruct,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;SimOpts.SimulationMode = &amp;#39;normal&amp;#39;;
+SimOpts.StopTime       = num2str(1);
+sim( &amp;#39;model&amp;#39;, SimOpts )
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Both of these methods change the way in which the to_workspace blocks work, instead of just outputting a variable to the workspace or available in the calling function sim now returns an 'Simulink.SimulationOutput' object.&lt;/p&gt;
+&lt;p&gt;Instead of just accessing 'simout' you know need to capture the sim output and use the get command to retrieve the data :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;simdata = sim( &amp;#39;model&amp;#39;, SimOpts ) ;
+simdata.get(&amp;#39;simout&amp;#39; )
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://www.mathworks.co.uk/help/simulink/ug/using-the-sim-command.html"&gt;Further Info on the sim command&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Name Spacing in Matlab"</title><link href="http://lizard-spock.co.uk/pelican_test/name-spacing-in-matlab.html" rel="alternate"></link><published>2013-09-12T19:51:19+00:00</published><updated>2013-09-12T19:51:19+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2013-09-12:/pelican_test/name-spacing-in-matlab.html</id><summary type="html">&lt;p&gt;A typical work flow in Matlab involves a folder filled with scripts and functions.
+Over time this folder grows until …&lt;/p&gt;</summary><content type="html">&lt;p&gt;A typical work flow in Matlab involves a folder filled with scripts and functions.
+Over time this folder grows until it becomes completely unmaintainable and 
+dependencies between scripts can not be tracked.&lt;/p&gt;
+&lt;p&gt;The next step is to group the related functions into folders in maintainable
+collections. They can then be added to the scripts that require them by adding to 
+Matlabs search path via:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;addpath(&amp;#39;../collection_of_functions_a/&amp;#39;);
+addpath(&amp;#39;../collection_of_functions_b/&amp;#39;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The main issue I have with this is that of name spacing when working with third
+party functions or developing your own it would be easy to override other functions
+even internal ones. For toolbox developers it is hard to known all the function names 
+from matlabs toolboxes. After a name collision which one is picked up is 
+dependent on the path order. Other languages often use name spacing to avoid these
+name conflicts.&lt;/p&gt;
+&lt;p&gt;Since MATLAB Version 7.6 &lt;a href="http://www.mathworks.co.uk/help/matlab/matlab_oop/scoping-classes-with-packages.html"&gt;Packages&lt;/a&gt; have been available for just this, adding
+name spacing to classes, but it also works for raw (plain) functions.&lt;/p&gt;
+&lt;p&gt;To create a package, as before place functions in a folder, start the folder name
+with a &lt;code&gt;+&lt;/code&gt;, ie &lt;code&gt;+mypkg&lt;/code&gt; then you have created package mypkg.&lt;/p&gt;
+&lt;p&gt;To use the package functions in a script they must be &lt;a href="http://www.mathworks.co.uk/help/matlab/ref/import.html"&gt;imported&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;mypkg.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;
+
+&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;call&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;function_x&lt;/span&gt;
+&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mypkg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;function_x&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;As packages themselves can not be on the path you have to &lt;a href="http://www.mathworks.co.uk/help/matlab/matlab_env/files-and-folders-that-matlab-accesses.html"&gt;make the parent folder accessible&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;If you have a folder containing a lot of packages then this is quite useful.
+Add one folder to path then import the required packages.&lt;/p&gt;
+&lt;p&gt;If the packages are being independently maintained then it is likely that they
+all have separate hierarchy (I think this is good from a development point of 
+view). To avoid adding unnecessary items to your search path I would recommend a
+hierarchy of:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;Top_level_package&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;function&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nx"&gt;my_pkg&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;function_x&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;function_y&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;test&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;run_test_function_x&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;run_test_function_y&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;run_test_function_x.m :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;addpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;../function/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;my_pkg.function_x&lt;/span&gt;
+
+&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;function_x&lt;/span&gt;
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The downside of this is that every package needs an &lt;code&gt;addpath&lt;/code&gt; and &lt;code&gt;import&lt;/code&gt;.
+Which you will have unless all your packages live under one parent directory.&lt;/p&gt;
+&lt;p&gt;An excerpt from &lt;a href="http://www.mathworks.co.uk/help/matlab/matlab_env/what-is-the-matlab-search-path.html"&gt;What is in the Matlab Search Path&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The userpath folder is first on the search path, above the folders supplied by
+MathWorks. By default, MATLAB adds the userpath folder to the search path at
+startup. Therefore, the userpath is convenient for storing files where MATLAB
+can access them.&lt;/p&gt;
+&lt;p&gt;The userpath consists of a primary path, and on Macintosh and UNIX® platforms,
+it also contains a secondary path. The primary path is only one folder, but the
+secondary path can contain multiple folders.&lt;/p&gt;
+&lt;/blockquote&gt;</content><category term="Engineering"></category><category term="Matlab"></category><category term="Programming"></category></entry><entry><title>"Navigate Verilog with VIM"</title><link href="http://lizard-spock.co.uk/pelican_test/navigate-verilog-with-vim.html" rel="alternate"></link><published>2013-06-04T21:08:39+00:00</published><updated>2013-06-04T21:08:39+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2013-06-04:/pelican_test/navigate-verilog-with-vim.html</id><summary type="html">&lt;h1&gt;Using &lt;code&gt;gf&lt;/code&gt;&lt;/h1&gt;
+&lt;p&gt;In your vimrc&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&amp;quot; gf goto_file, automatically add search for these file extensions
+:set suffixesadd+=.v
+:set suffixesadd+=.sv …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;h1&gt;Using &lt;code&gt;gf&lt;/code&gt;&lt;/h1&gt;
+&lt;p&gt;In your vimrc&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&amp;quot; gf goto_file, automatically add search for these file extensions
+:set suffixesadd+=.v
+:set suffixesadd+=.sv
+:set suffixesadd+=.bh.v
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now &lt;code&gt;gf&lt;/code&gt; on a module name will try to open file.v file.sv and file.bh.v  if they are in the same folder.
+Another good reason to keep module and file names matching.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ctrl-6&lt;/code&gt; will jump back to the previous file.&lt;/p&gt;</content><category term="Engineering"></category><category term="Vim"></category><category term="Verilog"></category></entry><entry><title>"Testing Matlab Arrays for Equality."</title><link href="//212/Testing_Matlab_Arrays_for_Equality." rel="alternate"></link><published>2013-02-16T21:22:07+00:00</published><updated>2013-02-16T21:22:07+00:00</updated><author><name>morganp</name></author><id>tag:212,2013-02-16:/Testing_Matlab_Arrays_for_Equality.</id><summary type="html">&lt;p&gt;Testing a matlab array for equality can be doen a few different was some have surprising side effects if your …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Testing a matlab array for equality can be doen a few different was some have surprising side effects if your not use to working with vectorised testing.&lt;/p&gt;
+&lt;p&gt;Initial test :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;3&lt;/span&gt;]&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;3&lt;/span&gt;]&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;disp&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;equal&amp;#39;&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;equal&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Seems easy, But what happens if the dimensions of the array are incorrect?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;3&lt;/span&gt;]&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;3&lt;/span&gt;,&lt;span class="mi"&gt;4&lt;/span&gt;]&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;disp&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;equal&amp;#39;&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="nv"&gt;Error&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;using&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="nv"&gt;Matrix&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;dimensions&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;must&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;agree&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;May be if we check dimensions first using short-circuiting (&lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt;) operators. NB: Short circuiting operators only execute if required, if it failed on the left hand side the right side will not be evaluated.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;3&lt;/span&gt;]&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;length&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;3&lt;/span&gt;,&lt;span class="mi"&gt;4&lt;/span&gt;]&lt;span class="ss"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;disp&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;equal&amp;#39;&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;So far so good, but lets check it will also pass:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;3&lt;/span&gt;]&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;length&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;3&lt;/span&gt;]&lt;span class="ss"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;disp&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;equal&amp;#39;&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="nv"&gt;Operands&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;to&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;operators&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;must&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;be&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;convertible&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;to&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;logical&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;scalar&lt;/span&gt;
+&lt;span class="nv"&gt;values&lt;/span&gt;.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This is where it got interesting for me:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a ==[1,2,3]
+ans =
+
+ 1     1     1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The basic equality &lt;code&gt;==&lt;/code&gt;  test for arrays is vectorised. When this is the only test it gets reduced down to true or false, but can not be combined with scalars.&lt;/p&gt;
+&lt;p&gt;Then I the discovered the &lt;a href="http://www.mathworks.co.uk/help/matlab/ref/isequal.html"&gt;isequal&lt;/a&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = [1,2,3];
+isequal(a, [1,2,3])
+
+ans =
+
+     1
+
+a = [1,2,3];
+isequal(a, [1,2,3,4])
+
+ans =
+
+     0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For direct comparisons of arrays use &lt;code&gt;isequal(a,b)&lt;/code&gt; for vectorised operations use &lt;code&gt;a==b&lt;/code&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>Tasks Using Absolute Delays</title><link href="http://lizard-spock.co.uk/pelican_test/tasks-using-absolute-delays.html" rel="alternate"></link><published>2010-07-02T00:10:10+00:00</published><updated>2010-07-02T00:10:10+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-07-02:/pelican_test/tasks-using-absolute-delays.html</id><summary type="html">&lt;p&gt;As previously mentioned SystemVerilog introduced abolute delays in the form of &lt;code&gt;#1s;&lt;/code&gt;, &lt;code&gt;#1ms&lt;/code&gt;, &lt;code&gt;#1us&lt;/code&gt;, &lt;code&gt;#1ns&lt;/code&gt;.
+Using these as values passed …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As previously mentioned SystemVerilog introduced abolute delays in the form of &lt;code&gt;#1s;&lt;/code&gt;, &lt;code&gt;#1ms&lt;/code&gt;, &lt;code&gt;#1us&lt;/code&gt;, &lt;code&gt;#1ns&lt;/code&gt;.
+Using these as values passed into function requires declaring the input to be of type time.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;task arduous_delay( time delay );
+  begin
+    #delay;
+  end
+endtask
+
+//Usage
+arduous_delay( 1ms );
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verification"></category><category term="Verilog"></category><category term="SystemVerilog"></category></entry><entry><title>"Matlab Scripting Axes Properties"</title><link href="//24/Matlab_Scripting_Axes_Properties" rel="alternate"></link><published>2010-05-03T06:47:06+01:00</published><updated>2010-05-03T06:47:06+01:00</updated><author><name>morganp</name></author><id>tag:24,2010-05-03:/Matlab_Scripting_Axes_Properties</id><summary type="html">&lt;p&gt;Matlab figure properties which can be set through the properties editor can also be set by scripts. My main stumbling …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Matlab figure properties which can be set through the properties editor can also be set by scripts. My main stumbling block was not realising that gca is a builtin function which returns the current axes. A list of &lt;a href="http://www.mathworks.co.uk/access/helpdesk/help/techdoc/ref/axes_props.html"&gt;all properties&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Below is a example matlab script which plots a graph then adds minor ticks to the X-axis:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;101&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="n"&gt;figure&lt;/span&gt;
+&lt;span class="s"&gt;plot(a,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;b)&lt;/span&gt;
+&lt;span class="c"&gt;% gca : get current axes&lt;/span&gt;
+&lt;span class="nb"&gt;set&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;gca&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;XMinorTick&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;on&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category><category term="plot"></category></entry></feed>

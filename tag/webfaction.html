@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - WebFaction</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///149/Sinatra_application_in_.%2Flib_and_views%2C_public_routes_not_working">"Sinatra application in ./lib and views, public routes not working"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2012-04-20T23:26:34+01:00">
+                Published: Fri 20 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info --><p>I have been setting up my recent Sinatra projects with a standard ruby project layout putting all of the application code within a lib folder. When running locally I have been cding in to the lib folder and just running: </p>
+<div class="highlight"><pre><span></span><code>ruby app.rb
+</code></pre></div>
+
+<p>I often found that when deploying (WebFaction or Heroku) that I had to make several attempts to get the config.ru correct. I then found that thin can load and run using the config.ru.</p>
+<div class="highlight"><pre><span></span><code>thin start --port 4567 -R config.ru
+</code></pre></div>
+
+<p>Which worked until I tried it on a non trivial application which used (erb) templates and then I started seeing these errors, when viewing 127:0.0.1:4567</p>
+<div class="highlight"><pre><span></span><code>Errno::ENOENT at /
+No such file or directory - ./views/home.erb
+file: template.rb location: binread line: 67
+</code></pre></div>
+
+<p>The problem is that we are now a level above where we use to be, not sure whay this has never been a problem in production before. </p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span> <span class="n">AnotherWebApp</span>
+  <span class="n">VERSION</span> = <span class="s">&#39;0.0.1&#39;</span>
+  <span class="k">class</span> <span class="n">App</span> &lt; <span class="n">Sinatra::Base</span>
+    <span class="k">use</span> <span class="n">Rack::MethodOverride</span>
+    <span class="c1">#set :public_folder, &quot;public&quot; # &lt;-- Old version</span>
+    <span class="n">set</span> :<span class="n">public_folder</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/public&quot;</span>   <span class="c1"># &lt;-- New Version</span>
+
+    <span class="c1"># Older ersions of Thin/Sinatra May require</span>
+    <span class="n">set</span> :<span class="n">public</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/public&quot;</span>              <span class="c1"># &lt;-- public changed to public_folder in newer release</span>
+    <span class="n">set</span> :<span class="n">views</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/views&quot;</span>                <span class="c1"># &lt;-- Need to set View</span>
+
+    <span class="nb">get</span> <span class="s">&#39;/&#39;</span> <span class="nb">do</span>
+      <span class="n">erb</span> :<span class="n">home</span>
+    <span class="nb">end</span>
+
+  <span class="nb">end</span>
+<span class="nb">end</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///89/gem_permissions_on_WebFaction" rel="bookmark"
+                               title="Permalink to "gem permissions on WebFaction"">"gem permissions on WebFaction"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-12T14:10:56+00:00">
+                Published: Sat 12 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>After making a few updates to my site I decided to upgrade the version of sinatra I was using in …</p>
+                        <a class="readmore" href="..///89/gem_permissions_on_WebFaction">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///69/Amazon_Drops_EC2_Web_Service_Prices" rel="bookmark"
+                               title="Permalink to "Amazon Drops EC2 Web Service Prices"">"Amazon Drops EC2 Web Service Prices"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-09T02:24:49+01:00">
+                Published: Thu 09 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>The new <a href="http://aws.amazon.com/ec2/#pricing">EC2-Pricing</a> also includes a new Micro service. This micro service is intended for small apps servicing tens of …</p>
+                        <a class="readmore" href="..///69/Amazon_Drops_EC2_Web_Service_Prices">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///57/Benchmark_your_website_for_load_times." rel="bookmark"
+                               title="Permalink to "Benchmark your website for load times."">"Benchmark your website for load times."</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-27T16:09:53+01:00">
+                Published: Tue 27 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/nginx.html">nginx</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/webfaction.html">WebFaction</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been wondering how to do this for a while and accidentally discovered it while perusing <a href="http://docs.heroku.com/performance">this heroku page …</a></p>
+                        <a class="readmore" href="..///57/Benchmark_your_website_for_load_times.">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///47/WebFaction_problems_restarting_nginx" rel="bookmark"
+                               title="Permalink to "WebFaction problems restarting nginx"">"WebFaction problems restarting nginx"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-27T09:39:48+01:00">
+                Published: Sun 27 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/nginx.html">nginx</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>After updating my website on <a href="http://www.webfaction.com/?affiliate=morgy">webfaction</a> nginx kept saying permission denied and when I tried to view my site I …</p>
+                        <a class="readmore" href="..///47/WebFaction_problems_restarting_nginx">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///25/Ruby_Memory_Issue_on_Web_Faction" rel="bookmark"
+                               title="Permalink to "Ruby Memory Issue on Web Faction"">"Ruby Memory Issue on Web Faction"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-03T13:19:02+01:00">
+                Published: Mon 03 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>I while ago I made <a href="http://amaras-tech.co.uk/people/morgan/article/14">a post</a> about installing ruby 1.9 on my webfaction shared host. They then pointed …</p>
+                        <a class="readmore" href="..///25/Ruby_Memory_Issue_on_Web_Faction">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///21/Webfaction_new_user_with_access_to_their_own_site" rel="bookmark"
+                               title="Permalink to "Webfaction new user with access to their own site"">"Webfaction new user with access to their own site"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-28T09:24:58+01:00">
+                Published: Wed 28 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>With <a href="http://www.webfaction.com/?affiliate=morgy">Webfaction</a> you can create new users with there own home area but there is no straight forward way to …</p>
+                        <a class="readmore" href="..///21/Webfaction_new_user_with_access_to_their_own_site">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///14/Installing_the_ruby_gem_twitter_on_webfaction" rel="bookmark"
+                               title="Permalink to "Installing the ruby gem twitter on webfaction"">"Installing the ruby gem twitter on webfaction"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-12T10:33:21+01:00">
+                Published: Mon 12 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/webfaction.html">WebFaction</a> <a href="../tag/twitter.html">Twitter</a> </p>        
+</footer><!-- /.post-info -->                        <p>[Update]<br>
+As this is a long post I am putting this update at the top. If you just want to …</p>
+                        <a class="readmore" href="..///14/Installing_the_ruby_gem_twitter_on_webfaction">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///1/Amaras_Finally_Online" rel="bookmark"
+                               title="Permalink to "Amaras Finally Online"">"Amaras Finally Online"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>Just a short first note to announce the fact that the site is finally up.</p>
+<p>We are running on <a href="http://www.webfaction.com/?affiliate=morgy">WebFaction …</a></p>
+                        <a class="readmore" href="..///1/Amaras_Finally_Online">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

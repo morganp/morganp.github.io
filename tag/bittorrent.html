@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - BitTorrent</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///206/Reverting_rtorrent_version_on_Snow_Leopard">"Reverting rtorrent version on Snow Leopard"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2012-12-06T20:22:33+00:00">
+                Published: Thu 06 December 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/bittorrent.html">BitTorrent</a> <a href="../tag/leopard.html">Leopard</a> <a href="../tag/snow-leopard.html">Snow Leopard</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/rtorrent.html">rtorrent</a> <a href="../tag/homebrew.html">Homebrew</a> </p>        
+</footer><!-- /.post-info --><p>After running  a <code>brew upgrade</code> rtorrent was plagued with segmentation faults. Which look something like :</p>
+<div class="highlight"><pre><span></span><code>Caught Segmentation fault, dumping stack:B] [Port: 16006]                                                                    [U 0/14]    [D 0/30] [H 28/32] [S 196/198/208] [F 15/16]
+0 0   rtorrent                            0x0000000100001c8c _Z8do_panici + 130
+1 1   rtorrent                            0x0000000100044d48 _ZN13SignalHandler6caughtEi + 234
+2 2   libSystem.B.dylib                   0x00007fff872b51ba _sigtramp + 26
+3 3   libcrypto.0.9.8.dylib               0x00007fff81414491 ERR_get_state + 65
+4 4   libtorrent.14.dylib                 0x00000001002a75a9 _ZN7torrent13DiffieHellman13store_pub_keyEPhj + 45
+5 5   libtorrent.14.dylib                 0x0000000100292fb0 _ZN7torrent9Handshake20prepare_key_plus_padEv + 74
+6 6   libtorrent.14.dylib                 0x00000001002932ac _ZN7torrent9Handshake11event_writeEv + 284
+7 7   libtorrent.14.dylib                 0x0000000100247322 _ZN7torrent10PollKQueue7performEv + 236
+8 8   libtorrent.14.dylib                 0x0000000100247d69 _ZN7torrent10PollKQueue7do_pollExi + 383
+9 9   libtorrent.14.dylib                 0x000000010026b608 _ZN7torrent11thread_base10event_loopEPS0_ + 330
+10 10  rtorrent                            0x0000000100005af4 main + 12976
+11 11  rtorrent                            0x0000000100001820 start + 52
+12 12  ???                                 0x0000000000000001 0x0 + 1
+Abort trap
+</code></pre></div>
+
+<p>Since mid 2011 brew has added a versions command. Lets check what versions are available:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>brew<span class="w"> </span>versions<span class="w"> </span>rtorrent
+<span class="m">0</span>.9.2<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>6b8d25f<span class="w"> </span>/usr/local/Library/Formula/rtorrent.rb
+<span class="m">0</span>.8.9<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>e459d51<span class="w"> </span>/usr/local/Library/Formula/rtorrent.rb
+<span class="m">0</span>.9.0<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>9b5cba7<span class="w"> </span>/usr/local/Library/Formula/rtorrent.rb
+<span class="m">0</span>.8.6<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>b782d9d<span class="w"> </span>/usr/local/Library/Formula/rtorrent.rb
+<span class="m">0</span>.8.5<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>b92799d<span class="w"> </span>/usr/local/Library/Formula/rtorrent.rb
+
+$<span class="w"> </span>brew<span class="w"> </span>versions<span class="w"> </span>libtorrent
+<span class="m">0</span>.13.2<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>8d5b242<span class="w"> </span>/usr/local/Library/Formula/libtorrent.rb
+<span class="m">0</span>.12.9<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>edd213c<span class="w"> </span>/usr/local/Library/Formula/libtorrent.rb
+<span class="m">0</span>.13.0<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>130b408<span class="w"> </span>/usr/local/Library/Formula/libtorrent.rb
+<span class="m">0</span>.12.6<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span><span class="m">0476235</span><span class="w"> </span>/usr/local/Library/Formula/libtorrent.rb
+<span class="m">0</span>.12.5<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>d0ec1e6<span class="w"> </span>/usr/local/Library/Formula/libtorrent.rb
+</code></pre></div>
+
+<p>The version giving me the segmentation faults is 0.9.2 with libtorrent 0.13.2, lets roll back to the previous version 0.8.9/0.12.9.</p>
+<div class="highlight"><pre><span></span><code>brew uninstall rtorrent libtorrent
+cd /usr/local/Library/Formula/
+git checkout edd213c
+# Not sure why brew thinks these are installed again but I had to run
+brew uninstall rtorrent libtorrent 
+brew install rtorrent libtorrent
+</code></pre></div>
+
+<p>Once that has completed rtorrent should run as 0.8.9/0.12.9, which seems a whole lot more reliable on a mid 2010 Mac mini running snow leopard.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///96/%27unregistered_torrent%27_flush_the_DNS" rel="bookmark"
+                               title="Permalink to "'unregistered torrent' flush the DNS"">"'unregistered torrent' flush the DNS"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-03-31T10:45:20+01:00">
+                Published: Thu 31 March 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/bittorrent.html">BitTorrent</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>If a torrent application has been running and torrents start showing a status of 'unregistered torrent' a likely cause is …</p>
+                        <a class="readmore" href="..///96/%27unregistered_torrent%27_flush_the_DNS">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///36/Ruby_parsing_torrent_files_for_meta_info" rel="bookmark"
+                               title="Permalink to "Ruby parsing torrent files for meta info"">"Ruby parsing torrent files for meta info"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-04T10:03:26+01:00">
+                Published: Fri 04 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/performance.html">Performance</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/bittorrent.html">BitTorrent</a> </p>        
+</footer><!-- /.post-info -->                        <p>There currently does not appear to be any really good torrent file parsers available via the gems system.</p>
+<p>rubytorrent seems …</p>
+                        <a class="readmore" href="..///36/Ruby_parsing_torrent_files_for_meta_info">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

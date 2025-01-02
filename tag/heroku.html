@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Pelican Trial - Heroku</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Pelican Trial Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Pelican Trial</a></h1>
+                        <nav><ul>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/garden.html">Garden</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/python.html">Python</a></li>
+                                                <li><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="..///149/Sinatra_application_in_.%2Flib_and_views%2C_public_routes_not_working">"Sinatra application in ./lib and views, public routes not working"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2012-04-20T23:26:34+01:00">
+                Published: Fri 20 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info --><p>I have been setting up my recent Sinatra projects with a standard ruby project layout putting all of the application code within a lib folder. When running locally I have been cding in to the lib folder and just running: </p>
+<div class="highlight"><pre><span></span><code>ruby app.rb
+</code></pre></div>
+
+<p>I often found that when deploying (WebFaction or Heroku) that I had to make several attempts to get the config.ru correct. I then found that thin can load and run using the config.ru.</p>
+<div class="highlight"><pre><span></span><code>thin start --port 4567 -R config.ru
+</code></pre></div>
+
+<p>Which worked until I tried it on a non trivial application which used (erb) templates and then I started seeing these errors, when viewing 127:0.0.1:4567</p>
+<div class="highlight"><pre><span></span><code>Errno::ENOENT at /
+No such file or directory - ./views/home.erb
+file: template.rb location: binread line: 67
+</code></pre></div>
+
+<p>The problem is that we are now a level above where we use to be, not sure whay this has never been a problem in production before. </p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span> <span class="n">AnotherWebApp</span>
+  <span class="n">VERSION</span> = <span class="s">&#39;0.0.1&#39;</span>
+  <span class="k">class</span> <span class="n">App</span> &lt; <span class="n">Sinatra::Base</span>
+    <span class="k">use</span> <span class="n">Rack::MethodOverride</span>
+    <span class="c1">#set :public_folder, &quot;public&quot; # &lt;-- Old version</span>
+    <span class="n">set</span> :<span class="n">public_folder</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/public&quot;</span>   <span class="c1"># &lt;-- New Version</span>
+
+    <span class="c1"># Older ersions of Thin/Sinatra May require</span>
+    <span class="n">set</span> :<span class="n">public</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/public&quot;</span>              <span class="c1"># &lt;-- public changed to public_folder in newer release</span>
+    <span class="n">set</span> :<span class="n">views</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/views&quot;</span>                <span class="c1"># &lt;-- Need to set View</span>
+
+    <span class="nb">get</span> <span class="s">&#39;/&#39;</span> <span class="nb">do</span>
+      <span class="n">erb</span> :<span class="n">home</span>
+    <span class="nb">end</span>
+
+  <span class="nb">end</span>
+<span class="nb">end</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku" rel="bookmark"
+                               title="Permalink to "Sinatra ActiveRecord DB config on Heroku"">"Sinatra ActiveRecord DB config on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-22T10:04:48+01:00">
+                Published: Wed 22 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/database.html">Database</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/regex.html">Regex</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sequel.html">Sequel</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>To make an automatic <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html">ActiveRecord</a> database connection using ENV['DATABASE_URL'] The following snippet can be used:</p>
+<p>From <a href="http://apidock.com/rails/v3.2.1/ActiveRecord/Base/establish_connection/class">ActiveRecord 3.2 …</a></p>
+                        <a class="readmore" href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///79/rake_aborted%21_undefined_method_%60info%27_for_nil%3ANilClass" rel="bookmark"
+                               title="Permalink to "rake aborted! undefined method `info' for nil:NilClass"">"rake aborted! undefined method `info' for nil:NilClass"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-11-04T11:24:05+00:00">
+                Published: Thu 04 November 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/migrations.html">Migrations</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>I am currently switching between runing migrations locally on an sqlite3 database and postgres for production on Heroku.</p>
+<p>When switching …</p>
+                        <a class="readmore" href="..///79/rake_aborted%21_undefined_method_%60info%27_for_nil%3ANilClass">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///78/Sinatra_Heroku_and_config.ru" rel="bookmark"
+                               title="Permalink to "Sinatra Heroku and config.ru"">"Sinatra Heroku and config.ru"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-11-03T16:43:22+00:00">
+                Published: Wed 03 November 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>Rack applications often require a config.ru for deployment. The standard config.ru for classic sinatra applications is well documented …</p>
+                        <a class="readmore" href="..///78/Sinatra_Heroku_and_config.ru">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///69/Amazon_Drops_EC2_Web_Service_Prices" rel="bookmark"
+                               title="Permalink to "Amazon Drops EC2 Web Service Prices"">"Amazon Drops EC2 Web Service Prices"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-09T02:24:49+01:00">
+                Published: Thu 09 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>The new <a href="http://aws.amazon.com/ec2/#pricing">EC2-Pricing</a> also includes a new Micro service. This micro service is intended for small apps servicing tens of …</p>
+                        <a class="readmore" href="..///69/Amazon_Drops_EC2_Web_Service_Prices">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///52/Get_client_IP_on_Heroku" rel="bookmark"
+                               title="Permalink to "Get client IP on Heroku"">"Get client IP on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-12T07:41:32+01:00">
+                Published: Mon 12 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> <a href="../tag/rack.html">Rack</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been trying to use the <a href="http://coderack.org/users/hosiawak/middlewares/36-geoip-country">GeoIP Rack App</a>, by copying this <a href="http://gist.github.com/208774">gist</a> in my Rack stack with a …</p>
+                        <a class="readmore" href="..///52/Get_client_IP_on_Heroku">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///51/Sinatra_running_on_Heroku" rel="bookmark"
+                               title="Permalink to "Sinatra running on Heroku"">"Sinatra running on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-09T08:37:13+01:00">
+                Published: Fri 09 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>For running small webapps <a href="http://heroku.com/">heroku</a> is free. The real attraction is the simplicity of deployment, if you are use to …</p>
+                        <a class="readmore" href="..///51/Sinatra_running_on_Heroku">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/pelican_test/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
