@@ -4,7 +4,7 @@ import markdown
 
 AUTHOR = 'morganp'
 SITENAME = 'Lizard-Spock'
-SITEURL = 'http://lizard-spock.co.uk/pelican_test'
+SITEURL = 'http://lizard-spock.co.uk'
 TIMEZONE = 'Europe/London'
 DEFAULT_LANG = 'en'
 
