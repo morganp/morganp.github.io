@@ -3,7 +3,7 @@
 import markdown
 
 AUTHOR = 'morganp'
-SITENAME = 'Pelican Trial'
+SITENAME = 'Lizard-Spock'
 SITEURL = 'http://lizard-spock.co.uk/pelican_test'
 TIMEZONE = 'Europe/London'
 DEFAULT_LANG = 'en'
