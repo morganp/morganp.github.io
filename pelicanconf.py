@@ -4,7 +4,7 @@ import markdown
 
 AUTHOR = 'morganp'
 SITENAME = 'Lizard-Spock'
-SITEURL = 'http://lizard-spock.co.uk'
+SITEURL = 'https://lizard-spock.co.uk'
 TIMEZONE = 'Europe/London'
 DEFAULT_LANG = 'en'
 
@@ -44,7 +44,8 @@ ARTICLE_PATHS = ['posts']
 
 ## Adding template pages creating /tag/index.html from tags.html
 TEMPLATE_PAGES = {'tags.html':       'tag/index.html',
-                  'categories.html': 'category/index.html'}
+                  'categories.html': 'category/index.html',
+                  'pages/CNAME': 'CNAME'}
 
 # -------------8<----------------------
 # Add an app with multiple files
