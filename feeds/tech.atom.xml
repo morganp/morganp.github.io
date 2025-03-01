@@ -1,12 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Tech</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/tech.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2025-01-02T18:09:00+00:00</updated><entry><title>Python Base Types</title><link href="http://lizard-spock.co.uk/python-base-types.html" rel="alternate"></link><published>2025-01-02T18:09:00+00:00</published><updated>2025-01-02T18:09:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/python-base-types.html</id><summary type="html">&lt;p&gt;Making notes as I work through &lt;a href="https://www.dr-chuck.com"&gt;Dr Chucks&lt;/a&gt; Python for Everyone course on &lt;a href="https://www.coursera.org/specializations/python"&gt;Coursera&lt;/a&gt;.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Tech</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/tech.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2025-03-01T12:24:00+00:00</updated><entry><title>Better Python Iterators</title><link href="http://lizard-spock.co.uk/better-python-iterators.html" rel="alternate"></link><published>2025-03-01T12:24:00+00:00</published><updated>2025-03-01T12:24:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-03-01:/better-python-iterators.html</id><summary type="html">&lt;!--to publish change draft to published--&gt;
+
+&lt;p&gt;Pyhton can convert most (all) lists/collections into iterator objects, this is done by calling &lt;code&gt;iter()&lt;/code&gt; ie&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;num_list = [1, 2 …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;!--to publish change draft to published--&gt;
+
+&lt;p&gt;Pyhton can convert most (all) lists/collections into iterator objects, this is done by calling &lt;code&gt;iter()&lt;/code&gt; ie&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;num_list = [1, 2, 3] 
+num_iter = iter(num_list)  # Returns Iterator
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Python in the background is calling the objects &lt;code&gt;__iter__()&lt;/code&gt; method.&lt;/p&gt;
+&lt;p&gt;A typical method for returning an Iterator is using a for loop to compile/create the elements. However the draw back to this is that the for loop can not begin executing until the full iterator is created.&lt;br&gt;
+This could make it the program look like it has stalled while it compiles long and or complex iterator objects.&lt;/p&gt;
+&lt;h2&gt;Generator Functions&lt;/h2&gt;
+&lt;p&gt;Generator function allow an optimisation that it allows the use of the iterator after each element has been created. Generator functions return elemnts using &lt;code&gt;yield&lt;/code&gt; instead of &lt;code&gt;return&lt;/code&gt; on the complete list. The a benefit of this approach is that the full iterator never has to be held in memory at the same time, allowing much larger data sets to be analysed.&lt;/p&gt;
+&lt;h2&gt;Generator Example&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;def my_generator(n):
+
+    # initialize counter
+    value = 0
+
+    # loop until counter is less than n
+    while value &amp;lt; n:
+
+        # produce the current value of the counter
+        yield value
+
+        # increment the counter
+        value += 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Non-Generator Example&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;def my_nongenerator(n):
+
+    # initialize counter
+    value = 0
+    this_list = list()
+    # loop until counter is less than n
+    while value &amp;lt; n:
+
+        # produce the current value of the counter
+        this_list.append( value )
+
+        # increment the counter
+        value += 1
+    return this_list
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Packaging Python Projects</title><link href="http://lizard-spock.co.uk/packaging-python-projects.html" rel="alternate"></link><published>2025-02-28T15:22:00+00:00</published><updated>2025-02-28T15:22:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-02-28:/packaging-python-projects.html</id><summary type="html">&lt;!--to publish change draft to published--&gt;
+
+&lt;p&gt;How to package a pythin script or project for distribution. Offical Docs are [here][python_package].
+Packaging for pip requires use …&lt;/p&gt;</summary><content type="html">&lt;!--to publish change draft to published--&gt;
+
+&lt;p&gt;How to package a pythin script or project for distribution. Offical Docs are [here][python_package].
+Packaging for pip requires use of a [build backend][], [Hatchling][] is the default for this example.&lt;/p&gt;
+&lt;p&gt;This run through uses the testPyPI. &lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://test.pypi.org/account/register/"&gt;Register for a test.pypi account&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Initialise Python project area:
+note: the build process also uses the gitignore to excluded the venv folder.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mkdir packaging_tutorial
+cd packagin_tutorial
+python3 -m venv venv
+source venv/bin/activate
+curl --output .gitignore &amp;quot;https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Python.gitignore&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Create the folder structure:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;packaging_tutorial&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;LICENSE&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;pyproject&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;toml&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;README&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;md&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;src&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;example_package_YOUR_USERNAME_HERE&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;py&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;example&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;py&lt;/span&gt;
+&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;tests&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;__init__.py&lt;/code&gt; can be empty, but allows project to be imported in standard way.&lt;/p&gt;
+&lt;p&gt;pyproject.toml - directs pip how to build the project&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[build-system]&lt;/span&gt;
+&lt;span class="na"&gt;requires&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;[&amp;quot;hatchling&amp;quot;]&lt;/span&gt;
+&lt;span class="na"&gt;build-backend&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;hatchling.build&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;[project]&lt;/span&gt;
+&lt;span class="na"&gt;name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;example_package_YOUR_USERNAME_HERE&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;0.0.1&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;authors&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;[&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="na"&gt;{ name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Example Author&amp;quot;, email=&amp;quot;author@example.com&amp;quot; },&lt;/span&gt;
+&lt;span class="na"&gt;]&lt;/span&gt;
+&lt;span class="na"&gt;description&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;A small example package&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;readme&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;README.md&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;requires-python&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;gt;=3.8&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;classifiers&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;[&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;&amp;quot;Programming Language&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="s"&gt;: Python :: 3&amp;quot;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;&amp;quot;Operating System&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="s"&gt;: OS Independent&amp;quot;,&lt;/span&gt;
+&lt;span class="na"&gt;]&lt;/span&gt;
+&lt;span class="na"&gt;license&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;MIT&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;license-files&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;[&amp;quot;LICEN[CS]E*&amp;quot;]&lt;/span&gt;
+
+&lt;span class="k"&gt;[project.urls]&lt;/span&gt;
+&lt;span class="na"&gt;Homepage&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://github.com/pypa/sampleproject&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;Issues&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://github.com/pypa/sampleproject/issues&amp;quot;&lt;/span&gt;
+
+
+&lt;span class="na"&gt;[python_package]&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;https://packaging.python.org/en/latest/tutorials/packaging-projects/&lt;/span&gt;
+&lt;span class="na"&gt;[build backend]&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;https://packaging.python.org/en/latest/glossary/&lt;/span&gt;&lt;span class="c1"&gt;#term-Build-Backend&lt;/span&gt;
+&lt;span class="na"&gt;[Hatchling]&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;https://hatch.pypa.io/latest/&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Generate Distrubution Archive&lt;/h2&gt;
+&lt;p&gt;Update &lt;code&gt;build&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pip install --upgrade build
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Build:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;python3 -m build
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This should create&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;dist&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;example_package_YOUR_USERNAME_HERE&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="m m-Double"&gt;0.0.1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;py3&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;none&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;any&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;whl&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Built&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Distribution&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;example_package_YOUR_USERNAME_HERE&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="m m-Double"&gt;0.0.1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;tar&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;gz&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Distibution&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Upload!&lt;/h2&gt;
+&lt;p&gt;Create and store API token. &lt;a href="https://test.pypi.org/manage/account/#api-tokens"&gt;Create Token&lt;/a&gt;, set scope to entire account.&lt;/p&gt;
+&lt;p&gt;Update &lt;code&gt;twine&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pip install --upgrade twine
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Upload the files in dist&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;python3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;twine&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;upload&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="n"&gt;repository&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;testpypi&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dist&lt;/span&gt;&lt;span class="o"&gt;/*&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Once Complete the uploaded package can be viewed here:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;https&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//test.pypi.org/project/example_package_YOUR_USERNAME_HERE.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Test install&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;python3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;pip&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;install&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;https&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//test.pypi.org/simple/ --no-deps example-package-YOUR-USERNAME-HERE&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Pelican New Post script</title><link href="http://lizard-spock.co.uk/pelican-new-post-script.html" rel="alternate"></link><published>2025-01-03T16:44:00+00:00</published><updated>2025-01-03T16:44:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-03:/pelican-new-post-script.html</id><summary type="html">&lt;p&gt;In the aim of keeping the navigation of the Blog posts clean, I have limited my self to a few …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In the aim of keeping the navigation of the Blog posts clean, I have limited my self to a few general categories, but remeberign them while editing in vim and not creating typos is a pain. Therefore I have added the category selection to my pyhton script for creating the new markdown files.&lt;/p&gt;
+&lt;p&gt;When running this file from the command line, top level of my pelican project, it first prompts for a category selection then requests The title of the post. The new file is created and correctly formated for a Pelican markdown post.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt; 1&lt;/span&gt;
+&lt;span class="normal"&gt; 2&lt;/span&gt;
+&lt;span class="normal"&gt; 3&lt;/span&gt;
+&lt;span class="normal"&gt; 4&lt;/span&gt;
+&lt;span class="normal"&gt; 5&lt;/span&gt;
+&lt;span class="normal"&gt; 6&lt;/span&gt;
+&lt;span class="normal"&gt; 7&lt;/span&gt;
+&lt;span class="normal"&gt; 8&lt;/span&gt;
+&lt;span class="normal"&gt; 9&lt;/span&gt;
+&lt;span class="normal"&gt;10&lt;/span&gt;
+&lt;span class="normal"&gt;11&lt;/span&gt;
+&lt;span class="normal"&gt;12&lt;/span&gt;
+&lt;span class="normal"&gt;13&lt;/span&gt;
+&lt;span class="normal"&gt;14&lt;/span&gt;
+&lt;span class="normal"&gt;15&lt;/span&gt;
+&lt;span class="normal"&gt;16&lt;/span&gt;
+&lt;span class="normal"&gt;17&lt;/span&gt;
+&lt;span class="normal"&gt;18&lt;/span&gt;
+&lt;span class="normal"&gt;19&lt;/span&gt;
+&lt;span class="normal"&gt;20&lt;/span&gt;
+&lt;span class="normal"&gt;21&lt;/span&gt;
+&lt;span class="normal"&gt;22&lt;/span&gt;
+&lt;span class="normal"&gt;23&lt;/span&gt;
+&lt;span class="normal"&gt;24&lt;/span&gt;
+&lt;span class="normal"&gt;25&lt;/span&gt;
+&lt;span class="normal"&gt;26&lt;/span&gt;
+&lt;span class="normal"&gt;27&lt;/span&gt;
+&lt;span class="normal"&gt;28&lt;/span&gt;
+&lt;span class="normal"&gt;29&lt;/span&gt;
+&lt;span class="normal"&gt;30&lt;/span&gt;
+&lt;span class="normal"&gt;31&lt;/span&gt;
+&lt;span class="normal"&gt;32&lt;/span&gt;
+&lt;span class="normal"&gt;33&lt;/span&gt;
+&lt;span class="normal"&gt;34&lt;/span&gt;
+&lt;span class="normal"&gt;35&lt;/span&gt;
+&lt;span class="normal"&gt;36&lt;/span&gt;
+&lt;span class="normal"&gt;37&lt;/span&gt;
+&lt;span class="normal"&gt;38&lt;/span&gt;
+&lt;span class="normal"&gt;39&lt;/span&gt;
+&lt;span class="normal"&gt;40&lt;/span&gt;
+&lt;span class="normal"&gt;41&lt;/span&gt;
+&lt;span class="normal"&gt;42&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="ch"&gt;#!/usr/bin/python3&lt;/span&gt;
+&lt;span class="c1"&gt;# coding=utf-8&lt;/span&gt;
+
+&lt;span class="c1"&gt;# CLI for creating a new markdown post&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;html&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;datetime&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;
+
+&lt;span class="c1"&gt;# datetime object containing current date and time&lt;/span&gt;
+&lt;span class="n"&gt;now&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="c1"&gt;# dd/mm/YY H:M&lt;/span&gt;
+&lt;span class="n"&gt;dt_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%Y-%m-&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s2"&gt; %H:%M&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;dt_string_simple&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%Y-%m-&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Create dictionary of categories, ask for user selection.&lt;/span&gt;
+&lt;span class="n"&gt;cat_dict&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Cooking&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Engineering&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Home&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Outdoor&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Photography&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Tech&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;cat_dict&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;post_cat&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;input&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Enter Post Category :&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;post_cat&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;post_cat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;#Request title of blog post&lt;/span&gt;
+&lt;span class="n"&gt;post_title&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;input&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Enter Post Title : &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;post_title&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;escape&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;post_title&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# sanitize&lt;/span&gt;
+&lt;span class="n"&gt;post_title_safe&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;post_title&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39; &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;new_post_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;dt_string_simple&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;post_title_safe&lt;/span&gt;
+
+&lt;span class="n"&gt;this_file_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;./content/posts/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;new_post_name&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.md&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this_file_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;w&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Title: &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;post_title&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Date: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt; &lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;dt_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Category: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;cat_dict&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;post_cat&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Tags: python&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Author: morganp&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Status: draft&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;lt;!--to publish change draft to published--&amp;gt;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this_file_name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Python Base Types</title><link href="http://lizard-spock.co.uk/python-base-types.html" rel="alternate"></link><published>2025-01-02T18:09:00+00:00</published><updated>2025-01-02T18:09:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/python-base-types.html</id><summary type="html">&lt;p&gt;Making notes as I work through &lt;a href="https://www.dr-chuck.com"&gt;Dr Chucks&lt;/a&gt; Python for Everyone course on &lt;a href="https://www.coursera.org/specializations/python"&gt;Coursera&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;There are 3 main types in …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Making notes as I work through &lt;a href="https://www.dr-chuck.com"&gt;Dr Chucks&lt;/a&gt; Python for Everyone course on &lt;a href="https://www.coursera.org/specializations/python"&gt;Coursera&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;There are 3 main types in Python:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;lists&lt;/li&gt;
-&lt;li&gt;dictionaries&lt;/li&gt;
-&lt;li&gt;tuples&lt;/li&gt;
-&lt;/ul&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Modify Pelican theme</title><link href="http://lizard-spock.co.uk/modify-pelican-theme.html" rel="alternate"></link><published>2025-01-02T16:53:00+00:00</published><updated>2025-01-02T16:53:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/modify-pelican-theme.html</id><summary type="html">&lt;p&gt;First figure out which theme you are using.
+&lt;li&gt;Lists []&lt;/li&gt;
+&lt;li&gt;Dictionaries {}&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://en.wikipedia.org/wiki/Tuple"&gt;Tuples&lt;/a&gt; ()&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;List&lt;/h2&gt;
+&lt;p&gt;Lists are mutable, ie elements can be changed.&lt;br&gt;
+Creation of a list:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;emptylist = []
+thislist  = [&amp;quot;A&amp;quot;,&amp;quot;B&amp;quot;,&amp;quot;C&amp;quot;]
+print( thislist )
+  [&amp;#39;A&amp;#39;, &amp;#39;B&amp;#39;, &amp;#39;C&amp;#39;]
+print( thislist[1] )
+  B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Dictionary&lt;/h2&gt;
+&lt;p&gt;Dictionaries are key value pairs.&lt;br&gt;
+Creation of Dictionary&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;emptydict = {}
+thisdict  = {0:&amp;quot;A&amp;quot;, 1:&amp;quot;B&amp;quot;, 2:&amp;quot;C&amp;quot;} 
+print( thisdict )
+  {0: &amp;#39;A&amp;#39;, 1: &amp;#39;B&amp;#39;, 2: &amp;#39;C&amp;#39;}
+print( thisdict[1] )
+  B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Tuple&lt;/h2&gt;
+&lt;p&gt;Tuples are unmodifiable lists. elements can not be changed or reordered.&lt;br&gt;
+Creation of Tuple.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;emptytuple = () # This is of no real use as imutable
+thistuple  = (&amp;quot;A&amp;quot;, &amp;quot;B&amp;quot;, &amp;quot;C&amp;quot;)
+print( thistuple )
+  (&amp;#39;A&amp;#39;, &amp;#39;B&amp;#39;, &amp;#39;C&amp;#39;)
+print( thistuple[1] )
+  B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Modify Pelican theme</title><link href="http://lizard-spock.co.uk/modify-pelican-theme.html" rel="alternate"></link><published>2025-01-02T16:53:00+00:00</published><updated>2025-01-02T16:53:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/modify-pelican-theme.html</id><summary type="html">&lt;p&gt;First figure out which theme you are using.
 List installed themes via:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;% pelican-themes -l&lt;/span&gt;
 &lt;span class="n"&gt;simple&lt;/span&gt;
@@ -1749,82 +2006,4 @@ Please install the latest version of XQuartz:
  https://xquartz.macosforge.org
 Error: An unsatisfied requirement failed this build.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;The easiest way to install R on OS X really does seem to be just run the &lt;a href="http://cran.r-project.org/bin/macosx/"&gt;package&lt;/a&gt;. 134MB install size.&lt;/p&gt;</content><category term="Tech"></category><category term="Apple"></category><category term="Command Line"></category><category term="OS X"></category><category term="Programming"></category><category term="R"></category><category term="Mountain Lion"></category></entry><entry><title>"Mountain Lion Setup, Part 5 /etc/hosts"</title><link href="//189/Mountain_Lion_Setup%2C_Part_5_%2Fetc%2Fhosts" rel="alternate"></link><published>2012-08-30T20:28:12+01:00</published><updated>2012-08-30T20:28:12+01:00</updated><author><name>morganp</name></author><id>tag:189,2012-08-30:/Mountain_Lion_Setup%2C_Part_5_%2Fetc%2Fhosts</id><summary type="html">&lt;p&gt;For ssh and ping to local machines with out the .local extension I added them to my /ets/hosts file …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For ssh and ping to local machines with out the .local extension I added them to my /ets/hosts file.&lt;/p&gt;
-&lt;p&gt;A normal user does not have permission so you have to use sudo. If you os x account has admin privlages it will prompt you for your password. If you have not used vim before, i for insert mode (like a standard text editor), esc to exit insert mode and :wq to write and quit.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;sudo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;vim&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;etc&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;hosts&lt;/span&gt;
-
-##
-#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Database&lt;/span&gt;
-#
-#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;localhost&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;is&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;used&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;to&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;configure&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;loopback&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;interface&lt;/span&gt;
-#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;when&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;system&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;is&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;booting&lt;/span&gt;.&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;Do&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;not&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;change&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;this&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;entry&lt;/span&gt;.&lt;span class="w"&gt;  &lt;/span&gt;
-##
-&lt;span class="mi"&gt;127&lt;/span&gt;.&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nv"&gt;localhost&lt;/span&gt;
-&lt;span class="mi"&gt;255&lt;/span&gt;.&lt;span class="mi"&gt;255&lt;/span&gt;.&lt;span class="mi"&gt;255&lt;/span&gt;.&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;broadcasthost&lt;/span&gt;
-::&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="nv"&gt;localhost&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
-&lt;span class="nv"&gt;fe80&lt;/span&gt;::&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="nv"&gt;lo0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;localhost&lt;/span&gt;
-
-##&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Append&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Local&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;fixed&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;ip&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Machines&lt;/span&gt;
-&lt;span class="mi"&gt;192&lt;/span&gt;.&lt;span class="mi"&gt;168&lt;/span&gt;.&lt;span class="mi"&gt;10&lt;/span&gt;.&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nv"&gt;router&lt;/span&gt;
-&lt;span class="mi"&gt;192&lt;/span&gt;.&lt;span class="mi"&gt;168&lt;/span&gt;.&lt;span class="mi"&gt;10&lt;/span&gt;.&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;macmini&lt;/span&gt;
-&lt;span class="mi"&gt;192&lt;/span&gt;.&lt;span class="mi"&gt;168&lt;/span&gt;.&lt;span class="mi"&gt;10&lt;/span&gt;.&lt;span class="mi"&gt;101&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;krypton&lt;/span&gt;
-&lt;span class="mi"&gt;192&lt;/span&gt;.&lt;span class="mi"&gt;168&lt;/span&gt;.&lt;span class="mi"&gt;10&lt;/span&gt;.&lt;span class="mi"&gt;250&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;backup&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="Apple"></category><category term="Mountain Lion"></category><category term="Network"></category></entry><entry><title>"OS X Get Info Summary for multiple items"</title><link href="//188/OS_X_Get_Info_Summary_for_multiple_items" rel="alternate"></link><published>2012-08-29T21:02:22+01:00</published><updated>2012-08-29T21:02:22+01:00</updated><author><name>morganp</name></author><id>tag:188,2012-08-29:/OS_X_Get_Info_Summary_for_multiple_items</id><summary type="html">&lt;p&gt;If you use the ⌘I shortcut in finder with a file selected you get a 'Get Info' window. If you …&lt;/p&gt;</summary><content type="html">&lt;p&gt;If you use the ⌘I shortcut in finder with a file selected you get a 'Get Info' window. If you do this with 20 files selected you get 20 windows, In Snow Leopard if 10 or more file were selected you got a Summary window. I found this handy for getting the disk usage for a bunch of files. &lt;/p&gt;
-&lt;p&gt;If you would like to change it to always get the Summary window, which I find useful in case of selecting all in a folder and accidentally hitting ⌘I you do not a have many many windows to close.&lt;/p&gt;
-&lt;p&gt;Open System preferences, select keyboard.&lt;br&gt;
-&lt;a href="http://www.flickr.com/photos/morgan_prior/7889683364/" title="01-SysPref_Keyboard.png by munky morgy, on Flickr"&gt;&lt;img src="http://farm9.staticflickr.com/8462/7889683364_21baa38a61.jpg" width="500" height="367" alt="01-SysPref_Keyboard.png"&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Keyboard Shortcuts -&amp;gt; Application Shortcut -&amp;gt; +&lt;br&gt;
-&lt;a href="http://www.flickr.com/photos/morgan_prior/7889714382/" title="02-Keyboard.png by munky morgy, on Flickr"&gt;&lt;img src="http://farm9.staticflickr.com/8035/7889714382_a81aa4d791.jpg" width="500" height="455" alt="02-Keyboard.png"&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Application, select Finder.&lt;br&gt;
-Menu Title, enter 'Summary Get Info'&lt;br&gt;
-Keyboard Shortcut, press  ⌘I &lt;br&gt;
-&lt;a href="http://www.flickr.com/photos/morgan_prior/7889720574/" title="03-Entry.png by munky morgy, on Flickr"&gt;&lt;img src="http://farm9.staticflickr.com/8032/7889720574_0ed2232077.jpg" width="500" height="455" alt="03-Entry.png"&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Done&lt;br&gt;
-&lt;a href="http://www.flickr.com/photos/morgan_prior/7889724254/" title="04-cmdI-final.png by munky morgy, on Flickr"&gt;&lt;img src="http://farm9.staticflickr.com/8443/7889724254_bf1f39f4a7.jpg" width="500" height="455" alt="04-cmdI-final.png"&gt;&lt;/a&gt;&lt;/p&gt;</content><category term="Tech"></category><category term="Apple"></category><category term="Lion"></category><category term="Mountain Lion"></category></entry><entry><title>"#vim toggle between last 2 edited buffers"</title><link href="//187/%23vim_toggle_between_last_2_edited_buffers" rel="alternate"></link><published>2012-08-29T11:22:06+01:00</published><updated>2012-08-29T11:22:06+01:00</updated><author><name>morganp</name></author><id>tag:187,2012-08-29:/%23vim_toggle_between_last_2_edited_buffers</id><summary type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ctrl-6
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h1&gt;Demo&lt;/h1&gt;
-&lt;p&gt;For the example we will create 3 new temp files and then open them in vim.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;touch vim_test1 …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ctrl-6
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h1&gt;Demo&lt;/h1&gt;
-&lt;p&gt;For the example we will create 3 new temp files and then open them in vim.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;touch vim_test1.txt
-touch vim_test2.txt
-touch vim_test3.txt
-vim vim_test*
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;From with in vim&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;:ls 
-1 %a   &amp;quot;vim_test1.txt&amp;quot;                line 2
-2      &amp;quot;vim_test2.txt&amp;quot;                line 0
-3      &amp;quot;vim_test3.txt&amp;quot;                line 0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Buffer 1 is active (%a) if we jump to buffer 3 &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;:b3
-:ls
-1 #    &amp;quot;vim_test1.txt&amp;quot;                line 2
-2      &amp;quot;vim_test2.txt&amp;quot;                line 0
-3 %a   &amp;quot;vim_test3.txt&amp;quot;                line 2
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Buffer 3 is active (%a) and 3 is previous edited buffer. ctrl-6 will switch these around. Toggling the active buffer between the two.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ctrl-6
-:ls
-1 %a   &amp;quot;vim_test1.txt&amp;quot;                line 2
-2      &amp;quot;vim_test2.txt&amp;quot;                line 0
-3 #    &amp;quot;vim_test3.txt&amp;quot;                line 2 
-ctrl-6
-:ls
-1 #    &amp;quot;vim_test1.txt&amp;quot;                line 2
-2      &amp;quot;vim_test2.txt&amp;quot;                line 0
-3 %a   &amp;quot;vim_test3.txt&amp;quot;                line 2
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;To scroll through the buffers in order:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nl"&gt;:bn&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="k"&gt;Next&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Buffer&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
-&lt;span class="nl"&gt;:bp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;Previous&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Buffer&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="Vim"></category></entry></feed>
+&lt;p&gt;The easiest way to install R on OS X really does seem to be just run the &lt;a href="http://cran.r-project.org/bin/macosx/"&gt;package&lt;/a&gt;. 134MB install size.&lt;/p&gt;</content><category term="Tech"></category><category term="Apple"></category><category term="Command Line"></category><category term="OS X"></category><category term="Programming"></category><category term="R"></category><category term="Mountain Lion"></category></entry></feed>

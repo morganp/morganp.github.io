@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Python Web Parsing</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="For Parsing Web pages with Python, BeatifulSoup is a helpful library. To install: pip install beautifulsoup4 Python for every one …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/cooking.html">Cooking</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/home.html">Home</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li class="active"><a href="../category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/python-web-parsing.html" rel="bookmark"
+             title="Permalink to Python Web Parsing">Python Web Parsing</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-01-05T11:15:00+00:00">
+                Published: Sun 05 January 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/tech.html">Tech</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->        <!--to publish change draft to published-->
+
+<p>For Parsing Web pages with Python, BeatifulSoup is a helpful library. To install:</p>
+<div class="highlight"><pre><span></span><code>pip install beautifulsoup4
+</code></pre></div>
+
+<p>Python for every one Example Usage:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># To run this, download the BeautifulSoup zip file</span>
+<span class="c1"># http://www.py4e.com/code3/bs4.zip</span>
+<span class="c1"># and unzip it in the same directory as this file</span>
+<span class="c1"># Or pip install beautifulsoup4</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span><span class="o">,</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="o">,</span><span class="w"> </span><span class="nn">urllib.error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="n">BeautifulSoup</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ssl</span>
+
+<span class="c1"># Ignore SSL certificate errors</span>
+<span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ssl</span><span class="o">.</span><span class="n">create_default_context</span><span class="p">()</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">check_hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">False</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">verify_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ssl</span><span class="o">.</span><span class="n">CERT_NONE</span>
+
+<span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Enter - &#39;</span><span class="p">)</span>
+<span class="n">html</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">context</span><span class="o">=</span><span class="n">ctx</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">soup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+
+<span class="c1"># Retrieve all of the anchor tags</span>
+<span class="n">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soup</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">tag</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">tags</span><span class="p">:</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">))</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

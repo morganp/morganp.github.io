@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Better Python Iterators</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Pyhton can convert most (all) lists/collections into iterator objects, this is done by calling iter() ie num_list = [1, 2 …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li><a href="./category/cooking.html">Cooking</a></li>
+                                                <li><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/home.html">Home</a></li>
+                                                <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li class="active"><a href="./category/tech.html">Tech</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./better-python-iterators.html" rel="bookmark"
+             title="Permalink to Better Python Iterators">Better Python Iterators</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-03-01T12:24:00+00:00">
+                Published: Sat 01 March 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/tech.html">Tech</a>.</p>
+<p>tags: <a href="./tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->        <!--to publish change draft to published-->
+
+<p>Pyhton can convert most (all) lists/collections into iterator objects, this is done by calling <code>iter()</code> ie</p>
+<div class="highlight"><pre><span></span><code>num_list = [1, 2, 3] 
+num_iter = iter(num_list)  # Returns Iterator
+</code></pre></div>
+
+<p>Python in the background is calling the objects <code>__iter__()</code> method.</p>
+<p>A typical method for returning an Iterator is using a for loop to compile/create the elements. However the draw back to this is that the for loop can not begin executing until the full iterator is created.<br>
+This could make it the program look like it has stalled while it compiles long and or complex iterator objects.</p>
+<h2>Generator Functions</h2>
+<p>Generator function allow an optimisation that it allows the use of the iterator after each element has been created. Generator functions return elemnts using <code>yield</code> instead of <code>return</code> on the complete list. The a benefit of this approach is that the full iterator never has to be held in memory at the same time, allowing much larger data sets to be analysed.</p>
+<h2>Generator Example</h2>
+<div class="highlight"><pre><span></span><code>def my_generator(n):
+
+    # initialize counter
+    value = 0
+
+    # loop until counter is less than n
+    while value &lt; n:
+
+        # produce the current value of the counter
+        yield value
+
+        # increment the counter
+        value += 1
+</code></pre></div>
+
+<h2>Non-Generator Example</h2>
+<div class="highlight"><pre><span></span><code>def my_nongenerator(n):
+
+    # initialize counter
+    value = 0
+    this_list = list()
+    # loop until counter is less than n
+    while value &lt; n:
+
+        # produce the current value of the counter
+        this_list.append( value )
+
+        # increment the counter
+        value += 1
+    return this_list
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

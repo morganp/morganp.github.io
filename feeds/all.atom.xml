@@ -1,12 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2025-01-02T18:09:00+00:00</updated><entry><title>Python Base Types</title><link href="http://lizard-spock.co.uk/python-base-types.html" rel="alternate"></link><published>2025-01-02T18:09:00+00:00</published><updated>2025-01-02T18:09:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/python-base-types.html</id><summary type="html">&lt;p&gt;Making notes as I work through &lt;a href="https://www.dr-chuck.com"&gt;Dr Chucks&lt;/a&gt; Python for Everyone course on &lt;a href="https://www.coursera.org/specializations/python"&gt;Coursera&lt;/a&gt;.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2025-03-01T12:24:00+00:00</updated><entry><title>Better Python Iterators</title><link href="http://lizard-spock.co.uk/better-python-iterators.html" rel="alternate"></link><published>2025-03-01T12:24:00+00:00</published><updated>2025-03-01T12:24:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-03-01:/better-python-iterators.html</id><summary type="html">&lt;!--to publish change draft to published--&gt;
+
+&lt;p&gt;Pyhton can convert most (all) lists/collections into iterator objects, this is done by calling &lt;code&gt;iter()&lt;/code&gt; ie&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;num_list = [1, 2 …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;!--to publish change draft to published--&gt;
+
+&lt;p&gt;Pyhton can convert most (all) lists/collections into iterator objects, this is done by calling &lt;code&gt;iter()&lt;/code&gt; ie&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;num_list = [1, 2, 3] 
+num_iter = iter(num_list)  # Returns Iterator
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Python in the background is calling the objects &lt;code&gt;__iter__()&lt;/code&gt; method.&lt;/p&gt;
+&lt;p&gt;A typical method for returning an Iterator is using a for loop to compile/create the elements. However the draw back to this is that the for loop can not begin executing until the full iterator is created.&lt;br&gt;
+This could make it the program look like it has stalled while it compiles long and or complex iterator objects.&lt;/p&gt;
+&lt;h2&gt;Generator Functions&lt;/h2&gt;
+&lt;p&gt;Generator function allow an optimisation that it allows the use of the iterator after each element has been created. Generator functions return elemnts using &lt;code&gt;yield&lt;/code&gt; instead of &lt;code&gt;return&lt;/code&gt; on the complete list. The a benefit of this approach is that the full iterator never has to be held in memory at the same time, allowing much larger data sets to be analysed.&lt;/p&gt;
+&lt;h2&gt;Generator Example&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;def my_generator(n):
+
+    # initialize counter
+    value = 0
+
+    # loop until counter is less than n
+    while value &amp;lt; n:
+
+        # produce the current value of the counter
+        yield value
+
+        # increment the counter
+        value += 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Non-Generator Example&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;def my_nongenerator(n):
+
+    # initialize counter
+    value = 0
+    this_list = list()
+    # loop until counter is less than n
+    while value &amp;lt; n:
+
+        # produce the current value of the counter
+        this_list.append( value )
+
+        # increment the counter
+        value += 1
+    return this_list
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Packaging Python Projects</title><link href="http://lizard-spock.co.uk/packaging-python-projects.html" rel="alternate"></link><published>2025-02-28T15:22:00+00:00</published><updated>2025-02-28T15:22:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-02-28:/packaging-python-projects.html</id><summary type="html">&lt;!--to publish change draft to published--&gt;
+
+&lt;p&gt;How to package a pythin script or project for distribution. Offical Docs are [here][python_package].
+Packaging for pip requires use …&lt;/p&gt;</summary><content type="html">&lt;!--to publish change draft to published--&gt;
+
+&lt;p&gt;How to package a pythin script or project for distribution. Offical Docs are [here][python_package].
+Packaging for pip requires use of a [build backend][], [Hatchling][] is the default for this example.&lt;/p&gt;
+&lt;p&gt;This run through uses the testPyPI. &lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://test.pypi.org/account/register/"&gt;Register for a test.pypi account&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Initialise Python project area:
+note: the build process also uses the gitignore to excluded the venv folder.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mkdir packaging_tutorial
+cd packagin_tutorial
+python3 -m venv venv
+source venv/bin/activate
+curl --output .gitignore &amp;quot;https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Python.gitignore&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Create the folder structure:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;packaging_tutorial&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;LICENSE&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;pyproject&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;toml&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;README&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;md&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;src&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;example_package_YOUR_USERNAME_HERE&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;py&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;example&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;py&lt;/span&gt;
+&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;tests&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;__init__.py&lt;/code&gt; can be empty, but allows project to be imported in standard way.&lt;/p&gt;
+&lt;p&gt;pyproject.toml - directs pip how to build the project&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[build-system]&lt;/span&gt;
+&lt;span class="na"&gt;requires&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;[&amp;quot;hatchling&amp;quot;]&lt;/span&gt;
+&lt;span class="na"&gt;build-backend&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;hatchling.build&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;[project]&lt;/span&gt;
+&lt;span class="na"&gt;name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;example_package_YOUR_USERNAME_HERE&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;0.0.1&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;authors&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;[&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="na"&gt;{ name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Example Author&amp;quot;, email=&amp;quot;author@example.com&amp;quot; },&lt;/span&gt;
+&lt;span class="na"&gt;]&lt;/span&gt;
+&lt;span class="na"&gt;description&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;A small example package&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;readme&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;README.md&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;requires-python&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;gt;=3.8&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;classifiers&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;[&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;&amp;quot;Programming Language&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="s"&gt;: Python :: 3&amp;quot;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;&amp;quot;Operating System&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="s"&gt;: OS Independent&amp;quot;,&lt;/span&gt;
+&lt;span class="na"&gt;]&lt;/span&gt;
+&lt;span class="na"&gt;license&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;MIT&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;license-files&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;[&amp;quot;LICEN[CS]E*&amp;quot;]&lt;/span&gt;
+
+&lt;span class="k"&gt;[project.urls]&lt;/span&gt;
+&lt;span class="na"&gt;Homepage&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://github.com/pypa/sampleproject&amp;quot;&lt;/span&gt;
+&lt;span class="na"&gt;Issues&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://github.com/pypa/sampleproject/issues&amp;quot;&lt;/span&gt;
+
+
+&lt;span class="na"&gt;[python_package]&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;https://packaging.python.org/en/latest/tutorials/packaging-projects/&lt;/span&gt;
+&lt;span class="na"&gt;[build backend]&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;https://packaging.python.org/en/latest/glossary/&lt;/span&gt;&lt;span class="c1"&gt;#term-Build-Backend&lt;/span&gt;
+&lt;span class="na"&gt;[Hatchling]&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;https://hatch.pypa.io/latest/&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Generate Distrubution Archive&lt;/h2&gt;
+&lt;p&gt;Update &lt;code&gt;build&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pip install --upgrade build
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Build:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;python3 -m build
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This should create&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;dist&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;example_package_YOUR_USERNAME_HERE&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="m m-Double"&gt;0.0.1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;py3&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;none&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;any&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;whl&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Built&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Distribution&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;example_package_YOUR_USERNAME_HERE&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="m m-Double"&gt;0.0.1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;tar&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;gz&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Distibution&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Upload!&lt;/h2&gt;
+&lt;p&gt;Create and store API token. &lt;a href="https://test.pypi.org/manage/account/#api-tokens"&gt;Create Token&lt;/a&gt;, set scope to entire account.&lt;/p&gt;
+&lt;p&gt;Update &lt;code&gt;twine&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pip install --upgrade twine
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Upload the files in dist&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;python3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;twine&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;upload&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="n"&gt;repository&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;testpypi&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dist&lt;/span&gt;&lt;span class="o"&gt;/*&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Once Complete the uploaded package can be viewed here:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;https&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//test.pypi.org/project/example_package_YOUR_USERNAME_HERE.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Test install&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;python3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;pip&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;install&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;https&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//test.pypi.org/simple/ --no-deps example-package-YOUR-USERNAME-HERE&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Pelican New Post script</title><link href="http://lizard-spock.co.uk/pelican-new-post-script.html" rel="alternate"></link><published>2025-01-03T16:44:00+00:00</published><updated>2025-01-03T16:44:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-03:/pelican-new-post-script.html</id><summary type="html">&lt;p&gt;In the aim of keeping the navigation of the Blog posts clean, I have limited my self to a few …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In the aim of keeping the navigation of the Blog posts clean, I have limited my self to a few general categories, but remeberign them while editing in vim and not creating typos is a pain. Therefore I have added the category selection to my pyhton script for creating the new markdown files.&lt;/p&gt;
+&lt;p&gt;When running this file from the command line, top level of my pelican project, it first prompts for a category selection then requests The title of the post. The new file is created and correctly formated for a Pelican markdown post.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt; 1&lt;/span&gt;
+&lt;span class="normal"&gt; 2&lt;/span&gt;
+&lt;span class="normal"&gt; 3&lt;/span&gt;
+&lt;span class="normal"&gt; 4&lt;/span&gt;
+&lt;span class="normal"&gt; 5&lt;/span&gt;
+&lt;span class="normal"&gt; 6&lt;/span&gt;
+&lt;span class="normal"&gt; 7&lt;/span&gt;
+&lt;span class="normal"&gt; 8&lt;/span&gt;
+&lt;span class="normal"&gt; 9&lt;/span&gt;
+&lt;span class="normal"&gt;10&lt;/span&gt;
+&lt;span class="normal"&gt;11&lt;/span&gt;
+&lt;span class="normal"&gt;12&lt;/span&gt;
+&lt;span class="normal"&gt;13&lt;/span&gt;
+&lt;span class="normal"&gt;14&lt;/span&gt;
+&lt;span class="normal"&gt;15&lt;/span&gt;
+&lt;span class="normal"&gt;16&lt;/span&gt;
+&lt;span class="normal"&gt;17&lt;/span&gt;
+&lt;span class="normal"&gt;18&lt;/span&gt;
+&lt;span class="normal"&gt;19&lt;/span&gt;
+&lt;span class="normal"&gt;20&lt;/span&gt;
+&lt;span class="normal"&gt;21&lt;/span&gt;
+&lt;span class="normal"&gt;22&lt;/span&gt;
+&lt;span class="normal"&gt;23&lt;/span&gt;
+&lt;span class="normal"&gt;24&lt;/span&gt;
+&lt;span class="normal"&gt;25&lt;/span&gt;
+&lt;span class="normal"&gt;26&lt;/span&gt;
+&lt;span class="normal"&gt;27&lt;/span&gt;
+&lt;span class="normal"&gt;28&lt;/span&gt;
+&lt;span class="normal"&gt;29&lt;/span&gt;
+&lt;span class="normal"&gt;30&lt;/span&gt;
+&lt;span class="normal"&gt;31&lt;/span&gt;
+&lt;span class="normal"&gt;32&lt;/span&gt;
+&lt;span class="normal"&gt;33&lt;/span&gt;
+&lt;span class="normal"&gt;34&lt;/span&gt;
+&lt;span class="normal"&gt;35&lt;/span&gt;
+&lt;span class="normal"&gt;36&lt;/span&gt;
+&lt;span class="normal"&gt;37&lt;/span&gt;
+&lt;span class="normal"&gt;38&lt;/span&gt;
+&lt;span class="normal"&gt;39&lt;/span&gt;
+&lt;span class="normal"&gt;40&lt;/span&gt;
+&lt;span class="normal"&gt;41&lt;/span&gt;
+&lt;span class="normal"&gt;42&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="ch"&gt;#!/usr/bin/python3&lt;/span&gt;
+&lt;span class="c1"&gt;# coding=utf-8&lt;/span&gt;
+
+&lt;span class="c1"&gt;# CLI for creating a new markdown post&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;html&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;datetime&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;
+
+&lt;span class="c1"&gt;# datetime object containing current date and time&lt;/span&gt;
+&lt;span class="n"&gt;now&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="c1"&gt;# dd/mm/YY H:M&lt;/span&gt;
+&lt;span class="n"&gt;dt_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%Y-%m-&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s2"&gt; %H:%M&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;dt_string_simple&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%Y-%m-&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Create dictionary of categories, ask for user selection.&lt;/span&gt;
+&lt;span class="n"&gt;cat_dict&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Cooking&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Engineering&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Home&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Outdoor&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Photography&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Tech&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;cat_dict&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;post_cat&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;input&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Enter Post Category :&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;post_cat&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;post_cat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;#Request title of blog post&lt;/span&gt;
+&lt;span class="n"&gt;post_title&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;input&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Enter Post Title : &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;post_title&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;escape&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;post_title&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# sanitize&lt;/span&gt;
+&lt;span class="n"&gt;post_title_safe&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;post_title&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39; &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;new_post_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;dt_string_simple&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;post_title_safe&lt;/span&gt;
+
+&lt;span class="n"&gt;this_file_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;./content/posts/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;new_post_name&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.md&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this_file_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;w&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Title: &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;post_title&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Date: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt; &lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;dt_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Category: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;cat_dict&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;post_cat&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Tags: python&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Author: morganp&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Status: draft&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;lt;!--to publish change draft to published--&amp;gt;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this_file_name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Python Base Types</title><link href="http://lizard-spock.co.uk/python-base-types.html" rel="alternate"></link><published>2025-01-02T18:09:00+00:00</published><updated>2025-01-02T18:09:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/python-base-types.html</id><summary type="html">&lt;p&gt;Making notes as I work through &lt;a href="https://www.dr-chuck.com"&gt;Dr Chucks&lt;/a&gt; Python for Everyone course on &lt;a href="https://www.coursera.org/specializations/python"&gt;Coursera&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;There are 3 main types in …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Making notes as I work through &lt;a href="https://www.dr-chuck.com"&gt;Dr Chucks&lt;/a&gt; Python for Everyone course on &lt;a href="https://www.coursera.org/specializations/python"&gt;Coursera&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;There are 3 main types in Python:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;lists&lt;/li&gt;
-&lt;li&gt;dictionaries&lt;/li&gt;
-&lt;li&gt;tuples&lt;/li&gt;
-&lt;/ul&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Modify Pelican theme</title><link href="http://lizard-spock.co.uk/modify-pelican-theme.html" rel="alternate"></link><published>2025-01-02T16:53:00+00:00</published><updated>2025-01-02T16:53:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/modify-pelican-theme.html</id><summary type="html">&lt;p&gt;First figure out which theme you are using.
+&lt;li&gt;Lists []&lt;/li&gt;
+&lt;li&gt;Dictionaries {}&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://en.wikipedia.org/wiki/Tuple"&gt;Tuples&lt;/a&gt; ()&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;List&lt;/h2&gt;
+&lt;p&gt;Lists are mutable, ie elements can be changed.&lt;br&gt;
+Creation of a list:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;emptylist = []
+thislist  = [&amp;quot;A&amp;quot;,&amp;quot;B&amp;quot;,&amp;quot;C&amp;quot;]
+print( thislist )
+  [&amp;#39;A&amp;#39;, &amp;#39;B&amp;#39;, &amp;#39;C&amp;#39;]
+print( thislist[1] )
+  B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Dictionary&lt;/h2&gt;
+&lt;p&gt;Dictionaries are key value pairs.&lt;br&gt;
+Creation of Dictionary&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;emptydict = {}
+thisdict  = {0:&amp;quot;A&amp;quot;, 1:&amp;quot;B&amp;quot;, 2:&amp;quot;C&amp;quot;} 
+print( thisdict )
+  {0: &amp;#39;A&amp;#39;, 1: &amp;#39;B&amp;#39;, 2: &amp;#39;C&amp;#39;}
+print( thisdict[1] )
+  B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Tuple&lt;/h2&gt;
+&lt;p&gt;Tuples are unmodifiable lists. elements can not be changed or reordered.&lt;br&gt;
+Creation of Tuple.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;emptytuple = () # This is of no real use as imutable
+thistuple  = (&amp;quot;A&amp;quot;, &amp;quot;B&amp;quot;, &amp;quot;C&amp;quot;)
+print( thistuple )
+  (&amp;#39;A&amp;#39;, &amp;#39;B&amp;#39;, &amp;#39;C&amp;#39;)
+print( thistuple[1] )
+  B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Modify Pelican theme</title><link href="http://lizard-spock.co.uk/modify-pelican-theme.html" rel="alternate"></link><published>2025-01-02T16:53:00+00:00</published><updated>2025-01-02T16:53:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/modify-pelican-theme.html</id><summary type="html">&lt;p&gt;First figure out which theme you are using.
 List installed themes via:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;% pelican-themes -l&lt;/span&gt;
 &lt;span class="n"&gt;simple&lt;/span&gt;
@@ -55,7 +312,24 @@ List installed themes via:&lt;/p&gt;
 TEMPLATE_PAGES = {&amp;#39;tags.html&amp;#39;: &amp;#39;tag/index.html&amp;#39;}
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;The Above takes the tags.html template and makes it available via example.com/tag&lt;/p&gt;</content><category term="Tech"></category><category term="python"></category><category term="pelican"></category></entry><entry><title>Japanese Garden 10 Years on</title><link href="http://lizard-spock.co.uk/japanese-garden-10-years-on.html" rel="alternate"></link><published>2025-01-02T13:02:00+00:00</published><updated>2025-01-02T13:02:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/japanese-garden-10-years-on.html</id><content type="html">&lt;p&gt;An update to the Japanese Garden, aorund 10 years after it was built.&lt;/p&gt;</content><category term="Home"></category><category term="Garden"></category><category term="DIY"></category></entry><entry><title>Python Regular Expressions</title><link href="http://lizard-spock.co.uk/python-regular-expressions.html" rel="alternate"></link><published>2024-12-23T10:21:00+00:00</published><updated>2024-12-23T10:21:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2024-12-23:/python-regular-expressions.html</id><summary type="html">&lt;h2&gt;Python Regular Expressions Quick Guide:&lt;/h2&gt;
+&lt;p&gt;The Above takes the tags.html template and makes it available via example.com/tag&lt;/p&gt;</content><category term="Tech"></category><category term="python"></category><category term="pelican"></category></entry><entry><title>Japanese Garden 10 Years on</title><link href="http://lizard-spock.co.uk/japanese-garden-10-years-on.html" rel="alternate"></link><published>2025-01-02T13:02:00+00:00</published><updated>2025-01-02T13:02:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-01-02:/japanese-garden-10-years-on.html</id><summary type="html">&lt;p&gt;An update to the Japanese Garden, aorund 10 years after it was built.&lt;br&gt;
+The ground cover is being removed in …&lt;/p&gt;</summary><content type="html">&lt;p&gt;An update to the Japanese Garden, aorund 10 years after it was built.&lt;br&gt;
+The ground cover is being removed in some of these images for the next iteration.  &lt;/p&gt;
+&lt;p&gt;The large panorama is 270 degree view of 3 sides of it.
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_4220.jpeg"&gt;
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_4221.jpeg"&gt;
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_4223.jpeg"&gt;&lt;/p&gt;
+&lt;p&gt;Various iterations of ground cover, last one was partially paved.
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_2181.jpeg"&gt;
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_2495.jpeg"&gt;
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_2496.jpeg"&gt;
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_2612.jpeg"&gt;&lt;/p&gt;
+&lt;h2&gt;Older pictures during Construction&lt;/h2&gt;
+&lt;p&gt;Then main structure nearly complete
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_0988.jpeg"&gt;
+&lt;img alt="photo" src="http://lizard-spock.co.uk/IMG_1120.jpeg"&gt;&lt;/p&gt;
+&lt;p&gt;Leveling up the roofs for the seating area.
+&lt;img alt="photo" src="http://lizard-spock.co.uk/The large panorama is 270 degree view of 3 sides of it.IMG_9401.jpeg"&gt;&lt;/p&gt;</content><category term="Home"></category><category term="Garden"></category><category term="DIY"></category></entry><entry><title>Python Regular Expressions</title><link href="http://lizard-spock.co.uk/python-regular-expressions.html" rel="alternate"></link><published>2024-12-23T10:21:00+00:00</published><updated>2024-12-23T10:21:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2024-12-23:/python-regular-expressions.html</id><summary type="html">&lt;h2&gt;Python Regular Expressions Quick Guide:&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;Matches&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;beginning&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;
 &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;Matches&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;
 &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;Matches&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;any&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;character …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;h2&gt;Python Regular Expressions Quick Guide:&lt;/h2&gt;
@@ -484,7 +758,7 @@ ReadyNAS: Remote access to larger volume drives (Movies and TV Collections)
 &lt;img alt="" src="/images/Gardening/Propogator/morganp-20150328--IMG_0178.jpg"&gt;
 &lt;img alt="" src="/images/Gardening/Propogator/morganp-20150328--IMG_0179.jpg"&gt;
 &lt;img alt="" src="/images/Gardening/Propogator/morganp-20150328--IMG_0180.jpg"&gt;&lt;/p&gt;</content><category term="Home"></category><category term="DIY"></category><category term="Garden"></category></entry><entry><title>"Planter"</title><link href="http://lizard-spock.co.uk/planter.html" rel="alternate"></link><published>2015-10-10T10:52:30+01:00</published><updated>2015-10-10T10:52:30+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-10-10:/planter.html</id><content type="html">&lt;p&gt;3 Fence boards used to create planter.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/images/Gardening/Planter/morganp-20150504-Planter-IMG_0543.jpg"&gt;&lt;/p&gt;</content><category term="Home"></category><category term="DIY"></category><category term="Garden"></category></entry><entry><title>"Matlab: floating point checking equality"</title><link href="http://lizard-spock.co.uk/matlab-floating-point-checking-equality.html" rel="alternate"></link><published>2015-06-10T20:43:32+01:00</published><updated>2015-06-10T20:43:32+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-06-10:/matlab-floating-point-checking-equality.html</id><summary type="html">&lt;p&gt;As previously decribed &lt;a href="/blog/engineering/floating-point-arithmetic-is-not-associative/"&gt;floating point arithmetic is not associative&lt;/a&gt;. Which means it is very easy for floating point models not …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As previously decribed &lt;a href="/blog/engineering/floating-point-arithmetic-is-not-associative/"&gt;floating point arithmetic is not associative&lt;/a&gt;. Which means it is very easy for floating point models not to match even though they are performing the same arithmetic operations. In matlab we compare the results:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/Gardening/Planter/morganp-20150504-Planter-IMG_0543.jpg"&gt;&lt;/p&gt;</content><category term="Home"></category><category term="DIY"></category><category term="Garden"></category><category term="Woodwork"></category></entry><entry><title>"Matlab: floating point checking equality"</title><link href="http://lizard-spock.co.uk/matlab-floating-point-checking-equality.html" rel="alternate"></link><published>2015-06-10T20:43:32+01:00</published><updated>2015-06-10T20:43:32+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-06-10:/matlab-floating-point-checking-equality.html</id><summary type="html">&lt;p&gt;As previously decribed &lt;a href="/blog/engineering/floating-point-arithmetic-is-not-associative/"&gt;floating point arithmetic is not associative&lt;/a&gt;. Which means it is very easy for floating point models not …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As previously decribed &lt;a href="/blog/engineering/floating-point-arithmetic-is-not-associative/"&gt;floating point arithmetic is not associative&lt;/a&gt;. Which means it is very easy for floating point models not to match even though they are performing the same arithmetic operations. In matlab we compare the results:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;a = 0.1 + 0.2 + 0.3 ;
 b = 0.1 + (0.2 + 0.3);
 
@@ -694,7 +968,7 @@ end
 &lt;img alt="" src="/images/Gardening/morganp-20141012-RaisedBed-IMG_9607.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;A couple of images before it was filled:
 &lt;img alt="" src="/images/Gardening/morganp-20140708-RaisedBed-_MG_9173.jpg"&gt;
-&lt;img alt="" src="/images/Gardening/morganp-20140708-RaisedBed-_MG_9175.jpg"&gt;&lt;/p&gt;</content><category term="Home"></category><category term="DIY"></category><category term="Garden"></category></entry><entry><title>"OS X disable back gesture"</title><link href="http://lizard-spock.co.uk/os-x-disable-back-gesture.html" rel="alternate"></link><published>2015-02-18T18:26:07+00:00</published><updated>2015-02-18T18:26:07+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-02-18:/os-x-disable-back-gesture.html</id><summary type="html">&lt;p&gt;After accidentally scrolling back a page when browsing the web in chrome too many times. Figured out how to disable …&lt;/p&gt;</summary><content type="html">&lt;p&gt;After accidentally scrolling back a page when browsing the web in chrome too many times. Figured out how to disable it: from your terminal&lt;/p&gt;
+&lt;img alt="" src="/images/Gardening/morganp-20140708-RaisedBed-_MG_9175.jpg"&gt;&lt;/p&gt;</content><category term="Home"></category><category term="DIY"></category><category term="Garden"></category><category term="Woodwork"></category></entry><entry><title>"OS X disable back gesture"</title><link href="http://lizard-spock.co.uk/os-x-disable-back-gesture.html" rel="alternate"></link><published>2015-02-18T18:26:07+00:00</published><updated>2015-02-18T18:26:07+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-02-18:/os-x-disable-back-gesture.html</id><summary type="html">&lt;p&gt;After accidentally scrolling back a page when browsing the web in chrome too many times. Figured out how to disable …&lt;/p&gt;</summary><content type="html">&lt;p&gt;After accidentally scrolling back a page when browsing the web in chrome too many times. Figured out how to disable it: from your terminal&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool FALSE
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -1677,7 +1951,7 @@ My version of &lt;a href="http://www.mysquarefootgarden.net/mels-mix/"&gt;Mels M
 &lt;p&gt;The first bed prepared. With make shift cat deterrent.
 &lt;img alt="" src="/images/Gardening/RaisedBed2/morganp-20140226-Garden-_MG_6881.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;The two raised bed in place for this (2014) year. The second raised bed has a deeper section for Carrots.
-&lt;img alt="" src="/images/Gardening/RaisedBed2/morganp-20140316-Garden-_MG_7028.jpg"&gt;&lt;/p&gt;</content><category term="Home"></category><category term="DIY"></category><category term="Kitchen Garden"></category></entry><entry><title>"Tool Acquisition"</title><link href="http://lizard-spock.co.uk/tool-acquisition.html" rel="alternate"></link><published>2014-03-16T19:37:57+00:00</published><updated>2014-03-16T19:37:57+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-16:/tool-acquisition.html</id><summary type="html">&lt;p&gt;&lt;img alt="" src="/images/Gardening/morganp-20140316-Garden-_MG_7012.jpg"&gt;&lt;/p&gt;
+&lt;img alt="" src="/images/Gardening/RaisedBed2/morganp-20140316-Garden-_MG_7028.jpg"&gt;&lt;/p&gt;</content><category term="Home"></category><category term="DIY"></category><category term="Kitchen Garden"></category><category term="Woodwork"></category></entry><entry><title>"Tool Acquisition"</title><link href="http://lizard-spock.co.uk/tool-acquisition.html" rel="alternate"></link><published>2014-03-16T19:37:57+00:00</published><updated>2014-03-16T19:37:57+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-16:/tool-acquisition.html</id><summary type="html">&lt;p&gt;&lt;img alt="" src="/images/Gardening/morganp-20140316-Garden-_MG_7012.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;Just after Christmas I got a Joseph Bently digging spade (larger than the border spade). Bought from &lt;a href="http://www.dunbargardencentre.co.uk/"&gt;Dunbar Garden Center …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="" src="/images/Gardening/morganp-20140316-Garden-_MG_7012.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;Just after Christmas I got a Joseph Bently digging spade (larger than the border spade). Bought from &lt;a href="http://www.dunbargardencentre.co.uk/"&gt;Dunbar Garden Center&lt;/a&gt; for £22 as I had a £5 Off voucher for spending over £50 during December. Actually had 2 vouchers one was used for the &lt;a href="/blog/garden/birdbox/"&gt;bird boxes&lt;/a&gt;.&lt;/p&gt;
 &lt;!-- more --&gt;
@@ -1710,149 +1984,4 @@ git push --tags
 git push --tags
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;em&gt;Note: The use of &lt;a href="http://semver.org/"&gt;major.minor.patch Semantic Versioning&lt;/a&gt; is a really good idea.&lt;/em&gt;&lt;/p&gt;</content><category term="Tech"></category><category term="Git"></category></entry><entry><title>"Beyond the LSB"</title><link href="http://lizard-spock.co.uk/beyond-the-lsb.html" rel="alternate"></link><published>2014-03-13T19:07:42+00:00</published><updated>2014-03-13T19:07:42+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-13:/beyond-the-lsb.html</id><summary type="html">&lt;p&gt;If we truncate a number, that is to throw away the LSBs (least significant bits) we loose resolution.&lt;/p&gt;
-&lt;p&gt;A 4 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;If we truncate a number, that is to throw away the LSBs (least significant bits) we loose resolution.&lt;/p&gt;
-&lt;p&gt;A 4 bit number truncated to 2 bits: &lt;em&gt;numbers shown in binary (Base2).&lt;/em&gt;   &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;0100&lt;/span&gt;
-&lt;span class="mf"&gt;0101&lt;/span&gt;
-&lt;span class="mf"&gt;0110&lt;/span&gt;
-&lt;span class="mf"&gt;0111&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Would all become 01.&lt;/p&gt;
-&lt;h1&gt;Introducing Dither&lt;/h1&gt;
-&lt;p&gt;Effective dithering increase the accuracy beyond the LSB of the truncated values. 
-Consider a small fractional value rounded to an integer. Starting with 0.5 with 1 bit random dither:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Input  Dither Sum &amp;amp; truncate
-00.1   0.1    01
-00.1   0.0    00
-00.1   0.1    01
-00.1   0.0    00
-Average over 4 samples is 0.5
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;If the value is below 0.5 this dither scheme will not work, as it would never
-round to a full integer.&lt;/p&gt;
-&lt;p&gt;So we increase the dither to 2 bits. Inputting a constant 0.25, Dither cycling
-through all possible values&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Input  Dither Sum &amp;amp; truncate
-00.01  0.00   00
-00.01  0.01   00
-00.01  0.10   00
-00.01  0.11   01
-Average of 4 Samples 0.25
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;In the above example we have increased the resolution of the time averaged value
-by 2 bits.&lt;/p&gt;
-&lt;p&gt;For every doubling of the frequency we gain an effective LSB if dithered correctly.
-Adding more bits than &lt;code&gt;log2(oversampling rate)&lt;/code&gt; of dithering will not gain accuracy.
-Although it may help breakup tonal behaviour of a system.&lt;/p&gt;
-&lt;h2&gt;Summary&lt;/h2&gt;
-&lt;p&gt;Apply dither to the bits to be truncated. Apply enough bits of dither so it is
-possible for the LSB of the required resolution to effect the truncated value.&lt;/p&gt;
-&lt;p&gt;The increase in resolution is limited to &lt;code&gt;log2(oversampling rate)&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Further Reading:&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.ece.rochester.edu/courses/ECE472/resources/Papers/Lipshitz_1992.pdf"&gt;Quanatization and Dither: A Theoretical Survey. LIPSHITZ, WANNAMAKER and VANDERKOOY&lt;/a&gt;  &lt;/p&gt;
-&lt;p&gt;&lt;a href="http://drewdaniels.com/dither.pdf"&gt;Resolution Below the Least Significant Bit in Digital Systems with Dither. VANDERKOOY and LIPSHITZ&lt;/a&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="LFSR"></category><category term="Random"></category></entry><entry><title>"Spicy Chocolate Cake"</title><link href="http://lizard-spock.co.uk/spicy-chocolate-cake.html" rel="alternate"></link><published>2014-03-08T09:12:04+00:00</published><updated>2014-03-08T09:12:04+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-08:/spicy-chocolate-cake.html</id><summary type="html">&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5189.jpg"&gt;&lt;/p&gt;
-&lt;!-- more --&gt;
-
-&lt;h2&gt;Ingredients&lt;/h2&gt;
-&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5125.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;That is Ginger not stem ginger pictured&lt;/strong&gt;, it works, but stem ginger is much better.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="nx"&gt;Dark&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;choclate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Shavings&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;for …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5189.jpg"&gt;&lt;/p&gt;
-&lt;!-- more --&gt;
-
-&lt;h2&gt;Ingredients&lt;/h2&gt;
-&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5125.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;That is Ginger not stem ginger pictured&lt;/strong&gt;, it works, but stem ginger is much better.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="nx"&gt;Dark&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;choclate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Shavings&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;topping&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;ml&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;Espresso&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;ball&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Stem&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Ginger&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;large&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Eggs&lt;/span&gt;
-&lt;span class="mi"&gt;175&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="k"&gt;Self&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Raising&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Flour&lt;/span&gt;
-&lt;span class="mi"&gt;250&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nx"&gt;Golden&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Caster&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Sugar&lt;/span&gt;
-&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nx"&gt;Cocoa&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Powder&lt;/span&gt;
-&lt;span class="mi"&gt;150&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;ml&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;Butter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;milk&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;tsp&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nx"&gt;Coffee&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Essence&lt;/span&gt;
-&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;tsp&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nx"&gt;Baking&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Powder&lt;/span&gt;
-&lt;span class="mi"&gt;120&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nx"&gt;Unsalted&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Butter&lt;/span&gt;
-&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nx"&gt;Unsalted&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Butter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;greasing&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="mi"&gt;260&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nx"&gt;Icing&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Sugar&lt;/span&gt;
-&lt;span class="mi"&gt;120&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;ml&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;Vegatble&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Oil&lt;/span&gt;
-
-&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nx"&gt;Unsalted&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Butter&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Pre-heat oven to 180 Degrees. Grease with unsalted butter 2 20cm/8inch cake tins, line base with grease proof paper.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;250&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="kr"&gt;Go&lt;/span&gt;&lt;span class="n"&gt;lden&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Caster&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Sugar&lt;/span&gt;
-&lt;span class="mf"&gt;120&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ml&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Vegatble&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Oil&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;large&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Eggs&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Whisk golden caster sugar, vegetable Oil and eggs. &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;150&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ml&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Butter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;milk&lt;/span&gt;
-&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ml&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Espresso&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Once pale and fluffy add butter milk and espresso, whisk again.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;175&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;Self&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Raising&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Flour&lt;/span&gt;
-&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;60&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;Cocoa&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Powder&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Slowly add self raising flour and cocoa powder, mixing and folding until well combined.&lt;/p&gt;
-&lt;p&gt;Add equally into the prepared cake tins, Bake for around 20 minutes, until golden and risen.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5157-Edit.jpg"&gt;
-&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5180.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;Leave cakes to cool in tins for about 10 minutes than transfer to rack to cool completely.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  1 ball  Stem Ginger
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Finely chop stem ginger&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;120&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;Unsalted&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Butter&lt;/span&gt;
-&lt;span class="mf"&gt;260&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;Icing&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Sugar&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5132.jpg"&gt;
-&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5148.jpg"&gt;
-&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5150.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;Add butter to large bowl and whisk until smooth (about 1 minute). &lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5174.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;Gradually add the icing sugar, whisk until light an fluffy.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  2 tsp   Coffee Essence
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Added chopped stem ginger and coffee essence to bowl and whisk until mixed (30 seconds).&lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5183.jpg"&gt;
-&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5185.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;Place one cake on plate, then spread with two thirds of the icing. Add second layer of
-cake and cover with remaining icing. Top with cocoa powder or dark chocolate shavings.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5189.jpg"&gt;&lt;/p&gt;</content><category term="Cooking"></category><category term="Recipe"></category><category term="Cake"></category><category term="Dessert"></category></entry><entry><title>"Matlab Function Outputs"</title><link href="http://lizard-spock.co.uk/matlab-function-outputs.html" rel="alternate"></link><published>2014-03-08T08:02:27+00:00</published><updated>2014-03-08T08:02:27+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-08:/matlab-function-outputs.html</id><summary type="html">&lt;p&gt;Handling functions with extraneous leading outputs. For example:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="err"&gt; [&lt;/span&gt;&lt;span class="nf"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dummy_function&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="n"&gt;endfunction&lt;/span&gt;
-
-
-&lt;span class="s"&gt;[a,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;b]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dummy_function …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Handling functions with extraneous leading outputs. For example:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="err"&gt; [&lt;/span&gt;&lt;span class="nf"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dummy_function&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="n"&gt;endfunction&lt;/span&gt;
-
-
-&lt;span class="s"&gt;[a,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;b]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dummy_function&lt;/span&gt;
-
-&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;
-
-&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;If &lt;code&gt;a&lt;/code&gt; is not required it can be replaced with a tilda &lt;code&gt;~&lt;/code&gt;.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;[~, b] = dummy_function
-
-b =
-    20
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category><category term="Programming"></category></entry></feed>
+&lt;p&gt;&lt;em&gt;Note: The use of &lt;a href="http://semver.org/"&gt;major.minor.patch Semantic Versioning&lt;/a&gt; is a really good idea.&lt;/em&gt;&lt;/p&gt;</content><category term="Tech"></category><category term="Git"></category></entry></feed>
