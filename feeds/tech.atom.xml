@@ -1,5 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Tech</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/tech.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2025-05-31T10:11:00+01:00</updated><entry><title>Book: Mastering the command line</title><link href="http://lizard-spock.co.uk/book-mastering-the-command-line.html" rel="alternate"></link><published>2025-05-31T10:11:00+01:00</published><updated>2025-05-31T10:11:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-05-31:/book-mastering-the-command-line.html</id><summary type="html">&lt;!--to publish change draft to published--&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Tech</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/tech.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2025-09-06T13:19:00+01:00</updated><entry><title>Command Line Disk Usage</title><link href="http://lizard-spock.co.uk/command-line-disk-usage.html" rel="alternate"></link><published>2025-09-06T13:19:00+01:00</published><updated>2025-09-06T13:19:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-09-06:/command-line-disk-usage.html</id><summary type="html">&lt;h1&gt;NCurses Disk Usage&lt;/h1&gt;
+&lt;p&gt;A useful Command Line Iterface (CLI) for exploring disk usage:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ncdu
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Example output.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ncdu 2.9.1 …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;h1&gt;NCurses Disk Usage&lt;/h1&gt;
+&lt;p&gt;A useful Command Line Iterface (CLI) for exploring disk usage:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ncdu
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Example output.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ncdu 2.9.1 ~ Use the arrow keys to navigate, press ? for help
+--- ... github.io --------------------------
+  115.6 MiB [##################] /venv
+   59.7 MiB [#########         ] /output
+   47.6 MiB [#######           ] /.git
+   46.1 MiB [#######           ] /content
+    8.0 KiB [                  ]  .DS_Store
+    8.0 KiB [                  ]  tasks.py
+    8.0 KiB [                  ] /__pycache__
+    4.0 KiB [                  ]  Makefile
+    4.0 KiB [                  ]  readme.md
+    4.0 KiB [                  ]  pelicanconf.py
+    4.0 KiB [                  ]  python_search_category.py
+    4.0 KiB [                  ]  python_search_and_replace.py
+    4.0 KiB [                  ]  create_new_post.py
+    4.0 KiB [                  ]  publishconf.py
+    4.0 KiB [                  ]  .gitignore
+    4.0 KiB [                  ]  CNAME
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If you are using MacOS then &lt;a href="https://brew.sh"&gt;brew&lt;/a&gt; can be used to install:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;brew install ncdu
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h1&gt;Disk Usage&lt;/h1&gt;
+&lt;p&gt;The disk usage tool &lt;code&gt;du&lt;/code&gt; is a simpler non interactive way of listing file sizes.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;du -h -d 1
+  60M   ./output
+  46M   ./content
+ 8.0K   ./__pycache__
+ 116M   ./venv
+  48M   ./.git
+ 313M   .
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;-h&lt;/code&gt; gives human readable output, ie sizes in k, M, G TBytes.&lt;br&gt;
+thr &lt;code&gt;-d 1&lt;/code&gt; on MacOS limits listing to 1 directory deep. &lt;code&gt;-s&lt;/code&gt;can be used to summarise the requested directory.&lt;/p&gt;
+&lt;h1&gt;Tree&lt;/h1&gt;
+&lt;p&gt;Another alternative is to use &lt;code&gt;tree&lt;/code&gt; to list folde contents with the &lt;code&gt;-h&lt;/code&gt;option to give human readable file sizes.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;tree -L 1 -h
+[ 608]  .
+├── [ 128]  __pycache__
+├── [  19]  CNAME
+├── [ 224]  content
+├── [1.2K]  create_new_post.py
+├── [2.8K]  Makefile
+├── [ 28K]  output
+├── [2.1K]  pelicanconf.py
+├── [ 528]  publishconf.py
+├── [1.3K]  python_search_and_replace.py
+├── [1.7K]  python_search_category.py
+├── [2.2K]  readme.md
+├── [4.1K]  tasks.py
+├── [ 224]  venv
+└── [ 224]  venv_old
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;MacOs install tree with &lt;a href="https://brew.sh"&gt;brew&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;brew install tree
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="python"></category></entry><entry><title>Book: Mastering the command line</title><link href="http://lizard-spock.co.uk/book-mastering-the-command-line.html" rel="alternate"></link><published>2025-05-31T10:11:00+01:00</published><updated>2025-05-31T10:11:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-05-31:/book-mastering-the-command-line.html</id><summary type="html">&lt;!--to publish change draft to published--&gt;
 
 &lt;p&gt;&lt;a href="https://leanpub.com/masteringcli"&gt;Mastering the command line like a hacker by Xiaodong Xu&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;The book focuses on bash and zsh, which is great …&lt;/p&gt;</summary><content type="html">&lt;!--to publish change draft to published--&gt;
@@ -2034,24 +2105,4 @@ highlight clear SpellBad
 highlight SpellBad cterm=underline 
 &amp;quot; GVIM/MVIM squiggle underline &amp;quot;
 highlight SpellBad gui=undercurl
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="Vim"></category></entry><entry><title>"Get snipMate working, a #vim plugin"</title><link href="//191/Get_snipMate_working%2C_a_%23vim_plugin" rel="alternate"></link><published>2012-09-05T00:45:31+01:00</published><updated>2012-09-05T00:45:31+01:00</updated><author><name>morganp</name></author><id>tag:191,2012-09-05:/Get_snipMate_working%2C_a_%23vim_plugin</id><summary type="html">&lt;p&gt;&lt;a href="http://www.vim.org/scripts/script.php?script_id=2540"&gt;snipMate&lt;/a&gt; is a useful vim plugin which allows short cuts like for'tab' to be set up which will insert the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://www.vim.org/scripts/script.php?script_id=2540"&gt;snipMate&lt;/a&gt; is a useful vim plugin which allows short cuts like for'tab' to be set up which will insert the snippet:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="c1"&gt;; i &amp;lt; count; i++) {&lt;/span&gt;
-
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;To install you just have to download the the zip file from &lt;a href="http://www.vim.org/scripts/script.php?script_id=2540"&gt;snipMate&lt;/a&gt; and copy the files into your vim folder (~/.vim).&lt;/p&gt;
-&lt;p&gt;Make sure you have this in your .vimrc file&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;filetype&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;plugin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;I still could not get tab completion to work. running &lt;code&gt;:scriptnames&lt;/code&gt; inside vim will list the files it has loaded and should include:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;plugin/snipMate.vim
-after/plugin/snipMate.vim
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;On my first install the plugin/snipMate.vim was not executable and therefore the after/plugin/snipMate.vim did not get loaded.&lt;/p&gt;
-&lt;h2&gt;The Fix&lt;/h2&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;cd ~/.vim 
-chmod ugo+x plugin/snipMate.vim
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="Programming"></category><category term="Vim"></category></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"></category><category term="Vim"></category></entry></feed>
