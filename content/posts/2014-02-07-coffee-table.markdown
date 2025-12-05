@@ -4,7 +4,7 @@ title: "Coffee Table"
 date: 2014-02-07 21:18:14 +0000
 comments: true
 Category: Home
-Tags: DIY, Hardwood, Woodwork,
+Tags: DIY, Hardwood, Woodwork
 ---
 
 In 2007 I built our coffee table from 2.5" thick Elm purchased from [Lanarkshire Hardwoods](http://www.lanarkshirehardwoods.co.uk/).

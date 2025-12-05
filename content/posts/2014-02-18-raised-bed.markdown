@@ -4,7 +4,7 @@ title: "Raised Bed"
 date: 2014-02-18 18:58:30 +0000
 comments: true
 Category: Home
-tags: DIY, Kitchen Garden,
+tags: DIY, Kitchen Garden, Woodwork
 ---
 
 Putting together my first raised bed, 8 foot by 2 foot, 1 plank high.

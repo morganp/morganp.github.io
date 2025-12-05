@@ -75,3 +75,4 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 DEFAULT_PAGINATION = False
+PAGINATED_TEMPLATES = {'index': 10, 'tag': None, 'category': None, 'author': None}

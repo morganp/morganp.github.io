@@ -4,7 +4,7 @@ title: "Chandelier"
 date: 2014-02-06 20:29:49 +0000
 comments: true
 Category: Home
-tags: DIY,
+tags: DIY, Woodwork
 ---
 A new feature in the dining room.
 

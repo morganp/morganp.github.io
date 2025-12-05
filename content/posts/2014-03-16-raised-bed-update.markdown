@@ -4,7 +4,7 @@ title: "Raised Bed, Update"
 date: 2014-03-16 21:36:59 +0000
 comments: true
 Category: Home
-tags: DIY, Kitchen Garden,
+tags: DIY, Kitchen Garden, Woodwork
 ---
 
 Update to the raised beds. Delivery of top soil:
