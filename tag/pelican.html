@@ -73,7 +73,14 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 
 <h3>Using it in a post</h3>
 <p>Write a fenced code block with the language set to <code>mermaid</code> or <code>dot</code>:</p>
-<div class="highlight"><pre><span></span><code>![<span class="nt">FSM diagram</span>](<span class="na">{static}/images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg</span>)
+<div class="highlight"><pre><span></span><code><span class="sb">```mermaid</span>
+<span class="s">stateDiagram-v2</span>
+<span class="s">    [*] --&gt; Idle</span>
+<span class="s">    Idle --&gt; Running : start</span>
+<span class="s">    Running --&gt; Idle : stop</span>
+<span class="s">    Running --&gt; Error : fault</span>
+<span class="s">    Error --&gt; Idle : reset</span>
+<span class="sb">```</span>
 </code></pre></div>
 
 <p>At build time this becomes an SVG embedded in the page:</p>
