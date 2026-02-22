@@ -109,66 +109,101 @@ curl<span class="w"> </span>-o<span class="w"> </span>~/.claude/skills/fsm/SKILL
 ln<span class="w"> </span>-s<span class="w"> </span>~/dotfiles/config/claude/skills/fsm<span class="w"> </span>~/.claude/skills/fsm
 </code></pre></div>
 
-<h2>Mermaid stateDiagram-v2 quick reference</h2>
+<h2>Syntax quick reference</h2>
+<p>Both formats can express the same FSM concepts, but use different syntax. The table below maps them side by side.</p>
 <table>
 <thead>
 <tr>
-<th>Syntax</th>
-<th>Meaning</th>
+<th>Concept</th>
+<th>Mermaid <code>stateDiagram-v2</code></th>
+<th>Graphviz DOT</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>[*] --&gt; State</code></td>
-<td>Initial transition</td>
+<td>Graph declaration</td>
+<td><code>stateDiagram-v2</code></td>
+<td><code>digraph FSM { ... }</code></td>
 </tr>
 <tr>
-<td><code>State --&gt; [*]</code></td>
-<td>Final transition</td>
+<td>Default node style</td>
+<td>automatic</td>
+<td><code>node [shape=circle]</code></td>
 </tr>
 <tr>
-<td><code>A --&gt; B : event</code></td>
-<td>Transition with event label</td>
-</tr>
-<tr>
-<td><code>A --&gt; B : event / action()</code></td>
-<td>Transition with action</td>
-</tr>
-<tr>
-<td><code>A --&gt; B : [guard]</code></td>
-<td>Guarded transition</td>
-</tr>
-<tr>
-<td><code>state "Label" as Name</code></td>
-<td>State with display label</td>
-</tr>
-<tr>
-<td><code>state S { ... }</code></td>
-<td>Composite (nested) state</td>
-</tr>
-<tr>
-<td><code>state C &lt;&lt;choice&gt;&gt;</code></td>
-<td>Choice pseudostate</td>
-</tr>
-<tr>
-<td><code>state F &lt;&lt;fork&gt;&gt;</code></td>
-<td>Fork pseudostate</td>
-</tr>
-<tr>
-<td><code>state J &lt;&lt;join&gt;&gt;</code></td>
-<td>Join pseudostate</td>
-</tr>
-<tr>
-<td><code>--</code> inside composite</td>
-<td>Concurrent regions</td>
-</tr>
-<tr>
-<td><code>direction LR</code></td>
 <td>Left-to-right layout</td>
+<td><code>direction LR</code></td>
+<td><code>rankdir=LR</code></td>
 </tr>
 <tr>
-<td><code>%% comment</code></td>
 <td>Comment</td>
+<td><code>%% comment</code></td>
+<td><code>// comment</code></td>
+</tr>
+<tr>
+<td>Plain state</td>
+<td><code>StateName</code></td>
+<td><code>StateName</code></td>
+</tr>
+<tr>
+<td>State with display label</td>
+<td><code>state "Label" as Name</code></td>
+<td><code>Name [label="Label"]</code></td>
+</tr>
+<tr>
+<td>Initial pseudostate</td>
+<td><code>[*] --&gt; State</code></td>
+<td><code>__start [shape=point width=0.2]</code> + <code>__start -&gt; State</code></td>
+</tr>
+<tr>
+<td>Final/accepting state</td>
+<td><code>State --&gt; [*]</code></td>
+<td><code>State [shape=doublecircle]</code></td>
+</tr>
+<tr>
+<td>Transition</td>
+<td><code>A --&gt; B</code></td>
+<td><code>A -&gt; B</code></td>
+</tr>
+<tr>
+<td>Transition with event</td>
+<td><code>A --&gt; B : event</code></td>
+<td><code>A -&gt; B [label="event"]</code></td>
+</tr>
+<tr>
+<td>Transition with action</td>
+<td><code>A --&gt; B : event / action()</code></td>
+<td><code>A -&gt; B [label="event / action()"]</code></td>
+</tr>
+<tr>
+<td>Guarded transition</td>
+<td><code>A --&gt; B : [guard]</code></td>
+<td><code>A -&gt; B [label="[guard]"]</code></td>
+</tr>
+<tr>
+<td>Composite (nested) state</td>
+<td><code>state S { ... }</code></td>
+<td><code>subgraph cluster_S { ... }</code></td>
+</tr>
+<tr>
+<td>Choice pseudostate</td>
+<td><code>state C &lt;&lt;choice&gt;&gt;</code></td>
+<td><code>C [shape=diamond]</code></td>
+</tr>
+<tr>
+<td>Fork pseudostate</td>
+<td><code>state F &lt;&lt;fork&gt;&gt;</code></td>
+<td>invisible node + multiple outgoing edges</td>
+</tr>
+<tr>
+<td>Join pseudostate</td>
+<td><code>state J &lt;&lt;join&gt;&gt;</code></td>
+<td>invisible node + multiple incoming edges</td>
+</tr>
+<tr>
+<td>Concurrent regions</td>
+<td><code>--</code> inside composite</td>
+<td>parallel <code>subgraph</code> blocks</td>
 </tr>
 </tbody>
 </table>
