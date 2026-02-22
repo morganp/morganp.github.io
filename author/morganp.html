@@ -25,7 +25,57 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../top-museums-for-families.html">Top Museums for Families</a></h1>
+                        <h1 class="entry-title"><a href="../verilog-lint-skill-for-claude-code.html">Verilog Lint Skill for Claude Code</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-02-22T12:00:00+00:00">
+                Published: Sun 22 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/verilog.html">verilog</a> <a href="../tag/systemverilog.html">systemverilog</a> <a href="../tag/rtl.html">rtl</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/hardware.html">hardware</a> <a href="../tag/linting.html">linting</a> </p>        
+</footer><!-- /.post-info --><p>I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code generation and linting. Writing Verilog by hand is tedious; having Claude generate it and immediately validate it with real tools closes that gap nicely.</p>
+<h2>What it does</h2>
+<p>The skill connects two open-source linters into an agentic write → lint → fix → re-lint loop:</p>
+<ul>
+<li><strong>Verilator</strong> (<code>--lint-only -Wall</code>) catches semantic errors: undeclared signals, bit-width mismatches, blocking assignments in <code>always_ff</code> blocks, multi-driven nets</li>
+<li><strong>Verible</strong> (<code>verible-verilog-lint</code>) enforces style: naming conventions, whitespace, port alignment, <code>always_ff</code>/<code>always_comb</code> discipline</li>
+</ul>
+<p>When Claude generates RTL, the skill automatically:</p>
+<ol>
+<li>Writes the code to a temp file</li>
+<li>Runs both linters</li>
+<li>Parses error messages with line numbers</li>
+<li>Applies fixes and re-lints — up to 3 times</li>
+<li>Reports clean status or surfaces a diagnostic table if errors remain</li>
+</ol>
+<h2>Why two tools</h2>
+<p>They complement each other. Verilator thinks like a synthesizer — it catches things that will fail elaboration or produce incorrect silicon. Verible doesn't simulate; it reads the source and checks against Google's SystemVerilog style guide. Together they cover both "will this work" and "is this readable".</p>
+<h2>Both are free and open source</h2>
+<ul>
+<li>Verilator: <code>brew install verilator</code> / <code>apt install verilator</code></li>
+<li>Verible: <code>brew tap chipsalliance/verible &amp;&amp; brew install verible</code> (macOS), or grab a binary from the <a href="https://github.com/chipsalliance/verible/releases">GitHub releases page</a></li>
+</ul>
+<h2>RTL patterns baked in</h2>
+<p>The skill includes reference patterns for mistake-free SystemVerilog: synchronous-reset flip-flops, <code>always_comb</code> combinational blocks, parameterized FSMs with <code>typedef enum</code>. Claude defaults to these when generating new modules, which avoids most of the common lint warnings before the first pass even runs.</p>
+<h2>Same pattern as WaveDrom</h2>
+<p>This follows the same skill format as the <a href="../drafts/wavedrom-timing-diagram-test.html">WaveDrom timing diagram skill</a> — a <code>SKILL.md</code> file that gives Claude structured instructions, reference tables, and workflow steps. Both skills live in <code>~/.claude/skills/</code> and are picked up automatically by Claude Code.</p>
+<p>The combination is handy for hardware work: describe a protocol, get a timing diagram, then generate and lint the RTL that implements it.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../top-museums-for-families.html" rel="bookmark"
+                               title="Permalink to Top Museums for Families">Top Museums for Families</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2025-12-05T15:06:00+00:00">
                 Published: Fri 05 December 2025
@@ -36,17 +86,15 @@
                 </address>
         <p>In <a href="../category/outdoor.html">Outdoor</a>.</p>
 <p>tags: <a href="../tag/family.html">Family</a> </p>        
-</footer><!-- /.post-info --><p><a href="https://www.beamish.org.uk/">Beamish</a></p>
+</footer><!-- /.post-info -->                        <p><a href="https://www.beamish.org.uk/">Beamish</a></p>
 <p><a href="https://www.life.org.uk">Life Science Centre</a></p>
 <p><a href="https://play.eureka.org.uk/">Eureka: Children’s Museum</a>
 <a href="https://discover.eureka.org.uk/">Eureka: Science Museum</a></p>
 <p><a href="https://edencamp.co.uk">Eden Camp</a></p>
-<p><a href="https://dynamicearth.org.uk">Dynamic Earth</a></p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+<p><a href="https://dynamicearth.org.uk">Dynamic Earth</a></p>
+                        <a class="readmore" href="../top-museums-for-families.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>

@@ -4,7 +4,7 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Lizard-Spock - Verilog</title>
+                        <title>Lizard-Spock - verilog</title>
                         <link rel="stylesheet" href="../theme/css/main.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
         </head>
@@ -25,7 +25,57 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../systemverilog-rtl-types.html">"SystemVerilog: RTL Types"</a></h1>
+                        <h1 class="entry-title"><a href="../verilog-lint-skill-for-claude-code.html">Verilog Lint Skill for Claude Code</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-02-22T12:00:00+00:00">
+                Published: Sun 22 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/verilog.html">verilog</a> <a href="../tag/systemverilog.html">systemverilog</a> <a href="../tag/rtl.html">rtl</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/hardware.html">hardware</a> <a href="../tag/linting.html">linting</a> </p>        
+</footer><!-- /.post-info --><p>I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code generation and linting. Writing Verilog by hand is tedious; having Claude generate it and immediately validate it with real tools closes that gap nicely.</p>
+<h2>What it does</h2>
+<p>The skill connects two open-source linters into an agentic write → lint → fix → re-lint loop:</p>
+<ul>
+<li><strong>Verilator</strong> (<code>--lint-only -Wall</code>) catches semantic errors: undeclared signals, bit-width mismatches, blocking assignments in <code>always_ff</code> blocks, multi-driven nets</li>
+<li><strong>Verible</strong> (<code>verible-verilog-lint</code>) enforces style: naming conventions, whitespace, port alignment, <code>always_ff</code>/<code>always_comb</code> discipline</li>
+</ul>
+<p>When Claude generates RTL, the skill automatically:</p>
+<ol>
+<li>Writes the code to a temp file</li>
+<li>Runs both linters</li>
+<li>Parses error messages with line numbers</li>
+<li>Applies fixes and re-lints — up to 3 times</li>
+<li>Reports clean status or surfaces a diagnostic table if errors remain</li>
+</ol>
+<h2>Why two tools</h2>
+<p>They complement each other. Verilator thinks like a synthesizer — it catches things that will fail elaboration or produce incorrect silicon. Verible doesn't simulate; it reads the source and checks against Google's SystemVerilog style guide. Together they cover both "will this work" and "is this readable".</p>
+<h2>Both are free and open source</h2>
+<ul>
+<li>Verilator: <code>brew install verilator</code> / <code>apt install verilator</code></li>
+<li>Verible: <code>brew tap chipsalliance/verible &amp;&amp; brew install verible</code> (macOS), or grab a binary from the <a href="https://github.com/chipsalliance/verible/releases">GitHub releases page</a></li>
+</ul>
+<h2>RTL patterns baked in</h2>
+<p>The skill includes reference patterns for mistake-free SystemVerilog: synchronous-reset flip-flops, <code>always_comb</code> combinational blocks, parameterized FSMs with <code>typedef enum</code>. Claude defaults to these when generating new modules, which avoids most of the common lint warnings before the first pass even runs.</p>
+<h2>Same pattern as WaveDrom</h2>
+<p>This follows the same skill format as the <a href="../drafts/wavedrom-timing-diagram-test.html">WaveDrom timing diagram skill</a> — a <code>SKILL.md</code> file that gives Claude structured instructions, reference tables, and workflow steps. Both skills live in <code>~/.claude/skills/</code> and are picked up automatically by Claude Code.</p>
+<p>The combination is handy for hardware work: describe a protocol, get a timing diagram, then generate and lint the RTL that implements it.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../systemverilog-rtl-types.html" rel="bookmark"
+                               title="Permalink to "SystemVerilog: RTL Types"">"SystemVerilog: RTL Types"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2015-03-26T20:08:34+00:00">
                 Published: Thu 26 March 2015
@@ -36,45 +86,10 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/verilog.html">Verilog</a> <a href="../tag/programming.html">Programming</a> </p>        
-</footer><!-- /.post-info --><p><code>reg</code> and <code>wire</code> were the original synthesisable types. Wires are constantly assigned and regs are evaluated at particular points, the advantage here is for the simulator to make optimisations.</p>
-<div class="highlight"><pre><span></span><code><span class="kt">wire</span><span class="w"> </span><span class="n">w_data</span><span class="p">;</span>
-<span class="k">assign</span><span class="w"> </span><span class="n">w_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
-
-<span class="c1">// Same function as above using reg</span>
-<span class="kt">reg</span><span class="w"> </span><span class="n">r_data</span><span class="p">;</span>
-<span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="o">*</span><span class="w"> </span>
-<span class="w">  </span><span class="n">r_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">;</span>
-</code></pre></div>
-
-<p>A common mistake when learning Verilog is to assume the reg type implies a register in hardware. The earlier optimisation for the simulator can be done through the context of its usage.</p>
-<p>This introduces <code>logic</code> which can be used in place of wire and reg.</p>
-<div class="highlight"><pre><span></span><code><span class="kt">logic</span><span class="w">  </span><span class="n">w_data</span><span class="p">;</span>
-<span class="k">assign</span><span class="w"> </span><span class="n">w_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
-
-<span class="c1">// Same function as above using reg</span>
-<span class="kt">logic</span><span class="w"> </span><span class="n">r_data</span><span class="p">;</span>
-<span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="o">*</span><span class="w"> </span>
-<span class="w">  </span><span class="n">r_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">;</span>
-</code></pre></div>
-
-<p>The type <code>bit</code> and <code>byte</code> have also been created that can only hold 2 states 0 or 1 no x or z. <code>byte</code> implies <code>bit [7:0]</code>. Using these types offers a small speed improvement but I would recommend not using them in RTL as your verification may miss uninitialized values or critical resets.</p>
-<p>The usage of <code>bit</code> and <code>byte</code> would be more common in testbench components, but can lead to issues in case of having to drive x's to stimulate data corruption and recovery.</p>
-<hr>
-<p><strong>Update</strong></p>
-<p>At the time of writing I was under the impression that <code>logic</code> could not be used for tristate, I am unable to find the original paper that I based this on. Until further updates, comments or edits, I revoke my assertion that <em>logic can not be used to create tri-state lines</em>.</p>
-<hr>
-<p>The <code>tri</code> type has been added, for explicitly defining a tri-state line. It is based on the properties of a <code>wire</code>, <code>logic</code> is based on the properties of a <code>reg</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="kt">tri</span><span class="w"> </span><span class="n">t_data</span><span class="p">;</span>
-<span class="k">assign</span><span class="w"> </span><span class="n">t_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">drive</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">1</span><span class="p">&#39;</span><span class="n">bz</span><span class="w"> </span><span class="p">;</span>
-</code></pre></div>
-
-<p>If you no longer have to support backwards compatibility Verilog then I would recommend switching to using <code>logic</code> and <code>tri</code>. Using <code>logic</code> aids re-factoring and and <code>tri</code>  reflects the design intent of a tristate line.</p>
-<p>Originally posted as a<a href="http://stackoverflow.com/a/13285242/97073"> SO answer</a>.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p><code>reg</code> and <code>wire</code> were the original synthesisable types. Wires are constantly assigned and regs are evaluated at particular points, the …</p>
+                        <a class="readmore" href="../systemverilog-rtl-types.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
