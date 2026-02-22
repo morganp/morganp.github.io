@@ -1,5 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Engineering</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-02-22T12:00:00+00:00</updated><entry><title>Verilog Lint Skill for Claude Code</title><link href="http://lizard-spock.co.uk/verilog-lint-skill-for-claude-code.html" rel="alternate"></link><published>2026-02-22T12:00:00+00:00</published><updated>2026-02-22T12:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-02-22:/verilog-lint-skill-for-claude-code.html</id><summary type="html">&lt;p&gt;I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code generation and linting. Writing Verilog by hand is tedious; having Claude generate it and immediately validate it with real tools closes that gap nicely.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Engineering</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-02-22T18:00:00+00:00</updated><entry><title>FSM Diagrams in Pelican and Claude Code</title><link href="http://lizard-spock.co.uk/fsm-diagrams-in-pelican-and-claude-code.html" rel="alternate"></link><published>2026-02-22T18:00:00+00:00</published><updated>2026-02-22T18:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-02-22:/fsm-diagrams-in-pelican-and-claude-code.html</id><summary type="html">&lt;p&gt;Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious. This post covers two tools I've built: a Pelican plugin that renders FSM diagrams at build time so they appear as images in published posts, and a Claude Code skill that generates diagrams from plain-English descriptions.&lt;/p&gt;
+&lt;p&gt;The pattern is identical to the &lt;a href="http://lizard-spock.co.uk/wavedrom-timing-diagrams-in-pelican-with-claude-code.html"&gt;WaveDrom plugin and skill&lt;/a&gt;: describe what you want, get a fenced code block, paste it into a post, and the build renders it to SVG automatically.&lt;/p&gt;
+&lt;h2&gt;The Pelican plugin&lt;/h2&gt;
+&lt;p&gt;The plugin is at &lt;a href="https://github.com/morganp/pelican-fsm"&gt;github.com/morganp/pelican-fsm&lt;/a&gt;, cloned to &lt;code&gt;~/Code/pelican-fsm&lt;/code&gt; (a sibling directory to the blog repo). It intercepts fenced &lt;code&gt;```mermaid ```&lt;/code&gt; and &lt;code&gt;```dot ```&lt;/code&gt; code blocks before Pelican's standard Markdown processing, renders each one to an SVG using the appropriate CLI tool, caches the result by content hash in &lt;code&gt;content/images/fsm/&lt;/code&gt;, and replaces the block with a standard image reference. Pelican then copies the SVG to &lt;code&gt;output/images/fsm/&lt;/code&gt; as a static asset.&lt;/p&gt;
+&lt;p&gt;SVGs are cached across builds, so only diagrams whose source has changed are re-rendered.&lt;/p&gt;
+&lt;h3&gt;Requirements&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid-cli"&gt;Mermaid CLI&lt;/a&gt; for &lt;code&gt;mermaid&lt;/code&gt; blocks:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;npm&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-g&lt;span class="w"&gt; &lt;/span&gt;@mermaid-js/mermaid-cli
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://graphviz.org/"&gt;Graphviz&lt;/a&gt; for &lt;code&gt;dot&lt;/code&gt; blocks:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;brew&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;graphviz&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="c1"&gt;# macOS&lt;/span&gt;
+sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;graphviz&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;# Debian/Ubuntu&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Both tools are optional. If one is missing, blocks for that type fall back gracefully to a fenced &lt;code&gt;text&lt;/code&gt; block without failing the build.&lt;/p&gt;
+&lt;h3&gt;Installation&lt;/h3&gt;
+&lt;p&gt;Clone the plugin alongside your Pelican project and install it into the Pelican virtualenv in editable mode:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;https://github.com/morganp/pelican-fsm&lt;span class="w"&gt; &lt;/span&gt;../pelican-fsm
+&lt;span class="nb"&gt;source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;venv/bin/activate
+pip&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-e&lt;span class="w"&gt; &lt;/span&gt;../pelican-fsm&lt;span class="w"&gt; &lt;/span&gt;--config-settings&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;editable_mode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;compat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;editable_mode=compat&lt;/code&gt; flag is required. Without it, modern setuptools editable installs use a path-hook mechanism that prevents Pelican's namespace plugin auto-discovery from finding the plugin.&lt;/p&gt;
+&lt;p&gt;Pelican 4.5+ auto-discovers namespace plugins, so no changes to &lt;code&gt;pelicanconf.py&lt;/code&gt; are needed.&lt;/p&gt;
+&lt;h3&gt;Optional config&lt;/h3&gt;
+&lt;p&gt;If &lt;code&gt;mmdc&lt;/code&gt; or &lt;code&gt;dot&lt;/code&gt; are not on your &lt;code&gt;PATH&lt;/code&gt; during the build, set their full paths in &lt;code&gt;pelicanconf.py&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;FSM_MERMAID_CLI&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/opt/homebrew/bin/mmdc&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;FSM_DOT_CLI&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/opt/homebrew/bin/dot&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Using it in a post&lt;/h3&gt;
+&lt;p&gt;Write a fenced code block with the language set to &lt;code&gt;mermaid&lt;/code&gt; or &lt;code&gt;dot&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;![&lt;span class="nt"&gt;FSM diagram&lt;/span&gt;](&lt;span class="na"&gt;{static}/images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;At build time this becomes an SVG embedded in the page:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Graphviz DOT works the same way, and is a better fit for hardware and RTL documentation where the compact box-and-arrow style is conventional:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_d33619e8d6e9ae49f343c57a8f6db1e1.svg"&gt;&lt;/p&gt;
+&lt;p&gt;If the CLI is not found or rendering fails, the block falls back to fenced &lt;code&gt;text&lt;/code&gt; — the post still builds, you just see the raw source instead of a diagram.&lt;/p&gt;
+&lt;h2&gt;The Claude Code skill&lt;/h2&gt;
+&lt;p&gt;The skill lives at &lt;a href="https://github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm"&gt;github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm&lt;/a&gt;. Claude Code auto-discovers skills from &lt;code&gt;~/.claude/skills/&lt;/code&gt; and loads them on demand.&lt;/p&gt;
+&lt;p&gt;The skill triggers automatically when you describe anything involving states, transitions, or control flow: protocol implementations, UI flows, hardware FSMs, parsers, game logic. You describe the system in plain English and Claude generates the diagram.&lt;/p&gt;
+&lt;p&gt;The skill knows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Full Mermaid &lt;code&gt;stateDiagram-v2&lt;/code&gt; syntax: plain states, display labels, transitions with events/guards/actions, composite (nested) states, choice pseudostates, fork/join for parallel regions, concurrent regions (&lt;code&gt;--&lt;/code&gt;), notes, direction, and classDef styling&lt;/li&gt;
+&lt;li&gt;Graphviz DOT FSM conventions: Moore vs Mealy annotation, initial pseudostate arrow, accepting states as double circles&lt;/li&gt;
+&lt;li&gt;When to prefer each format: Mermaid for software/web docs, DOT for hardware/RTL&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Example workflow&lt;/h3&gt;
+&lt;p&gt;Describe the system:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;"Draw the states for a TCP connection"&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Claude produces:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_03bf39c43e71e98bd12e737558c3f9e3.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Because the skill outputs a &lt;code&gt;mermaid&lt;/code&gt; fenced block, you can paste it directly into a blog post and the Pelican plugin renders it automatically.&lt;/p&gt;
+&lt;h3&gt;Installing the skill&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mkdir&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;~/.claude/skills/fsm
+curl&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;~/.claude/skills/fsm/SKILL.md&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;https://raw.githubusercontent.com/morganp/dotfiles/main/config/claude/skills/fsm/SKILL.md
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Or clone the dotfiles repo and symlink:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;https://github.com/morganp/dotfiles&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles
+ln&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles/config/claude/skills/fsm&lt;span class="w"&gt; &lt;/span&gt;~/.claude/skills/fsm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Mermaid stateDiagram-v2 quick reference&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Syntax&lt;/th&gt;
+&lt;th&gt;Meaning&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;[*] --&amp;gt; State&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Initial transition&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;State --&amp;gt; [*]&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Final transition&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;A --&amp;gt; B : event&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Transition with event label&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;A --&amp;gt; B : event / action()&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Transition with action&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;A --&amp;gt; B : [guard]&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Guarded transition&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;state "Label" as Name&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;State with display label&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;state S { ... }&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Composite (nested) state&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;state C &amp;lt;&amp;lt;choice&amp;gt;&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Choice pseudostate&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;state F &amp;lt;&amp;lt;fork&amp;gt;&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Fork pseudostate&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;state J &amp;lt;&amp;lt;join&amp;gt;&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Join pseudostate&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--&lt;/code&gt; inside composite&lt;/td&gt;
+&lt;td&gt;Concurrent regions&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;direction LR&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Left-to-right layout&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;%% comment&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Comment&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;Project structure&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;~/&lt;/span&gt;&lt;span class="n"&gt;Code&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morganp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;github&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;io&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="w"&gt;              &lt;/span&gt;&lt;span class="c1"&gt;# blog source (main branch)&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;content&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;images&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;fsm&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;# SVG cache (persists across make clean)&lt;/span&gt;
+&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;pelican&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;fsm&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="w"&gt;                    &lt;/span&gt;&lt;span class="c1"&gt;# github.com/morganp/pelican-fsm&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;pelican&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;plugins&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;fsm_renderer&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="err"&gt;├──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;__init__&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="c1"&gt;# plugin entry point, signal registration&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;preprocessor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;# Markdown extension + preprocessor&lt;/span&gt;
+
+&lt;span class="o"&gt;~/.&lt;/span&gt;&lt;span class="n"&gt;claude&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;skills&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fsm&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;└──&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SKILL&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;md&lt;/span&gt;&lt;span class="w"&gt;                    &lt;/span&gt;&lt;span class="c1"&gt;# Claude Code skill definition&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The combination is useful for any documentation that involves control flow: describe the behaviour, get the diagram from Claude, drop it into a post, and the plugin renders it at build time. No manual editing of diagram syntax, no copy-pasting between browser tabs.&lt;/p&gt;</content><category term="Engineering"></category><category term="fsm"></category><category term="pelican"></category><category term="mermaid"></category><category term="graphviz"></category><category term="claude"></category><category term="ai"></category></entry><entry><title>Verilog Lint Skill for Claude Code</title><link href="http://lizard-spock.co.uk/verilog-lint-skill-for-claude-code.html" rel="alternate"></link><published>2026-02-22T12:00:00+00:00</published><updated>2026-02-22T12:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-02-22:/verilog-lint-skill-for-claude-code.html</id><summary type="html">&lt;p&gt;I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code generation and linting. Writing Verilog by hand is tedious; having Claude generate it and immediately validate it with real tools closes that gap nicely.&lt;/p&gt;
 &lt;h2&gt;What it does&lt;/h2&gt;
 &lt;p&gt;The skill connects two open-source linters into an agentic write → lint → fix → re-lint loop:&lt;/p&gt;
 &lt;ul&gt;

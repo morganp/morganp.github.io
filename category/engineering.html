@@ -25,7 +25,181 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../verilog-lint-skill-for-claude-code.html">Verilog Lint Skill for Claude Code</a></h1>
+                        <h1 class="entry-title"><a href="../fsm-diagrams-in-pelican-and-claude-code.html">FSM Diagrams in Pelican and Claude Code</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-02-22T18:00:00+00:00">
+                Published: Sun 22 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/fsm.html">fsm</a> <a href="../tag/pelican.html">pelican</a> <a href="../tag/mermaid.html">mermaid</a> <a href="../tag/graphviz.html">graphviz</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> </p>        
+</footer><!-- /.post-info --><p>Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious. This post covers two tools I've built: a Pelican plugin that renders FSM diagrams at build time so they appear as images in published posts, and a Claude Code skill that generates diagrams from plain-English descriptions.</p>
+<p>The pattern is identical to the <a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom plugin and skill</a>: describe what you want, get a fenced code block, paste it into a post, and the build renders it to SVG automatically.</p>
+<h2>The Pelican plugin</h2>
+<p>The plugin is at <a href="https://github.com/morganp/pelican-fsm">github.com/morganp/pelican-fsm</a>, cloned to <code>~/Code/pelican-fsm</code> (a sibling directory to the blog repo). It intercepts fenced <code>```mermaid ```</code> and <code>```dot ```</code> code blocks before Pelican's standard Markdown processing, renders each one to an SVG using the appropriate CLI tool, caches the result by content hash in <code>content/images/fsm/</code>, and replaces the block with a standard image reference. Pelican then copies the SVG to <code>output/images/fsm/</code> as a static asset.</p>
+<p>SVGs are cached across builds, so only diagrams whose source has changed are re-rendered.</p>
+<h3>Requirements</h3>
+<ul>
+<li><a href="https://github.com/mermaid-js/mermaid-cli">Mermaid CLI</a> for <code>mermaid</code> blocks:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@mermaid-js/mermaid-cli
+</code></pre></div>
+
+<ul>
+<li><a href="https://graphviz.org/">Graphviz</a> for <code>dot</code> blocks:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>graphviz<span class="w">      </span><span class="c1"># macOS</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>graphviz<span class="w">  </span><span class="c1"># Debian/Ubuntu</span>
+</code></pre></div>
+
+<p>Both tools are optional. If one is missing, blocks for that type fall back gracefully to a fenced <code>text</code> block without failing the build.</p>
+<h3>Installation</h3>
+<p>Clone the plugin alongside your Pelican project and install it into the Pelican virtualenv in editable mode:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/pelican-fsm<span class="w"> </span>../pelican-fsm
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>../pelican-fsm<span class="w"> </span>--config-settings<span class="w"> </span><span class="nv">editable_mode</span><span class="o">=</span>compat
+</code></pre></div>
+
+<p>The <code>editable_mode=compat</code> flag is required. Without it, modern setuptools editable installs use a path-hook mechanism that prevents Pelican's namespace plugin auto-discovery from finding the plugin.</p>
+<p>Pelican 4.5+ auto-discovers namespace plugins, so no changes to <code>pelicanconf.py</code> are needed.</p>
+<h3>Optional config</h3>
+<p>If <code>mmdc</code> or <code>dot</code> are not on your <code>PATH</code> during the build, set their full paths in <code>pelicanconf.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">FSM_MERMAID_CLI</span> <span class="o">=</span> <span class="s1">&#39;/opt/homebrew/bin/mmdc&#39;</span>
+<span class="n">FSM_DOT_CLI</span> <span class="o">=</span> <span class="s1">&#39;/opt/homebrew/bin/dot&#39;</span>
+</code></pre></div>
+
+<h3>Using it in a post</h3>
+<p>Write a fenced code block with the language set to <code>mermaid</code> or <code>dot</code>:</p>
+<div class="highlight"><pre><span></span><code>![<span class="nt">FSM diagram</span>](<span class="na">{static}/images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg</span>)
+</code></pre></div>
+
+<p>At build time this becomes an SVG embedded in the page:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg"></p>
+<p>Graphviz DOT works the same way, and is a better fit for hardware and RTL documentation where the compact box-and-arrow style is conventional:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_d33619e8d6e9ae49f343c57a8f6db1e1.svg"></p>
+<p>If the CLI is not found or rendering fails, the block falls back to fenced <code>text</code> — the post still builds, you just see the raw source instead of a diagram.</p>
+<h2>The Claude Code skill</h2>
+<p>The skill lives at <a href="https://github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm">github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm</a>. Claude Code auto-discovers skills from <code>~/.claude/skills/</code> and loads them on demand.</p>
+<p>The skill triggers automatically when you describe anything involving states, transitions, or control flow: protocol implementations, UI flows, hardware FSMs, parsers, game logic. You describe the system in plain English and Claude generates the diagram.</p>
+<p>The skill knows:</p>
+<ul>
+<li>Full Mermaid <code>stateDiagram-v2</code> syntax: plain states, display labels, transitions with events/guards/actions, composite (nested) states, choice pseudostates, fork/join for parallel regions, concurrent regions (<code>--</code>), notes, direction, and classDef styling</li>
+<li>Graphviz DOT FSM conventions: Moore vs Mealy annotation, initial pseudostate arrow, accepting states as double circles</li>
+<li>When to prefer each format: Mermaid for software/web docs, DOT for hardware/RTL</li>
+</ul>
+<h3>Example workflow</h3>
+<p>Describe the system:</p>
+<blockquote>
+<p>"Draw the states for a TCP connection"</p>
+</blockquote>
+<p>Claude produces:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_03bf39c43e71e98bd12e737558c3f9e3.svg"></p>
+<p>Because the skill outputs a <code>mermaid</code> fenced block, you can paste it directly into a blog post and the Pelican plugin renders it automatically.</p>
+<h3>Installing the skill</h3>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.claude/skills/fsm
+curl<span class="w"> </span>-o<span class="w"> </span>~/.claude/skills/fsm/SKILL.md<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://raw.githubusercontent.com/morganp/dotfiles/main/config/claude/skills/fsm/SKILL.md
+</code></pre></div>
+
+<p>Or clone the dotfiles repo and symlink:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/dotfiles<span class="w"> </span>~/dotfiles
+ln<span class="w"> </span>-s<span class="w"> </span>~/dotfiles/config/claude/skills/fsm<span class="w"> </span>~/.claude/skills/fsm
+</code></pre></div>
+
+<h2>Mermaid stateDiagram-v2 quick reference</h2>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[*] --&gt; State</code></td>
+<td>Initial transition</td>
+</tr>
+<tr>
+<td><code>State --&gt; [*]</code></td>
+<td>Final transition</td>
+</tr>
+<tr>
+<td><code>A --&gt; B : event</code></td>
+<td>Transition with event label</td>
+</tr>
+<tr>
+<td><code>A --&gt; B : event / action()</code></td>
+<td>Transition with action</td>
+</tr>
+<tr>
+<td><code>A --&gt; B : [guard]</code></td>
+<td>Guarded transition</td>
+</tr>
+<tr>
+<td><code>state "Label" as Name</code></td>
+<td>State with display label</td>
+</tr>
+<tr>
+<td><code>state S { ... }</code></td>
+<td>Composite (nested) state</td>
+</tr>
+<tr>
+<td><code>state C &lt;&lt;choice&gt;&gt;</code></td>
+<td>Choice pseudostate</td>
+</tr>
+<tr>
+<td><code>state F &lt;&lt;fork&gt;&gt;</code></td>
+<td>Fork pseudostate</td>
+</tr>
+<tr>
+<td><code>state J &lt;&lt;join&gt;&gt;</code></td>
+<td>Join pseudostate</td>
+</tr>
+<tr>
+<td><code>--</code> inside composite</td>
+<td>Concurrent regions</td>
+</tr>
+<tr>
+<td><code>direction LR</code></td>
+<td>Left-to-right layout</td>
+</tr>
+<tr>
+<td><code>%% comment</code></td>
+<td>Comment</td>
+</tr>
+</tbody>
+</table>
+<h2>Project structure</h2>
+<div class="highlight"><pre><span></span><code><span class="o">~/</span><span class="n">Code</span><span class="o">/</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">morganp</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="w">              </span><span class="c1"># blog source (main branch)</span>
+<span class="err">│</span><span class="w">   </span><span class="err">└──</span><span class="w"> </span><span class="n">content</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">fsm</span><span class="o">/</span><span class="w">         </span><span class="c1"># SVG cache (persists across make clean)</span>
+<span class="err">└──</span><span class="w"> </span><span class="n">pelican</span><span class="o">-</span><span class="n">fsm</span><span class="o">/</span><span class="w">                    </span><span class="c1"># github.com/morganp/pelican-fsm</span>
+<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">pelican</span><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">fsm_renderer</span><span class="o">/</span>
+<span class="w">        </span><span class="err">├──</span><span class="w"> </span><span class="n">__init__</span><span class="o">.</span><span class="n">py</span><span class="w">             </span><span class="c1"># plugin entry point, signal registration</span>
+<span class="w">        </span><span class="err">└──</span><span class="w"> </span><span class="n">preprocessor</span><span class="o">.</span><span class="n">py</span><span class="w">        </span><span class="c1"># Markdown extension + preprocessor</span>
+
+<span class="o">~/.</span><span class="n">claude</span><span class="o">/</span><span class="n">skills</span><span class="o">/</span>
+<span class="err">└──</span><span class="w"> </span><span class="n">fsm</span><span class="o">/</span>
+<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">SKILL</span><span class="o">.</span><span class="n">md</span><span class="w">                    </span><span class="c1"># Claude Code skill definition</span>
+</code></pre></div>
+
+<p>The combination is useful for any documentation that involves control flow: describe the behaviour, get the diagram from Claude, drop it into a post, and the plugin renders it at build time. No manual editing of diagram syntax, no copy-pasting between browser tabs.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-lint-skill-for-claude-code.html" rel="bookmark"
+                               title="Permalink to Verilog Lint Skill for Claude Code">Verilog Lint Skill for Claude Code</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-02-22T12:00:00+00:00">
                 Published: Sun 22 February 2026
@@ -36,38 +210,10 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/verilog.html">verilog</a> <a href="../tag/systemverilog.html">systemverilog</a> <a href="../tag/rtl.html">rtl</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/hardware.html">hardware</a> <a href="../tag/linting.html">linting</a> </p>        
-</footer><!-- /.post-info --><p>I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code generation and linting. Writing Verilog by hand is tedious; having Claude generate it and immediately validate it with real tools closes that gap nicely.</p>
-<h2>What it does</h2>
-<p>The skill connects two open-source linters into an agentic write → lint → fix → re-lint loop:</p>
-<ul>
-<li><strong>Verilator</strong> (<code>--lint-only -Wall</code>) catches semantic errors: undeclared signals, bit-width mismatches, blocking assignments in <code>always_ff</code> blocks, multi-driven nets</li>
-<li><strong>Verible</strong> (<code>verible-verilog-lint</code>) enforces style: naming conventions, whitespace, port alignment, <code>always_ff</code>/<code>always_comb</code> discipline</li>
-</ul>
-<p>When Claude generates RTL, the skill automatically:</p>
-<ol>
-<li>Writes the code to a temp file</li>
-<li>Runs both linters</li>
-<li>Parses error messages with line numbers</li>
-<li>Applies fixes and re-lints — up to 3 times</li>
-<li>Reports clean status or surfaces a diagnostic table if errors remain</li>
-</ol>
-<h2>Why two tools</h2>
-<p>They complement each other. Verilator thinks like a synthesizer — it catches things that will fail elaboration or produce incorrect silicon. Verible doesn't simulate; it reads the source and checks against Google's SystemVerilog style guide. Together they cover both "will this work" and "is this readable".</p>
-<h2>Both are free and open source</h2>
-<ul>
-<li>Verilator: <code>brew install verilator</code> / <code>apt install verilator</code></li>
-<li>Verible: <code>brew tap chipsalliance/verible &amp;&amp; brew install verible</code> (macOS), or grab a binary from the <a href="https://github.com/chipsalliance/verible/releases">GitHub releases page</a></li>
-</ul>
-<h2>RTL patterns baked in</h2>
-<p>The skill includes reference patterns for mistake-free SystemVerilog: synchronous-reset flip-flops, <code>always_comb</code> combinational blocks, parameterized FSMs with <code>typedef enum</code>. Claude defaults to these when generating new modules, which avoids most of the common lint warnings before the first pass even runs.</p>
-<h2>Same pattern as WaveDrom</h2>
-<p>This follows the same skill format as the <a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom timing diagram skill</a> — a <code>SKILL.md</code> file that gives Claude structured instructions, reference tables, and workflow steps. Both skills live in <code>~/.claude/skills/</code> and are picked up automatically by Claude Code.</p>
-<p>The combination is handy for hardware work: describe a protocol, get a timing diagram, then generate and lint the RTL that implements it.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code …</p>
+                        <a class="readmore" href="../verilog-lint-skill-for-claude-code.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>

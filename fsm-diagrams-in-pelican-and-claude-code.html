@@ -4,40 +4,46 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Lizard-Spock - pelican</title>
-                        <link rel="stylesheet" href="../theme/css/main.css" />
+                        <title>FSM Diagrams in Pelican and Claude Code</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious …" />
         </head>
 
         <body id="index" class="home">
                 <header id="banner" class="body">
-                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <h1><a href="./">Lizard-Spock</a></h1>
                         <nav><ul>
-                                                <li><a href="../pages/about.html">About</a></li>
-                                                <li><a href="../category/cooking.html">Cooking</a></li>
-                                                <li><a href="../category/engineering.html">Engineering</a></li>
-                                                <li><a href="../category/home.html">Home</a></li>
-                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
-                                                <li><a href="../category/photography.html">Photography</a></li>
-                                                <li><a href="../category/tech.html">Tech</a></li>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li><a href="./category/cooking.html">Cooking</a></li>
+                                                <li class="active"><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/home.html">Home</a></li>
+                                                <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/tech.html">Tech</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./fsm-diagrams-in-pelican-and-claude-code.html" rel="bookmark"
+             title="Permalink to FSM Diagrams in Pelican and Claude Code">FSM Diagrams in Pelican and Claude Code</a></h1>
+      </header>
 
-                <aside id="featured" class="body">
-                    <article>
-                        <h1 class="entry-title"><a href="../fsm-diagrams-in-pelican-and-claude-code.html">FSM Diagrams in Pelican and Claude Code</a></h1>
+      <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-02-22T18:00:00+00:00">
                 Published: Sun 22 February 2026
         </abbr>
 
                 <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
                 </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/fsm.html">fsm</a> <a href="../tag/pelican.html">pelican</a> <a href="../tag/mermaid.html">mermaid</a> <a href="../tag/graphviz.html">graphviz</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> </p>        
-</footer><!-- /.post-info --><p>Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious. This post covers two tools I've built: a Pelican plugin that renders FSM diagrams at build time so they appear as images in published posts, and a Claude Code skill that generates diagrams from plain-English descriptions.</p>
-<p>The pattern is identical to the <a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom plugin and skill</a>: describe what you want, get a fenced code block, paste it into a post, and the build renders it to SVG automatically.</p>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/fsm.html">fsm</a> <a href="./tag/pelican.html">pelican</a> <a href="./tag/mermaid.html">mermaid</a> <a href="./tag/graphviz.html">graphviz</a> <a href="./tag/claude.html">claude</a> <a href="./tag/ai.html">ai</a> </p>        
+</footer><!-- /.post-info -->        <p>Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious. This post covers two tools I've built: a Pelican plugin that renders FSM diagrams at build time so they appear as images in published posts, and a Claude Code skill that generates diagrams from plain-English descriptions.</p>
+<p>The pattern is identical to the <a href="./wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom plugin and skill</a>: describe what you want, get a fenced code block, paste it into a post, and the build renders it to SVG automatically.</p>
 <h2>The Pelican plugin</h2>
 <p>The plugin is at <a href="https://github.com/morganp/pelican-fsm">github.com/morganp/pelican-fsm</a>, cloned to <code>~/Code/pelican-fsm</code> (a sibling directory to the blog repo). It intercepts fenced <code>```mermaid ```</code> and <code>```dot ```</code> code blocks before Pelican's standard Markdown processing, renders each one to an SVG using the appropriate CLI tool, caches the result by content hash in <code>content/images/fsm/</code>, and replaces the block with a standard image reference. Pelican then copies the SVG to <code>output/images/fsm/</code> as a static asset.</p>
 <p>SVGs are cached across builds, so only diagrams whose source has changed are re-rendered.</p>
@@ -77,9 +83,9 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </code></pre></div>
 
 <p>At build time this becomes an SVG embedded in the page:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg"></p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg"></p>
 <p>Graphviz DOT works the same way, and is a better fit for hardware and RTL documentation where the compact box-and-arrow style is conventional:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_d33619e8d6e9ae49f343c57a8f6db1e1.svg"></p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_d33619e8d6e9ae49f343c57a8f6db1e1.svg"></p>
 <p>If the CLI is not found or rendering fails, the block falls back to fenced <code>text</code> — the post still builds, you just see the raw source instead of a diagram.</p>
 <h2>The Claude Code skill</h2>
 <p>The skill lives at <a href="https://github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm">github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm</a>. Claude Code auto-discovers skills from <code>~/.claude/skills/</code> and loads them on demand.</p>
@@ -96,7 +102,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <p>"Draw the states for a TCP connection"</p>
 </blockquote>
 <p>Claude produces:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_03bf39c43e71e98bd12e737558c3f9e3.svg"></p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_03bf39c43e71e98bd12e737558c3f9e3.svg"></p>
 <p>Because the skill outputs a <code>mermaid</code> fenced block, you can paste it directly into a blog post and the Pelican plugin renders it automatically.</p>
 <h3>Installing the skill</h3>
 <div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.claude/skills/fsm
@@ -186,113 +192,11 @@ ln<span class="w"> </span>-s<span class="w"> </span>~/dotfiles/config/claude/ski
 <span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">SKILL</span><span class="o">.</span><span class="n">md</span><span class="w">                    </span><span class="c1"># Claude Code skill definition</span>
 </code></pre></div>
 
-<p>The combination is useful for any documentation that involves control flow: describe the behaviour, get the diagram from Claude, drop it into a post, and the plugin renders it at build time. No manual editing of diagram syntax, no copy-pasting between browser tabs.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+<p>The combination is useful for any documentation that involves control flow: describe the behaviour, get the diagram from Claude, drop it into a post, and the plugin renders it at build time. No manual editing of diagram syntax, no copy-pasting between browser tabs.</p>
+      </div><!-- /.entry-content -->
 
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html" rel="bookmark"
-                               title="Permalink to WaveDrom Timing Diagrams in Pelican with Claude Code">WaveDrom Timing Diagrams in Pelican with Claude Code</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2026-02-20T12:00:00+00:00">
-                Published: Fri 20 February 2026
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/wavedrom.html">wavedrom</a> <a href="../tag/timing.html">timing</a> <a href="../tag/electronics.html">electronics</a> <a href="../tag/pelican.html">pelican</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> </p>        
-</footer><!-- /.post-info -->                        <p><a href="https://wavedrom.com">WaveDrom</a> is a JavaScript library that renders digital timing diagrams from a simple JSON-based format called WaveJSON. It's widely used …</p>
-                        <a class="readmore" href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../modify-pelican-theme.html" rel="bookmark"
-                               title="Permalink to Modify Pelican theme">Modify Pelican theme</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2025-01-02T16:53:00+00:00">
-                Published: Thu 02 January 2025
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/tech.html">Tech</a>.</p>
-<p>tags: <a href="../tag/python.html">python</a> <a href="../tag/pelican.html">pelican</a> </p>        
-</footer><!-- /.post-info -->                        <p>First figure out which theme you are using.
-List installed themes via:</p>
-<div class="highlight"><pre><span></span><code><span class="c">% pelican-themes -l</span>
-<span class="n">simple</span>
-<span class="s">notmyidea</span>
-</code></pre></div>
-
-<p>pelicanconf.py does not …</p>
-                        <a class="readmore" href="../modify-pelican-theme.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../pelican-site-add-tags-and-categories-list.html" rel="bookmark"
-                               title="Permalink to Pelican Site add Tags and Categories list">Pelican Site add Tags and Categories list</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2025-01-02T15:39:00+00:00">
-                Published: Thu 02 January 2025
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/tech.html">Tech</a>.</p>
-<p>tags: <a href="../tag/python.html">python</a> <a href="../tag/pelican.html">pelican</a> </p>        
-</footer><!-- /.post-info -->                        <p>I think it improves website usability when they are navigatable via the URL.</p>
-<p>For example when viewing Posts under the …</p>
-                        <a class="readmore" href="../pelican-site-add-tags-and-categories-list.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../python-read-a-csv-file.html" rel="bookmark"
-                               title="Permalink to Python read a CSV file">Python read a CSV file</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2024-04-19T12:34:00+01:00">
-                Published: Fri 19 April 2024
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/tech.html">Tech</a>.</p>
-<p>tags: <a href="../tag/pelican.html">pelican</a> <a href="../tag/python.html">python</a> </p>        
-</footer><!-- /.post-info -->                        <p>Python example for reading data from a csv file.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
-<span class="k">with</span><span class="w"> </span><span class="nb">open</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">csv</span><span class="s1">&#39;, newline=&#39;&#39;) as csvfile:</span>
-<span class="w">    </span><span class="n">spamreader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">csv …</span></code></pre></div>
-                        <a class="readmore" href="../python-read-a-csv-file.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-                    </ol><!-- /#posts-list -->
-                    </section><!-- /#content -->
+    </article>
+  </section>
                 <section id="extras" class="body">
                                 <div class="social">
                                         <h2>social</h2>
