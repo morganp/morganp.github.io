@@ -71,9 +71,9 @@ Move mixture to a large mixing bowl to cool, Once cool mix in the beef with salt
 
 Roll out the pastry into tea towel size, or unroll the sheets. Add mixture into the middle and roll up sealing the ends. Apply second half of beaten egg to the top of the wellington with a pastry brush.
 ![Pastry](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6807.jpg)
-![](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6808.jpg)
-![](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6811.jpg)
-![](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6812.jpg)
+![Beef Wellington](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6808.jpg)
+![Beef Wellington](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6811.jpg)
+![Beef Wellington](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6812.jpg)
 ![Wellingtons ready for oven](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6814.jpg)
 
 Put in the oven for 180 Degrees for an hour.

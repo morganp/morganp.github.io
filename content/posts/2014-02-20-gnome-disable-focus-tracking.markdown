@@ -11,4 +11,4 @@ Sometime ago I enabled focus tracking the mouse on Gnome. It took a while to fin
 
     System -> Preferences -> Windows
 
-![](/images/Tech/Disable_Mouse_focus_tracking.png)§
+![Disable Mouse Focus Tracking](/images/Tech/Disable_Mouse_focus_tracking.png)§

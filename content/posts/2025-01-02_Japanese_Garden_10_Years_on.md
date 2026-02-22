@@ -25,7 +25,9 @@ Then main structure nearly complete
 ![photo]({attach}/images/Gardening/JapaneseGarden10yr/IMG_1120.jpeg)
 
 Leveling up the roofs for the seating area.
-![photo]({attach}/images/Gardening/JapaneseGarden10yr/The large panorama is 270 degree view of 3 sides of it.IMG_9401.jpeg)
+The large panorama is a 270 degree view of 3 sides of it.
+
+![270 degree panorama of the garden]({attach}/images/Gardening/JapaneseGarden10yr/IMG_9401.jpeg)
 
 
 

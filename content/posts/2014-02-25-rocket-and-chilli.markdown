@@ -10,9 +10,9 @@ tags: Propagator, Rocket, Chilli, Cayenne, Kitchen Garden,
 The first batch of seeds in the propagator are off to a good start.
 
 Rocket:
-![](/images/Gardening/morganp-20140225-Garden-IMG_6843.jpg "Rocket")
+![Rocket](/images/Gardening/morganp-20140225-Garden-IMG_6843.jpg "Rocket")
 
 De Cayenne, Chilli Peppers:
-![](/images/Gardening/morganp-20140225-Garden-IMG_6848.jpg "De Cayenne, Chilli Peppers")
+![De Cayenne, Chilli Peppers](/images/Gardening/morganp-20140225-Garden-IMG_6848.jpg "De Cayenne, Chilli Peppers")
 
 Soon will re-pot and start [hardening off](http://apps.rhs.org.uk/advicesearch/profile.aspx?pid=386).

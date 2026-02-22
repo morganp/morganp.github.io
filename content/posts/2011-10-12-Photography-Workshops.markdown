@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: Photography
 discuss_url: //124
 url: //124/Photography_Workshops
 id: 124

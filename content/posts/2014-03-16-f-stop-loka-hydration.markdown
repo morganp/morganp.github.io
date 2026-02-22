@@ -10,5 +10,5 @@ tags: fstop, Loka,
 Not a review, just noting the default position of the velcro hydration loop, before I remove it.
 Left shoulder, under chest harness.
 
-![](/images/Photography/Loka/morganp-20140315-Loka-IMG_6970.jpg)
-![](/images/Photography/Loka/morganp-20140315-Loka-IMG_6976.jpg)
+![Loka](/images/Photography/Loka/morganp-20140315-Loka-IMG_6970.jpg)
+![Loka](/images/Photography/Loka/morganp-20140315-Loka-IMG_6976.jpg)

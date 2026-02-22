@@ -30,11 +30,11 @@ Using right angle clamps to assemble first corner.
 
 Holding the spikes in place with quick clamps.
 ![Attaching Spike](/images/Gardening/RaisedBed/morganp-20140211-RaisedBed-IMG_6751.jpg)
-![](/images/Gardening/RaisedBed/morganp-20140211-RaisedBed-IMG_6753.jpg)
+![Attaching corner spike](/images/Gardening/RaisedBed/morganp-20140211-RaisedBed-IMG_6753.jpg)
 
 Constructing the second corner.
 ![Second Corner](/images/Gardening/RaisedBed/morganp-20140211-RaisedBed-IMG_6758.jpg)
-![](/images/Gardening/RaisedBed/morganp-20140211-RaisedBed-IMG_6761.jpg)
+![Second corner assembled](/images/Gardening/RaisedBed/morganp-20140211-RaisedBed-IMG_6761.jpg)
 
 The final side and 2 corners, using 4 right angle clamps to hold it all in place.
 ![Final Corners](/images/Gardening/RaisedBed/morganp-20140211-RaisedBed-IMG_6766.jpg)

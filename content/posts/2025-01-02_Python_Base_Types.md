@@ -4,6 +4,7 @@ Category: Tech
 Tags: python
 Author: morganp
 
+
 Making notes as I work through [Dr Chucks][dr] Python for Everyone course on [Coursera][course].
 
 There are 3 main types in Python:

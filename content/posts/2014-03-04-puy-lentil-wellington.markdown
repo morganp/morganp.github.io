@@ -9,7 +9,7 @@ tags: Recipe, Put Lentil, Wellington, Rosemary, Thyme, Onion, Vegetarian,
 
 Based on a [uktv recipe](http://uktv.co.uk/food/recipe/aid/516620).
 
-![](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6871.jpg)
+![Puy lentil wellington finished dish](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6871.jpg)
 
 <!-- more -->
 
@@ -26,15 +26,15 @@ Ingredients
       1 tbsp  Thyme
     375 g     Puff Pastry
 
-![](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6852.jpg)
+![Puy lentil wellington ingredients](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6852.jpg)
 
 Finely dice onion and fry on low heat with olive oil, after a minute or two add
 the sugar. Mean while simmer the lentils in water
 
-![](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6853.jpg)
-![](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6856.jpg)
+![Diced onions frying](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6853.jpg)
+![Lentils simmering](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6856.jpg)
 
-Finely chop the Rosemary and Thyme, add to the onions. 
+Finely chop the Rosemary and Thyme, add to the onions.
 Mix well and keep on a low heat, stir occasionally to stop burning.
 When onions are soft (about 15 minutes) take off heat and allow to cool.
 
@@ -42,6 +42,6 @@ Mix Lentils and onions then place into a sheet of puff pastry then fold over to 
 
 Place in oven for 20-25 minutes.
 
-![](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6858.jpg)
-![](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6864.jpg)
-![](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6871.jpg)
+![Wellington wrapped in puff pastry](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6858.jpg)
+![Wellington baked golden](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6864.jpg)
+![Puy lentil wellington sliced](/images/Cooking/PuyWellington/morganp-20140225-PuyLentil-IMG_6871.jpg)

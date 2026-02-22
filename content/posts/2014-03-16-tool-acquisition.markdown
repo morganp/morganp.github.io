@@ -6,21 +6,21 @@ comments: true
 Category: Home
 tags: Tools, Joseph Bently, Garden
 ---
-![](/images/Gardening/morganp-20140316-Garden-_MG_7012.jpg)
+![Garden](/images/Gardening/morganp-20140316-Garden-_MG_7012.jpg)
 
 Just after Christmas I got a Joseph Bently digging spade (larger than the border spade). Bought from [Dunbar Garden Center](http://www.dunbargardencentre.co.uk/) for £22 as I had a £5 Off voucher for spending over £50 during December. Actually had 2 vouchers one was used for the [bird boxes](/blog/garden/birdbox/).
 
 <!-- more -->
 
-![](/images/Gardening/morganp-20140209-Spade-IMG_6737.jpg)
+![Spade](/images/Gardening/morganp-20140209-Spade-IMG_6737.jpg)
 
 Used for preparing ground for the raised beds.
 
 
 The latest acquisition was a Joseph Bently Edging knife. 
 
-![](/images/Gardening/morganp-20140316-Garden-_MG_7008.jpg)
+![Garden](/images/Gardening/morganp-20140316-Garden-_MG_7008.jpg)
 Really should have got this before digging up the turf to put the raised beds in.
 This should result in much cleaner edges when removing turf.
 
-![](/images/Gardening/morganp-20140316-Garden-_MG_7016.jpg)
+![Garden](/images/Gardening/morganp-20140316-Garden-_MG_7016.jpg)

@@ -57,5 +57,3 @@ Now back to cloudflare install it docker service as a deamon
 
     sudo docker run -d cloudflare/cloudflared:latest tunnel --no-autoupdate run --token eyJhIjo
 
-<!--Image Example: image location content/images/photo.jpg-->
-![photo]({attach}/images/photo.jpg)

@@ -12,7 +12,7 @@ published: true
 
 My large ICU loaded with my [Strobies portrait kit][Strobies] and Canon 580EX MKII.
 
-![](/images/Photography/fstop_icu_large_lighting/morganp-20140517-FStop-_MG_8927.jpg)
+![F Stop](/images/Photography/fstop_icu_large_lighting/morganp-20140517-FStop-_MG_8927.jpg)
 
 The collapsed soft box is folded into the right hand side. Additional accessories are a [3M Lastolite off camera cord][Cord], [Colorvision SpyderCube][cube] and a [Stofen][].
 

@@ -11,7 +11,7 @@ Since upgrading to Mavericks I get a sound whenever I get mail. I find this very
 
 This did not work, I found a separate option in mail for playing a sound on incoming mail, disabled that and other actions if you want.
 
-![](/images/Tech/Disable_mail_sound.png)
+![Mail sound preferences in OS X Mavericks](/images/Tech/Disable_mail_sound.png)
 
 *NB: On checking things to write this I found that 'Play user interface sound effects' had been enabled again.*
 

@@ -10,11 +10,11 @@ tags: Kettlebell, Woodwork,
 published: true
 ---
 
-![](/images/Home/KettlebellRack/morganp-20140518-diy-_MG_8954.jpg)
+![DIY](/images/Home/KettlebellRack/morganp-20140518-diy-_MG_8954.jpg)
 Kettlebell rack with 24kg, 16kg, 8kg, 12kg, 16kg, 20kg.
 
-![](/images/Home/KettlebellRack/morganp-20140518-diy-_MG_8960.jpg)
+![DIY](/images/Home/KettlebellRack/morganp-20140518-diy-_MG_8960.jpg)
 End detail showing bracing.
 
-![](/images/Home/KettlebellRack/morganp-20140518-diy-_MG_8968.jpg)
+![DIY](/images/Home/KettlebellRack/morganp-20140518-diy-_MG_8968.jpg)
 Underside of rack.

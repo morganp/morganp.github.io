@@ -11,7 +11,7 @@ Tags: DIY, Garden
 
 Propagator hack using some seed trays and capillary matting.
 
-![](/images/Gardening/Propogator/morganp-20150328--IMG_0176.jpg)
-![](/images/Gardening/Propogator/morganp-20150328--IMG_0178.jpg)
-![](/images/Gardening/Propogator/morganp-20150328--IMG_0179.jpg)
-![](/images/Gardening/Propogator/morganp-20150328--IMG_0180.jpg)
+![Propagator](/images/Gardening/Propogator/morganp-20150328--IMG_0176.jpg)
+![Propagator](/images/Gardening/Propogator/morganp-20150328--IMG_0178.jpg)
+![Propagator](/images/Gardening/Propogator/morganp-20150328--IMG_0179.jpg)
+![Propagator](/images/Gardening/Propogator/morganp-20150328--IMG_0180.jpg)

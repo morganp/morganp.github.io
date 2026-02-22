@@ -10,4 +10,4 @@ tags: OS X, Mavericks, Macbook,
 Checkout : [Apple support](http://support.apple.com/kb/HT4882).
 
 Disable 'Adjust keyboard brightness in low light'.  
-![](/images/Tech/Keyboard_low_light.png)
+![Keyboard Low Light](/images/Tech/Keyboard_low_light.png)

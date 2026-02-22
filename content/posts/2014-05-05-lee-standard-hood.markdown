@@ -21,7 +21,7 @@ It actually has a very clever rail system which allows it to be mounted in a slo
 When mounted on to a lee adapter ring this sits further back out of the way.
 All Lee products should have this and there would be no need for a tandem connector. 
 
-![](/images/Photography/LEE/morganp-20140405-Lee-_MG_7257.jpg)
+![LEE standard hood](/images/Photography/LEE/morganp-20140405-Lee-_MG_7257.jpg)
 
 Filter weigh 150g
 
@@ -41,15 +41,15 @@ Min expansion
     hood & mount: 3.6cm
     hood only   : 3.1cm
 
-![](/images/Photography/LEE/morganp-20140405-Lee-_MG_7249.jpg)
+![LEE standard hood minimum expansion](/images/Photography/LEE/morganp-20140405-Lee-_MG_7249.jpg)
 
 Max Expansion
 
     complete    : 15.0cm
     hood & mount: 14.0cm
-    hood only   : 13.3cm 
+    hood only   : 13.3cm
 
-![](/images/Photography/LEE/morganp-20140405-Lee-_MG_7251.jpg)
+![LEE standard hood maximum expansion](/images/Photography/LEE/morganp-20140405-Lee-_MG_7251.jpg)
 
 
 **This hood is too small for use under 28mm on a full-frame camera.**
@@ -57,19 +57,19 @@ Max Expansion
 On a crop sensor it is still good at 16mm
 
 Vignetting examples:
-![](/images/Photography/LEE/morganp-20140405-Lee-IMG_0116.jpg)
+![LEE standard hood vignetting test setup](/images/Photography/LEE/morganp-20140405-Lee-IMG_0116.jpg)
 Setup for following examples, Canon 6D, wide angle adapter, Lee holder 3 slots (2 for filters, 1 for hood) then universal hood at minimal expansion.
 
-![](/images/Photography/LEE/morganp-20140409--_MG_7416.jpg "16mm full-frame")
+![16mm full-frame vignetting with filter holder](/images/Photography/LEE/morganp-20140409--_MG_7416.jpg "16mm full-frame")
 above 16mm full-frame with filter holder
 
-![](/images/Photography/LEE/morganp-20140409--_MG_7417.jpg "20mm full-frame")
+![20mm full-frame vignetting with filter holder](/images/Photography/LEE/morganp-20140409--_MG_7417.jpg "20mm full-frame")
 above 20mm full-frame with filter holder
 
-![](/images/Photography/LEE/morganp-20140409--_MG_7418.jpg "24mm full-frame")
+![24mm full-frame vignetting with filter holder](/images/Photography/LEE/morganp-20140409--_MG_7418.jpg "24mm full-frame")
 above 24mm full-frame with filter holder
 
-![](/images/Photography/LEE/morganp-20140409--_MG_7419.jpg "28mm full-frame")
+![28mm full-frame vignetting with filter holder](/images/Photography/LEE/morganp-20140409--_MG_7419.jpg "28mm full-frame")
 above 28mm full-frame with filter holder
 
 

@@ -28,4 +28,4 @@ SO I have 2 applications with updates ready, one wants an update the other refus
 to acknowledge it has been installed and wants a new install. A new program,
 Photoshop CC (2014), which only requires an update.
 
-![](/images/Photography/CC_update.png "Adobe Creative Cloud is Inconsistent")
+![Adobe Creative Cloud update inconsistency](/images/Photography/CC_update.png "Adobe Creative Cloud is Inconsistent")

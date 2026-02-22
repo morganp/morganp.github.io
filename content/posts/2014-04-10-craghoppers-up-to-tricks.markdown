@@ -31,21 +31,21 @@ The feel of the new trousers is not as nice as the old ones. They have altered t
 I guess the old ones were just to comfortable and stretchy :(
 
 The old style waist band:  
-![](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7421.jpg "Old style wasit band")
+![Old style wasit band](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7421.jpg "Old style wasit band")
 
 New style Waistband, minimal stretchiness :  
-![](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7425.jpg)
-![](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7426.jpg)
+![Craghoppers Pro Stretch](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7425.jpg)
+![Craghoppers Pro Stretch](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7426.jpg)
 
 
 Old style thigh pocket, completely external: 
-![](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7423.jpg "Old style thigh pocket, completely external")
+![Old style thigh pocket, completely external](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7423.jpg "Old style thigh pocket, completely external")
 
 Inside view of pocket, not much to rub or cause irritation which is good for a close fitting trouser.
-![](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7428.jpg)
+![Craghoppers Pro Stretch](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7428.jpg)
 
 New style, thigh pocket zipper looks very sleek.
-![](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7427.jpg)
+![Craghoppers Pro Stretch](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7427.jpg)
 
 New style, internal thigh pocket cleverly designed for maximum irritation while walking.
-![](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7429.jpg)
+![Craghoppers Pro Stretch](/images/Outdoor/morganp-20140410-CraghopperProStretch-_MG_7429.jpg)

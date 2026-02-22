@@ -49,5 +49,5 @@ If a large amount of text is to be placed in the box `minipage` is preffered ove
       \end{minipage}
     \end{document}
 
-![](/images/Tech/Tex/tex_minipage_footnote.png)
+![TeX minipage with footnotes example output](/images/Tech/Tex/tex_minipage_footnote.png)
 

@@ -7,13 +7,13 @@ Category: Cooking
 tags: Recipe, Cake, Dessert,
 ---
 
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5189.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5189.jpg)
 
 <!-- more -->
 
 Ingredients
 --
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5125.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5125.jpg)
 
 **That is Ginger not stem ginger pictured**, it works, but stem ginger is much better.
 
@@ -55,8 +55,8 @@ Slowly add self raising flour and cocoa powder, mixing and folding until well co
 
 Add equally into the prepared cake tins, Bake for around 20 minutes, until golden and risen.
 
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5157-Edit.jpg)
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5180.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5157-Edit.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5180.jpg)
 
 Leave cakes to cool in tins for about 10 minutes than transfer to rack to cool completely.
 
@@ -67,13 +67,13 @@ Finely chop stem ginger
     120 g     Unsalted Butter
     260 g     Icing Sugar
 
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5132.jpg)
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5148.jpg)
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5150.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5132.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5148.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5150.jpg)
 
 Add butter to large bowl and whisk until smooth (about 1 minute). 
 
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5174.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5174.jpg)
 
 Gradually add the icing sugar, whisk until light an fluffy.
 
@@ -81,11 +81,11 @@ Gradually add the icing sugar, whisk until light an fluffy.
 
 Added chopped stem ginger and coffee essence to bowl and whisk until mixed (30 seconds).
 
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5183.jpg)
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5185.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5183.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5185.jpg)
 
 Place one cake on plate, then spread with two thirds of the icing. Add second layer of
 cake and cover with remaining icing. Top with cocoa powder or dark chocolate shavings.
 
 
-![](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5189.jpg)
+![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5189.jpg)
