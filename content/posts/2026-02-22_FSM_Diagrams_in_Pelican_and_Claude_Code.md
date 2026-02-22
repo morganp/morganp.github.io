@@ -159,23 +159,29 @@ git clone https://github.com/morganp/dotfiles ~/dotfiles
 ln -s ~/dotfiles/config/claude/skills/fsm ~/.claude/skills/fsm
 ```
 
-## Mermaid stateDiagram-v2 quick reference
+## Syntax quick reference
 
-| Syntax | Meaning |
-|--------|---------|
-| `[*] --> State` | Initial transition |
-| `State --> [*]` | Final transition |
-| `A --> B : event` | Transition with event label |
-| `A --> B : event / action()` | Transition with action |
-| `A --> B : [guard]` | Guarded transition |
-| `state "Label" as Name` | State with display label |
-| `state S { ... }` | Composite (nested) state |
-| `state C <<choice>>` | Choice pseudostate |
-| `state F <<fork>>` | Fork pseudostate |
-| `state J <<join>>` | Join pseudostate |
-| `--` inside composite | Concurrent regions |
-| `direction LR` | Left-to-right layout |
-| `%% comment` | Comment |
+Both formats can express the same FSM concepts, but use different syntax. The table below maps them side by side.
+
+| Concept | Mermaid `stateDiagram-v2` | Graphviz DOT |
+|---------|--------------------------|--------------|
+| Graph declaration | `stateDiagram-v2` | `digraph FSM { ... }` |
+| Default node style | automatic | `node [shape=circle]` |
+| Left-to-right layout | `direction LR` | `rankdir=LR` |
+| Comment | `%% comment` | `// comment` |
+| Plain state | `StateName` | `StateName` |
+| State with display label | `state "Label" as Name` | `Name [label="Label"]` |
+| Initial pseudostate | `[*] --> State` | `__start [shape=point width=0.2]` + `__start -> State` |
+| Final/accepting state | `State --> [*]` | `State [shape=doublecircle]` |
+| Transition | `A --> B` | `A -> B` |
+| Transition with event | `A --> B : event` | `A -> B [label="event"]` |
+| Transition with action | `A --> B : event / action()` | `A -> B [label="event / action()"]` |
+| Guarded transition | `A --> B : [guard]` | `A -> B [label="[guard]"]` |
+| Composite (nested) state | `state S { ... }` | `subgraph cluster_S { ... }` |
+| Choice pseudostate | `state C <<choice>>` | `C [shape=diamond]` |
+| Fork pseudostate | `state F <<fork>>` | invisible node + multiple outgoing edges |
+| Join pseudostate | `state J <<join>>` | invisible node + multiple incoming edges |
+| Concurrent regions | `--` inside composite | parallel `subgraph` blocks |
 
 ## Project structure
 
