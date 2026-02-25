@@ -4,7 +4,7 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Lizard-Spock - electronics</title>
+                        <title>Lizard-Spock - Electronics</title>
                         <link rel="stylesheet" href="../theme/css/main.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
         </head>
@@ -25,150 +25,7 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom Timing Diagrams in Pelican with Claude Code</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2026-02-20T12:00:00+00:00">
-                Published: Fri 20 February 2026
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/wavedrom.html">wavedrom</a> <a href="../tag/timing.html">timing</a> <a href="../tag/electronics.html">electronics</a> <a href="../tag/pelican.html">pelican</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> </p>        
-</footer><!-- /.post-info --><p><a href="https://wavedrom.com">WaveDrom</a> is a JavaScript library that renders digital timing diagrams from a simple JSON-based format called WaveJSON. It's widely used in hardware documentation — you describe signal transitions in a compact string notation, and WaveDrom draws the waveform. This post covers two tools I've built around it: a Pelican plugin that renders diagrams at build time, and a Claude Code skill that generates WaveJSON from plain English.</p>
-<h2>The Pelican plugin</h2>
-<p>The plugin is at <a href="https://github.com/morganp/pelican-wavedrom">github.com/morganp/pelican-wavedrom</a>, cloned to <code>~/Code/pelican-wavedrom</code> — a sibling directory to the blog repo. It intercepts fenced <code>```wavedrom ```</code> code blocks before Pelican's standard Markdown processing, renders each one to an SVG using <code>wavedrom-cli</code>, caches the result by content hash in <code>content/images/wavedrom/</code>, and replaces the block with a standard image reference. Pelican then copies the SVG to <code>output/images/wavedrom/</code> as a static asset.</p>
-<p>SVGs are cached across builds — only diagrams whose source has changed are re-rendered.</p>
-<h3>Installation</h3>
-<p>The plugin requires <code>wavedrom-cli</code> globally via npm:</p>
-<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>wavedrom-cli
-</code></pre></div>
-
-<p>Then clone the plugin alongside your blog repo and install it into the Pelican virtualenv in editable mode:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/pelican-wavedrom<span class="w"> </span>../pelican-wavedrom
-<span class="nb">source</span><span class="w"> </span>venv/bin/activate
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>../pelican-wavedrom<span class="w"> </span>--config-settings<span class="w"> </span><span class="nv">editable_mode</span><span class="o">=</span>compat
-</code></pre></div>
-
-<p>The <code>editable_mode=compat</code> flag is required. Without it, modern setuptools editable installs use a path-hook mechanism that prevents Pelican's namespace plugin auto-discovery from finding the plugin.</p>
-<p>Pelican 4.5+ auto-discovers namespace plugins — no changes to <code>pelicanconf.py</code> are needed.</p>
-<h3>Optional config</h3>
-<p>If <code>wavedrom-cli</code> is not on your <code>PATH</code> during the build (e.g. in a CI environment), set its full path in <code>pelicanconf.py</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">WAVEDROM_CLI</span> <span class="o">=</span> <span class="s1">&#39;/opt/homebrew/bin/wavedrom-cli&#39;</span>
-</code></pre></div>
-
-<h3>Using it in a post</h3>
-<p>Write a fenced code block with the language set to <code>wavedrom</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="sb">```wavedrom</span>
-<span class="s">{ &quot;signal&quot;: [</span>
-<span class="s">  { &quot;name&quot;: &quot;CLK&quot;,     &quot;wave&quot;: &quot;p.....|...&quot; },</span>
-<span class="s">  { &quot;name&quot;: &quot;Data&quot;,    &quot;wave&quot;: &quot;x.345x|=.x&quot;, &quot;data&quot;: [&quot;head&quot;, &quot;body&quot;, &quot;tail&quot;, &quot;data&quot;] },</span>
-<span class="s">  { &quot;name&quot;: &quot;Request&quot;, &quot;wave&quot;: &quot;0.1..0|1.0&quot; }</span>
-<span class="s">]}</span>
-<span class="sb">```</span>
-</code></pre></div>
-
-<p>At build time (<code>make html</code> or <code>make github</code>) this becomes an SVG embedded in the page:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_da1bb22d431f672f9f36b629cf1f4152.svg"></p>
-<p>If <code>wavedrom-cli</code> is not found or rendering fails, the block falls back to a fenced <code>json</code> block — the post still builds, you just see the raw JSON instead of a diagram.</p>
-<h2>The Claude Code skill</h2>
-<p>The skill lives at <code>~/.claude/skills/wavedrom/SKILL.md</code>. Claude Code auto-discovers skills from <code>~/.claude/skills/</code> and loads them on demand.</p>
-<p>The skill triggers automatically when you describe anything related to timing diagrams, waveforms, or digital protocols — SPI, I2C, UART, AXI handshakes, clock enables, request/acknowledge patterns. You describe the signals in plain English; Claude generates the WaveJSON.</p>
-<p>The skill includes:</p>
-<ul>
-<li>The full WaveJSON wave-character reference (<code>p</code>, <code>n</code>, <code>0</code>, <code>1</code>, <code>x</code>, <code>z</code>, <code>.</code>, <code>=</code>, <code>2</code>–<code>9</code>, <code>|</code>)</li>
-<li>Signal properties (<code>phase</code>, <code>period</code>, <code>node</code>)</li>
-<li>Top-level properties (<code>edge</code>, <code>config</code>, <code>head</code>, <code>foot</code>)</li>
-<li>Group and spacer syntax</li>
-<li>Edge annotation syntax for timing arrows between signals</li>
-<li>Common patterns: SPI transactions, request/acknowledge handshakes, clock-with-enable, grouped signals</li>
-</ul>
-<h3>Example workflow</h3>
-<p>Describe the protocol:</p>
-<blockquote>
-<p>"Draw an I2C start condition followed by a 7-bit address byte with ACK"</p>
-</blockquote>
-<p>Claude generates the WaveJSON and explains the timing. Because the skill outputs a <code>wavedrom</code> fenced block (not just JSON), you can paste it directly into a blog post and the Pelican plugin renders it automatically.</p>
-<h2>WaveJSON quick reference</h2>
-<p>The wave string for each signal is a sequence of characters:</p>
-<table>
-<thead>
-<tr>
-<th>Char</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>p</code> / <code>n</code></td>
-<td>Positive / negative clock (with tick mark)</td>
-</tr>
-<tr>
-<td><code>0</code> / <code>1</code></td>
-<td>Logic low / high</td>
-</tr>
-<tr>
-<td><code>x</code></td>
-<td>Unknown / undefined</td>
-</tr>
-<tr>
-<td><code>z</code></td>
-<td>High impedance</td>
-</tr>
-<tr>
-<td><code>.</code></td>
-<td>Continue previous state</td>
-</tr>
-<tr>
-<td><code>=</code></td>
-<td>Multi-bit data (label from <code>data</code> array)</td>
-</tr>
-<tr>
-<td><code>2</code>–<code>9</code></td>
-<td>Coloured data states</td>
-</tr>
-<tr>
-<td><code>\|</code></td>
-<td>Gap / break in time axis</td>
-</tr>
-</tbody>
-</table>
-<p>A minimal diagram:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_47846f1d1444efee9e793db00192ea4d.svg"></p>
-<p>An SPI transaction with chip select:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_41ab2e5fe0cdd7dde2f60fec31f05df5.svg"></p>
-<p>A request/acknowledge handshake with an edge annotation showing propagation delay:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_df96e15d2ad371db91e44c66212ec566.svg"></p>
-<h2>Project structure</h2>
-<div class="highlight"><pre><span></span><code><span class="o">~/</span><span class="n">Code</span><span class="o">/</span>
-<span class="err">├──</span><span class="w"> </span><span class="n">morganp</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="w">          </span><span class="c1"># blog source (main branch)</span>
-<span class="err">│</span><span class="w">   </span><span class="err">└──</span><span class="w"> </span><span class="n">content</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">wavedrom</span><span class="o">/</span><span class="w">  </span><span class="c1"># SVG cache (persists across make clean)</span>
-<span class="err">└──</span><span class="w"> </span><span class="n">pelican</span><span class="o">-</span><span class="n">wavedrom</span><span class="o">/</span><span class="w">           </span><span class="c1"># github.com/morganp/pelican-wavedrom</span>
-<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">pelican</span><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">wavedrom_generator</span><span class="o">/</span>
-<span class="w">        </span><span class="err">├──</span><span class="w"> </span><span class="n">__init__</span><span class="o">.</span><span class="n">py</span><span class="w">         </span><span class="c1"># plugin entry point, signal registration</span>
-<span class="w">        </span><span class="err">└──</span><span class="w"> </span><span class="n">preprocessor</span><span class="o">.</span><span class="n">py</span><span class="w">    </span><span class="c1"># Markdown extension + preprocessor</span>
-
-<span class="o">~/.</span><span class="n">claude</span><span class="o">/</span><span class="n">skills</span><span class="o">/</span>
-<span class="err">└──</span><span class="w"> </span><span class="n">wavedrom</span><span class="o">/</span>
-<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">SKILL</span><span class="o">.</span><span class="n">md</span><span class="w">                </span><span class="c1"># Claude Code skill definition</span>
-</code></pre></div>
-
-<p>The combination is useful for hardware documentation: describe a protocol in English, get WaveJSON from Claude, drop the block into a post, and the plugin renders it at build time. No manual JSON editing, no copy-pasting between browser tabs.</p>
-<p>The same skill format is used by the <a href="../verilog-lint-skill-for-claude-code.html">Verilog lint skill</a> — describe a module, get generated RTL, and the lint loop validates it automatically.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../flip-flop.html" rel="bookmark"
-                               title="Permalink to "flip-flop"">"flip-flop"</a></h1>
-                    </header>
-
-                    <div class="entry-content">
+                        <h1 class="entry-title"><a href="../flip-flop.html">"flip-flop"</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2014-01-09T19:15:10+00:00">
                 Published: Thu 09 January 2014
@@ -179,13 +36,57 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/electronics.html">Electronics</a> <a href="../tag/design.html">Design</a> </p>        
-</footer><!-- /.post-info -->                        <p>A flip-flop (D-Type) is essentially 2 latches in series with the enable to one inverted.
-This stops the flip-flop from …</p>
-                        <a class="readmore" href="../flip-flop.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-                    </ol><!-- /#posts-list -->
-                    </section><!-- /#content -->
+</footer><!-- /.post-info --><p>A flip-flop (D-Type) is essentially 2 latches in series with the enable to one inverted.
+This stops the flip-flop from being transparent or open as a single latch can be.</p>
+<p>For ASIC design it is recommended that all flip-flops use active low asynchronous resets. 
+This is often connected to the power on reset circuit and retimed on to the rising edge of the clock at the top level of the chip.</p>
+<p>In Verilog a D-Type flip-flop can be implied with the following logic.<br>
+NB: the reg implies nothing about the flip-flop only that data is assigned inside an always block.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">data</span><span class="p">;</span><span class="w"> </span>
+<span class="k">always</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">rst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">rst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="n">data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="n">data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">new_data</span><span class="p">;</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+
+<p>If your flow supports the use of SystemVerilog, use of the <code>always_comb</code>, <code>always_latch</code> and <code>always_ff</code> are recommended. 
+the rules for sensitivity lists are a little stricter to minimize RTL to gates mismatch. 
+The added benefit is that it allows the designer to be clear about design intent. 
+Using the logic type also removes confusion about reg implying flip-flops and allows code refacoring with out having to switch types.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">logic</span><span class="w"> </span><span class="cp">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">0</span><span class="cp">]</span><span class="w"> </span><span class="nt">data</span><span class="o">;</span><span class="w"> </span>
+<span class="nt">always_ff</span><span class="w"> </span><span class="o">@(</span><span class="nt">posedge</span><span class="w"> </span><span class="nt">clk</span><span class="w"> </span><span class="nt">or</span><span class="w"> </span><span class="nt">negedge</span><span class="w"> </span><span class="nt">rst_n</span><span class="o">)</span><span class="w"> </span><span class="nt">begin</span>
+<span class="w">  </span><span class="nt">if</span><span class="w"> </span><span class="o">(~</span><span class="nt">rst_n</span><span class="o">)</span><span class="w"> </span><span class="nt">begin</span>
+<span class="w">    </span><span class="nt">data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="err">&#39;</span><span class="nt">b0</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">end</span>
+<span class="w">  </span><span class="nt">else</span><span class="w"> </span><span class="nt">begin</span>
+<span class="w">    </span><span class="nt">data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="nt">new_data</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">end</span>
+<span class="nt">end</span>
+</code></pre></div>
+
+<p>With a Synchronous Reset:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">logic</span><span class="w"> </span><span class="cp">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">0</span><span class="cp">]</span><span class="w"> </span><span class="nt">data</span><span class="o">;</span><span class="w"> </span>
+<span class="nt">always_ff</span><span class="w"> </span><span class="o">@(</span><span class="nt">posedge</span><span class="w"> </span><span class="nt">clk</span><span class="o">)</span><span class="w"> </span><span class="nt">begin</span>
+<span class="w">  </span><span class="nt">if</span><span class="w"> </span><span class="o">(~</span><span class="nt">rst_n</span><span class="o">)</span><span class="w"> </span><span class="nt">begin</span>
+<span class="w">    </span><span class="nt">data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="err">&#39;</span><span class="nt">b0</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">end</span>
+<span class="w">  </span><span class="nt">else</span><span class="w"> </span><span class="nt">begin</span>
+<span class="w">    </span><span class="nt">data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="nt">new_data</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">end</span>
+<span class="nt">end</span>
+</code></pre></div>
+
+<p>No Reset:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">logic</span><span class="w"> </span><span class="cp">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">0</span><span class="cp">]</span><span class="w"> </span><span class="nt">data</span><span class="o">;</span><span class="w"> </span>
+<span class="nt">always_ff</span><span class="w"> </span><span class="o">@(</span><span class="nt">posedge</span><span class="w"> </span><span class="nt">clk</span><span class="o">)</span><span class="w"> </span><span class="nt">begin</span>
+<span class="w">  </span><span class="nt">data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="nt">new_data</span><span class="o">;</span>
+<span class="nt">end</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
                 <section id="extras" class="body">
                                 <div class="social">
                                         <h2>social</h2>
