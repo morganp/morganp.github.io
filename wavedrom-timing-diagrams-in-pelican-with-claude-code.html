@@ -4,39 +4,45 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Lizard-Spock - electronics</title>
-                        <link rel="stylesheet" href="../theme/css/main.css" />
+                        <title>WaveDrom Timing Diagrams in Pelican with Claude Code</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="WaveDrom is a JavaScript library that renders digital timing diagrams from a simple JSON-based format called WaveJSON. It's widely used …" />
         </head>
 
         <body id="index" class="home">
                 <header id="banner" class="body">
-                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <h1><a href="./">Lizard-Spock</a></h1>
                         <nav><ul>
-                                                <li><a href="../pages/about.html">About</a></li>
-                                                <li><a href="../category/cooking.html">Cooking</a></li>
-                                                <li><a href="../category/engineering.html">Engineering</a></li>
-                                                <li><a href="../category/home.html">Home</a></li>
-                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
-                                                <li><a href="../category/photography.html">Photography</a></li>
-                                                <li><a href="../category/tech.html">Tech</a></li>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li><a href="./category/cooking.html">Cooking</a></li>
+                                                <li class="active"><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/home.html">Home</a></li>
+                                                <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/tech.html">Tech</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./wavedrom-timing-diagrams-in-pelican-with-claude-code.html" rel="bookmark"
+             title="Permalink to WaveDrom Timing Diagrams in Pelican with Claude Code">WaveDrom Timing Diagrams in Pelican with Claude Code</a></h1>
+      </header>
 
-                <aside id="featured" class="body">
-                    <article>
-                        <h1 class="entry-title"><a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom Timing Diagrams in Pelican with Claude Code</a></h1>
+      <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-02-20T12:00:00+00:00">
                 Published: Fri 20 February 2026
         </abbr>
 
                 <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
                 </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/wavedrom.html">wavedrom</a> <a href="../tag/timing.html">timing</a> <a href="../tag/electronics.html">electronics</a> <a href="../tag/pelican.html">pelican</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> </p>        
-</footer><!-- /.post-info --><p><a href="https://wavedrom.com">WaveDrom</a> is a JavaScript library that renders digital timing diagrams from a simple JSON-based format called WaveJSON. It's widely used in hardware documentation — you describe signal transitions in a compact string notation, and WaveDrom draws the waveform. This post covers two tools I've built around it: a Pelican plugin that renders diagrams at build time, and a Claude Code skill that generates WaveJSON from plain English.</p>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/wavedrom.html">wavedrom</a> <a href="./tag/timing.html">timing</a> <a href="./tag/electronics.html">electronics</a> <a href="./tag/pelican.html">pelican</a> <a href="./tag/claude.html">claude</a> <a href="./tag/ai.html">ai</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="https://wavedrom.com">WaveDrom</a> is a JavaScript library that renders digital timing diagrams from a simple JSON-based format called WaveJSON. It's widely used in hardware documentation — you describe signal transitions in a compact string notation, and WaveDrom draws the waveform. This post covers two tools I've built around it: a Pelican plugin that renders diagrams at build time, and a Claude Code skill that generates WaveJSON from plain English.</p>
 <h2>The Pelican plugin</h2>
 <p>The plugin is at <a href="https://github.com/morganp/pelican-wavedrom">github.com/morganp/pelican-wavedrom</a>, cloned to <code>~/Code/pelican-wavedrom</code> — a sibling directory to the blog repo. It intercepts fenced <code>```wavedrom ```</code> code blocks before Pelican's standard Markdown processing, renders each one to an SVG using <code>wavedrom-cli</code>, caches the result by content hash in <code>content/images/wavedrom/</code>, and replaces the block with a standard image reference. Pelican then copies the SVG to <code>output/images/wavedrom/</code> as a static asset.</p>
 <p>SVGs are cached across builds — only diagrams whose source has changed are re-rendered.</p>
@@ -70,7 +76,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </code></pre></div>
 
 <p>At build time (<code>make html</code> or <code>make github</code>) this becomes an SVG embedded in the page:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_da1bb22d431f672f9f36b629cf1f4152.svg"></p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_da1bb22d431f672f9f36b629cf1f4152.svg"></p>
 <p>If <code>wavedrom-cli</code> is not found or rendering fails, the block falls back to a fenced <code>json</code> block — the post still builds, you just see the raw JSON instead of a diagram.</p>
 <h2>The Claude Code skill</h2>
 <p>The skill lives at <code>~/.claude/skills/wavedrom/SKILL.md</code>. Claude Code auto-discovers skills from <code>~/.claude/skills/</code> and loads them on demand.</p>
@@ -135,11 +141,11 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </tbody>
 </table>
 <p>A minimal diagram:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_47846f1d1444efee9e793db00192ea4d.svg"></p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_47846f1d1444efee9e793db00192ea4d.svg"></p>
 <p>An SPI transaction with chip select:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_41ab2e5fe0cdd7dde2f60fec31f05df5.svg"></p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_41ab2e5fe0cdd7dde2f60fec31f05df5.svg"></p>
 <p>A request/acknowledge handshake with an edge annotation showing propagation delay:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_df96e15d2ad371db91e44c66212ec566.svg"></p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_df96e15d2ad371db91e44c66212ec566.svg"></p>
 <h2>Project structure</h2>
 <div class="highlight"><pre><span></span><code><span class="o">~/</span><span class="n">Code</span><span class="o">/</span>
 <span class="err">├──</span><span class="w"> </span><span class="n">morganp</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="w">          </span><span class="c1"># blog source (main branch)</span>
@@ -155,37 +161,11 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </code></pre></div>
 
 <p>The combination is useful for hardware documentation: describe a protocol in English, get WaveJSON from Claude, drop the block into a post, and the plugin renders it at build time. No manual JSON editing, no copy-pasting between browser tabs.</p>
-<p>The same skill format is used by the <a href="../verilog-lint-skill-for-claude-code.html">Verilog lint skill</a> — describe a module, get generated RTL, and the lint loop validates it automatically.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+<p>The same skill format is used by the <a href="./verilog-lint-skill-for-claude-code.html">Verilog lint skill</a> — describe a module, get generated RTL, and the lint loop validates it automatically.</p>
+      </div><!-- /.entry-content -->
 
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../flip-flop.html" rel="bookmark"
-                               title="Permalink to "flip-flop"">"flip-flop"</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2014-01-09T19:15:10+00:00">
-                Published: Thu 09 January 2014
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/electronics.html">Electronics</a> <a href="../tag/design.html">Design</a> </p>        
-</footer><!-- /.post-info -->                        <p>A flip-flop (D-Type) is essentially 2 latches in series with the enable to one inverted.
-This stops the flip-flop from …</p>
-                        <a class="readmore" href="../flip-flop.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-                    </ol><!-- /#posts-list -->
-                    </section><!-- /#content -->
+    </article>
+  </section>
                 <section id="extras" class="body">
                                 <div class="social">
                                         <h2>social</h2>
