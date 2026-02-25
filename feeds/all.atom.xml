@@ -1,5 +1,312 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-02-22T18:00:00+00:00</updated><entry><title>FSM Diagrams in Pelican and Claude Code</title><link href="http://lizard-spock.co.uk/fsm-diagrams-in-pelican-and-claude-code.html" rel="alternate"/><published>2026-02-22T18:00:00+00:00</published><updated>2026-02-22T18:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-02-22:/fsm-diagrams-in-pelican-and-claude-code.html</id><summary type="html">&lt;p&gt;Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious. This post covers two tools I've built: a Pelican plugin that renders FSM diagrams at build time so they appear as images in published posts, and a Claude Code skill that generates diagrams from plain-English descriptions.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-02-25T00:00:00+00:00</updated><entry><title>Installing Homebrew on a Debian 13 (Trixie) LXC Container</title><link href="http://lizard-spock.co.uk/installing-homebrew-on-a-debian-13-trixie-lxc-container.html" rel="alternate"/><published>2026-02-25T00:00:00+00:00</published><updated>2026-02-25T00:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-02-25:/installing-homebrew-on-a-debian-13-trixie-lxc-container.html</id><summary type="html">&lt;p&gt;A verified step-by-step guide to installing Homebrew (Linuxbrew) on a Debian 13 "trixie" LXC unprivileged container, including group setup, prefix pre-creation, and multi-user configuration.&lt;/p&gt;</summary><content type="html">&lt;p&gt;This tutorial documents a working, verified installation of Homebrew (Linuxbrew) on a
+Debian 13 "trixie" LXC container. Every step reflects what was actually done on this system;
+nothing has been invented or copied from generic guides without verification.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Tested environment:&lt;/strong&gt;
+- Debian GNU/Linux 13 (trixie), amd64
+- LXC unprivileged container
+- Homebrew 5.0.15
+- Primary non-root user: &lt;code&gt;morgan&lt;/code&gt; (uid=1000)&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Table of Contents&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="#1-prerequisites"&gt;Prerequisites&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#2-installation-steps"&gt;Installation Steps&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#3-per-user-shell-setup"&gt;Per-User Shell Setup&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#4-verification"&gt;Verification&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#5-adding-future-users"&gt;Adding Future Users&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#6-troubleshooting"&gt;Troubleshooting&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2&gt;1. Prerequisites&lt;/h2&gt;
+&lt;h3&gt;System packages&lt;/h3&gt;
+&lt;p&gt;The Homebrew installer requires these packages. Install them as root before running the
+installer:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;apt-get&lt;span class="w"&gt; &lt;/span&gt;update
+apt-get&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-y&lt;span class="w"&gt; &lt;/span&gt;build-essential&lt;span class="w"&gt; &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;curl&lt;span class="w"&gt; &lt;/span&gt;file&lt;span class="w"&gt; &lt;/span&gt;procps
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Verify all five are present:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;ii&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;build&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;essential&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m m-Double"&gt;12.12&lt;/span&gt;&lt;span class="w"&gt;              &lt;/span&gt;&lt;span class="nx"&gt;amd64&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Informational&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;list&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;build&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;essential&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;packages&lt;/span&gt;
+&lt;span class="nx"&gt;ii&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;curl&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="m m-Double"&gt;8.14.1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nx"&gt;deb13u2&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nx"&gt;amd64&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;line&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;tool&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;transferring&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;with&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;URL&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;syntax&lt;/span&gt;
+&lt;span class="nx"&gt;ii&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;file&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="m m-Double"&gt;5.46&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="nx"&gt;amd64&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Recognize&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;file&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;using&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;magic&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;numbers&lt;/span&gt;
+&lt;span class="nx"&gt;ii&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;git&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="m m-Double"&gt;2.47.3&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nx"&gt;deb13u1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;amd64&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;fast&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;scalable&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;distributed&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;revision&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;control&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;system&lt;/span&gt;
+&lt;span class="nx"&gt;ii&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;procps&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="m m-Double"&gt;4.0.4&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="nx"&gt;amd64&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nx"&gt;proc&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;file&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;system&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;utilities&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;PATH gotcha: /usr/sbin must be in root's PATH&lt;/h3&gt;
+&lt;p&gt;On Debian 13, &lt;code&gt;/usr/sbin&lt;/code&gt; is &lt;strong&gt;not&lt;/strong&gt; automatically in the PATH of non-login shells (including
+those invoked by &lt;code&gt;su&lt;/code&gt; without &lt;code&gt;-l&lt;/code&gt;). The installer calls &lt;code&gt;useradd&lt;/code&gt;, which lives at
+&lt;code&gt;/usr/sbin/useradd&lt;/code&gt;. If &lt;code&gt;/usr/sbin&lt;/code&gt; is missing from your PATH the installer will fail with a
+confusing "command not found" error.&lt;/p&gt;
+&lt;p&gt;Before running the installer, confirm your PATH includes &lt;code&gt;/usr/sbin&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$PATH&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If it does not, prepend it for the session:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/usr/sbin:&lt;/span&gt;&lt;span class="nv"&gt;$PATH&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Or simply run the installer from a full login shell (&lt;code&gt;su -&lt;/code&gt; rather than &lt;code&gt;su&lt;/code&gt;).&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;2. Installation Steps&lt;/h2&gt;
+&lt;p&gt;All steps in this section are run as &lt;strong&gt;root&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3&gt;Step 1 — Create the dedicated &lt;code&gt;linuxbrew&lt;/code&gt; group&lt;/h3&gt;
+&lt;p&gt;Homebrew on Linux uses a shared group so that multiple users can write to the installation
+prefix. Create it before the installer runs so you control its GID:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;groupadd&lt;span class="w"&gt; &lt;/span&gt;linuxbrew
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Step 2 — Pre-create the Homebrew prefix directory&lt;/h3&gt;
+&lt;p&gt;The Homebrew installer expects to own &lt;code&gt;/home/linuxbrew/.linuxbrew&lt;/code&gt;. In an LXC container the
+installer sometimes cannot create &lt;code&gt;/home/linuxbrew&lt;/code&gt; itself due to ownership constraints on
+&lt;code&gt;/home&lt;/code&gt;. Pre-create it and set the correct ownership &lt;strong&gt;before&lt;/strong&gt; running the installer:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mkdir&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew/.linuxbrew
+chown&lt;span class="w"&gt; &lt;/span&gt;-R&lt;span class="w"&gt; &lt;/span&gt;morgan:linuxbrew&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew
+chmod&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2775&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew
+chmod&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2775&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew/.linuxbrew
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;2775&lt;/code&gt; mode sets the &lt;strong&gt;setgid bit&lt;/strong&gt; (&lt;code&gt;s&lt;/code&gt;) on the directory. This causes all files and
+subdirectories created inside to inherit the &lt;code&gt;linuxbrew&lt;/code&gt; group automatically, which is what
+allows multiple users to install and update packages.&lt;/p&gt;
+&lt;p&gt;After this step, &lt;code&gt;ls -la /home/linuxbrew/&lt;/code&gt; should show:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;drwxrwxr-x  3 morgan linuxbrew 4096 Feb 25 15:31 .
+drwxr-xr-x  4 root   root      4096 Feb 25 15:31 ..
+drwxrwsr-x 14 morgan linuxbrew 4096 Feb 25 15:31 .linuxbrew
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;And &lt;code&gt;stat /home/linuxbrew/.linuxbrew&lt;/code&gt; confirms the setgid bit:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Access: (2775/drwxrwsr-x)  Uid: ( 1000/  morgan)   Gid: ( 1001/linuxbrew)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Step 3 — Add the primary user to the linuxbrew group&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;usermod&lt;span class="w"&gt; &lt;/span&gt;-aG&lt;span class="w"&gt; &lt;/span&gt;linuxbrew&lt;span class="w"&gt; &lt;/span&gt;morgan
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;-a&lt;/code&gt; flag is critical — without it &lt;code&gt;usermod -G&lt;/code&gt; &lt;strong&gt;replaces&lt;/strong&gt; all supplementary groups
+instead of appending to them.&lt;/p&gt;
+&lt;h3&gt;Step 4 — Run the Homebrew installer as the primary user&lt;/h3&gt;
+&lt;p&gt;Switch to the non-root user and run the official installer. Do &lt;strong&gt;not&lt;/strong&gt; run it as root:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;su&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt; &lt;/span&gt;morgan
+/bin/bash&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;curl&lt;span class="w"&gt; &lt;/span&gt;-fsSL&lt;span class="w"&gt; &lt;/span&gt;https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Because the prefix directory already exists and is writable by the &lt;code&gt;linuxbrew&lt;/code&gt; group (and
+&lt;code&gt;morgan&lt;/code&gt; is a member), the installer will populate it without needing to create it or change
+system-level ownership.&lt;/p&gt;
+&lt;h3&gt;Step 5 — Create the system-wide profile.d script&lt;/h3&gt;
+&lt;p&gt;To activate Homebrew automatically for every user who logs in, create a shell script in
+&lt;code&gt;/etc/profile.d/&lt;/code&gt; as root:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;cat&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/etc/profile.d/homebrew.sh&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt; &amp;#39;EOF&amp;#39;&lt;/span&gt;
+&lt;span class="s"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="s"&gt;if [ -d &amp;quot;/home/linuxbrew/.linuxbrew&amp;quot; ]; then&lt;/span&gt;
+&lt;span class="s"&gt;    eval &amp;quot;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;fi&lt;/span&gt;
+&lt;span class="s"&gt;EOF&lt;/span&gt;
+chmod&lt;span class="w"&gt; &lt;/span&gt;+x&lt;span class="w"&gt; &lt;/span&gt;/etc/profile.d/homebrew.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This is exactly the file present on this system:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# /etc/profile.d/homebrew.sh&lt;/span&gt;
+&lt;span class="c1"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-d&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/linuxbrew/.linuxbrew&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;eval&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;/home/linuxbrew/.linuxbrew/bin/brew&lt;span class="w"&gt; &lt;/span&gt;shellenv&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;if&lt;/code&gt; guard makes the script safe on systems where the prefix does not exist (e.g., before
+installation, or if the directory is removed).&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;3. Per-User Shell Setup&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;/etc/profile.d/homebrew.sh&lt;/code&gt; script runs automatically for &lt;strong&gt;login shells&lt;/strong&gt;. This covers
+&lt;code&gt;su - username&lt;/code&gt;, SSH logins, and console logins.&lt;/p&gt;
+&lt;p&gt;For interactive non-login shells (e.g., a new terminal tab that sources &lt;code&gt;~/.bashrc&lt;/code&gt; instead of
+&lt;code&gt;~/.bash_profile&lt;/code&gt;), a user may need to add the following to their &lt;code&gt;~/.bashrc&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Homebrew (Linuxbrew)&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-d&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/linuxbrew/.linuxbrew&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;eval&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;/home/linuxbrew/.linuxbrew/bin/brew&lt;span class="w"&gt; &lt;/span&gt;shellenv&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;brew shellenv&lt;/code&gt; sets these environment variables:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Variable&lt;/th&gt;
+&lt;th&gt;Value&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;HOMEBREW_PREFIX&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;/home/linuxbrew/.linuxbrew&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;HOMEBREW_CELLAR&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;/home/linuxbrew/.linuxbrew/Cellar&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;HOMEBREW_REPOSITORY&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;/home/linuxbrew/.linuxbrew/Homebrew&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;PATH&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;prepends &lt;code&gt;/home/linuxbrew/.linuxbrew/bin&lt;/code&gt; and &lt;code&gt;.../sbin&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;MANPATH&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;prepends &lt;code&gt;.../share/man&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;INFOPATH&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;prepends &lt;code&gt;.../share/info&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2&gt;4. Verification&lt;/h2&gt;
+&lt;h3&gt;Confirm the installation prefix layout&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ls&lt;span class="w"&gt; &lt;/span&gt;-la&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew/.linuxbrew/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Expected output (all entries owned by &lt;code&gt;morgan:linuxbrew&lt;/code&gt;, setgid &lt;code&gt;s&lt;/code&gt; visible):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;total&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;56&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwxr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;..&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Caskroom&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Cellar&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Frameworks&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Homebrew&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;etc&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;include&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;lib&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;opt&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sbin&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;share&lt;/span&gt;
+&lt;span class="n"&gt;drwxrwsr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;morgan&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linuxbrew&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Feb&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;var&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Check the Homebrew version&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;su&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt; &lt;/span&gt;morgan&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;brew --version&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Homebrew 5.0.15
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Run brew doctor&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;su&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt; &lt;/span&gt;morgan&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;brew doctor&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Your system is ready to brew.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Confirm group membership&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;getent&lt;span class="w"&gt; &lt;/span&gt;group&lt;span class="w"&gt; &lt;/span&gt;linuxbrew
+&lt;span class="c1"&gt;# linuxbrew:x:1001:morgan&lt;/span&gt;
+
+id&lt;span class="w"&gt; &lt;/span&gt;morgan
+&lt;span class="c1"&gt;# uid=1000(morgan) gid=1000(morgan) groups=1000(morgan),100(users),1001(linuxbrew)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Test installing a package (dry run)&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;su&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt; &lt;/span&gt;morgan&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;brew install --dry-run hello&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;==&amp;gt; Would install 1 formula:
+hello
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;5. Adding Future Users&lt;/h2&gt;
+&lt;p&gt;When a new user needs Homebrew access:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# As root — add the new user to the linuxbrew group&lt;/span&gt;
+usermod&lt;span class="w"&gt; &lt;/span&gt;-aG&lt;span class="w"&gt; &lt;/span&gt;linuxbrew&lt;span class="w"&gt; &lt;/span&gt;newuser
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The user must log out and back in (or start a new login shell) for the group change to take
+effect. The &lt;code&gt;/etc/profile.d/homebrew.sh&lt;/code&gt; script will activate &lt;code&gt;brew&lt;/code&gt; for them automatically
+on their next login. No other changes are needed.&lt;/p&gt;
+&lt;p&gt;To verify the new user can reach Homebrew:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;su&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt; &lt;/span&gt;newuser&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;brew --version&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;6. Troubleshooting&lt;/h2&gt;
+&lt;h3&gt;&lt;code&gt;brew: command not found&lt;/code&gt; in a non-login shell&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;/etc/profile.d/homebrew.sh&lt;/code&gt; script only runs in login shells. In a non-login shell
+(typical terminal emulators, &lt;code&gt;su username&lt;/code&gt; without the &lt;code&gt;-&lt;/code&gt;), Homebrew will not be on the PATH.&lt;/p&gt;
+&lt;p&gt;Fix: source the script manually, or add the &lt;code&gt;eval&lt;/code&gt; line to &lt;code&gt;~/.bashrc&lt;/code&gt; as shown in
+&lt;a href="#3-per-user-shell-setup"&gt;Section 3&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Quick test — if this works but &lt;code&gt;brew&lt;/code&gt; does not:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;/home/linuxbrew/.linuxbrew/bin/brew&lt;span class="w"&gt; &lt;/span&gt;--version
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;then the issue is purely PATH/environment, not the installation.&lt;/p&gt;
+&lt;h3&gt;&lt;code&gt;useradd: command not found&lt;/code&gt; during installation&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;useradd&lt;/code&gt; lives at &lt;code&gt;/usr/sbin/useradd&lt;/code&gt;. On Debian 13, &lt;code&gt;/usr/sbin&lt;/code&gt; is not in the PATH of
+non-login root shells. Run the installer from a full login shell:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;su&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;# note the hyphen — this gives a login shell with /usr/sbin in PATH&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Or prepend it explicitly before running the installer:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/usr/sbin:&lt;/span&gt;&lt;span class="nv"&gt;$PATH&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Installer fails to create &lt;code&gt;/home/linuxbrew&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;In LXC containers, the installer may not be able to create the prefix directory itself because
+&lt;code&gt;/home&lt;/code&gt; is owned by &lt;code&gt;root:root&lt;/code&gt; with mode &lt;code&gt;755&lt;/code&gt;. The installer does not have write access to
+&lt;code&gt;/home&lt;/code&gt; when running as a non-root user.&lt;/p&gt;
+&lt;p&gt;Solution: pre-create the directory as root before running the installer (see
+&lt;a href="#step-2--pre-create-the-homebrew-prefix-directory"&gt;Step 2&lt;/a&gt;).&lt;/p&gt;
+&lt;h3&gt;Permission denied errors when running &lt;code&gt;brew install&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;The user must be in the &lt;code&gt;linuxbrew&lt;/code&gt; group &lt;strong&gt;and&lt;/strong&gt; must have started a new session after being
+added. Check:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;id&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="c1"&gt;# linuxbrew should appear in the groups list&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If &lt;code&gt;linuxbrew&lt;/code&gt; is absent, either the &lt;code&gt;usermod -aG linuxbrew username&lt;/code&gt; step was skipped, or
+the user has not logged out and back in since being added.&lt;/p&gt;
+&lt;h3&gt;&lt;code&gt;brew doctor&lt;/code&gt; reports warnings about &lt;code&gt;/usr/local&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;On Linux, Homebrew uses &lt;code&gt;/home/linuxbrew/.linuxbrew&lt;/code&gt; as its prefix, not &lt;code&gt;/usr/local&lt;/code&gt;. Warnings
+about &lt;code&gt;/usr/local&lt;/code&gt; being absent or not owned by the current user are normal and harmless on a
+Linux installation.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Quick-Reference: Full Root-Side Install Sequence&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# 1. Install dependencies&lt;/span&gt;
+apt-get&lt;span class="w"&gt; &lt;/span&gt;update&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;apt-get&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-y&lt;span class="w"&gt; &lt;/span&gt;build-essential&lt;span class="w"&gt; &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;curl&lt;span class="w"&gt; &lt;/span&gt;file&lt;span class="w"&gt; &lt;/span&gt;procps
+
+&lt;span class="c1"&gt;# 2. Ensure /usr/sbin is in PATH (run as login shell or set manually)&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/usr/sbin:&lt;/span&gt;&lt;span class="nv"&gt;$PATH&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# 3. Create the linuxbrew group&lt;/span&gt;
+groupadd&lt;span class="w"&gt; &lt;/span&gt;linuxbrew
+
+&lt;span class="c1"&gt;# 4. Pre-create the prefix and set ownership/permissions&lt;/span&gt;
+mkdir&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew/.linuxbrew
+chown&lt;span class="w"&gt; &lt;/span&gt;-R&lt;span class="w"&gt; &lt;/span&gt;morgan:linuxbrew&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew
+chmod&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2775&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew
+chmod&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2775&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/home/linuxbrew/.linuxbrew
+
+&lt;span class="c1"&gt;# 5. Add the primary user to the group&lt;/span&gt;
+usermod&lt;span class="w"&gt; &lt;/span&gt;-aG&lt;span class="w"&gt; &lt;/span&gt;linuxbrew&lt;span class="w"&gt; &lt;/span&gt;morgan
+
+&lt;span class="c1"&gt;# 6. Run the installer as the non-root user&lt;/span&gt;
+su&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt; &lt;/span&gt;morgan&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/bin/bash -c &amp;quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&amp;quot;&amp;#39;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# 7. Install the system-wide profile.d activation script&lt;/span&gt;
+cat&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/etc/profile.d/homebrew.sh&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt; &amp;#39;EOF&amp;#39;&lt;/span&gt;
+&lt;span class="s"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="s"&gt;if [ -d &amp;quot;/home/linuxbrew/.linuxbrew&amp;quot; ]; then&lt;/span&gt;
+&lt;span class="s"&gt;    eval &amp;quot;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;fi&lt;/span&gt;
+&lt;span class="s"&gt;EOF&lt;/span&gt;
+chmod&lt;span class="w"&gt; &lt;/span&gt;+x&lt;span class="w"&gt; &lt;/span&gt;/etc/profile.d/homebrew.sh
+
+&lt;span class="c1"&gt;# 8. Verify&lt;/span&gt;
+su&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt; &lt;/span&gt;morgan&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;brew --version &amp;amp;&amp;amp; brew doctor&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Tech"/><category term="homebrew"/><category term="linux"/><category term="debian"/><category term="lxc"/><category term="proxmox"/></entry><entry><title>FSM Diagrams in Pelican and Claude Code</title><link href="http://lizard-spock.co.uk/fsm-diagrams-in-pelican-and-claude-code.html" rel="alternate"/><published>2026-02-22T18:00:00+00:00</published><updated>2026-02-22T18:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-02-22:/fsm-diagrams-in-pelican-and-claude-code.html</id><summary type="html">&lt;p&gt;Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious. This post covers two tools I've built: a Pelican plugin that renders FSM diagrams at build time so they appear as images in published posts, and a Claude Code skill that generates diagrams from plain-English descriptions.&lt;/p&gt;
 &lt;p&gt;The pattern is identical to the &lt;a href="http://lizard-spock.co.uk/wavedrom-timing-diagrams-in-pelican-with-claude-code.html"&gt;WaveDrom plugin and skill&lt;/a&gt;: describe what you want, get a fenced code block, paste it into a post, and the build renders it to SVG automatically.&lt;/p&gt;
 &lt;h2&gt;The Pelican plugin&lt;/h2&gt;
 &lt;p&gt;The plugin is at &lt;a href="https://github.com/morganp/pelican-fsm"&gt;github.com/morganp/pelican-fsm&lt;/a&gt;, cloned to &lt;code&gt;~/Code/pelican-fsm&lt;/code&gt; (a sibling directory to the blog repo). It intercepts fenced &lt;code&gt;```mermaid ```&lt;/code&gt; and &lt;code&gt;```dot ```&lt;/code&gt; code blocks before Pelican's standard Markdown processing, renders each one to an SVG using the appropriate CLI tool, caches the result by content hash in &lt;code&gt;content/images/fsm/&lt;/code&gt;, and replaces the block with a standard image reference. Pelican then copies the SVG to &lt;code&gt;output/images/fsm/&lt;/code&gt; as a static asset.&lt;/p&gt;
@@ -2430,7 +2737,4 @@ sprintf([&amp;#39;%&amp;#39;,num2str(min_width),&amp;#39;.&amp;#39;, num2str(min
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dat       = &amp;#39;1&amp;#39;
 min_width = 4;
 sprintf([&amp;#39;%0&amp;#39;,num2str(6),&amp;#39;s&amp;#39;], dat)
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"/><category term="Matlab"/><category term="Programming"/></entry><entry><title>"Mavericks Disable Mail Sound"</title><link href="http://lizard-spock.co.uk/mavericks-disable-mail-sound.html" rel="alternate"/><published>2014-03-18T17:41:49+00:00</published><updated>2014-03-18T17:41:49+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-03-18:/mavericks-disable-mail-sound.html</id><summary type="html">&lt;p&gt;Since upgrading to Mavericks I get a sound whenever I get mail. I find this very annoying so first port …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Since upgrading to Mavericks I get a sound whenever I get mail. I find this very annoying so first port of call is to disable 'Play user interface sound effects' from  System Preferences -&amp;gt; Sound.&lt;/p&gt;
-&lt;p&gt;This did not work, I found a separate option in mail for playing a sound on incoming mail, disabled that and other actions if you want.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Mail sound preferences in OS X Mavericks" src="/images/Tech/Disable_mail_sound.png"&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;NB: On checking things to write this I found that 'Play user interface sound effects' had been enabled again.&lt;/em&gt;&lt;/p&gt;</content><category term="Tech"/><category term="OS X"/><category term="Mavericks"/></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"/><category term="Matlab"/><category term="Programming"/></entry></feed>
