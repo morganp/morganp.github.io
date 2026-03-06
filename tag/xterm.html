@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Lizard-Spock - xterm</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/homelab.html">Homelab</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix \& Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../tmux-training-manual-ghostty-xterm-and-pve-lxc-terminals.html">tmux Training Manual: Ghostty, xterm and PVE LXC Terminals</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-02-27T12:00:00+00:00">
+                Published: Fri 27 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/tmux.html">tmux</a> <a href="../tag/terminal.html">terminal</a> <a href="../tag/ghostty.html">ghostty</a> <a href="../tag/xterm.html">xterm</a> <a href="../tag/proxmox.html">proxmox</a> <a href="../tag/lxc.html">lxc</a> <a href="../tag/linux.html">linux</a> </p>        
+</footer><!-- /.post-info --><p>tmux is a terminal multiplexer: it lets you run multiple terminal sessions inside a single window, split panes side by side, and crucially, keep sessions alive after you disconnect. For headless Proxmox VE (PVE) LXC containers accessed over SSH, this is essential. If your SSH connection drops mid-task, tmux keeps the job running and lets you reattach exactly where you left off. This manual walks through tmux in practical exercises, covering Ghostty on macOS, xterm, and terminal sessions inside PVE LXC containers.</p>
+<h2>Getting Back to a Known State</h2>
+<p>This section comes first because it is the most important concept to internalise. Just as pressing <code>Escape</code> repeatedly in vim returns you to a safe state, tmux has equivalent recovery paths. Learn these before anything else.</p>
+<h3>The Prefix Key</h3>
+<p>Every tmux command starts with the <strong>prefix key</strong>, which is <code>Ctrl+b</code> by default. You press <code>Ctrl+b</code>, release both keys, then press the command key. Nothing happens if you just hold <code>Ctrl+b</code> without following up.</p>
+<p>If you press <code>Ctrl+b</code> and then the wrong key, tmux usually just ignores it. You are not stuck.</p>
+<h3>Exiting Any Mode</h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>How to exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stuck in copy mode</td>
+<td>Press <code>q</code> or <code>Escape</code></td>
+</tr>
+<tr>
+<td>Stuck in command mode (<code>:</code> prompt)</td>
+<td>Press <code>Escape</code> or <code>Ctrl+c</code></td>
+</tr>
+<tr>
+<td>Pane running something</td>
+<td>Press <code>Ctrl+c</code> to interrupt it</td>
+</tr>
+<tr>
+<td>Everything looks wrong</td>
+<td>Detach with <code>Ctrl+b d</code> and reattach fresh</td>
+</tr>
+</tbody>
+</table>
+<h3>Emergency Exit Sequences</h3>
+<p><strong>Detach from session (session keeps running):</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b d
+</code></pre></div>
+
+<p><strong>List all sessions from outside tmux:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>ls
+</code></pre></div>
+
+<p><strong>Reattach to a named session:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>&lt;session-name&gt;
+</code></pre></div>
+
+<p><strong>Reattach to the most recent session:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach
+</code></pre></div>
+
+<p><strong>Kill a specific pane (with confirmation prompt):</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b x
+</code></pre></div>
+
+<p><strong>Kill a specific window (with confirmation prompt):</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b &amp;
+</code></pre></div>
+
+<p><strong>Kill a session entirely from the command line:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>kill-session<span class="w"> </span>-t<span class="w"> </span>&lt;session-name&gt;
+</code></pre></div>
+
+<p><strong>Kill all tmux sessions:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>kill-server
+</code></pre></div>
+
+<p>The pattern to remember: <code>Ctrl+b d</code> detaches safely, <code>tmux ls</code> shows what is running, and <code>tmux attach -t &lt;name&gt;</code> gets you back. These three commands will rescue you from almost any situation.</p>
+<hr>
+<h2>Installation</h2>
+<h3>Debian and Ubuntu LXC Containers</h3>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>tmux
+</code></pre></div>
+
+<h3>macOS (Ghostty Host)</h3>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>tmux
+</code></pre></div>
+
+<h3>Verify Installation</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>-V
+</code></pre></div>
+
+<p>Expected output: <code>tmux 3.x</code> (version 3.3a or later is common as of 2026).</p>
+<hr>
+<h2>Terminal Compatibility Notes</h2>
+<h3>Ghostty</h3>
+<p>Ghostty works excellently with tmux. It supports true colour, full mouse reporting, and passes modifier keys correctly. No special configuration is needed.</p>
+<p>If colours look wrong inside tmux running in Ghostty, set this in your shell profile:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">TERM</span><span class="o">=</span>xterm-256color
+</code></pre></div>
+
+<p>Or add this to <code>~/.tmux.conf</code> to force 256 colour mode:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>default-terminal<span class="w"> </span><span class="s2">&quot;screen-256color&quot;</span>
+</code></pre></div>
+
+<h3>xterm</h3>
+<p>xterm is a reliable fallback. It handles tmux correctly but defaults to a limited colour palette. Set the terminal type explicitly if you see rendering artefacts:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">TERM</span><span class="o">=</span>xterm-256color<span class="w"> </span>tmux
+</code></pre></div>
+
+<p>Or add to your shell profile permanently:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">TERM</span><span class="o">=</span>xterm-256color
+</code></pre></div>
+
+<h3>PVE LXC Console: noVNC vs SSH</h3>
+<p>PVE's web console (noVNC) can cause key capture problems with tmux. The <code>Ctrl+b</code> prefix may not pass through correctly because the browser intercepts some key combinations. In practice, <code>Ctrl+b</code> often works, but scrolling, mouse support, and certain modifier combinations behave inconsistently.</p>
+<p><strong>Recommendation: always use SSH into the LXC for tmux work.</strong></p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>user@&lt;lxc-ip&gt;
+</code></pre></div>
+
+<p>SSH gives you a proper PTY, correct terminal type negotiation, and reliable key forwarding. noVNC is fine for quick root access or emergency recovery, but not for regular tmux sessions.</p>
+<p>If you must use the PVE noVNC console with tmux, set a longer escape time to reduce timeout frustration:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-sg<span class="w"> </span>escape-time<span class="w"> </span><span class="m">50</span>
+</code></pre></div>
+
+<hr>
+<h2>Exercise 1: First Session</h2>
+<p>This exercise covers starting, using, detaching, and reattaching to a named session.</p>
+<h3>Start a Named Session</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>new<span class="w"> </span>-s<span class="w"> </span>training
+</code></pre></div>
+
+<p>You are now inside a tmux session called <code>training</code>. The green (or coloured) bar at the bottom is the <strong>status bar</strong>.</p>
+<h3>Reading the Status Bar</h3>
+<p>The status bar shows:</p>
+<ul>
+<li>Left side: session name in brackets, e.g. <code>[training]</code>, followed by window index and name, e.g. <code>0:bash</code></li>
+<li>Right side: hostname and time (depending on your config)</li>
+<li>An asterisk <code>*</code> next to the current window name</li>
+</ul>
+<h3>Run a Command</h3>
+<div class="highlight"><pre><span></span><code>top
+</code></pre></div>
+
+<p>Watch it run. Now detach without killing it.</p>
+<h3>Detach from the Session</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b d
+</code></pre></div>
+
+<p>You are back at your normal shell prompt. The <code>top</code> command is still running inside tmux.</p>
+<h3>Verify the Session is Still Running</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>ls
+</code></pre></div>
+
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code>training: 1 windows (created Thu Feb 27 12:00:00 2026)
+</code></pre></div>
+
+<h3>Reattach to the Session</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>training
+</code></pre></div>
+
+<p>You are back inside the session. <code>top</code> is still running. Press <code>q</code> to quit <code>top</code>.</p>
+<h3>Recovery Notes for Exercise 1</h3>
+<p>If you lose track of session names, <code>tmux ls</code> always shows what is running. If <code>tmux ls</code> shows nothing, there are no sessions and you start fresh with <code>tmux new -s &lt;name&gt;</code>.</p>
+<hr>
+<h2>Exercise 2: Windows</h2>
+<p>Windows in tmux are like browser tabs. Each window fills the full terminal area and can run a different program.</p>
+<h3>Create a New Window</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b c
+</code></pre></div>
+
+<p>A new window appears. The status bar now shows two windows: <code>0:bash</code> and <code>1:bash</code>.</p>
+<h3>Name the Current Window</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b ,
+</code></pre></div>
+
+<p>A rename prompt appears at the bottom. Type a name, for example <code>logs</code>, then press <code>Enter</code>.</p>
+<h3>Switch Between Windows</h3>
+<p>Switch to window by number:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b 0
+Ctrl+b 1
+</code></pre></div>
+
+<p>Switch to next window:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b n
+</code></pre></div>
+
+<p>Switch to previous window:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b p
+</code></pre></div>
+
+<h3>List All Windows (Known State Check)</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b w
+</code></pre></div>
+
+<p>An interactive list of all windows appears. Use arrow keys to navigate and <code>Enter</code> to select. Press <code>Escape</code> to cancel without switching. This gives you a clear view of what is open.</p>
+<h3>Close a Window</h3>
+<p>The cleanest way is to exit the shell:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">exit</span>
+</code></pre></div>
+
+<p>Or force close the current window (with confirmation):</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b &amp;
+</code></pre></div>
+
+<p>Type <code>y</code> to confirm. If you have multiple windows, tmux moves you to the next one. If it was the last window, the session ends.</p>
+<h3>Recovery Notes for Exercise 2</h3>
+<p>If you are confused about which window you are in, <code>Ctrl+b w</code> shows the full list. If a window is running something stuck, <code>Ctrl+b &amp;</code> closes it after confirmation.</p>
+<hr>
+<h2>Exercise 3: Panes</h2>
+<p>Panes split a single window into multiple terminal areas visible at the same time.</p>
+<h3>Split Horizontally (Left and Right)</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b %
+</code></pre></div>
+
+<p>The window is now split into two vertical columns (left pane and right pane).</p>
+<h3>Split Vertically (Top and Bottom)</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b &quot;
+</code></pre></div>
+
+<p>The current pane is split into two horizontal rows.</p>
+<h3>Navigate Between Panes</h3>
+<p>Use the prefix followed by an arrow key:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b &lt;arrow key&gt;
+</code></pre></div>
+
+<p>For example, <code>Ctrl+b</code> then the right arrow moves focus to the right pane.</p>
+<h3>Show Pane Numbers (Known State Check)</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b q
+</code></pre></div>
+
+<p>Large numbers appear briefly over each pane. Press the number while it is visible to jump to that pane directly.</p>
+<h3>Resize a Pane</h3>
+<p>Hold the prefix and then repeatedly press arrow keys. In most terminals:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b :resize-pane -D 5
+</code></pre></div>
+
+<p>This resizes the current pane down by 5 rows. Directions: <code>-U</code> (up), <code>-D</code> (down), <code>-L</code> (left), <code>-R</code> (right).</p>
+<p>Alternatively, if mouse mode is enabled (covered in the config section), you can drag pane borders.</p>
+<h3>Zoom a Pane to Full Screen</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b z
+</code></pre></div>
+
+<p>The current pane expands to fill the entire window. Press <code>Ctrl+b z</code> again to return to the split layout. The status bar shows <code>[Z]</code> when a pane is zoomed.</p>
+<h3>Close a Pane</h3>
+<p>The cleanest way:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">exit</span>
+</code></pre></div>
+
+<p>Or force close with confirmation:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b x
+</code></pre></div>
+
+<p>Type <code>y</code> to confirm. If it is the last pane in the window, the window closes too.</p>
+<h3>Recovery Notes for Exercise 3</h3>
+<p><code>Ctrl+b q</code> shows pane numbers so you can see where you are. <code>Ctrl+b z</code> is useful if you accidentally zoomed and the layout looks wrong: toggle it again to return to the split view.</p>
+<hr>
+<h2>Exercise 4: Copy Mode (and How to Exit It)</h2>
+<p>Copy mode lets you scroll back through terminal output and copy text. Knowing how to exit it reliably is as important as knowing how to enter it.</p>
+<h3>Enter Copy Mode</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b [
+</code></pre></div>
+
+<p>The status bar shows <code>[Copy]</code> in the top right corner. You are now in copy mode.</p>
+<h3>Navigate in Copy Mode</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arrow keys</td>
+<td>Move cursor one line/column</td>
+</tr>
+<tr>
+<td><code>PgUp</code> / <code>PgDn</code></td>
+<td>Scroll up or down a page</td>
+</tr>
+<tr>
+<td><code>g</code></td>
+<td>Go to the top of the scrollback buffer</td>
+</tr>
+<tr>
+<td><code>G</code></td>
+<td>Go to the bottom (current output)</td>
+</tr>
+<tr>
+<td><code>/</code></td>
+<td>Search forward</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>Search backward</td>
+</tr>
+<tr>
+<td><code>n</code></td>
+<td>Next search match</td>
+</tr>
+<tr>
+<td><code>N</code></td>
+<td>Previous search match</td>
+</tr>
+</tbody>
+</table>
+<h3>Exit Copy Mode</h3>
+<p><strong>Press <code>q</code> or <code>Escape</code>.</strong></p>
+<p>This is the key thing to remember. If you are in copy mode and the terminal seems unresponsive to normal commands, you are still in copy mode. Press <code>q</code> or <code>Escape</code> to return to normal mode.</p>
+<h3>Copy Text</h3>
+<ol>
+<li>Enter copy mode: <code>Ctrl+b [</code></li>
+<li>Navigate to the start of the text you want</li>
+<li>Press <code>Space</code> to begin selection</li>
+<li>Move to the end of the text</li>
+<li>Press <code>Enter</code> to copy and exit copy mode</li>
+</ol>
+<h3>Paste Copied Text</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b ]
+</code></pre></div>
+
+<p>This pastes the tmux clipboard into the current pane at the cursor position.</p>
+<h3>Recovery Notes for Exercise 4</h3>
+<p>If your keyboard input is being swallowed and commands are not running, the most likely cause is that you are in copy mode. Press <code>q</code> first, then <code>Escape</code> if <code>q</code> did not work.</p>
+<hr>
+<h2>Exercise 5: PVE LXC Workflow</h2>
+<p>This exercise demonstrates the core use case for tmux in a Proxmox VE environment: running long tasks in an LXC container and safely reconnecting after a disconnect.</p>
+<h3>Step 1: SSH into the LXC Container</h3>
+<p>From your workstation (Ghostty or any terminal):</p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>user@&lt;lxc-ip&gt;
+</code></pre></div>
+
+<p>Replace <code>&lt;lxc-ip&gt;</code> with the IP address of your LXC container. You can find this in the PVE web interface under the container's Network tab, or by running <code>ip a</code> inside the container.</p>
+<h3>Step 2: Start a Persistent Session</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>new<span class="w"> </span>-s<span class="w"> </span>work
+</code></pre></div>
+
+<h3>Step 3: Run a Long Job</h3>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>upgrade
+</code></pre></div>
+
+<p>This may take several minutes. Let it run.</p>
+<h3>Step 4: Detach and Close SSH</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b d
+</code></pre></div>
+
+<p>You are back at the container's shell prompt (outside tmux). Now close the SSH connection entirely:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">exit</span>
+</code></pre></div>
+
+<p>Or close the terminal window. The <code>apt upgrade</code> is still running inside the tmux session on the LXC container.</p>
+<h3>Step 5: Reconnect and Reattach</h3>
+<p>Open a new terminal and SSH back in:</p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>user@&lt;lxc-ip&gt;
+</code></pre></div>
+
+<p>List running sessions:</p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>ls
+</code></pre></div>
+
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code>work: 1 windows (created Thu Feb 27 12:05:00 2026)
+</code></pre></div>
+
+<p>Reattach:</p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>work
+</code></pre></div>
+
+<p>You are back watching <code>apt upgrade</code> complete, exactly as you left it.</p>
+<h3>Why tmux Beats GNU Screen for LXC Work</h3>
+<p>Both tmux and screen provide session persistence, but tmux has clearer defaults, better pane support, and easier scripting. The <code>tmux ls</code> command gives a clean session overview. Pane splitting is built in without workarounds. Configuration via <code>~/.tmux.conf</code> is straightforward. For new setups, start with tmux.</p>
+<hr>
+<h2>Quick Reference Table</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Key or Command</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New named session</td>
+<td><code>tmux new -s &lt;name&gt;</code></td>
+<td>Run from shell</td>
+</tr>
+<tr>
+<td>List sessions</td>
+<td><code>tmux ls</code></td>
+<td>Run from shell</td>
+</tr>
+<tr>
+<td>Attach to session</td>
+<td><code>tmux attach -t &lt;name&gt;</code></td>
+<td>Run from shell</td>
+</tr>
+<tr>
+<td>Detach from session</td>
+<td><code>Ctrl+b d</code></td>
+<td>Session keeps running</td>
+</tr>
+<tr>
+<td>New window</td>
+<td><code>Ctrl+b c</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Rename window</td>
+<td><code>Ctrl+b ,</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Switch to window N</td>
+<td><code>Ctrl+b &lt;N&gt;</code></td>
+<td>0-9</td>
+</tr>
+<tr>
+<td>Next window</td>
+<td><code>Ctrl+b n</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Previous window</td>
+<td><code>Ctrl+b p</code></td>
+<td></td>
+</tr>
+<tr>
+<td>List windows</td>
+<td><code>Ctrl+b w</code></td>
+<td>Interactive picker</td>
+</tr>
+<tr>
+<td>Close window</td>
+<td><code>Ctrl+b &amp;</code></td>
+<td>Confirmation required</td>
+</tr>
+<tr>
+<td>Split pane left/right</td>
+<td><code>Ctrl+b %</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Split pane top/bottom</td>
+<td><code>Ctrl+b "</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Navigate panes</td>
+<td><code>Ctrl+b &lt;arrow&gt;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Show pane numbers</td>
+<td><code>Ctrl+b q</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Zoom pane toggle</td>
+<td><code>Ctrl+b z</code></td>
+<td>Status bar shows [Z]</td>
+</tr>
+<tr>
+<td>Close pane</td>
+<td><code>Ctrl+b x</code></td>
+<td>Confirmation required</td>
+</tr>
+<tr>
+<td>Enter copy mode</td>
+<td><code>Ctrl+b [</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Exit copy mode</td>
+<td><code>q</code> or <code>Escape</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Start selection</td>
+<td><code>Space</code></td>
+<td>While in copy mode</td>
+</tr>
+<tr>
+<td>Copy selection</td>
+<td><code>Enter</code></td>
+<td>While in copy mode</td>
+</tr>
+<tr>
+<td>Paste</td>
+<td><code>Ctrl+b ]</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Reload config</td>
+<td><code>Ctrl+b :source-file ~/.tmux.conf</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Kill session</td>
+<td><code>tmux kill-session -t &lt;name&gt;</code></td>
+<td>Run from shell</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Config Tweaks</h2>
+<p>tmux reads <code>~/.tmux.conf</code> on startup. Create or edit this file to customise behaviour. Changes take effect in new sessions, or you can reload without restarting.</p>
+<h3>Location</h3>
+<div class="highlight"><pre><span></span><code>~/.tmux.conf
+</code></pre></div>
+
+<h3>Change the Prefix Key to Ctrl+a</h3>
+<p>Many users prefer <code>Ctrl+a</code> because it is easier to reach and was the <code>screen</code> default:</p>
+<div class="highlight"><pre><span></span><code>unbind<span class="w"> </span>C-b
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>prefix<span class="w"> </span>C-a
+<span class="nb">bind</span><span class="w"> </span>C-a<span class="w"> </span>send-prefix
+</code></pre></div>
+
+<p>After this, all commands use <code>Ctrl+a</code> instead of <code>Ctrl+b</code>. The <code>bind C-a send-prefix</code> line lets you type a literal <code>Ctrl+a</code> in programs like bash by pressing the prefix twice.</p>
+<h3>Enable Mouse Support</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>mouse<span class="w"> </span>on
+</code></pre></div>
+
+<p>With mouse enabled, you can click to select panes, drag borders to resize, and scroll with the mouse wheel. Scroll wheel enters copy mode automatically. To exit copy mode after scrolling, press <code>q</code>.</p>
+<h3>Increase Scrollback Buffer</h3>
+<p>The default scrollback is 2000 lines, which fills up quickly. Increase it:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>history-limit<span class="w"> </span><span class="m">10000</span>
+</code></pre></div>
+
+<h3>Reduce Escape Time (Useful for PVE noVNC)</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-sg<span class="w"> </span>escape-time<span class="w"> </span><span class="m">50</span>
+</code></pre></div>
+
+<p>This reduces the delay tmux waits after pressing <code>Escape</code> before deciding it is not a prefix sequence. Lower values make <code>Escape</code> feel more responsive in vim and other tools inside tmux.</p>
+<h3>Start Window and Pane Index at 1</h3>
+<p>By default windows are numbered from 0. Starting at 1 maps better to the number keys:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>base-index<span class="w"> </span><span class="m">1</span>
+setw<span class="w"> </span>-g<span class="w"> </span>pane-base-index<span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+
+<h3>Reload Config Without Restarting</h3>
+<p>After editing <code>~/.tmux.conf</code>, reload it inside a running tmux session:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b :source-file ~/.tmux.conf
+</code></pre></div>
+
+<p>Or add a keybinding for this in <code>~/.tmux.conf</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">bind</span><span class="w"> </span>r<span class="w"> </span>source-file<span class="w"> </span>~/.tmux.conf<span class="w"> </span><span class="se">\;</span><span class="w"> </span>display-message<span class="w"> </span><span class="s2">&quot;Config reloaded&quot;</span>
+</code></pre></div>
+
+<p>Then use <code>Ctrl+b r</code> (or <code>Ctrl+a r</code> if you changed the prefix) to reload.</p>
+<h3>Minimal Recommended Config</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Change prefix to Ctrl+a</span>
+unbind<span class="w"> </span>C-b
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>prefix<span class="w"> </span>C-a
+<span class="nb">bind</span><span class="w"> </span>C-a<span class="w"> </span>send-prefix
+
+<span class="c1"># Enable mouse</span>
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>mouse<span class="w"> </span>on
+
+<span class="c1"># Increase scrollback</span>
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>history-limit<span class="w"> </span><span class="m">10000</span>
+
+<span class="c1"># Reduce escape time</span>
+<span class="nb">set</span><span class="w"> </span>-sg<span class="w"> </span>escape-time<span class="w"> </span><span class="m">50</span>
+
+<span class="c1"># Start numbering from 1</span>
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>base-index<span class="w"> </span><span class="m">1</span>
+setw<span class="w"> </span>-g<span class="w"> </span>pane-base-index<span class="w"> </span><span class="m">1</span>
+
+<span class="c1"># Reload config</span>
+<span class="nb">bind</span><span class="w"> </span>r<span class="w"> </span>source-file<span class="w"> </span>~/.tmux.conf<span class="w"> </span><span class="se">\;</span><span class="w"> </span>display-message<span class="w"> </span><span class="s2">&quot;Config reloaded&quot;</span>
+</code></pre></div>
+
+<hr>
+<h2>Known State Cheatsheet</h2>
+<p>Bookmark this section. When something goes wrong, work through it from top to bottom.</p>
+<p><strong>1. Exit any mode:</strong></p>
+<ul>
+<li>In copy mode: press <code>q</code>, then <code>Escape</code> if needed</li>
+<li>In command mode: press <code>Escape</code></li>
+<li>Program stuck: press <code>Ctrl+c</code></li>
+</ul>
+<p><strong>2. Check what windows and panes are open:</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b w    (list windows)
+Ctrl+b q    (show pane numbers)
+</code></pre></div>
+
+<p><strong>3. Detach safely (session keeps running):</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b d
+</code></pre></div>
+
+<p><strong>4. From the shell, list all sessions:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>ls
+</code></pre></div>
+
+<p><strong>5. Reattach to a session:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>&lt;name&gt;
+tmux<span class="w"> </span>attach<span class="w">          </span><span class="c1"># most recent session</span>
+</code></pre></div>
+
+<p><strong>6. Kill a stuck pane:</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b x    (confirmation prompt, then y)
+</code></pre></div>
+
+<p><strong>7. Kill a stuck window:</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b &amp;    (confirmation prompt, then y)
+</code></pre></div>
+
+<p><strong>8. Kill a session entirely:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>kill-session<span class="w"> </span>-t<span class="w"> </span>&lt;name&gt;
+</code></pre></div>
+
+<p><strong>9. Nuclear option: kill all tmux sessions:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>kill-server
+</code></pre></div>
+
+<p><strong>10. Start fresh:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>new<span class="w"> </span>-s<span class="w"> </span>main
+</code></pre></div>
+
+<p>Following this list top to bottom will resolve the vast majority of situations where tmux feels stuck or confusing. The core principle: <code>Ctrl+b d</code> gets you out, <code>tmux ls</code> shows what is there, and <code>tmux attach</code> gets you back in.</p>                    </article>
+                </aside><!-- /#featured -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

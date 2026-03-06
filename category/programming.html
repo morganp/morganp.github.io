@@ -1,0 +1,3194 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Lizard-Spock - Programming</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/homelab.html">Homelab</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li class="active"><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix \& Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../book-mastering-the-command-line.html">Book: Mastering the command line</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2025-05-31T10:11:00+01:00">
+                Published: Sat 31 May 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info --><!--to publish change draft to published-->
+
+<p><a href="https://leanpub.com/masteringcli">Mastering the command line like a hacker by Xiaodong Xu</a></p>
+<p>The book focuses on bash and zsh, which is great since I use both of those shells.</p>
+<p>The useful sections from the book include:</p>
+<h1>Zsh Completion</h1>
+<div class="highlight"><pre><span></span><code><span class="c1"># ~/.zshrc</span>
+<span class="n">autoload</span><span class="w"> </span><span class="o">-</span><span class="n">U</span><span class="w"> </span><span class="n">compinit</span>
+<span class="n">compinit</span><span class="w"> </span><span class="o">-</span><span class="n">i</span>
+
+<span class="n">source</span><span class="w"> </span><span class="o">~/</span><span class="n">dotfiles</span><span class="o">/</span><span class="n">zsh</span><span class="o">-</span><span class="n">autosuggestions</span><span class="o">/</span><span class="n">zsh</span><span class="o">-</span><span class="n">autosuggestions</span><span class="o">.</span><span class="n">zsh</span>
+</code></pre></div>
+
+<p>The zsh-autosuggestions.zsh needs to be <a href="https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md">installed/downloaded from Github</a>, adding as a seperate depo or adding as a submodule to your dotfiles depo.</p>
+<h1>History</h1>
+<h2>BASH History</h2>
+<div class="highlight"><pre><span></span><code>#<span class="w"> </span><span class="o">~/</span>.<span class="nv">bashrc</span>
+#<span class="w"> </span><span class="nv">Save</span><span class="w"> </span><span class="mi">5000</span><span class="w"> </span><span class="nv">lins</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="nv">history</span>,<span class="w"> </span><span class="nv">with</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">same</span><span class="w"> </span><span class="nv">scroll</span><span class="w"> </span><span class="nv">back</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">terminal</span>
+<span class="nv">HISTFILESIZE</span><span class="o">=</span><span class="mi">5000</span>
+<span class="nv">HISTSIZE</span><span class="o">=</span><span class="mi">5000</span>
+
+#<span class="w"> </span><span class="k">Do</span><span class="w"> </span><span class="nv">not</span><span class="w"> </span><span class="nv">save</span><span class="w"> </span><span class="nv">duplicate</span><span class="w"> </span><span class="nv">commands</span>,<span class="w"> </span><span class="nv">ignore</span><span class="w"> </span><span class="nv">commands</span><span class="w"> </span><span class="nv">starting</span><span class="w"> </span><span class="nv">with</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">space</span>
+<span class="nv">HISTCONTROL</span><span class="o">=</span><span class="s1">&#39;erasedups:ignorespace&#39;</span>
+</code></pre></div>
+
+<h2>ZSH History</h2>
+<div class="highlight"><pre><span></span><code><span class="gh">#</span> ~/.zshrc 
+<span class="gh">#</span> Save 5000 lins of history, with the same scroll back in the terminal
+SAVEHIST=5000
+HISTSIZE=5000
+
+<span class="gh">#</span> Do not save duplicate commands, ignore commands starting with a space
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+</code></pre></div>
+
+<h2>Using History</h2>
+<p>View the last 5 commands</p>
+<div class="highlight"><pre><span></span><code># Bash
+$ history 5
+# Zsh
+$ history -5
+</code></pre></div>
+
+<p>For zsh we can see the last time the command was run and the time taken with :</p>
+<div class="highlight"><pre><span></span><code>history -i -D
+</code></pre></div>
+
+<p>Alternative command to history:</p>
+<div class="highlight"><pre><span></span><code>fc
+</code></pre></div>
+
+<h2>Searching History</h2>
+<p>The most common way is piping history through grep to search.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">history</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;cmd&#39;</span>
+</code></pre></div>
+
+<p>Ctrl+r is another option which starts a reverse search through the history.</p>
+<p>Ctrl+p and Ctrl+n can be used to scroll forwards and backwards through previous commands. Although for me the up down cursors workk mor enaturally.</p>
+<h2>Repeating Commands</h2>
+<p>Repeat the last command used (Bang Bang)</p>
+<div class="highlight"><pre><span></span><code>!!
+</code></pre></div>
+
+<p>great example is when you run a command but it fails because of require Superuser access.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>cmd_that_needs_root
+&gt;<span class="w"> </span>fail
+$<span class="w"> </span>sudo<span class="w"> </span>!!
+&gt;<span class="w"> </span>yay!
+</code></pre></div>
+
+<p>Execute command 2 back.</p>
+<div class="highlight"><pre><span></span><code>!-2
+#Note
+!! =&gt; !-1
+</code></pre></div>
+
+<p>Execute command 100 from history</p>
+<div class="highlight"><pre><span></span><code><span class="sx">!100</span>
+</code></pre></div>
+
+<h2>Last Argument</h2>
+<p><code>!$</code> recalls the last Argument. typicall usage could be with mkdir and cd:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>mkdir<span class="w"> </span>notes
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>!$
+</code></pre></div>
+
+<!--Image Example: image location content/images/photo.jpg-->
+<p><img alt="photo" src="../photo.jpg"></p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../better-python-iterators.html" rel="bookmark"
+                               title="Permalink to Better Python Iterators">Better Python Iterators</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-03-01T12:24:00+00:00">
+                Published: Sat 01 March 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <!--to publish change draft to published-->
+
+<p>Pyhton can convert most (all) lists/collections into iterator objects, this is done by calling <code>iter()</code> ie</p>
+<div class="highlight"><pre><span></span><code>num_list = [1, 2 …</code></pre></div>
+                        <a class="readmore" href="../better-python-iterators.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../packaging-python-projects.html" rel="bookmark"
+                               title="Permalink to Packaging Python Projects">Packaging Python Projects</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-02-28T15:22:00+00:00">
+                Published: Fri 28 February 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <!--to publish change draft to published-->
+
+<p>How to package a pythin script or project for distribution. Offical Docs are [here][python_package].
+Packaging for pip requires use …</p>
+                        <a class="readmore" href="../packaging-python-projects.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../pelican-new-post-script.html" rel="bookmark"
+                               title="Permalink to Pelican New Post script">Pelican New Post script</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-01-03T16:44:00+00:00">
+                Published: Fri 03 January 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <p>In the aim of keeping the navigation of the Blog posts clean, I have limited my self to a few …</p>
+                        <a class="readmore" href="../pelican-new-post-script.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../python-base-types.html" rel="bookmark"
+                               title="Permalink to Python Base Types">Python Base Types</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-01-02T18:09:00+00:00">
+                Published: Thu 02 January 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <p>Making notes as I work through <a href="https://www.dr-chuck.com">Dr Chucks</a> Python for Everyone course on <a href="https://www.coursera.org/specializations/python">Coursera</a>.</p>
+<p>There are 3 main types in …</p>
+                        <a class="readmore" href="../python-base-types.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../modify-pelican-theme.html" rel="bookmark"
+                               title="Permalink to Modify Pelican theme">Modify Pelican theme</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-01-02T16:53:00+00:00">
+                Published: Thu 02 January 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> <a href="../tag/pelican.html">pelican</a> </p>        
+</footer><!-- /.post-info -->                        <p>First figure out which theme you are using.
+List installed themes via:</p>
+<div class="highlight"><pre><span></span><code><span class="c">% pelican-themes -l</span>
+<span class="n">simple</span>
+<span class="s">notmyidea</span>
+</code></pre></div>
+
+<p>pelicanconf.py does not …</p>
+                        <a class="readmore" href="../modify-pelican-theme.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../pelican-site-add-tags-and-categories-list.html" rel="bookmark"
+                               title="Permalink to Pelican Site add Tags and Categories list">Pelican Site add Tags and Categories list</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-01-02T15:39:00+00:00">
+                Published: Thu 02 January 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> <a href="../tag/pelican.html">pelican</a> </p>        
+</footer><!-- /.post-info -->                        <p>I think it improves website usability when they are navigatable via the URL.</p>
+<p>For example when viewing Posts under the …</p>
+                        <a class="readmore" href="../pelican-site-add-tags-and-categories-list.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../python-regular-expressions.html" rel="bookmark"
+                               title="Permalink to Python Regular Expressions">Python Regular Expressions</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-12-23T10:21:00+00:00">
+                Published: Mon 23 December 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <h2>Python Regular Expressions Quick Guide:</h2>
+<div class="highlight"><pre><span></span><code><span class="o">^</span><span class="w">        </span><span class="n">Matches</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">beginning</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">line</span>
+<span class="err">$</span><span class="w">        </span><span class="n">Matches</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">end</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">line</span>
+<span class="p">.</span><span class="w">        </span><span class="n">Matches</span><span class="w"> </span><span class="ow">any</span><span class="w"> </span><span class="k">character …</span></code></pre></div>
+                        <a class="readmore" href="../python-regular-expressions.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../pyhton_virtual_env.html" rel="bookmark"
+                               title="Permalink to Pyhton_virtual_env">Pyhton_virtual_env</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-05-30T16:03:00+01:00">
+                Published: Thu 30 May 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+        
+</footer><!-- /.post-info -->                        <p>Creating/Setup a pyhton virtual enviroment called 'venv'</p>
+<div class="highlight"><pre><span></span><code>python3 -m venv venv
+</code></pre></div>
+
+<p>Load the virtual env called venv</p>
+<div class="highlight"><pre><span></span><code>source venv …</code></pre></div>
+                        <a class="readmore" href="../pyhton_virtual_env.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../convolution-in-python.html" rel="bookmark"
+                               title="Permalink to Convolution in Python">Convolution in Python</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-05-03T14:25:00+01:00">
+                Published: Fri 03 May 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+        
+</footer><!-- /.post-info -->                        <p>Convolution in Python, for merging filter responses, creating pascals triangle ...</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">a</span><span class="o">=</span><span class="w"> </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">b …</span></code></pre></div>
+                        <a class="readmore" href="../convolution-in-python.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../perforce-update-files-in-a-shelve.html" rel="bookmark"
+                               title="Permalink to Perforce Update files in a Shelve">Perforce Update files in a Shelve</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-04-30T11:04:00+01:00">
+                Published: Tue 30 April 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+        
+</footer><!-- /.post-info -->                        <p>Perforce can temporarily checkins of changes that you might want to share with others before fully commiting them to the …</p>
+                        <a class="readmore" href="../perforce-update-files-in-a-shelve.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../python-merge-pdfs.html" rel="bookmark"
+                               title="Permalink to Python merge PDFs">Python merge PDFs</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-04-22T18:49:00+01:00">
+                Published: Mon 22 April 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <p>Using python script to merge pdfs together.</p>
+<p>Install package</p>
+<div class="highlight"><pre><span></span><code>pip install pypdf
+</code></pre></div>
+
+<p>Script:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pypdf</span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="n">PdfWriter</span>
+
+<span class="n">pdfs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;file1.pdf …</span></code></pre></div>
+                        <a class="readmore" href="../python-merge-pdfs.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../pythonista-pip-install-pelican.html" rel="bookmark"
+                               title="Permalink to Pythonista pip install pelican">Pythonista pip install pelican</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-04-20T12:04:00+01:00">
+                Published: Sat 20 April 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <p>On the journey towards publish static site generator blog posts from iPadOS, my next step after installing stash on pythonista …</p>
+                        <a class="readmore" href="../pythonista-pip-install-pelican.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../pythonista-using-stash-for-pip.html" rel="bookmark"
+                               title="Permalink to Pythonista using stash for pip">Pythonista using stash for pip</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-04-19T17:04:00+01:00">
+                Published: Fri 19 April 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <p>Installing stash on pythonista</p>
+                        <a class="readmore" href="../pythonista-using-stash-for-pip.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../python-read-a-csv-file.html" rel="bookmark"
+                               title="Permalink to Python read a CSV file">Python read a CSV file</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-04-19T12:34:00+01:00">
+                Published: Fri 19 April 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/pelican.html">pelican</a> <a href="../tag/python.html">python</a> </p>        
+</footer><!-- /.post-info -->                        <p>Python example for reading data from a csv file.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="k">with</span><span class="w"> </span><span class="nb">open</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">csv</span><span class="s1">&#39;, newline=&#39;&#39;) as csvfile:</span>
+<span class="w">    </span><span class="n">spamreader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">csv …</span></code></pre></div>
+                        <a class="readmore" href="../python-read-a-csv-file.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../python-sinewave.html" rel="bookmark"
+                               title="Permalink to Python Sinewave">Python Sinewave</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-04-19T12:34:00+01:00">
+                Published: Fri 19 April 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/python.html">python</a> <a href="../tag/signal.html">signal</a> <a href="../tag/dsp.html">DSP</a> </p>        
+</footer><!-- /.post-info -->                        <p>Create and plot a sinewave in python</p>
+                        <a class="readmore" href="../python-sinewave.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../find-your-ruby-gems-path.html" rel="bookmark"
+                               title="Permalink to "Find your ruby gems path"">"Find your ruby gems path"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-02-18T16:39:32+00:00">
+                Published: Wed 18 February 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code> ruby -r rubygems -e &quot;p Gem.path&quot;
+</code></pre></div>
+
+<p>From <a href="http://gilesbowkett.blogspot.co.uk/2009/06/find-your-ruby-gems-path.html">Giles Bowkett</a>.</p>
+                        <a class="readmore" href="../find-your-ruby-gems-path.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../error-storage-class-specified-for-parameter.html" rel="bookmark"
+                               title="Permalink to "error: storage class specified for parameter"">"error: storage class specified for parameter"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-06-19T20:42:33+01:00">
+                Published: Thu 19 June 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/c.html">C</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code><span class="n">error</span><span class="o">:</span><span class="w"> </span><span class="n">storage</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">parameter</span>
+</code></pre></div>
+
+<p><a href="http://stackoverflow.com/q/3676969/97073">There is probably a missing semicolon <code>;</code> in a header file!</a> Just written my first …</p>
+                        <a class="readmore" href="../error-storage-class-specified-for-parameter.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../octopress-categories-with-different-styles.html" rel="bookmark"
+                               title="Permalink to "Octopress categories with different styles"">"Octopress categories with different styles"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-06-14T08:24:01+01:00">
+                Published: Sat 14 June 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/octopress.html">Octopress</a> </p>        
+</footer><!-- /.post-info -->                        <p>As I use the code blocks for ingredient lists on my recipe pages I wanted to 
+have a different style …</p>
+                        <a class="readmore" href="../octopress-categories-with-different-styles.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../licence-types-and-short-identifiers.html" rel="bookmark"
+                               title="Permalink to "Licence Types and Short Identifiers"">"Licence Types and Short Identifiers"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-05-05T20:17:43+01:00">
+                Published: Mon 05 May 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>Some time ago <a href="http://guides.rubygems.org/specification-reference/">gemspec</a> files for ruby gems added the ability to
+specify the short identifier for the license type …</p>
+                        <a class="readmore" href="../licence-types-and-short-identifiers.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../ruby-methods-and-splat.html" rel="bookmark"
+                               title="Permalink to "Ruby Methods and Splat"">"Ruby Methods and Splat"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-09T19:47:47+01:00">
+                Published: Wed 09 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Ruby methods can set default values for optional arguments:</p>
+<div class="highlight"><pre><span></span><code>def commit(path=Dir.pwd)
+</code></pre></div>
+
+<p>To take an optional number of …</p>
+                        <a class="readmore" href="../ruby-methods-and-splat.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../thor-adding-verbose.html" rel="bookmark"
+                               title="Permalink to "Thor Adding --verbose"">"Thor Adding --verbose"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-09T19:26:44+01:00">
+                Published: Wed 09 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>With a command line Ruby application using Thor for the option parsing I want to be able to run:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>thor_app …</code></pre></div>
+                        <a class="readmore" href="../thor-adding-verbose.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../thor-variable-arguments.html" rel="bookmark"
+                               title="Permalink to "Thor Variable Arguments"">"Thor Variable Arguments"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-01T19:39:19+01:00">
+                Published: Tue 01 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://whatisthor.com/">Thor</a> is a Ruby Gem, which allows you to build command line applications which accept commands, in the same way …</p>
+                        <a class="readmore" href="../thor-variable-arguments.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../ruby-print-array.html" rel="bookmark"
+                               title="Permalink to "Ruby Print Array"">"Ruby Print Array"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-01T18:36:00+01:00">
+                Published: Tue 01 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p><code>puts</code> and <code>to_s</code> could be better:</p>
+<div class="highlight"><pre><span></span><code>a = [1, 2, 3]
+puts a
+<span class="k">&gt; </span><span class="ge">1</span>
+<span class="k">&gt; </span><span class="ge">2</span>
+<span class="k">&gt; </span><span class="ge">3</span>
+
+puts a.to_s
+<span class="k">&gt; </span><span class="ge">[1, 2 …</span></code></pre></div>
+                        <a class="readmore" href="../ruby-print-array.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../ruby-iterate-over-lines-in-a-string.html" rel="bookmark"
+                               title="Permalink to "Ruby iterate over lines in a string"">"Ruby iterate over lines in a string"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-13T21:03:54+00:00">
+                Published: Thu 13 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>str.each_line do |line|
+  #do something with line
+end
+</code></pre></div>
+
+<p><a href="http://stackoverflow.com/a/601892/97073">Source</a>.</p>
+                        <a class="readmore" href="../ruby-iterate-over-lines-in-a-string.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../edit-octopress-posts.html" rel="bookmark"
+                               title="Permalink to "Edit Octopress Posts"">"Edit Octopress Posts"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-01T19:28:17+00:00">
+                Published: Sat 01 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/octopress.html">Octopress</a> <a href="../tag/vim.html">Vim</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>Creating new posts in Octopress is <code>rake new_post["Edit Posts"]</code> which outputs the created filename. </p>
+<p>Posts are prefixed with date …</p>
+                        <a class="readmore" href="../edit-octopress-posts.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../monkey-patch-octopress.html" rel="bookmark"
+                               title="Permalink to "Monkey Patch Octopress"">"Monkey Patch Octopress"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-02-18T19:46:55+00:00">
+                Published: Tue 18 February 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/web.html">Web</a> <a href="../tag/octopress.html">Octopress</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on <a href="https://github.com/imathis/octopress/blob/master/plugins/post_filters.rb">post_filters by imathis</a>.</p>
+<p>First Move the original method out the way with <code>alias_method</code>  then create a new method …</p>
+                        <a class="readmore" href="../monkey-patch-octopress.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///239/OS_X_Handbrake_install_libdvdcss_%28Decryption%29" rel="bookmark"
+                               title="Permalink to "OS X Handbrake install libdvdcss (Decryption)"">"OS X Handbrake install libdvdcss (Decryption)"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-10-30T12:38:35+00:00">
+                Published: Wed 30 October 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/handbrake.html">Handbrake</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/vlc.html">VLC</a> </p>        
+</footer><!-- /.post-info -->                        <ol>
+<li>
+<p>Go to the <a href="http://amaras-tech.co.uk/u/7h">Videolan</a> website and download and run the libdvdcss.pkg.</p>
+</li>
+<li>
+<p>Switch VLC preference, Advanced, uncheck Dvd-Video use libdvdnav …</p></li></ol>
+                        <a class="readmore" href="..///239/OS_X_Handbrake_install_libdvdcss_%28Decryption%29">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///228/Ruby_Evaluate_Envvars_in_string." rel="bookmark"
+                               title="Permalink to "Ruby Evaluate Envvars in string."">"Ruby Evaluate Envvars in string."</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-07-12T22:59:37+01:00">
+                Published: Fri 12 July 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>In ruby Dir.entries takes a path and returns a list of its contents. However it does not deal with …</p>
+                        <a class="readmore" href="..///228/Ruby_Evaluate_Envvars_in_string.">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///223/Ruby%3A_optionally_add_path_separator" rel="bookmark"
+                               title="Permalink to "Ruby: optionally add path separator"">"Ruby: optionally add path separator"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-06-05T11:46:58+01:00">
+                Published: Wed 05 June 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>I was wanting to use Dir.glob to get a file list and wanted to do <code>Dir.glob( path + '*')</code> but …</p>
+                        <a class="readmore" href="..///223/Ruby%3A_optionally_add_path_separator">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///222/Add_about_page_to_Octopress" rel="bookmark"
+                               title="Permalink to "Add about page to Octopress"">"Add about page to Octopress"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-05-19T08:41:53+01:00">
+                Published: Sun 19 May 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/octopress.html">Octopress</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>To add  static about page to octopress blog, assuming that octopress has been already setup:</p>
+<p>Create the page from the …</p>
+                        <a class="readmore" href="..///222/Add_about_page_to_Octopress">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///217/JavaScript_Net_Curtain" rel="bookmark"
+                               title="Permalink to "JavaScript Net Curtain"">"JavaScript Net Curtain"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-04-24T07:44:19+01:00">
+                Published: Wed 24 April 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/javascript.html">Javascript</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>Normally this would just end up on <a href="http://amaras-tech.co.uk/u">my link blog</a>, but thought it was worthy of a proper mention.</p>
+<p><a href="http://amaras-tech.co.uk/u/5m">A …</a></p>
+                        <a class="readmore" href="..///217/JavaScript_Net_Curtain">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///211/Algebra_%3A_Properties_of_Real_%28%26%23x211D%29_Numbers" rel="bookmark"
+                               title="Permalink to "Algebra : Properties of Real (ℝ) Numbers"">"Algebra : Properties of Real (&#x211D) Numbers"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-02-14T17:57:46+00:00">
+                Published: Thu 14 February 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/math.html">Math</a> </p>        
+</footer><!-- /.post-info -->                        <h2>Commutative</h2>
+<p>Configurable order of numbers:</p>
+<div class="highlight"><pre><span></span><code>x+y = y+x
+xy  = yx
+</code></pre></div>
+
+<h2>Associative</h2>
+<p>Order that multiplication is applied :</p>
+<div class="highlight"><pre><span></span><code>(x+y)+z …</code></pre></div>
+                        <a class="readmore" href="..///211/Algebra_%3A_Properties_of_Real_%28%26%23x211D%29_Numbers">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///207/Ruby_duck_typing_Strings_and_Arrays" rel="bookmark"
+                               title="Permalink to "Ruby duck typing Strings and Arrays"">"Ruby duck typing Strings and Arrays"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-12-20T16:12:08+00:00">
+                Published: Thu 20 December 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>How to get method which handles a single string input or an array of strings?</p>
+<h2>Splat *</h2>
+<p>* turns single strings into …</p>
+                        <a class="readmore" href="..///207/Ruby_duck_typing_Strings_and_Arrays">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///201/Print_nested_array_structures_in_table_format" rel="bookmark"
+                               title="Permalink to "Print nested array structures in table format"">"Print nested array structures in table format"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-10-03T20:47:13+01:00">
+                Published: Wed 03 October 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <h2>Problem</h2>
+<p>Take an array of arrays and format it for displaying to the terminal or outputting to a text file …</p>
+                        <a class="readmore" href="..///201/Print_nested_array_structures_in_table_format">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///200/Converting_flat_structure_into_a_nested_structure" rel="bookmark"
+                               title="Permalink to "Converting flat structure into a nested structure"">"Converting flat structure into a nested structure"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-10-03T20:11:12+01:00">
+                Published: Wed 03 October 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Given a flat hierarchy of data comprising level and a label, aim to nest the lower level of objects in …</p>
+                        <a class="readmore" href="..///200/Converting_flat_structure_into_a_nested_structure">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///198/Calculating_Regression_Coefficients_in_R" rel="bookmark"
+                               title="Permalink to "Calculating Regression Coefficients in R"">"Calculating Regression Coefficients in R"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-29T12:10:18+01:00">
+                Published: Sat 29 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/r.html">R</a> <a href="../tag/statistics.html">Statistics</a> </p>        
+</footer><!-- /.post-info -->                        <p>For this example we will have a data file with two columns of data labelled A and B. For example …</p>
+                        <a class="readmore" href="..///198/Calculating_Regression_Coefficients_in_R">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///182/Mountain_Lion_Setup%2C_Part_2_Homebrew_%26_RVM" rel="bookmark"
+                               title="Permalink to "Mountain Lion Setup, Part 2 Homebrew & RVM"">"Mountain Lion Setup, Part 2 Homebrew & RVM"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T11:34:57+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> </p>        
+</footer><!-- /.post-info -->                        <p>Following on from <a href="http://amaras-tech.co.uk/article/180">Macbook Pro Setup</a>, Now it is time to install some of the command line tools.</p>
+<p>I have …</p>
+                        <a class="readmore" href="..///182/Mountain_Lion_Setup%2C_Part_2_Homebrew_%26_RVM">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///180/Mountain_Lion_Setup%2C_Part_1_%3A_Upgrade_Lion" rel="bookmark"
+                               title="Permalink to "Mountain Lion Setup, Part 1 : Upgrade Lion"">"Mountain Lion Setup, Part 1 : Upgrade Lion"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T10:00:14+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/lion.html">Lion</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> </p>        
+</footer><!-- /.post-info -->                        <p>MacBook Pro with Lion arrives, before installing any other software apply for the <a href="http://www.apple.com/uk/osx/uptodate/">Up-to-Date Programme</a> for free a mountain lion …</p>
+                        <a class="readmore" href="..///180/Mountain_Lion_Setup%2C_Part_1_%3A_Upgrade_Lion">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///177/Web_Automation_with_Watir" rel="bookmark"
+                               title="Permalink to "Web Automation with Watir"">"Web Automation with Watir"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-06T13:30:06+01:00">
+                Published: Mon 06 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://watir.com/">Watir</a> is a web testing framework implemented in ruby, but can be used for testing or automating any web service …</p>
+                        <a class="readmore" href="..///177/Web_Automation_with_Watir">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///174/Pragmatic_Programmers%2C_Dropbox_integration" rel="bookmark"
+                               title="Permalink to "Pragmatic Programmers, Dropbox integration"">"Pragmatic Programmers, Dropbox integration"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-06-19T09:13:07+01:00">
+                Published: Tue 19 June 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/ipad.html">iPad</a> <a href="../tag/kindle.html">Kindle</a> <a href="../tag/pragprog.html">PragProg</a> </p>        
+</footer><!-- /.post-info -->                        <p>After deciding to try out epub on the kindle, as I noticed people are listing epub as an apple format …</p>
+                        <a class="readmore" href="..///174/Pragmatic_Programmers%2C_Dropbox_integration">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///167/Create_And%2COr_of_multiple_booleans" rel="bookmark"
+                               title="Permalink to "Create And,Or of multiple booleans"">"Create And,Or of multiple booleans"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-21T11:35:19+01:00">
+                Published: Mon 21 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>To reduce an array of Booleans to a single Boolean using enumerables reduce method:</p>
+<div class="highlight"><pre><span></span><code>[true, true, true].reduce( :| ) ## OR
+=&gt; true …</code></pre></div>
+                        <a class="readmore" href="..///167/Create_And%2COr_of_multiple_booleans">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///166/rspec_testing_exceptions" rel="bookmark"
+                               title="Permalink to "rspec testing exceptions"">"rspec testing exceptions"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-20T15:24:34+01:00">
+                Published: Sun 20 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rspec.html">Rspec</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://rspec.info/">rspec</a> is a testing framework designed to make test-driven development enjoyable and productive. On the recent release of <a href="http://morganp.github.com/RubyIt/">RubyIt</a> I …</p>
+                        <a class="readmore" href="..///166/rspec_testing_exceptions">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///165/rspec_testing_exceptions_%28old_post%29" rel="bookmark"
+                               title="Permalink to "rspec testing exceptions (old post)"">"rspec testing exceptions (old post)"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-20T14:57:39+01:00">
+                Published: Sun 20 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rspec.html">Rspec</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://amaras-tech.co.uk/article/166">Correct Post</a></p>
+                        <a class="readmore" href="..///165/rspec_testing_exceptions_%28old_post%29">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///164/Ruby_special_exception_variables_made_mnemonic" rel="bookmark"
+                               title="Permalink to "Ruby special exception variables made mnemonic"">"Ruby special exception variables made mnemonic"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-19T14:56:56+01:00">
+                Published: Sat 19 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>In ruby you can catch StandardErrors using begin rescue end</p>
+<div class="highlight"><pre><span></span><code><span class="nv">begin</span>
+<span class="w">  </span>#<span class="nv">Some</span><span class="w"> </span><span class="nv">thing</span><span class="w"> </span><span class="nv">which</span><span class="w"> </span><span class="nv">might</span><span class="w"> </span><span class="nv">fails</span>
+<span class="nv">rescue</span>
+<span class="w">  </span>$<span class="nv">stderr</span>.<span class="nv">puts</span><span class="w"> </span>$<span class="o">!</span>
+<span class="k">end …</span></code></pre></div>
+                        <a class="readmore" href="..///164/Ruby_special_exception_variables_made_mnemonic">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///163/Handle_www._and_no-www_for_better_google_juice" rel="bookmark"
+                               title="Permalink to "Handle www. and no-www for better google juice"">"Handle www. and no-www for better google juice"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-18T23:00:39+01:00">
+                Published: Fri 18 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/bundler.html">Bundler</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>There was an interesting post on hacker news recently, <a href="http://blog.safeshepherd.com/post/23218902229/google-just-nerfed-us-a-venture-backed-startup">safeshepherd suddenly fell off the google</a> for their own name. The …</p>
+                        <a class="readmore" href="..///163/Handle_www._and_no-www_for_better_google_juice">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///156/Syntax_error%3A_Not_a_valid_color_stop%3A_Sass%3A%3AScript%3A%3AString%3A_white" rel="bookmark"
+                               title="Permalink to "Syntax error: Not a valid color stop: Sass::Script::String: white"">"Syntax error: Not a valid color stop: Sass::Script::String: white"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-28T19:02:50+01:00">
+                Published: Sat 28 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/bundler.html">Bundler</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sass.html">SASS</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>After making a few updates to my site it stopped working after deploying. The issue was that the gem version …</p>
+                        <a class="readmore" href="..///156/Syntax_error%3A_Not_a_valid_color_stop%3A_Sass%3A%3AScript%3A%3AString%3A_white">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///155/Minify_your_HTML_from_Sinatra" rel="bookmark"
+                               title="Permalink to "Minify your HTML from Sinatra"">"Minify your HTML from Sinatra"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-26T15:13:49+01:00">
+                Published: Thu 26 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>There are gzip compression options available but when I looked at this a long time ago I found that the …</p>
+                        <a class="readmore" href="..///155/Minify_your_HTML_from_Sinatra">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///149/Sinatra_application_in_.%2Flib_and_views%2C_public_routes_not_working" rel="bookmark"
+                               title="Permalink to "Sinatra application in ./lib and views, public routes not working"">"Sinatra application in ./lib and views, public routes not working"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-20T23:26:34+01:00">
+                Published: Fri 20 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been setting up my recent Sinatra projects with a standard ruby project layout putting all of the application …</p>
+                        <a class="readmore" href="..///149/Sinatra_application_in_.%2Flib_and_views%2C_public_routes_not_working">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///148/Update_your_RVM_Ruby_and_migrate_gemsets" rel="bookmark"
+                               title="Permalink to "Update your RVM Ruby and migrate gemsets"">"Update your RVM Ruby and migrate gemsets"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-20T22:08:43+01:00">
+                Published: Fri 20 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> </p>        
+</footer><!-- /.post-info -->                        <p>Update RVM</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rvm<span class="w"> </span>get<span class="w"> </span>head
+</code></pre></div>
+
+<p>List current versions, and all versions </p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rvm<span class="w"> </span>list
+$<span class="w"> </span>rvm<span class="w"> </span>list<span class="w"> </span>known
+</code></pre></div>
+
+<p>Select the version you …</p>
+                        <a class="readmore" href="..///148/Update_your_RVM_Ruby_and_migrate_gemsets">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///146/Encoding%3A%3AUndefinedConversionError_-_" rel="bookmark"
+                               title="Permalink to "Encoding::UndefinedConversionError - "">"Encoding::UndefinedConversionError - "</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-04T20:37:01+01:00">
+                Published: Wed 04 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sass.html">SASS</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>Are you running into the following error</p>
+<div class="highlight"><pre><span></span><code>Encoding::UndefinedConversionError - &quot;\xE2&quot; from ASCII-8BIT to UTF-8:
+</code></pre></div>
+
+<p>If you are using Ruby and …</p>
+                        <a class="readmore" href="..///146/Encoding%3A%3AUndefinedConversionError_-_">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///144/CSS_%28Via_SASS%29_Seperating_Colour_and_Position" rel="bookmark"
+                               title="Permalink to "CSS (Via SASS) Seperating Colour and Position"">"CSS (Via SASS) Seperating Colour and Position"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-01T16:15:15+01:00">
+                Published: Sun 01 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/css.html">CSS</a> <a href="../tag/sass.html">SASS</a> <a href="../tag/web.html">Web</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>While working on this site I wanted to find a simple way of trying out multiple stylesheets for different colour …</p>
+                        <a class="readmore" href="..///144/CSS_%28Via_SASS%29_Seperating_Colour_and_Position">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///143/User_selectable_stylesheets_%28Using_Sinatra%29" rel="bookmark"
+                               title="Permalink to "User selectable stylesheets (Using Sinatra)"">"User selectable stylesheets (Using Sinatra)"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-03-29T21:49:23+01:00">
+                Published: Thu 29 March 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/css.html">CSS</a> <a href="../tag/design.html">Design</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sass.html">SASS</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>Working on my site design I thought it would be nice to have user selectable stylesheets, say a black text …</p>
+                        <a class="readmore" href="..///143/User_selectable_stylesheets_%28Using_Sinatra%29">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///136/matrix%3A_A_Ruby_Standard_Library" rel="bookmark"
+                               title="Permalink to "matrix: A Ruby Standard Library"">"matrix: A Ruby Standard Library"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-01-20T12:09:05+00:00">
+                Published: Fri 20 January 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/math.html">Math</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://github.com/sandal/guides/wiki/STDLIB:-Matrix">Originally written</a> as an assignment for <a href="http://mendicantuniversity.org/">Ruby Mendicant University</a>.</p>
+<p>matrix is part of the <a href="http://ruby-doc.org/stdlib/libdoc/matrix/rdoc/classes/Matrix.html">Ruby Standard Library</a>  </p>
+<h1>Usage</h1>
+<p>A note …</p>
+                        <a class="readmore" href="..///136/matrix%3A_A_Ruby_Standard_Library">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///132/Ruby_get_a_users_real_name" rel="bookmark"
+                               title="Permalink to "Ruby get a users real name"">"Ruby get a users real name"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-12-22T12:06:08+00:00">
+                Published: Thu 22 December 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>There does not appear to be a nice way to get a current users real name in ruby. The best …</p>
+                        <a class="readmore" href="..///132/Ruby_get_a_users_real_name">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///131/Ruby_send_message_to_stderr" rel="bookmark"
+                               title="Permalink to "Ruby send message to stderr"">"Ruby send message to stderr"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-12-22T11:56:25+00:00">
+                Published: Thu 22 December 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>When creating applications normal messages should go to <a href="http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29">stdout</a> and error messages should go to <a href="http://en.wikipedia.org/wiki/Standard_streams#Standard_error_.28stderr.29">stderr</a>, unfortunately there is not …</p>
+                        <a class="readmore" href="..///131/Ruby_send_message_to_stderr">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///130/Suppressing_Warnings_in_Ruby_Scripts" rel="bookmark"
+                               title="Permalink to "Suppressing Warnings in Ruby Scripts"">"Suppressing Warnings in Ruby Scripts"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-12-02T10:13:29+00:00">
+                Published: Fri 02 December 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Suppressing warnings is usually a bad idea but if you understand the risk and want to carry on regardless. When …</p>
+                        <a class="readmore" href="..///130/Suppressing_Warnings_in_Ruby_Scripts">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///129/Setting_Ruby_Defaults_%27%7C%7C%27_vs_%27fetch%28%29%7B%7D%27" rel="bookmark"
+                               title="Permalink to "Setting Ruby Defaults '||' vs 'fetch(){}'"">"Setting Ruby Defaults '||' vs 'fetch(){}'"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-11-09T17:29:10+00:00">
+                Published: Wed 09 November 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>There is a very good presentation <a href="http://avdi.org/talks/confident-code-rubymidwest-2011/">Confident Code</a> by <a href="http://avdi.org/">Avdi Grimm</a> author of <a href="http://exceptionalruby.com/">http://exceptionalruby.com/</a>. <a href="http://confreaks.net/videos/614-cascadiaruby2011-confident-code">Previously presented at Cascadia …</a></p>
+                        <a class="readmore" href="..///129/Setting_Ruby_Defaults_%27%7C%7C%27_vs_%27fetch%28%29%7B%7D%27">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///128/Benchmarking_Ruby%2C_explicit_vs_implicit_returns" rel="bookmark"
+                               title="Permalink to "Benchmarking Ruby, explicit vs implicit returns"">"Benchmarking Ruby, explicit vs implicit returns"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-10-26T09:12:29+01:00">
+                Published: Wed 26 October 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Back in 2009 <a href="http://barkingiguana.com/2009/11/11/returning-explicitly-is-slower/">barkingiguana</a> wrote about how explicit returns <code>'return "String"'</code> was slower than an implicit return, ie just letting …</p>
+                        <a class="readmore" href="..///128/Benchmarking_Ruby%2C_explicit_vs_implicit_returns">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///126/Arrays_3%2C_write_idiomatic_Ruby" rel="bookmark"
+                               title="Permalink to "Arrays 3, write idiomatic Ruby"">"Arrays 3, write idiomatic Ruby"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-10-25T12:44:48+01:00">
+                Published: Tue 25 October 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Previous posts <a href="http://amaras-tech.co.uk/people/morgan/article/108">arrays</a> and <a href="http://amaras-tech.co.uk/people/morgan/article/122">arrays2</a></p>
+<p>Based on a post by <a href="http://barkingiguana.com/2011/03/14/be-cool-with-arrays/">barkingiguana</a>, some idiomatic ruby ways to handle arrays.
+Ruby tries …</p>
+                        <a class="readmore" href="..///126/Arrays_3%2C_write_idiomatic_Ruby">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///125/Ruby_Search_and_Replace_Script." rel="bookmark"
+                               title="Permalink to "Ruby Search and Replace Script."">"Ruby Search and Replace Script."</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-10-25T12:06:36+01:00">
+                Published: Tue 25 October 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>A small standalone script that search through a file doing text substitutions.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8 …</span></pre></div></td></tr></table></div>
+                        <a class="readmore" href="..///125/Ruby_Search_and_Replace_Script.">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///123/warning%3A_already_initialized_constant" rel="bookmark"
+                               title="Permalink to "warning: already initialized constant"">"warning: already initialized constant"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-10-06T00:57:30+01:00">
+                Published: Thu 06 October 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Do you some times see:</p>
+<div class="highlight"><pre><span></span><code><span class="n">FileUtils</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">93</span><span class="p">:</span><span class="w"> </span><span class="n">warning</span><span class="p">:</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="n">constant</span><span class="w"> </span><span class="n">OPT_TABLE</span>
+<span class="n">FileUtils</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">1176</span><span class="p">:</span><span class="w"> </span><span class="n">warning</span><span class="p">:</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="n">constant …</span></code></pre></div>
+                        <a class="readmore" href="..///123/warning%3A_already_initialized_constant">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///122/Ruby_Arrays_Concatenation_and_Subtraction" rel="bookmark"
+                               title="Permalink to "Ruby Arrays Concatenation and Subtraction"">"Ruby Arrays Concatenation and Subtraction"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-08-24T22:08:02+01:00">
+                Published: Wed 24 August 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Building on my <a href="http://amaras-tech.co.uk/people/morgan/article/108">original Ruby Arrays article</a> a few more things you can do with Ruby Arrays.</p>
+<p>Concatenation</p>
+<div class="highlight"><pre><span></span><code>a = [1 …</code></pre></div>
+                        <a class="readmore" href="..///122/Ruby_Arrays_Concatenation_and_Subtraction">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///121/Ruby_Blocks_for_better_code_reuse" rel="bookmark"
+                               title="Permalink to "Ruby Blocks for better code reuse"">"Ruby Blocks for better code reuse"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-30T13:51:28+01:00">
+                Published: Sat 30 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>While working on some disk space / folder structure scripts I had several functions which hierarchically search the disk then performed …</p>
+                        <a class="readmore" href="..///121/Ruby_Blocks_for_better_code_reuse">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///118/Get_latest_Ruby_1.9.2_build_with_RVM" rel="bookmark"
+                               title="Permalink to "Get latest Ruby 1.9.2 build with RVM"">"Get latest Ruby 1.9.2 build with RVM"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-16T07:47:23+01:00">
+                Published: Sat 16 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> </p>        
+</footer><!-- /.post-info -->                        <p>Ruby 1.9.2-p290 released, if you have <a href="http://beginrescueend.com/">RVM</a> installed updating to the latest release is easy</p>
+<div class="highlight"><pre><span></span><code><span class="n">rvm</span><span class="w"> </span><span class="n">get</span><span class="w"> </span><span class="n">head …</span></code></pre></div>
+                        <a class="readmore" href="..///118/Get_latest_Ruby_1.9.2_build_with_RVM">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///114/Ideas_1st_July_to_the_3rd_July" rel="bookmark"
+                               title="Permalink to "Ideas 1st July to the 3rd July"">"Ideas 1st July to the 3rd July"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-03T22:38:38+01:00">
+                Published: Sun 03 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+        
+</footer><!-- /.post-info -->                        <p>When working with HDLs (Hardware Description Languages) there a few things that could be improved/made easier:</p>
+<p>Renaming a file …</p>
+                        <a class="readmore" href="..///114/Ideas_1st_July_to_the_3rd_July">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///113/Ruby_Basic_File_Read_and_Write" rel="bookmark"
+                               title="Permalink to "Ruby Basic File Read and Write"">"Ruby Basic File Read and Write"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-01T20:38:27+01:00">
+                Published: Fri 01 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Read text file with one line:</p>
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+<p>Write text with one line :</p>
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+<h2>Explanation and other ways</h2>
+<p>When reading a text file …</p>
+                        <a class="readmore" href="..///113/Ruby_Basic_File_Read_and_Write">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///112/uninitialized_constant_Compass%3A%3ALogger" rel="bookmark"
+                               title="Permalink to "uninitialized constant Compass::Logger"">"uninitialized constant Compass::Logger"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-23T20:21:03+01:00">
+                Published: Thu 23 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/compass.html">Compass</a> <a href="../tag/database.html">Database</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/migrations.html">Migrations</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/sequel.html">Sequel</a> </p>        
+</footer><!-- /.post-info -->                        <p>Working on a joint project an error started showing up when trying to perform migrations.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rake<span class="w"> </span>db:migrate<span class="w"> </span><span class="nv">VERSION</span><span class="o">=</span><span class="m">0 …</span></code></pre></div>
+                        <a class="readmore" href="..///112/uninitialized_constant_Compass%3A%3ALogger">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku" rel="bookmark"
+                               title="Permalink to "Sinatra ActiveRecord DB config on Heroku"">"Sinatra ActiveRecord DB config on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-22T10:04:48+01:00">
+                Published: Wed 22 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/database.html">Database</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/regex.html">Regex</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sequel.html">Sequel</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>To make an automatic <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html">ActiveRecord</a> database connection using ENV['DATABASE_URL'] The following snippet can be used:</p>
+<p>From <a href="http://apidock.com/rails/v3.2.1/ActiveRecord/Base/establish_connection/class">ActiveRecord 3.2 …</a></p>
+                        <a class="readmore" href="..///111/Sinatra_ActiveRecord_DB_config_on_Heroku">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///110/Ruby_script_connect_to_DB_using_database.yml" rel="bookmark"
+                               title="Permalink to "Ruby script connect to DB using database.yml"">"Ruby script connect to DB using database.yml"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-20T12:07:51+01:00">
+                Published: Mon 20 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/database.html">Database</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>To connect to a rails style DB config outside of the normal workflow, or using a database.yml in a …</p>
+                        <a class="readmore" href="..///110/Ruby_script_connect_to_DB_using_database.yml">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///108/Ruby_Arrays%2C_Part_1" rel="bookmark"
+                               title="Permalink to "Ruby Arrays, Part 1"">"Ruby Arrays, Part 1"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-05-23T23:37:26+01:00">
+                Published: Mon 23 May 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Some uses of Arrays that were not apparent at first.</p>
+<h2>Enumeration</h2>
+<p><a href="http://ruby-doc.org/core/classes/Array.html#M000231">each</a> is the basic enumerator method but there is …</p>
+                        <a class="readmore" href="..///108/Ruby_Arrays%2C_Part_1">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///106/Obnoxious_gem_warnings" rel="bookmark"
+                               title="Permalink to "Obnoxious gem warnings"">"Obnoxious gem warnings"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-05-11T17:11:47+01:00">
+                Published: Wed 11 May 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>recenlty after updating rubygems Istarted getting a lot of warning like this when running ruby or executable gems:</p>
+<p>NOTE: Gem …</p>
+                        <a class="readmore" href="..///106/Obnoxious_gem_warnings">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///105/Recent_issue_with_building_Gems" rel="bookmark"
+                               title="Permalink to "Recent issue with building Gems"">"Recent issue with building Gems"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-05-07T23:25:34+01:00">
+                Published: Sat 07 May 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>When running gem build on a new library I have been working on I started getting the following error:</p>
+<div class="highlight"><pre><span></span><code>[ruby_svg_light …</code></pre></div>
+                        <a class="readmore" href="..///105/Recent_issue_with_building_Gems">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///100/Behaviour_and_State" rel="bookmark"
+                               title="Permalink to "Behaviour and State"">"Behaviour and State"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-16T17:59:44+01:00">
+                Published: Sat 16 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Classes are a basic Object Orientated Structure which encapsulate state and behaviour. Some times you just require to capture state …</p>
+                        <a class="readmore" href="..///100/Behaviour_and_State">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///99/Better_Open_Source_Project_Setup%2C_with_RVM_%26_Bundler" rel="bookmark"
+                               title="Permalink to "Better Open Source Project Setup, with RVM & Bundler"">"Better Open Source Project Setup, with RVM & Bundler"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-10T06:35:10+01:00">
+                Published: Sun 10 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/bundler.html">Bundler</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> <a href="../tag/open-source.html">Open Source</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on 'Raise the bar, lower the pressure' given by Durran Jordan at ScotRubyConf 2011.</p>
+<p>There has been some debate …</p>
+                        <a class="readmore" href="..///99/Better_Open_Source_Project_Setup%2C_with_RVM_%26_Bundler">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///98/Schwartzian_Transform" rel="bookmark"
+                               title="Permalink to "Schwartzian Transform"">"Schwartzian Transform"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-08T10:37:44+01:00">
+                Published: Fri 08 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/memory.html">Memory</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/perl.html">Perl</a> </p>        
+</footer><!-- /.post-info -->                        <p>I recently heard about the Schwartzian transform, which is a sorting idiom from perl. It allows an array of objects …</p>
+                        <a class="readmore" href="..///98/Schwartzian_Transform">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///95/Ruby_CLI_user_input_using_gets" rel="bookmark"
+                               title="Permalink to "Ruby CLI user input using gets"">"Ruby CLI user input using gets"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-03-27T06:04:31+01:00">
+                Published: Sun 27 March 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Using a while true loop with 'gets' and a case statement, can create a compact command line interface for ruby …</p>
+                        <a class="readmore" href="..///95/Ruby_CLI_user_input_using_gets">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///93/Amaras_Site_Updates" rel="bookmark"
+                               title="Permalink to "Amaras Site Updates"">"Amaras Site Updates"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-28T13:19:09+00:00">
+                Published: Mon 28 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/design.html">Design</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have just finished some minor updates to the site. The largest is the move to Droid Fonts, <a href="http://www.google.com/webfonts">Google Fonts …</a></p>
+                        <a class="readmore" href="..///93/Amaras_Site_Updates">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///92/ORM%28Activerecord%29_or_Ruby_Sort" rel="bookmark"
+                               title="Permalink to "ORM(Activerecord) or Ruby Sort"">"ORM(Activerecord) or Ruby Sort"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-20T02:19:17+00:00">
+                Published: Sun 20 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on an <a href="http://amaras-tech.co.uk/people/morgan/article/18">old Article</a> I wrote, investigating incase sensitive sorting performance.</p>
+<p>I have an active record model call Tag …</p>
+                        <a class="readmore" href="..///92/ORM%28Activerecord%29_or_Ruby_Sort">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///91/Activerecord_Find_All%2FMultiple" rel="bookmark"
+                               title="Permalink to "Activerecord Find All/Multiple"">"Activerecord Find All/Multiple"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-19T06:31:03+00:00">
+                Published: Sat 19 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Using Tags (An active record model) to find tags by the tag property:</p>
+<div class="highlight"><pre><span></span><code>Tag.find_by_tag(&quot;Ruby&quot;)
+Ruby
+
+Tag.find_by_tag([&quot;Ruby …</code></pre></div>
+                        <a class="readmore" href="..///91/Activerecord_Find_All%2FMultiple">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///89/gem_permissions_on_WebFaction" rel="bookmark"
+                               title="Permalink to "gem permissions on WebFaction"">"gem permissions on WebFaction"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-12T14:10:56+00:00">
+                Published: Sat 12 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>After making a few updates to my site I decided to upgrade the version of sinatra I was using in …</p>
+                        <a class="readmore" href="..///89/gem_permissions_on_WebFaction">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///88/Sinatra_regex_routes" rel="bookmark"
+                               title="Permalink to "Sinatra regex routes"">"Sinatra regex routes"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-02-12T06:41:10+00:00">
+                Published: Sat 12 February 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>The routes for my site have been growing since adding pagination (/articles/older/) and tag filtering. As well as the …</p>
+                        <a class="readmore" href="..///88/Sinatra_regex_routes">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///84/Ruby_Block_Selection_in_Vim_%28Plugin%29" rel="bookmark"
+                               title="Permalink to "Ruby Block Selection in Vim (Plugin)"">"Ruby Block Selection in Vim (Plugin)"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-28T22:42:03+00:00">
+                Published: Tue 28 December 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>A new very cool plugin for Rubyists using Vim. <a href="http://vimcasts.org/blog/2010/12/a-text-object-for-ruby-blocks/">RubyBlock</a> TextObjects created by <a href="http://drewneil.com/">Drew Neil</a> from <a href="http://vimcasts.org/">Vimcasts.org</a>. Once installed …</p>
+                        <a class="readmore" href="..///84/Ruby_Block_Selection_in_Vim_%28Plugin%29">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///80/Put_methods_not_working_with_Classy_Sinatra_apps" rel="bookmark"
+                               title="Permalink to "Put methods not working with Classy Sinatra apps"">"Put methods not working with Classy Sinatra apps"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-11T05:38:06+00:00">
+                Published: Sat 11 December 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>Since moving to Classy Sinatra applications I have not been able to get put and delete methods to work correctly …</p>
+                        <a class="readmore" href="..///80/Put_methods_not_working_with_Classy_Sinatra_apps">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///79/rake_aborted%21_undefined_method_%60info%27_for_nil%3ANilClass" rel="bookmark"
+                               title="Permalink to "rake aborted! undefined method `info' for nil:NilClass"">"rake aborted! undefined method `info' for nil:NilClass"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-11-04T11:24:05+00:00">
+                Published: Thu 04 November 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/migrations.html">Migrations</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>I am currently switching between runing migrations locally on an sqlite3 database and postgres for production on Heroku.</p>
+<p>When switching …</p>
+                        <a class="readmore" href="..///79/rake_aborted%21_undefined_method_%60info%27_for_nil%3ANilClass">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///78/Sinatra_Heroku_and_config.ru" rel="bookmark"
+                               title="Permalink to "Sinatra Heroku and config.ru"">"Sinatra Heroku and config.ru"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-11-03T16:43:22+00:00">
+                Published: Wed 03 November 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>Rack applications often require a config.ru for deployment. The standard config.ru for classic sinatra applications is well documented …</p>
+                        <a class="readmore" href="..///78/Sinatra_Heroku_and_config.ru">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///77/Sinatra_Session_Extension" rel="bookmark"
+                               title="Permalink to "Sinatra Session Extension"">"Sinatra Session Extension"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-11-02T12:49:03+00:00">
+                Published: Tue 02 November 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have just started to use a <a href="http://www.sinatrarb.com/extensions.html">sinatra extensions</a> called <a href="http://mjijackson.com/sinatra-session/">Sinatra Session</a>. The write up on the <a href="http://mjijackson.com/sinatra-session/">main site</a> is …</p>
+                        <a class="readmore" href="..///77/Sinatra_Session_Extension">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///76/Sinatra_reload_source_file_changes_in_development_mode" rel="bookmark"
+                               title="Permalink to "Sinatra reload source file changes in development mode"">"Sinatra reload source file changes in development mode"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-11-02T11:03:26+00:00">
+                Published: Tue 02 November 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://github.com/rkh/sinatra-reloader">Sinatra Reloader</a> is a sinatra extension which reloads source files while in development mode, this functionality was removed from base …</p>
+                        <a class="readmore" href="..///76/Sinatra_reload_source_file_changes_in_development_mode">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///72/Ruby_each_or_delete_if" rel="bookmark"
+                               title="Permalink to "Ruby each or delete_if"">"Ruby each or delete_if"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-25T12:38:50+01:00">
+                Published: Sat 25 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>In ruby some times you want to iterate over an array and remove items that meet certain conditions, if using …</p>
+                        <a class="readmore" href="..///72/Ruby_each_or_delete_if">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///71/Storing_secret_keys_in_Ruby_config_files_an_approach" rel="bookmark"
+                               title="Permalink to "Storing secret keys in Ruby config files an approach"">"Storing secret keys in Ruby config files an approach"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-11T19:04:53+01:00">
+                Published: Sat 11 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have for a while wondered about an ideal (good) approach to storing api keys in config files in ruby …</p>
+                        <a class="readmore" href="..///71/Storing_secret_keys_in_Ruby_config_files_an_approach">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind" rel="bookmark"
+                               title="Permalink to "Ruby Regular Expressions Lookahead / Lookbehind"">"Ruby Regular Expressions Lookahead / Lookbehind"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-07T01:39:28+01:00">
+                Published: Tue 07 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/regex.html">Regex</a> </p>        
+</footer><!-- /.post-info -->                        <p>I recently discovered a feature of regular expressions called lookahead. This means for a match the lookahead must exist but …</p>
+                        <a class="readmore" href="..///68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///67/Ruby_Time_save_and_Restore_%28serialise%29" rel="bookmark"
+                               title="Permalink to "Ruby Time save and Restore (serialise)"">"Ruby Time save and Restore (serialise)"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-06T16:25:45+01:00">
+                Published: Mon 06 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>One method to save a time and restore it correctly:</p>
+<div class="highlight"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">get_time_run</span>
+<span class="err">##</span><span class="w"> </span><span class="k">File</span><span class="w"> </span><span class="n">Access</span><span class="w"> </span><span class="n">based</span><span class="w"> </span><span class="k">on</span>
+<span class="err">##</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">rubylearning</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">satishtalim …</span></code></pre></div>
+                        <a class="readmore" href="..///67/Ruby_Time_save_and_Restore_%28serialise%29">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///64/Error%3A_NoMethodError%3A_undefined_method_%60compact%27_for_nil%3ANilClass" rel="bookmark"
+                               title="Permalink to "Error: NoMethodError: undefined method `compact' for nil:NilClass"">"Error: NoMethodError: undefined method `compact' for nil:NilClass"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-21T07:20:40+01:00">
+                Published: Sat 21 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sequel.html">Sequel</a> </p>        
+</footer><!-- /.post-info -->                        <p>When running a sequel migration I kept getting this error: <br>
+<strong>Error: NoMethodError: undefined method `compact' for nil:NilClass</strong></p>
+<p>My setup …</p>
+                        <a class="readmore" href="..///64/Error%3A_NoMethodError%3A_undefined_method_%60compact%27_for_nil%3ANilClass">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///61/Active_Record__attributes_simplify_update_and_create." rel="bookmark"
+                               title="Permalink to "Active Record attributes simplify update and create."">"Active Record  attributes simplify update and create."</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-13T02:13:17+01:00">
+                Published: Fri 13 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>In Active Record when updating records I used to have an very manual process to this some thing like:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">@todo …</span></code></pre></div>
+                        <a class="readmore" href="..///61/Active_Record__attributes_simplify_update_and_create.">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///60/Active_Record_create_unique_or_return_existing_element" rel="bookmark"
+                               title="Permalink to "Active Record create unique or return existing element"">"Active Record create unique or return existing element"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-08T09:20:39+01:00">
+                Published: Sun 08 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>When working with databases it is often a requirement to have unique elements (columns) which are not the primary key …</p>
+                        <a class="readmore" href="..///60/Active_Record_create_unique_or_return_existing_element">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///59/Activerecord_queries_on_table_joins" rel="bookmark"
+                               title="Permalink to "Activerecord queries on table joins"">"Activerecord queries on table joins"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-02T11:33:16+01:00">
+                Published: Mon 02 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/migrations.html">Migrations</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/active-record.html">Active Record</a> </p>        
+</footer><!-- /.post-info -->                        <p>An example of joining tables through active record models. There is <a href="http://guides.rubyonrails.org/association_basics.html">a good tutorial on the basics</a> of Activerecord joins …</p>
+                        <a class="readmore" href="..///59/Activerecord_queries_on_table_joins">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///57/Benchmark_your_website_for_load_times." rel="bookmark"
+                               title="Permalink to "Benchmark your website for load times."">"Benchmark your website for load times."</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-27T16:09:53+01:00">
+                Published: Tue 27 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/nginx.html">nginx</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/webfaction.html">WebFaction</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been wondering how to do this for a while and accidentally discovered it while perusing <a href="http://docs.heroku.com/performance">this heroku page …</a></p>
+                        <a class="readmore" href="..///57/Benchmark_your_website_for_load_times.">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///56/%40philip_roberts_taught_me_a_thing_or_two_about_CSS" rel="bookmark"
+                               title="Permalink to "@philip_roberts taught me a thing or two about CSS"">"@philip_roberts taught me a thing or two about CSS"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-22T10:15:50+01:00">
+                Published: Thu 22 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/web.html">Web</a> <a href="../tag/css.html">CSS</a> </p>        
+</footer><!-- /.post-info -->                        <p>CSS or Cascading Style Sheets are used for styling html elements. HTML elements can have id's, which must be unique …</p>
+                        <a class="readmore" href="..///56/%40philip_roberts_taught_me_a_thing_or_two_about_CSS">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///52/Get_client_IP_on_Heroku" rel="bookmark"
+                               title="Permalink to "Get client IP on Heroku"">"Get client IP on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-12T07:41:32+01:00">
+                Published: Mon 12 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> <a href="../tag/rack.html">Rack</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been trying to use the <a href="http://coderack.org/users/hosiawak/middlewares/36-geoip-country">GeoIP Rack App</a>, by copying this <a href="http://gist.github.com/208774">gist</a> in my Rack stack with a …</p>
+                        <a class="readmore" href="..///52/Get_client_IP_on_Heroku">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///51/Sinatra_running_on_Heroku" rel="bookmark"
+                               title="Permalink to "Sinatra running on Heroku"">"Sinatra running on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-09T08:37:13+01:00">
+                Published: Fri 09 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>For running small webapps <a href="http://heroku.com/">heroku</a> is free. The real attraction is the simplicity of deployment, if you are use to …</p>
+                        <a class="readmore" href="..///51/Sinatra_running_on_Heroku">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///48/jQuery_clear_form_on_focus_and_restore_on_exit" rel="bookmark"
+                               title="Permalink to "jQuery clear form on focus and restore on exit"">"jQuery clear form on focus and restore on exit"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-27T10:57:35+01:00">
+                Published: Sun 27 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/jquery.html">jQuery</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>I used <a href="http://www.eggchops.com/web-stuff/jquery/jquery-clear-focus-function/">this as a jQuery reference</a> to hide and show default text in forms.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;head&gt;</span>
+<span class="w">   </span><span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">”text/javascript …</span></code></pre></div>
+                        <a class="readmore" href="..///48/jQuery_clear_form_on_focus_and_restore_on_exit">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///47/WebFaction_problems_restarting_nginx" rel="bookmark"
+                               title="Permalink to "WebFaction problems restarting nginx"">"WebFaction problems restarting nginx"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-27T09:39:48+01:00">
+                Published: Sun 27 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/nginx.html">nginx</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>After updating my website on <a href="http://www.webfaction.com/?affiliate=morgy">webfaction</a> nginx kept saying permission denied and when I tried to view my site I …</p>
+                        <a class="readmore" href="..///47/WebFaction_problems_restarting_nginx">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///43/Creating_executable_gems" rel="bookmark"
+                               title="Permalink to "Creating executable gems"">"Creating executable gems"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-21T08:43:48+01:00">
+                Published: Mon 21 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>This is not necessarily the correct way of creating executable gems but a method which worked for me.</p>
+<p>Assuming we …</p>
+                        <a class="readmore" href="..///43/Creating_executable_gems">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///42/gem_install_memory_usage" rel="bookmark"
+                               title="Permalink to "gem install memory_usage"">"gem install memory_usage"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-17T13:01:14+01:00">
+                Published: Thu 17 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/gem.html">Gem</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Just released my first gem <a href="http://rubygems.org/gems/memory_usage">'memory_usage'</a> Version 0.0.1.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gem<span class="w"> </span>install<span class="w"> </span>memory_usage
+</code></pre></div>
+
+<p>Assuming the gems folder has been set-up …</p>
+                        <a class="readmore" href="..///42/gem_install_memory_usage">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///40/64Bit_Handbrake_for_Video_Encoding_on_Mac_OS_X" rel="bookmark"
+                               title="Permalink to "64Bit Handbrake for Video Encoding on Mac OS X"">"64Bit Handbrake for Video Encoding on Mac OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-16T00:59:24+01:00">
+                Published: Wed 16 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/vlc.html">VLC</a> <a href="../tag/handbrake.html">Handbrake</a> </p>        
+</footer><!-- /.post-info -->                        <p>If you are trying to use the <a href="http://handbrake.fr/rotation.php?file=HandBrake-0.9.4-MacOSX.5_GUI_x86_64.dmg">64 bit version of handbrake</a> on Snow Leopard do not for get that …</p>
+                        <a class="readmore" href="..///40/64Bit_Handbrake_for_Video_Encoding_on_Mac_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///38/Ruby_runnable_and_includeable" rel="bookmark"
+                               title="Permalink to "Ruby runnable and includeable"">"Ruby runnable and includeable"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-11T13:24:06+01:00">
+                Published: Fri 11 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>I might have just made up includable, but I like it.</p>
+<p>Some times you have written a ruby script (using …</p>
+                        <a class="readmore" href="..///38/Ruby_runnable_and_includeable">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///33/Super_simple_Ruby_list_directory_contents" rel="bookmark"
+                               title="Permalink to "Super simple Ruby list directory contents"">"Super simple Ruby list directory contents"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-16T08:14:52+01:00">
+                Published: Sun 16 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>A very simple Ruby way for listing files in a directory is the glob function:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5 …</span></pre></div></td></tr></table></div>
+                        <a class="readmore" href="..///33/Super_simple_Ruby_list_directory_contents">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///27/413_Request_Entity_Too_Large" rel="bookmark"
+                               title="Permalink to "413 Request Entity Too Large"">"413 Request Entity Too Large"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-08T03:22:08+01:00">
+                Published: Sat 08 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/web.html">Web</a> <a href="../tag/nginx.html">nginx</a> </p>        
+</footer><!-- /.post-info -->                        <p>The '413 Request Entity Too Large' Error message is because you have filled in a form and are submitting it …</p>
+                        <a class="readmore" href="..///27/413_Request_Entity_Too_Large">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///26/Installing_Ruby_Enterprise_on_Mac_OS_X" rel="bookmark"
+                               title="Permalink to "Installing Ruby Enterprise on Mac OS X"">"Installing Ruby Enterprise on Mac OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-04T11:13:48+01:00">
+                Published: Tue 04 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/performance.html">Performance</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://www.rubyenterpriseedition.com/download.html">Download ruby enterprise</a> and follow instructions on page. The exact commands I used are:</p>
+<div class="highlight"><pre><span></span><code><span class="o">$</span><span class="w"> </span><span class="n">cd</span><span class="w"> </span><span class="o">~/</span><span class="n">bin</span>
+<span class="o">$</span><span class="w"> </span><span class="n">wget</span><span class="w"> </span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">rubyforge</span><span class="o">.</span><span class="n">org …</span></code></pre></div>
+                        <a class="readmore" href="..///26/Installing_Ruby_Enterprise_on_Mac_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///25/Ruby_Memory_Issue_on_Web_Faction" rel="bookmark"
+                               title="Permalink to "Ruby Memory Issue on Web Faction"">"Ruby Memory Issue on Web Faction"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-03T13:19:02+01:00">
+                Published: Mon 03 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>I while ago I made <a href="http://amaras-tech.co.uk/people/morgan/article/14">a post</a> about installing ruby 1.9 on my webfaction shared host. They then pointed …</p>
+                        <a class="readmore" href="..///25/Ruby_Memory_Issue_on_Web_Faction">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///23/Sinatra_File_Upload" rel="bookmark"
+                               title="Permalink to "Sinatra File Upload"">"Sinatra File Upload"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-01T07:54:03+01:00">
+                Published: Sat 01 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>A simple Sinatra web app to upload a single file. Also available as a <a href="http://gist.github.com/386495">gist</a>, based on <a href="http://pastie.caboo.se/134681">http://pastie.caboo …</a></p>
+                        <a class="readmore" href="..///23/Sinatra_File_Upload">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///21/Webfaction_new_user_with_access_to_their_own_site" rel="bookmark"
+                               title="Permalink to "Webfaction new user with access to their own site"">"Webfaction new user with access to their own site"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-28T09:24:58+01:00">
+                Published: Wed 28 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>With <a href="http://www.webfaction.com/?affiliate=morgy">Webfaction</a> you can create new users with there own home area but there is no straight forward way to …</p>
+                        <a class="readmore" href="..///21/Webfaction_new_user_with_access_to_their_own_site">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///20/Ruby%2C_Ruby%2C_Ruby%2C_why_are_you_so_wierd_at_times%3F" rel="bookmark"
+                               title="Permalink to "Ruby, Ruby, Ruby, why are you so wierd at times?"">"Ruby, Ruby, Ruby, why are you so wierd at times?"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-26T07:48:47+01:00">
+                Published: Mon 26 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>This feature of ruby keeps catching me out as the behaviour is quite unexpected (by me).</p>
+<p>I can use a …</p>
+                        <a class="readmore" href="..///20/Ruby%2C_Ruby%2C_Ruby%2C_why_are_you_so_wierd_at_times%3F">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///19/Testing_tweets_from_Production_server_This_should_be_working%21" rel="bookmark"
+                               title="Permalink to "Testing tweets from Production server This should be working!"">"Testing tweets from Production server This should be working!"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-18T13:45:45+01:00">
+                Published: Sun 18 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        
+                        <a class="readmore" href="..///19/Testing_tweets_from_Production_server_This_should_be_working%21">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///18/Ruby_incase_sensitive_sort" rel="bookmark"
+                               title="Permalink to "Ruby incase sensitive sort"">"Ruby incase sensitive sort"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-18T11:13:51+01:00">
+                Published: Sun 18 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Ruby has a .sort method which sorts basic objects. it is case sensitive though so Zebra is before apple. Using …</p>
+                        <a class="readmore" href="..///18/Ruby_incase_sensitive_sort">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///16/Ruby_and_gemspec" rel="bookmark"
+                               title="Permalink to "Ruby and gemspec"">"Ruby and gemspec"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-16T10:01:58+01:00">
+                Published: Fri 16 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/gem.html">Gem</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have just forked and cloned a project on github and discovered *.gemspec files. They are a nice way of …</p>
+                        <a class="readmore" href="..///16/Ruby_and_gemspec">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///15/Ruby_.nil%3F_tests_fail_%3F_you_really_want_%7C%7C%3D" rel="bookmark"
+                               title="Permalink to "Ruby .nil? tests fail ? you really want ||="">"Ruby .nil? tests fail ? you really want ||="</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-15T07:43:50+01:00">
+                Published: Thu 15 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>I recently discovered ||= in ruby. Its main use is for initialising a variable if it does not already exists, this …</p>
+                        <a class="readmore" href="..///15/Ruby_.nil%3F_tests_fail_%3F_you_really_want_%7C%7C%3D">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///14/Installing_the_ruby_gem_twitter_on_webfaction" rel="bookmark"
+                               title="Permalink to "Installing the ruby gem twitter on webfaction"">"Installing the ruby gem twitter on webfaction"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-12T10:33:21+01:00">
+                Published: Mon 12 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/webfaction.html">WebFaction</a> <a href="../tag/twitter.html">Twitter</a> </p>        
+</footer><!-- /.post-info -->                        <p>[Update]<br>
+As this is a long post I am putting this update at the top. If you just want to …</p>
+                        <a class="readmore" href="..///14/Installing_the_ruby_gem_twitter_on_webfaction">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///13/gem_install_with_out_the_docs" rel="bookmark"
+                               title="Permalink to "gem install with out the docs"">"gem install with out the docs"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-10T14:11:26+01:00">
+                Published: Sat 10 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/gem.html">Gem</a> </p>        
+</footer><!-- /.post-info -->                        <p>When I install gems on my server I do not get any of the documentation which is normally 3-5 times …</p>
+                        <a class="readmore" href="..///13/gem_install_with_out_the_docs">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///12/Sinatra_blog_retrieving_next_and_previous_ids" rel="bookmark"
+                               title="Permalink to "Sinatra blog retrieving next and previous ids"">"Sinatra blog retrieving next and previous ids"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-09T10:13:17+01:00">
+                Published: Fri 09 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>When displaying blog/articles it is often nice to have previous and next posts. Simply -1 +1 from the current …</p>
+                        <a class="readmore" href="..///12/Sinatra_blog_retrieving_next_and_previous_ids">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///11/Sequel_ORM_Migrations" rel="bookmark"
+                               title="Permalink to "Sequel ORM Migrations"">"Sequel ORM Migrations"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-31T09:07:51+01:00">
+                Published: Wed 31 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/sequel.html">Sequel</a> <a href="../tag/migrations.html">Migrations</a> </p>        
+</footer><!-- /.post-info -->                        <p>Available as a <a href="http://gist.github.com/348121">gist</a> a Sequel Migration to rename a database column.</p>
+<div class="highlight"><pre><span></span><code><span class="gu">##</span> Command line to apply Migration
+<span class="gh">#</span>sequel -m ./db …</code></pre></div>
+                        <a class="readmore" href="..///11/Sequel_ORM_Migrations">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///1/Amaras_Finally_Online" rel="bookmark"
+                               title="Permalink to "Amaras Finally Online"">"Amaras Finally Online"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>Just a short first note to announce the fact that the site is finally up.</p>
+<p>We are running on <a href="http://www.webfaction.com/?affiliate=morgy">WebFaction …</a></p>
+                        <a class="readmore" href="..///1/Amaras_Finally_Online">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///4/FourThirds_Sinatra_RESTful_example" rel="bookmark"
+                               title="Permalink to "FourThirds Sinatra RESTful example"">"FourThirds Sinatra RESTful example"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> </p>        
+</footer><!-- /.post-info -->                        <p>This is an example of efficient use of views in <a href="http://www.sinatrarb.com">Sinatra</a> covering RESTful actions. This is a copy of my …</p>
+                        <a class="readmore" href="..///4/FourThirds_Sinatra_RESTful_example">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///2/Ruby_include_%28require%29_local_files" rel="bookmark"
+                               title="Permalink to "Ruby include (require) local files"">"Ruby include (require) local files"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Also a <a href="http://gist.github.com/341255">gist</a> on github. This is an example of how you can require files in a relative path to …</p>
+                        <a class="readmore" href="..///2/Ruby_include_%28require%29_local_files">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///7/Ruby_Logger" rel="bookmark"
+                               title="Permalink to "Ruby Logger"">"Ruby Logger"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Ruby has a nice logging function, </p>
+<p>Update once example of rotating logs finished</p>
+                        <a class="readmore" href="..///7/Ruby_Logger">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///6/Ruby_Performance_Measure" rel="bookmark"
+                               title="Permalink to "Ruby Performance Measure"">"Ruby Performance Measure"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/matlab.html">Matlab</a> <a href="../tag/performance.html">Performance</a> </p>        
+</footer><!-- /.post-info -->                        <p>Also available as a <a href="http://gist.github.com/342639">gist</a>. Very simple way of measuring execution time in seconds using Ruby</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4 …</span></pre></div></td></tr></table></div>
+                        <a class="readmore" href="..///6/Ruby_Performance_Measure">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///5/Ruby_run_%28execute%29_command_line" rel="bookmark"
+                               title="Permalink to "Ruby run (execute) command line"">"Ruby run (execute) command line"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>Also a <a href="http://gist.github.com/341670">gist</a> on github. This code snippet is an example of how to execute a command line argument in …</p>
+                        <a class="readmore" href="..///5/Ruby_run_%28execute%29_command_line">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///8/Sinatra_1.0_Released" rel="bookmark"
+                               title="Permalink to "Sinatra 1.0 Released"">"Sinatra 1.0 Released"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>Sinatra 1.0 has been released!</p>
+<p>When you install the new version the old one are still left behind. This …</p>
+                        <a class="readmore" href="..///8/Sinatra_1.0_Released">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///3/Sinatra_and_compass_sending_compressed_cached_CSS" rel="bookmark"
+                               title="Permalink to "Sinatra and compass sending compressed cached CSS"">"Sinatra and compass sending compressed cached CSS"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/compass.html">Compass</a> <a href="../tag/sass.html">SASS</a> <a href="../tag/css.html">CSS</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have previously mentioned on <a href="http://munkymorgy.blogspot.com/">blogger</a> how to use Compass and SASS with Sinatra for rendering the stylesheets.</p>
+<p>I have …</p>
+                        <a class="readmore" href="..///3/Sinatra_and_compass_sending_compressed_cached_CSS">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///10/GitX" rel="bookmark"
+                               title="Permalink to "GitX"">"GitX"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:58:39+01:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p>Git has a hand full of GUIs available on Mac OS X, gitk proved a little tricky to use but …</p>
+                        <a class="readmore" href="..///10/GitX">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///9/Ruby_Time_Formats" rel="bookmark"
+                               title="Permalink to "Ruby Time Formats"">"Ruby Time Formats"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:30+01:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been playing around with getting my blog posts timestamped I found the <a href="http://ruby-doc.org/core/classes/Time.html#M000298">Ruby Time Docs</a> to be very …</p>
+                        <a class="readmore" href="..///9/Ruby_Time_Formats">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

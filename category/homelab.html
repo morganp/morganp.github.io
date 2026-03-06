@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Lizard-Spock - Homelab</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li class="active"><a href="../category/homelab.html">Homelab</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix \& Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../installing-homebrew-on-a-debian-13-trixie-lxc-container.html">Installing Homebrew on a Debian 13 (Trixie) LXC Container</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-02-25T00:00:00+00:00">
+                Published: Wed 25 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/homebrew.html">homebrew</a> <a href="../tag/linux.html">linux</a> <a href="../tag/debian.html">debian</a> <a href="../tag/lxc.html">lxc</a> <a href="../tag/proxmox.html">proxmox</a> </p>        
+</footer><!-- /.post-info --><p>This tutorial documents a working, verified installation of Homebrew (Linuxbrew) on a
+Debian 13 "trixie" LXC container. Every step reflects what was actually done on this system;
+nothing has been invented or copied from generic guides without verification.</p>
+<p><strong>Tested environment:</strong>
+- Debian GNU/Linux 13 (trixie), amd64
+- LXC unprivileged container
+- Homebrew 5.0.15
+- Primary non-root user: <code>morgan</code> (uid=1000)</p>
+<hr>
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#1-prerequisites">Prerequisites</a></li>
+<li><a href="#2-installation-steps">Installation Steps</a></li>
+<li><a href="#3-per-user-shell-setup">Per-User Shell Setup</a></li>
+<li><a href="#4-verification">Verification</a></li>
+<li><a href="#5-adding-future-users">Adding Future Users</a></li>
+<li><a href="#6-troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr>
+<h2>1. Prerequisites</h2>
+<h3>System packages</h3>
+<p>The Homebrew installer requires these packages. Install them as root before running the
+installer:</p>
+<div class="highlight"><pre><span></span><code>apt-get<span class="w"> </span>update
+apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>build-essential<span class="w"> </span>git<span class="w"> </span>curl<span class="w"> </span>file<span class="w"> </span>procps
+</code></pre></div>
+
+<p>Verify all five are present:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">ii</span><span class="w">  </span><span class="nx">build</span><span class="o">-</span><span class="nx">essential</span><span class="w"> </span><span class="m m-Double">12.12</span><span class="w">              </span><span class="nx">amd64</span><span class="w">  </span><span class="nx">Informational</span><span class="w"> </span><span class="nx">list</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="nx">build</span><span class="o">-</span><span class="nx">essential</span><span class="w"> </span><span class="nx">packages</span>
+<span class="nx">ii</span><span class="w">  </span><span class="nx">curl</span><span class="w">            </span><span class="m m-Double">8.14.1</span><span class="o">-</span><span class="mi">2</span><span class="o">+</span><span class="nx">deb13u2</span><span class="w">   </span><span class="nx">amd64</span><span class="w">  </span><span class="nx">command</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="nx">tool</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">transferring</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="nx">with</span><span class="w"> </span><span class="nx">URL</span><span class="w"> </span><span class="nx">syntax</span>
+<span class="nx">ii</span><span class="w">  </span><span class="nx">file</span><span class="w">            </span><span class="mi">1</span><span class="p">:</span><span class="m m-Double">5.46</span><span class="o">-</span><span class="mi">5</span><span class="w">           </span><span class="nx">amd64</span><span class="w">  </span><span class="nx">Recognize</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="nx">file</span><span class="w"> </span><span class="nx">using</span><span class="w"> </span><span class="s">&quot;magic&quot;</span><span class="w"> </span><span class="nx">numbers</span>
+<span class="nx">ii</span><span class="w">  </span><span class="nx">git</span><span class="w">             </span><span class="mi">1</span><span class="p">:</span><span class="m m-Double">2.47.3</span><span class="o">-</span><span class="mi">0</span><span class="o">+</span><span class="nx">deb13u1</span><span class="w"> </span><span class="nx">amd64</span><span class="w">  </span><span class="nx">fast</span><span class="p">,</span><span class="w"> </span><span class="nx">scalable</span><span class="p">,</span><span class="w"> </span><span class="nx">distributed</span><span class="w"> </span><span class="nx">revision</span><span class="w"> </span><span class="nx">control</span><span class="w"> </span><span class="nx">system</span>
+<span class="nx">ii</span><span class="w">  </span><span class="nx">procps</span><span class="w">          </span><span class="mi">2</span><span class="p">:</span><span class="m m-Double">4.0.4</span><span class="o">-</span><span class="mi">9</span><span class="w">          </span><span class="nx">amd64</span><span class="w">  </span><span class="o">/</span><span class="nx">proc</span><span class="w"> </span><span class="nx">file</span><span class="w"> </span><span class="nx">system</span><span class="w"> </span><span class="nx">utilities</span>
+</code></pre></div>
+
+<h3>PATH gotcha: /usr/sbin must be in root's PATH</h3>
+<p>On Debian 13, <code>/usr/sbin</code> is <strong>not</strong> automatically in the PATH of non-login shells (including
+those invoked by <code>su</code> without <code>-l</code>). The installer calls <code>useradd</code>, which lives at
+<code>/usr/sbin/useradd</code>. If <code>/usr/sbin</code> is missing from your PATH the installer will fail with a
+confusing "command not found" error.</p>
+<p>Before running the installer, confirm your PATH includes <code>/usr/sbin</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+</code></pre></div>
+
+<p>If it does not, prepend it for the session:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/sbin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>Or simply run the installer from a full login shell (<code>su -</code> rather than <code>su</code>).</p>
+<hr>
+<h2>2. Installation Steps</h2>
+<p>All steps in this section are run as <strong>root</strong>.</p>
+<h3>Step 1 — Create the dedicated <code>linuxbrew</code> group</h3>
+<p>Homebrew on Linux uses a shared group so that multiple users can write to the installation
+prefix. Create it before the installer runs so you control its GID:</p>
+<div class="highlight"><pre><span></span><code>groupadd<span class="w"> </span>linuxbrew
+</code></pre></div>
+
+<h3>Step 2 — Pre-create the Homebrew prefix directory</h3>
+<p>The Homebrew installer expects to own <code>/home/linuxbrew/.linuxbrew</code>. In an LXC container the
+installer sometimes cannot create <code>/home/linuxbrew</code> itself due to ownership constraints on
+<code>/home</code>. Pre-create it and set the correct ownership <strong>before</strong> running the installer:</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>/home/linuxbrew/.linuxbrew
+chown<span class="w"> </span>-R<span class="w"> </span>morgan:linuxbrew<span class="w"> </span>/home/linuxbrew
+chmod<span class="w"> </span><span class="m">2775</span><span class="w"> </span>/home/linuxbrew
+chmod<span class="w"> </span><span class="m">2775</span><span class="w"> </span>/home/linuxbrew/.linuxbrew
+</code></pre></div>
+
+<p>The <code>2775</code> mode sets the <strong>setgid bit</strong> (<code>s</code>) on the directory. This causes all files and
+subdirectories created inside to inherit the <code>linuxbrew</code> group automatically, which is what
+allows multiple users to install and update packages.</p>
+<p>After this step, <code>ls -la /home/linuxbrew/</code> should show:</p>
+<div class="highlight"><pre><span></span><code>drwxrwxr-x  3 morgan linuxbrew 4096 Feb 25 15:31 .
+drwxr-xr-x  4 root   root      4096 Feb 25 15:31 ..
+drwxrwsr-x 14 morgan linuxbrew 4096 Feb 25 15:31 .linuxbrew
+</code></pre></div>
+
+<p>And <code>stat /home/linuxbrew/.linuxbrew</code> confirms the setgid bit:</p>
+<div class="highlight"><pre><span></span><code>Access: (2775/drwxrwsr-x)  Uid: ( 1000/  morgan)   Gid: ( 1001/linuxbrew)
+</code></pre></div>
+
+<h3>Step 3 — Add the primary user to the linuxbrew group</h3>
+<div class="highlight"><pre><span></span><code>usermod<span class="w"> </span>-aG<span class="w"> </span>linuxbrew<span class="w"> </span>morgan
+</code></pre></div>
+
+<p>The <code>-a</code> flag is critical — without it <code>usermod -G</code> <strong>replaces</strong> all supplementary groups
+instead of appending to them.</p>
+<h3>Step 4 — Run the Homebrew installer as the primary user</h3>
+<p>Switch to the non-root user and run the official installer. Do <strong>not</strong> run it as root:</p>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>morgan
+/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="k">)</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>Because the prefix directory already exists and is writable by the <code>linuxbrew</code> group (and
+<code>morgan</code> is a member), the installer will populate it without needing to create it or change
+system-level ownership.</p>
+<h3>Step 5 — Create the system-wide profile.d script</h3>
+<p>To activate Homebrew automatically for every user who logs in, create a shell script in
+<code>/etc/profile.d/</code> as root:</p>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span>&gt;<span class="w"> </span>/etc/profile.d/homebrew.sh<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">if [ -d &quot;/home/linuxbrew/.linuxbrew&quot; ]; then</span>
+<span class="s">    eval &quot;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&quot;</span>
+<span class="s">fi</span>
+<span class="s">EOF</span>
+chmod<span class="w"> </span>+x<span class="w"> </span>/etc/profile.d/homebrew.sh
+</code></pre></div>
+
+<p>This is exactly the file present on this system:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># /etc/profile.d/homebrew.sh</span>
+<span class="c1">#!/bin/bash</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;/home/linuxbrew/.linuxbrew&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>/home/linuxbrew/.linuxbrew/bin/brew<span class="w"> </span>shellenv<span class="k">)</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>The <code>if</code> guard makes the script safe on systems where the prefix does not exist (e.g., before
+installation, or if the directory is removed).</p>
+<hr>
+<h2>3. Per-User Shell Setup</h2>
+<p>The <code>/etc/profile.d/homebrew.sh</code> script runs automatically for <strong>login shells</strong>. This covers
+<code>su - username</code>, SSH logins, and console logins.</p>
+<p>For interactive non-login shells (e.g., a new terminal tab that sources <code>~/.bashrc</code> instead of
+<code>~/.bash_profile</code>), a user may need to add the following to their <code>~/.bashrc</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Homebrew (Linuxbrew)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;/home/linuxbrew/.linuxbrew&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>/home/linuxbrew/.linuxbrew/bin/brew<span class="w"> </span>shellenv<span class="k">)</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+<p><code>brew shellenv</code> sets these environment variables:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HOMEBREW_PREFIX</code></td>
+<td><code>/home/linuxbrew/.linuxbrew</code></td>
+</tr>
+<tr>
+<td><code>HOMEBREW_CELLAR</code></td>
+<td><code>/home/linuxbrew/.linuxbrew/Cellar</code></td>
+</tr>
+<tr>
+<td><code>HOMEBREW_REPOSITORY</code></td>
+<td><code>/home/linuxbrew/.linuxbrew/Homebrew</code></td>
+</tr>
+<tr>
+<td><code>PATH</code></td>
+<td>prepends <code>/home/linuxbrew/.linuxbrew/bin</code> and <code>.../sbin</code></td>
+</tr>
+<tr>
+<td><code>MANPATH</code></td>
+<td>prepends <code>.../share/man</code></td>
+</tr>
+<tr>
+<td><code>INFOPATH</code></td>
+<td>prepends <code>.../share/info</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>4. Verification</h2>
+<h3>Confirm the installation prefix layout</h3>
+<div class="highlight"><pre><span></span><code>ls<span class="w"> </span>-la<span class="w"> </span>/home/linuxbrew/.linuxbrew/
+</code></pre></div>
+
+<p>Expected output (all entries owned by <code>morgan:linuxbrew</code>, setgid <code>s</code> visible):</p>
+<div class="highlight"><pre><span></span><code><span class="n">total</span><span class="w"> </span><span class="mi">56</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">14</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="o">.</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="o">..</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">Caskroom</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">Cellar</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">Frameworks</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">Homebrew</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">bin</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">32</span><span class="w"> </span><span class="n">etc</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">include</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">lib</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">opt</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">sbin</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">6</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">32</span><span class="w"> </span><span class="n">share</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="k">var</span>
+</code></pre></div>
+
+<h3>Check the Homebrew version</h3>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew --version&#39;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>Homebrew 5.0.15
+</code></pre></div>
+
+<h3>Run brew doctor</h3>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew doctor&#39;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>Your system is ready to brew.
+</code></pre></div>
+
+<h3>Confirm group membership</h3>
+<div class="highlight"><pre><span></span><code>getent<span class="w"> </span>group<span class="w"> </span>linuxbrew
+<span class="c1"># linuxbrew:x:1001:morgan</span>
+
+id<span class="w"> </span>morgan
+<span class="c1"># uid=1000(morgan) gid=1000(morgan) groups=1000(morgan),100(users),1001(linuxbrew)</span>
+</code></pre></div>
+
+<h3>Test installing a package (dry run)</h3>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew install --dry-run hello&#39;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>==&gt; Would install 1 formula:
+hello
+</code></pre></div>
+
+<hr>
+<h2>5. Adding Future Users</h2>
+<p>When a new user needs Homebrew access:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># As root — add the new user to the linuxbrew group</span>
+usermod<span class="w"> </span>-aG<span class="w"> </span>linuxbrew<span class="w"> </span>newuser
+</code></pre></div>
+
+<p>The user must log out and back in (or start a new login shell) for the group change to take
+effect. The <code>/etc/profile.d/homebrew.sh</code> script will activate <code>brew</code> for them automatically
+on their next login. No other changes are needed.</p>
+<p>To verify the new user can reach Homebrew:</p>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>newuser<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew --version&#39;</span>
+</code></pre></div>
+
+<hr>
+<h2>6. Troubleshooting</h2>
+<h3><code>brew: command not found</code> in a non-login shell</h3>
+<p>The <code>/etc/profile.d/homebrew.sh</code> script only runs in login shells. In a non-login shell
+(typical terminal emulators, <code>su username</code> without the <code>-</code>), Homebrew will not be on the PATH.</p>
+<p>Fix: source the script manually, or add the <code>eval</code> line to <code>~/.bashrc</code> as shown in
+<a href="#3-per-user-shell-setup">Section 3</a>.</p>
+<p>Quick test — if this works but <code>brew</code> does not:</p>
+<div class="highlight"><pre><span></span><code>/home/linuxbrew/.linuxbrew/bin/brew<span class="w"> </span>--version
+</code></pre></div>
+
+<p>then the issue is purely PATH/environment, not the installation.</p>
+<h3><code>useradd: command not found</code> during installation</h3>
+<p><code>useradd</code> lives at <code>/usr/sbin/useradd</code>. On Debian 13, <code>/usr/sbin</code> is not in the PATH of
+non-login root shells. Run the installer from a full login shell:</p>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w">        </span><span class="c1"># note the hyphen — this gives a login shell with /usr/sbin in PATH</span>
+</code></pre></div>
+
+<p>Or prepend it explicitly before running the installer:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/sbin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<h3>Installer fails to create <code>/home/linuxbrew</code></h3>
+<p>In LXC containers, the installer may not be able to create the prefix directory itself because
+<code>/home</code> is owned by <code>root:root</code> with mode <code>755</code>. The installer does not have write access to
+<code>/home</code> when running as a non-root user.</p>
+<p>Solution: pre-create the directory as root before running the installer (see
+<a href="#step-2--pre-create-the-homebrew-prefix-directory">Step 2</a>).</p>
+<h3>Permission denied errors when running <code>brew install</code></h3>
+<p>The user must be in the <code>linuxbrew</code> group <strong>and</strong> must have started a new session after being
+added. Check:</p>
+<div class="highlight"><pre><span></span><code>id<span class="w">          </span><span class="c1"># linuxbrew should appear in the groups list</span>
+</code></pre></div>
+
+<p>If <code>linuxbrew</code> is absent, either the <code>usermod -aG linuxbrew username</code> step was skipped, or
+the user has not logged out and back in since being added.</p>
+<h3><code>brew doctor</code> reports warnings about <code>/usr/local</code></h3>
+<p>On Linux, Homebrew uses <code>/home/linuxbrew/.linuxbrew</code> as its prefix, not <code>/usr/local</code>. Warnings
+about <code>/usr/local</code> being absent or not owned by the current user are normal and harmless on a
+Linux installation.</p>
+<hr>
+<h2>Quick-Reference: Full Root-Side Install Sequence</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Install dependencies</span>
+apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>build-essential<span class="w"> </span>git<span class="w"> </span>curl<span class="w"> </span>file<span class="w"> </span>procps
+
+<span class="c1"># 2. Ensure /usr/sbin is in PATH (run as login shell or set manually)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/sbin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+
+<span class="c1"># 3. Create the linuxbrew group</span>
+groupadd<span class="w"> </span>linuxbrew
+
+<span class="c1"># 4. Pre-create the prefix and set ownership/permissions</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>/home/linuxbrew/.linuxbrew
+chown<span class="w"> </span>-R<span class="w"> </span>morgan:linuxbrew<span class="w"> </span>/home/linuxbrew
+chmod<span class="w"> </span><span class="m">2775</span><span class="w"> </span>/home/linuxbrew
+chmod<span class="w"> </span><span class="m">2775</span><span class="w"> </span>/home/linuxbrew/.linuxbrew
+
+<span class="c1"># 5. Add the primary user to the group</span>
+usermod<span class="w"> </span>-aG<span class="w"> </span>linuxbrew<span class="w"> </span>morgan
+
+<span class="c1"># 6. Run the installer as the non-root user</span>
+su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;&#39;</span>
+
+<span class="c1"># 7. Install the system-wide profile.d activation script</span>
+cat<span class="w"> </span>&gt;<span class="w"> </span>/etc/profile.d/homebrew.sh<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">if [ -d &quot;/home/linuxbrew/.linuxbrew&quot; ]; then</span>
+<span class="s">    eval &quot;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&quot;</span>
+<span class="s">fi</span>
+<span class="s">EOF</span>
+chmod<span class="w"> </span>+x<span class="w"> </span>/etc/profile.d/homebrew.sh
+
+<span class="c1"># 8. Verify</span>
+su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew --version &amp;&amp; brew doctor&#39;</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../node-red-vs-home-assistant.html" rel="bookmark"
+                               title="Permalink to Node Red vs Home Assistant">Node Red vs Home Assistant</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-24T15:58:00+01:00">
+                Published: Thu 24 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/homeassistant.html">homeassistant</a> </p>        
+</footer><!-- /.post-info -->                        <p>Node Red vs Home Assistant</p>
+<p>Which is better* ?</p>
+<p>*better: CPU/RAM efficient, easier to learn and or offer better support …</p>
+                        <a class="readmore" href="../node-red-vs-home-assistant.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../proxmox-plex-container.html" rel="bookmark"
+                               title="Permalink to Proxmox Plex Container">Proxmox Plex Container</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-24T13:10:00+01:00">
+                Published: Thu 24 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/proxmox.html">proxmox</a> <a href="../tag/plex.html">plex</a> </p>        
+</footer><!-- /.post-info -->                        <p>With Proxmox installed time to setup Plex in a container, and migrate from Synology NAS.</p>
+<p>I am following these guides …</p>
+                        <a class="readmore" href="../proxmox-plex-container.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../starting-with-proxmox.html" rel="bookmark"
+                               title="Permalink to Starting with ProxMox">Starting with ProxMox</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-24T12:56:00+01:00">
+                Published: Thu 24 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/proxmox.html">proxmox</a> </p>        
+</footer><!-- /.post-info -->                        <p>Having decided that <a href="https://www.proxmox.com/en/">Proxmox</a> is the way forward to manage docker and ivrtualisation outside of the synology NAS. i need …</p>
+                        <a class="readmore" href="../starting-with-proxmox.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../beelink-n200-proxmox-and-plex.html" rel="bookmark"
+                               title="Permalink to Beelink N200 Proxmox and Plex">Beelink N200 Proxmox and Plex</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-24T11:43:00+01:00">
+                Published: Thu 24 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/networking-plex-proxmox.html">Networking Plex Proxmox</a> </p>        
+</footer><!-- /.post-info -->                        <p>To improve the Plex transcoding options and off load the computation from the NAS, the plan is purchase a BeeLink …</p>
+                        <a class="readmore" href="../beelink-n200-proxmox-and-plex.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../cat8-t-568.html" rel="bookmark"
+                               title="Permalink to Cat8 T-568">Cat8 T-568</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-21T13:31:00+01:00">
+                Published: Mon 21 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/ethernet.html">ethernet</a> <a href="../tag/networking.html">networking</a> </p>        
+</footer><!-- /.post-info -->                        <p>Cat 8 Wiring, comes in 2 variants T-568A and T-568B.  </p>
+<p><img alt="Wiring Diagram" src="../T-568AB.png"></p>
+<p>Cat8 replaces the need for crimping tools with field termination …</p>
+                        <a class="readmore" href="../cat8-t-568.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../synology-connecting-across-vlan-with-active-vpn.html" rel="bookmark"
+                               title="Permalink to Synology Connecting Across VLAN with active VPN">Synology Connecting Across VLAN with active VPN</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-16T11:30:00+01:00">
+                Published: Wed 16 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/synology.html">Synology</a> <a href="../tag/networking.html">networking</a> <a href="../tag/vlan.html">VLAN</a> <a href="../tag/vpn.html">VPN</a> </p>        
+</footer><!-- /.post-info -->                        <p>When a Synology NAS creates a VPN connection it overides the default gateway, except for devices listed as contained within …</p>
+                        <a class="readmore" href="../synology-connecting-across-vlan-with-active-vpn.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///247/rtorrent_move_on_download_completion" rel="bookmark"
+                               title="Permalink to "rtorrent move on download completion"">"rtorrent move on download completion"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-01-08T19:53:02+00:00">
+                Published: Wed 08 January 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/rtorrent.html">rtorrent</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>rtorrent moving torrents upon completion:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Torrents go in ~/Torrents</span>
+<span class="c1"># Incomplete Downloads in ~/Incomplete</span>
+<span class="c1"># Upon Completion Data is moved to ~/Seeding …</span></code></pre></div>
+                        <a class="readmore" href="..///247/rtorrent_move_on_download_completion">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///230/Weather_alerts_via_eMail_from_the_MetOffice" rel="bookmark"
+                               title="Permalink to "Weather alerts via eMail from the MetOffice"">"Weather alerts via eMail from the MetOffice"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-08-15T12:17:08+01:00">
+                Published: Thu 15 August 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/plants.html">Plants</a> <a href="../tag/weather.html">Weather</a> </p>        
+</footer><!-- /.post-info -->                        <p>In the UK you can now get regional weather alerts from the 
+<a href="https://service.govdelivery.com/service/multi_subscribe.html?code=UKMETOFFICE&amp;origin=http://www.metoffice.gov.uk">Met Office</a>.</p>
+<p>Unfortunately it does not break it …</p>
+                        <a class="readmore" href="..///230/Weather_alerts_via_eMail_from_the_MetOffice">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///225/Home_Wi-Fi" rel="bookmark"
+                               title="Permalink to "Home Wi-Fi"">"Home Wi-Fi"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-06-17T11:38:27+01:00">
+                Published: Mon 17 June 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/network.html">Network</a> </p>        
+</footer><!-- /.post-info -->                        <p>On the continuous search for a decent ADSL, Router and Wireless access point. I have tried many (unscientifically). Finding that …</p>
+                        <a class="readmore" href="..///225/Home_Wi-Fi">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///220/Ubuntu_and_the_Jetway_ADPE4S" rel="bookmark"
+                               title="Permalink to "Ubuntu and the Jetway ADPE4S"">"Ubuntu and the Jetway ADPE4S"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-05-02T17:02:37+01:00">
+                Published: Thu 02 May 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/linux.html">Linux</a> <a href="../tag/ubuntu.html">Ubuntu</a> </p>        
+</footer><!-- /.post-info -->                        <p><strong>Still unresolved</strong></p>
+<p>The Jetway ADPE4S uses a Marvell 88SE6145 chip which a number of users have had trouble getting to …</p>
+                        <a class="readmore" href="..///220/Ubuntu_and_the_Jetway_ADPE4S">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///219/Ubuntu_%28Linux%29_List_Disks" rel="bookmark"
+                               title="Permalink to "Ubuntu (Linux) List Disks"">"Ubuntu (Linux) List Disks"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-05-02T13:39:24+01:00">
+                Published: Thu 02 May 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/ubuntu.html">Ubuntu</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>sudo lshw -class disk -class storage -short
+</code></pre></div>
+
+<p>Outputs :</p>
+<div class="highlight"><pre><span></span><code><span class="n">H</span><span class="o">/</span><span class="n">W</span><span class="w"> </span><span class="n">path</span><span class="w">           </span><span class="n">Device</span><span class="w">     </span><span class="kt">Class</span><span class="w">       </span><span class="n">Description</span>
+<span class="o">=====================================================</span>
+<span class="o">/</span><span class="mi">0</span><span class="o">/</span><span class="mi">100</span><span class="o">/</span><span class="mi">1</span><span class="n">c</span><span class="mf">.3</span><span class="o">/</span><span class="mi">0 …</span></code></pre></div>
+                        <a class="readmore" href="..///219/Ubuntu_%28Linux%29_List_Disks">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///218/BT_Broadband_messing_around_with_your_DNS" rel="bookmark"
+                               title="Permalink to "BT Broadband messing around with your DNS"">"BT Broadband messing around with your DNS"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-04-25T09:02:48+01:00">
+                Published: Thu 25 April 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/network.html">Network</a> </p>        
+</footer><!-- /.post-info -->                        <p>BT broadband has <strong>BT Web Address Help</strong> enabled by default. This allows then to redirect you to another site if …</p>
+                        <a class="readmore" href="..///218/BT_Broadband_messing_around_with_your_DNS">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///216/BitTorrent_Sync%2C_free_rival_to_DropBox" rel="bookmark"
+                               title="Permalink to "BitTorrent Sync, free rival to DropBox"">"BitTorrent Sync, free rival to DropBox"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-04-24T07:11:47+01:00">
+                Published: Wed 24 April 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+        
+</footer><!-- /.post-info -->                        <p><a href="http://labs.bittorrent.com/experiments/sync.html">BitTorrent Sync</a> although still in Beta offers a App and protocol for <a href="http://db.tt/ZZzJ5LBq">DropBox</a> like file syncing. As it is an …</p>
+                        <a class="readmore" href="..///216/BitTorrent_Sync%2C_free_rival_to_DropBox">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///120/Make_Ubuntu_Samba_share_show_up_on_OS_X_10.6_finder" rel="bookmark"
+                               title="Permalink to "Make Ubuntu Samba share show up on OS X 10.6 finder"">"Make Ubuntu Samba share show up on OS X 10.6 finder"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-25T20:35:18+01:00">
+                Published: Mon 25 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/ubuntu.html">Ubuntu</a> </p>        
+</footer><!-- /.post-info -->                        <p>Install Avahi, it like bonjour auto discovery but for linux, then tell it about your servers samba service.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>apt-get …</code></pre></div>
+                        <a class="readmore" href="..///120/Make_Ubuntu_Samba_share_show_up_on_OS_X_10.6_finder">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///74/Stop%2FStart_and_Restart_Samba_on_OS_X" rel="bookmark"
+                               title="Permalink to "Stop/Start and Restart Samba on OS X"">"Stop/Start and Restart Samba on OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-10-10T10:13:52+01:00">
+                Published: Sun 10 October 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>To Stop Start and Restart Samba on Mac OS X 10.6:</p>
+<div class="highlight"><pre><span></span><code>sudo /usr/sbin/smbd stop
+sudo /usr/sbin …</code></pre></div>
+                        <a class="readmore" href="..///74/Stop%2FStart_and_Restart_Samba_on_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///36/Ruby_parsing_torrent_files_for_meta_info" rel="bookmark"
+                               title="Permalink to "Ruby parsing torrent files for meta info"">"Ruby parsing torrent files for meta info"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-04T10:03:26+01:00">
+                Published: Fri 04 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/performance.html">Performance</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/bittorrent.html">BitTorrent</a> </p>        
+</footer><!-- /.post-info -->                        <p>There currently does not appear to be any really good torrent file parsers available via the gems system.</p>
+<p>rubytorrent seems …</p>
+                        <a class="readmore" href="..///36/Ruby_parsing_torrent_files_for_meta_info">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///31/Add_HTTP_%28web%29_control_over_your_InfaRed_devices" rel="bookmark"
+                               title="Permalink to "Add HTTP (web) control over your InfaRed devices"">"Add HTTP (web) control over your InfaRed devices"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-11T01:49:48+01:00">
+                Published: Tue 11 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/audio.html">Audio</a> <a href="../tag/web.html">Web</a> <a href="../tag/automation.html">Automation</a> </p>        
+</footer><!-- /.post-info -->                        <p>Using the new <a href="http://www.keene.co.uk/electronic/keene-electronics/keene-ir-anywhere-ir-over-ip-module-%28128-code%29/KIRA128.html">IR ANYWHERE IR OVER IP MODULE</a> you can send web requests that get turned into standard consumer …</p>
+                        <a class="readmore" href="..///31/Add_HTTP_%28web%29_control_over_your_InfaRed_devices">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

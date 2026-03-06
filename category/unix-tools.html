@@ -1,0 +1,3486 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Lizard-Spock - Unix \& Tools</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/homelab.html">Homelab</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li class="active"><a href="../category/unix-tools.html">Unix \& Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../tmux-training-manual-ghostty-xterm-and-pve-lxc-terminals.html">tmux Training Manual: Ghostty, xterm and PVE LXC Terminals</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-02-27T12:00:00+00:00">
+                Published: Fri 27 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/tmux.html">tmux</a> <a href="../tag/terminal.html">terminal</a> <a href="../tag/ghostty.html">ghostty</a> <a href="../tag/xterm.html">xterm</a> <a href="../tag/proxmox.html">proxmox</a> <a href="../tag/lxc.html">lxc</a> <a href="../tag/linux.html">linux</a> </p>        
+</footer><!-- /.post-info --><p>tmux is a terminal multiplexer: it lets you run multiple terminal sessions inside a single window, split panes side by side, and crucially, keep sessions alive after you disconnect. For headless Proxmox VE (PVE) LXC containers accessed over SSH, this is essential. If your SSH connection drops mid-task, tmux keeps the job running and lets you reattach exactly where you left off. This manual walks through tmux in practical exercises, covering Ghostty on macOS, xterm, and terminal sessions inside PVE LXC containers.</p>
+<h2>Getting Back to a Known State</h2>
+<p>This section comes first because it is the most important concept to internalise. Just as pressing <code>Escape</code> repeatedly in vim returns you to a safe state, tmux has equivalent recovery paths. Learn these before anything else.</p>
+<h3>The Prefix Key</h3>
+<p>Every tmux command starts with the <strong>prefix key</strong>, which is <code>Ctrl+b</code> by default. You press <code>Ctrl+b</code>, release both keys, then press the command key. Nothing happens if you just hold <code>Ctrl+b</code> without following up.</p>
+<p>If you press <code>Ctrl+b</code> and then the wrong key, tmux usually just ignores it. You are not stuck.</p>
+<h3>Exiting Any Mode</h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>How to exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stuck in copy mode</td>
+<td>Press <code>q</code> or <code>Escape</code></td>
+</tr>
+<tr>
+<td>Stuck in command mode (<code>:</code> prompt)</td>
+<td>Press <code>Escape</code> or <code>Ctrl+c</code></td>
+</tr>
+<tr>
+<td>Pane running something</td>
+<td>Press <code>Ctrl+c</code> to interrupt it</td>
+</tr>
+<tr>
+<td>Everything looks wrong</td>
+<td>Detach with <code>Ctrl+b d</code> and reattach fresh</td>
+</tr>
+</tbody>
+</table>
+<h3>Emergency Exit Sequences</h3>
+<p><strong>Detach from session (session keeps running):</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b d
+</code></pre></div>
+
+<p><strong>List all sessions from outside tmux:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>ls
+</code></pre></div>
+
+<p><strong>Reattach to a named session:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>&lt;session-name&gt;
+</code></pre></div>
+
+<p><strong>Reattach to the most recent session:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach
+</code></pre></div>
+
+<p><strong>Kill a specific pane (with confirmation prompt):</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b x
+</code></pre></div>
+
+<p><strong>Kill a specific window (with confirmation prompt):</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b &amp;
+</code></pre></div>
+
+<p><strong>Kill a session entirely from the command line:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>kill-session<span class="w"> </span>-t<span class="w"> </span>&lt;session-name&gt;
+</code></pre></div>
+
+<p><strong>Kill all tmux sessions:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>kill-server
+</code></pre></div>
+
+<p>The pattern to remember: <code>Ctrl+b d</code> detaches safely, <code>tmux ls</code> shows what is running, and <code>tmux attach -t &lt;name&gt;</code> gets you back. These three commands will rescue you from almost any situation.</p>
+<hr>
+<h2>Installation</h2>
+<h3>Debian and Ubuntu LXC Containers</h3>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>tmux
+</code></pre></div>
+
+<h3>macOS (Ghostty Host)</h3>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>tmux
+</code></pre></div>
+
+<h3>Verify Installation</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>-V
+</code></pre></div>
+
+<p>Expected output: <code>tmux 3.x</code> (version 3.3a or later is common as of 2026).</p>
+<hr>
+<h2>Terminal Compatibility Notes</h2>
+<h3>Ghostty</h3>
+<p>Ghostty works excellently with tmux. It supports true colour, full mouse reporting, and passes modifier keys correctly. No special configuration is needed.</p>
+<p>If colours look wrong inside tmux running in Ghostty, set this in your shell profile:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">TERM</span><span class="o">=</span>xterm-256color
+</code></pre></div>
+
+<p>Or add this to <code>~/.tmux.conf</code> to force 256 colour mode:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>default-terminal<span class="w"> </span><span class="s2">&quot;screen-256color&quot;</span>
+</code></pre></div>
+
+<h3>xterm</h3>
+<p>xterm is a reliable fallback. It handles tmux correctly but defaults to a limited colour palette. Set the terminal type explicitly if you see rendering artefacts:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">TERM</span><span class="o">=</span>xterm-256color<span class="w"> </span>tmux
+</code></pre></div>
+
+<p>Or add to your shell profile permanently:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">TERM</span><span class="o">=</span>xterm-256color
+</code></pre></div>
+
+<h3>PVE LXC Console: noVNC vs SSH</h3>
+<p>PVE's web console (noVNC) can cause key capture problems with tmux. The <code>Ctrl+b</code> prefix may not pass through correctly because the browser intercepts some key combinations. In practice, <code>Ctrl+b</code> often works, but scrolling, mouse support, and certain modifier combinations behave inconsistently.</p>
+<p><strong>Recommendation: always use SSH into the LXC for tmux work.</strong></p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>user@&lt;lxc-ip&gt;
+</code></pre></div>
+
+<p>SSH gives you a proper PTY, correct terminal type negotiation, and reliable key forwarding. noVNC is fine for quick root access or emergency recovery, but not for regular tmux sessions.</p>
+<p>If you must use the PVE noVNC console with tmux, set a longer escape time to reduce timeout frustration:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-sg<span class="w"> </span>escape-time<span class="w"> </span><span class="m">50</span>
+</code></pre></div>
+
+<hr>
+<h2>Exercise 1: First Session</h2>
+<p>This exercise covers starting, using, detaching, and reattaching to a named session.</p>
+<h3>Start a Named Session</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>new<span class="w"> </span>-s<span class="w"> </span>training
+</code></pre></div>
+
+<p>You are now inside a tmux session called <code>training</code>. The green (or coloured) bar at the bottom is the <strong>status bar</strong>.</p>
+<h3>Reading the Status Bar</h3>
+<p>The status bar shows:</p>
+<ul>
+<li>Left side: session name in brackets, e.g. <code>[training]</code>, followed by window index and name, e.g. <code>0:bash</code></li>
+<li>Right side: hostname and time (depending on your config)</li>
+<li>An asterisk <code>*</code> next to the current window name</li>
+</ul>
+<h3>Run a Command</h3>
+<div class="highlight"><pre><span></span><code>top
+</code></pre></div>
+
+<p>Watch it run. Now detach without killing it.</p>
+<h3>Detach from the Session</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b d
+</code></pre></div>
+
+<p>You are back at your normal shell prompt. The <code>top</code> command is still running inside tmux.</p>
+<h3>Verify the Session is Still Running</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>ls
+</code></pre></div>
+
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code>training: 1 windows (created Thu Feb 27 12:00:00 2026)
+</code></pre></div>
+
+<h3>Reattach to the Session</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>training
+</code></pre></div>
+
+<p>You are back inside the session. <code>top</code> is still running. Press <code>q</code> to quit <code>top</code>.</p>
+<h3>Recovery Notes for Exercise 1</h3>
+<p>If you lose track of session names, <code>tmux ls</code> always shows what is running. If <code>tmux ls</code> shows nothing, there are no sessions and you start fresh with <code>tmux new -s &lt;name&gt;</code>.</p>
+<hr>
+<h2>Exercise 2: Windows</h2>
+<p>Windows in tmux are like browser tabs. Each window fills the full terminal area and can run a different program.</p>
+<h3>Create a New Window</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b c
+</code></pre></div>
+
+<p>A new window appears. The status bar now shows two windows: <code>0:bash</code> and <code>1:bash</code>.</p>
+<h3>Name the Current Window</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b ,
+</code></pre></div>
+
+<p>A rename prompt appears at the bottom. Type a name, for example <code>logs</code>, then press <code>Enter</code>.</p>
+<h3>Switch Between Windows</h3>
+<p>Switch to window by number:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b 0
+Ctrl+b 1
+</code></pre></div>
+
+<p>Switch to next window:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b n
+</code></pre></div>
+
+<p>Switch to previous window:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b p
+</code></pre></div>
+
+<h3>List All Windows (Known State Check)</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b w
+</code></pre></div>
+
+<p>An interactive list of all windows appears. Use arrow keys to navigate and <code>Enter</code> to select. Press <code>Escape</code> to cancel without switching. This gives you a clear view of what is open.</p>
+<h3>Close a Window</h3>
+<p>The cleanest way is to exit the shell:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">exit</span>
+</code></pre></div>
+
+<p>Or force close the current window (with confirmation):</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b &amp;
+</code></pre></div>
+
+<p>Type <code>y</code> to confirm. If you have multiple windows, tmux moves you to the next one. If it was the last window, the session ends.</p>
+<h3>Recovery Notes for Exercise 2</h3>
+<p>If you are confused about which window you are in, <code>Ctrl+b w</code> shows the full list. If a window is running something stuck, <code>Ctrl+b &amp;</code> closes it after confirmation.</p>
+<hr>
+<h2>Exercise 3: Panes</h2>
+<p>Panes split a single window into multiple terminal areas visible at the same time.</p>
+<h3>Split Horizontally (Left and Right)</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b %
+</code></pre></div>
+
+<p>The window is now split into two vertical columns (left pane and right pane).</p>
+<h3>Split Vertically (Top and Bottom)</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b &quot;
+</code></pre></div>
+
+<p>The current pane is split into two horizontal rows.</p>
+<h3>Navigate Between Panes</h3>
+<p>Use the prefix followed by an arrow key:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b &lt;arrow key&gt;
+</code></pre></div>
+
+<p>For example, <code>Ctrl+b</code> then the right arrow moves focus to the right pane.</p>
+<h3>Show Pane Numbers (Known State Check)</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b q
+</code></pre></div>
+
+<p>Large numbers appear briefly over each pane. Press the number while it is visible to jump to that pane directly.</p>
+<h3>Resize a Pane</h3>
+<p>Hold the prefix and then repeatedly press arrow keys. In most terminals:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b :resize-pane -D 5
+</code></pre></div>
+
+<p>This resizes the current pane down by 5 rows. Directions: <code>-U</code> (up), <code>-D</code> (down), <code>-L</code> (left), <code>-R</code> (right).</p>
+<p>Alternatively, if mouse mode is enabled (covered in the config section), you can drag pane borders.</p>
+<h3>Zoom a Pane to Full Screen</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b z
+</code></pre></div>
+
+<p>The current pane expands to fill the entire window. Press <code>Ctrl+b z</code> again to return to the split layout. The status bar shows <code>[Z]</code> when a pane is zoomed.</p>
+<h3>Close a Pane</h3>
+<p>The cleanest way:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">exit</span>
+</code></pre></div>
+
+<p>Or force close with confirmation:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b x
+</code></pre></div>
+
+<p>Type <code>y</code> to confirm. If it is the last pane in the window, the window closes too.</p>
+<h3>Recovery Notes for Exercise 3</h3>
+<p><code>Ctrl+b q</code> shows pane numbers so you can see where you are. <code>Ctrl+b z</code> is useful if you accidentally zoomed and the layout looks wrong: toggle it again to return to the split view.</p>
+<hr>
+<h2>Exercise 4: Copy Mode (and How to Exit It)</h2>
+<p>Copy mode lets you scroll back through terminal output and copy text. Knowing how to exit it reliably is as important as knowing how to enter it.</p>
+<h3>Enter Copy Mode</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b [
+</code></pre></div>
+
+<p>The status bar shows <code>[Copy]</code> in the top right corner. You are now in copy mode.</p>
+<h3>Navigate in Copy Mode</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arrow keys</td>
+<td>Move cursor one line/column</td>
+</tr>
+<tr>
+<td><code>PgUp</code> / <code>PgDn</code></td>
+<td>Scroll up or down a page</td>
+</tr>
+<tr>
+<td><code>g</code></td>
+<td>Go to the top of the scrollback buffer</td>
+</tr>
+<tr>
+<td><code>G</code></td>
+<td>Go to the bottom (current output)</td>
+</tr>
+<tr>
+<td><code>/</code></td>
+<td>Search forward</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>Search backward</td>
+</tr>
+<tr>
+<td><code>n</code></td>
+<td>Next search match</td>
+</tr>
+<tr>
+<td><code>N</code></td>
+<td>Previous search match</td>
+</tr>
+</tbody>
+</table>
+<h3>Exit Copy Mode</h3>
+<p><strong>Press <code>q</code> or <code>Escape</code>.</strong></p>
+<p>This is the key thing to remember. If you are in copy mode and the terminal seems unresponsive to normal commands, you are still in copy mode. Press <code>q</code> or <code>Escape</code> to return to normal mode.</p>
+<h3>Copy Text</h3>
+<ol>
+<li>Enter copy mode: <code>Ctrl+b [</code></li>
+<li>Navigate to the start of the text you want</li>
+<li>Press <code>Space</code> to begin selection</li>
+<li>Move to the end of the text</li>
+<li>Press <code>Enter</code> to copy and exit copy mode</li>
+</ol>
+<h3>Paste Copied Text</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b ]
+</code></pre></div>
+
+<p>This pastes the tmux clipboard into the current pane at the cursor position.</p>
+<h3>Recovery Notes for Exercise 4</h3>
+<p>If your keyboard input is being swallowed and commands are not running, the most likely cause is that you are in copy mode. Press <code>q</code> first, then <code>Escape</code> if <code>q</code> did not work.</p>
+<hr>
+<h2>Exercise 5: PVE LXC Workflow</h2>
+<p>This exercise demonstrates the core use case for tmux in a Proxmox VE environment: running long tasks in an LXC container and safely reconnecting after a disconnect.</p>
+<h3>Step 1: SSH into the LXC Container</h3>
+<p>From your workstation (Ghostty or any terminal):</p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>user@&lt;lxc-ip&gt;
+</code></pre></div>
+
+<p>Replace <code>&lt;lxc-ip&gt;</code> with the IP address of your LXC container. You can find this in the PVE web interface under the container's Network tab, or by running <code>ip a</code> inside the container.</p>
+<h3>Step 2: Start a Persistent Session</h3>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>new<span class="w"> </span>-s<span class="w"> </span>work
+</code></pre></div>
+
+<h3>Step 3: Run a Long Job</h3>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>upgrade
+</code></pre></div>
+
+<p>This may take several minutes. Let it run.</p>
+<h3>Step 4: Detach and Close SSH</h3>
+<div class="highlight"><pre><span></span><code>Ctrl+b d
+</code></pre></div>
+
+<p>You are back at the container's shell prompt (outside tmux). Now close the SSH connection entirely:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">exit</span>
+</code></pre></div>
+
+<p>Or close the terminal window. The <code>apt upgrade</code> is still running inside the tmux session on the LXC container.</p>
+<h3>Step 5: Reconnect and Reattach</h3>
+<p>Open a new terminal and SSH back in:</p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>user@&lt;lxc-ip&gt;
+</code></pre></div>
+
+<p>List running sessions:</p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>ls
+</code></pre></div>
+
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code>work: 1 windows (created Thu Feb 27 12:05:00 2026)
+</code></pre></div>
+
+<p>Reattach:</p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>work
+</code></pre></div>
+
+<p>You are back watching <code>apt upgrade</code> complete, exactly as you left it.</p>
+<h3>Why tmux Beats GNU Screen for LXC Work</h3>
+<p>Both tmux and screen provide session persistence, but tmux has clearer defaults, better pane support, and easier scripting. The <code>tmux ls</code> command gives a clean session overview. Pane splitting is built in without workarounds. Configuration via <code>~/.tmux.conf</code> is straightforward. For new setups, start with tmux.</p>
+<hr>
+<h2>Quick Reference Table</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Key or Command</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New named session</td>
+<td><code>tmux new -s &lt;name&gt;</code></td>
+<td>Run from shell</td>
+</tr>
+<tr>
+<td>List sessions</td>
+<td><code>tmux ls</code></td>
+<td>Run from shell</td>
+</tr>
+<tr>
+<td>Attach to session</td>
+<td><code>tmux attach -t &lt;name&gt;</code></td>
+<td>Run from shell</td>
+</tr>
+<tr>
+<td>Detach from session</td>
+<td><code>Ctrl+b d</code></td>
+<td>Session keeps running</td>
+</tr>
+<tr>
+<td>New window</td>
+<td><code>Ctrl+b c</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Rename window</td>
+<td><code>Ctrl+b ,</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Switch to window N</td>
+<td><code>Ctrl+b &lt;N&gt;</code></td>
+<td>0-9</td>
+</tr>
+<tr>
+<td>Next window</td>
+<td><code>Ctrl+b n</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Previous window</td>
+<td><code>Ctrl+b p</code></td>
+<td></td>
+</tr>
+<tr>
+<td>List windows</td>
+<td><code>Ctrl+b w</code></td>
+<td>Interactive picker</td>
+</tr>
+<tr>
+<td>Close window</td>
+<td><code>Ctrl+b &amp;</code></td>
+<td>Confirmation required</td>
+</tr>
+<tr>
+<td>Split pane left/right</td>
+<td><code>Ctrl+b %</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Split pane top/bottom</td>
+<td><code>Ctrl+b "</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Navigate panes</td>
+<td><code>Ctrl+b &lt;arrow&gt;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Show pane numbers</td>
+<td><code>Ctrl+b q</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Zoom pane toggle</td>
+<td><code>Ctrl+b z</code></td>
+<td>Status bar shows [Z]</td>
+</tr>
+<tr>
+<td>Close pane</td>
+<td><code>Ctrl+b x</code></td>
+<td>Confirmation required</td>
+</tr>
+<tr>
+<td>Enter copy mode</td>
+<td><code>Ctrl+b [</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Exit copy mode</td>
+<td><code>q</code> or <code>Escape</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Start selection</td>
+<td><code>Space</code></td>
+<td>While in copy mode</td>
+</tr>
+<tr>
+<td>Copy selection</td>
+<td><code>Enter</code></td>
+<td>While in copy mode</td>
+</tr>
+<tr>
+<td>Paste</td>
+<td><code>Ctrl+b ]</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Reload config</td>
+<td><code>Ctrl+b :source-file ~/.tmux.conf</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Kill session</td>
+<td><code>tmux kill-session -t &lt;name&gt;</code></td>
+<td>Run from shell</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Config Tweaks</h2>
+<p>tmux reads <code>~/.tmux.conf</code> on startup. Create or edit this file to customise behaviour. Changes take effect in new sessions, or you can reload without restarting.</p>
+<h3>Location</h3>
+<div class="highlight"><pre><span></span><code>~/.tmux.conf
+</code></pre></div>
+
+<h3>Change the Prefix Key to Ctrl+a</h3>
+<p>Many users prefer <code>Ctrl+a</code> because it is easier to reach and was the <code>screen</code> default:</p>
+<div class="highlight"><pre><span></span><code>unbind<span class="w"> </span>C-b
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>prefix<span class="w"> </span>C-a
+<span class="nb">bind</span><span class="w"> </span>C-a<span class="w"> </span>send-prefix
+</code></pre></div>
+
+<p>After this, all commands use <code>Ctrl+a</code> instead of <code>Ctrl+b</code>. The <code>bind C-a send-prefix</code> line lets you type a literal <code>Ctrl+a</code> in programs like bash by pressing the prefix twice.</p>
+<h3>Enable Mouse Support</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>mouse<span class="w"> </span>on
+</code></pre></div>
+
+<p>With mouse enabled, you can click to select panes, drag borders to resize, and scroll with the mouse wheel. Scroll wheel enters copy mode automatically. To exit copy mode after scrolling, press <code>q</code>.</p>
+<h3>Increase Scrollback Buffer</h3>
+<p>The default scrollback is 2000 lines, which fills up quickly. Increase it:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>history-limit<span class="w"> </span><span class="m">10000</span>
+</code></pre></div>
+
+<h3>Reduce Escape Time (Useful for PVE noVNC)</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-sg<span class="w"> </span>escape-time<span class="w"> </span><span class="m">50</span>
+</code></pre></div>
+
+<p>This reduces the delay tmux waits after pressing <code>Escape</code> before deciding it is not a prefix sequence. Lower values make <code>Escape</code> feel more responsive in vim and other tools inside tmux.</p>
+<h3>Start Window and Pane Index at 1</h3>
+<p>By default windows are numbered from 0. Starting at 1 maps better to the number keys:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>base-index<span class="w"> </span><span class="m">1</span>
+setw<span class="w"> </span>-g<span class="w"> </span>pane-base-index<span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+
+<h3>Reload Config Without Restarting</h3>
+<p>After editing <code>~/.tmux.conf</code>, reload it inside a running tmux session:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+b :source-file ~/.tmux.conf
+</code></pre></div>
+
+<p>Or add a keybinding for this in <code>~/.tmux.conf</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">bind</span><span class="w"> </span>r<span class="w"> </span>source-file<span class="w"> </span>~/.tmux.conf<span class="w"> </span><span class="se">\;</span><span class="w"> </span>display-message<span class="w"> </span><span class="s2">&quot;Config reloaded&quot;</span>
+</code></pre></div>
+
+<p>Then use <code>Ctrl+b r</code> (or <code>Ctrl+a r</code> if you changed the prefix) to reload.</p>
+<h3>Minimal Recommended Config</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Change prefix to Ctrl+a</span>
+unbind<span class="w"> </span>C-b
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>prefix<span class="w"> </span>C-a
+<span class="nb">bind</span><span class="w"> </span>C-a<span class="w"> </span>send-prefix
+
+<span class="c1"># Enable mouse</span>
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>mouse<span class="w"> </span>on
+
+<span class="c1"># Increase scrollback</span>
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>history-limit<span class="w"> </span><span class="m">10000</span>
+
+<span class="c1"># Reduce escape time</span>
+<span class="nb">set</span><span class="w"> </span>-sg<span class="w"> </span>escape-time<span class="w"> </span><span class="m">50</span>
+
+<span class="c1"># Start numbering from 1</span>
+<span class="nb">set</span><span class="w"> </span>-g<span class="w"> </span>base-index<span class="w"> </span><span class="m">1</span>
+setw<span class="w"> </span>-g<span class="w"> </span>pane-base-index<span class="w"> </span><span class="m">1</span>
+
+<span class="c1"># Reload config</span>
+<span class="nb">bind</span><span class="w"> </span>r<span class="w"> </span>source-file<span class="w"> </span>~/.tmux.conf<span class="w"> </span><span class="se">\;</span><span class="w"> </span>display-message<span class="w"> </span><span class="s2">&quot;Config reloaded&quot;</span>
+</code></pre></div>
+
+<hr>
+<h2>Known State Cheatsheet</h2>
+<p>Bookmark this section. When something goes wrong, work through it from top to bottom.</p>
+<p><strong>1. Exit any mode:</strong></p>
+<ul>
+<li>In copy mode: press <code>q</code>, then <code>Escape</code> if needed</li>
+<li>In command mode: press <code>Escape</code></li>
+<li>Program stuck: press <code>Ctrl+c</code></li>
+</ul>
+<p><strong>2. Check what windows and panes are open:</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b w    (list windows)
+Ctrl+b q    (show pane numbers)
+</code></pre></div>
+
+<p><strong>3. Detach safely (session keeps running):</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b d
+</code></pre></div>
+
+<p><strong>4. From the shell, list all sessions:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>ls
+</code></pre></div>
+
+<p><strong>5. Reattach to a session:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>&lt;name&gt;
+tmux<span class="w"> </span>attach<span class="w">          </span><span class="c1"># most recent session</span>
+</code></pre></div>
+
+<p><strong>6. Kill a stuck pane:</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b x    (confirmation prompt, then y)
+</code></pre></div>
+
+<p><strong>7. Kill a stuck window:</strong></p>
+<div class="highlight"><pre><span></span><code>Ctrl+b &amp;    (confirmation prompt, then y)
+</code></pre></div>
+
+<p><strong>8. Kill a session entirely:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>kill-session<span class="w"> </span>-t<span class="w"> </span>&lt;name&gt;
+</code></pre></div>
+
+<p><strong>9. Nuclear option: kill all tmux sessions:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>kill-server
+</code></pre></div>
+
+<p><strong>10. Start fresh:</strong></p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>new<span class="w"> </span>-s<span class="w"> </span>main
+</code></pre></div>
+
+<p>Following this list top to bottom will resolve the vast majority of situations where tmux feels stuck or confusing. The core principle: <code>Ctrl+b d</code> gets you out, <code>tmux ls</code> shows what is there, and <code>tmux attach</code> gets you back in.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../command-line-disk-usage.html" rel="bookmark"
+                               title="Permalink to Command Line Disk Usage">Command Line Disk Usage</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-09-06T13:19:00+01:00">
+                Published: Sat 06 September 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/macos.html">MacOS</a> <a href="../tag/osx.html">OSX</a> <a href="../tag/cli.html">CLI</a> </p>        
+</footer><!-- /.post-info -->                        <h1>NCurses Disk Usage</h1>
+<p>A useful Command Line Iterface (CLI) for exploring disk usage:</p>
+<div class="highlight"><pre><span></span><code>ncdu
+</code></pre></div>
+
+<p>Example output.</p>
+<div class="highlight"><pre><span></span><code>ncdu 2.9.1 …</code></pre></div>
+                        <a class="readmore" href="../command-line-disk-usage.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../tex-hyphenation.html" rel="bookmark"
+                               title="Permalink to TeX hyphenation">TeX hyphenation</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-14T14:45:00+01:00">
+                Published: Mon 14 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/tex.html">TeX</a> </p>        
+</footer><!-- /.post-info -->                        <p>When TeX/LaTeX is fully justifying text there are times when it could do better but it does not know …</p>
+                        <a class="readmore" href="../tex-hyphenation.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../tex-paragraph-box.html" rel="bookmark"
+                               title="Permalink to TeX Paragraph Box">TeX Paragraph Box</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-11T14:18:00+01:00">
+                Published: Fri 11 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/tex.html">TeX</a> </p>        
+</footer><!-- /.post-info -->                        <p><code>parbox</code> is a LaTeX command used to place a box around text. </p>
+<p>Remeber that optional arguments are in [] (Square brackets …</p>
+                        <a class="readmore" href="../tex-paragraph-box.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../latex-macros.html" rel="bookmark"
+                               title="Permalink to LaTeX macros">LaTeX macros</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-10T14:17:00+01:00">
+                Published: Thu 10 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/tex.html">TeX</a> </p>        
+</footer><!-- /.post-info -->                        <p>LaTeX macros can be used as simple text replacments for example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">\documentclass</span><span class="nb">{</span>article<span class="nb">}</span>
+<span class="k">\newcommand</span><span class="nb">{</span><span class="k">\LUG</span><span class="nb">}{</span>LEGO User Group<span class="nb">}</span>
+<span class="k">\begin</span><span class="nb">{</span>document …</code></pre></div>
+                        <a class="readmore" href="../latex-macros.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../tools-for-technical-writing.html" rel="bookmark"
+                               title="Permalink to Tools for Technical Writing">Tools for Technical Writing</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-09-10T10:17:00+01:00">
+                Published: Tue 10 September 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/tex.html">TeX</a> </p>        
+</footer><!-- /.post-info -->                        <p>WYSIWYG editor for LaTeX <a href="https://www.lyx.org/">lyx</a>, and a manager for Bibliography <a href="https://www.jabref.org/">JabRef</a>.</p>
+<p>Lyx Tutorial: <a href="https://wiki.lyx.org/Mac/Mac">Lyx mac Guide</a></p>
+<p>JabRef Tutorial: <a href="https://docs.jabref.org/getting-started">Getting Started …</a></p>
+                        <a class="readmore" href="../tools-for-technical-writing.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../home-directory-file-structure.html" rel="bookmark"
+                               title="Permalink to "Home Directory File Structure"">"Home Directory File Structure"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-10-22T10:32:44+01:00">
+                Published: Thu 22 October 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/filesystem.html">Filesystem</a> <a href="../tag/organised.html">Organised</a> </p>        
+</footer><!-- /.post-info -->                        <p>Apples default directory structure is :</p>
+<div class="highlight"><pre><span></span><code><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">username</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">Desktop</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">Documents</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">Downloads</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">Library</span><span class="w">   </span><span class="c1"># Hidden by default</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">Movies</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">Music</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">Pictures</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">Public</span>
+</code></pre></div>
+
+<p>My current …</p>
+                        <a class="readmore" href="../home-directory-file-structure.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../os-x-disable-back-gesture.html" rel="bookmark"
+                               title="Permalink to "OS X disable back gesture"">"OS X disable back gesture"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-02-18T18:26:07+00:00">
+                Published: Wed 18 February 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>After accidentally scrolling back a page when browsing the web in chrome too many times. Figured out how to disable …</p>
+                        <a class="readmore" href="../os-x-disable-back-gesture.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../vim-macro.html" rel="bookmark"
+                               title="Permalink to "Vim: Macro"">"Vim: Macro"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-02-18T16:41:40+00:00">
+                Published: Wed 18 February 2015
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>When <code>.</code> just will not do (repeats last action) because you need to capture  a movement as well, macros are quick …</p>
+                        <a class="readmore" href="../vim-macro.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../tcsh-remove-trailing.html" rel="bookmark"
+                               title="Permalink to "tcsh Remove trailing /"">"tcsh Remove trailing /"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-10-08T21:15:43+01:00">
+                Published: Wed 08 October 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">#!/bin/tcsh</span>
+
+<span class="nb">set </span><span class="nv">var</span> <span class="o">=</span> <span class="s2">&quot;helloworld/&quot;</span>
+
+<span class="c">## http://dbaspot.com/shell/350417-sed-removing-trailing.html</span>
+<span class="nb">set …</span></code></pre></div></td></tr></table></div>
+                        <a class="readmore" href="../tcsh-remove-trailing.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../command-line-bulk-file-rename.html" rel="bookmark"
+                               title="Permalink to "Command line bulk file rename"">"Command line bulk file rename"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-09-05T18:06:05+01:00">
+                Published: Fri 05 September 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>To prepend to to filenames</p>
+<div class="highlight"><pre><span></span><code>cd to_folder
+ls | xargs -I {} mv {} addthis-{}
+</code></pre></div>
+
+<p>or target jpgs</p>
+<div class="highlight"><pre><span></span><code>cd to_folder
+ls *.jpg | xargs …</code></pre></div>
+                        <a class="readmore" href="../command-line-bulk-file-rename.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../word-word-the-difference.html" rel="bookmark"
+                               title="Permalink to "Word WORD the Difference"">"Word WORD the Difference"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-08-19T06:27:30+01:00">
+                Published: Tue 19 August 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>Just realised there is a difference between word and WORD in Vim.</p>
+<p>WORD is non-blank delimited by whitespace.
+word is …</p>
+                        <a class="readmore" href="../word-word-the-difference.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../list-files-ignored-by-git.html" rel="bookmark"
+                               title="Permalink to "List files ignored by git"">"List files ignored by git"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-07-30T20:18:07+01:00">
+                Published: Wed 30 July 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="https://www.youtube.com/watch?v=4VBG9FlyiOw">From Github Training &amp; Guides</a>.  </p>
+<div class="highlight"><pre><span></span><code>git ls-files --others --ignored --exclude-standard
+</code></pre></div>
+                        <a class="readmore" href="../list-files-ignored-by-git.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../xkill.html" rel="bookmark"
+                               title="Permalink to "xkill"">"xkill"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-07-30T20:16:39+01:00">
+                Published: Wed 30 July 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/sge.html">SGE</a> </p>        
+</footer><!-- /.post-info -->                        <p>I just discovered the <code>xkill</code> command, when a window has crashed you
+can call xkill and get a skull and …</p>
+                        <a class="readmore" href="../xkill.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../shell-redirection.html" rel="bookmark"
+                               title="Permalink to "Shell redirection"">"Shell redirection"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-06-19T20:10:57+01:00">
+                Published: Thu 19 June 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/bash.html">Bash</a> <a href="../tag/tcsh.html">Tcsh</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>To redirect stdout and stderr in bash we use:</p>
+<div class="highlight"><pre><span></span><code>./ShellFile.sh &amp;&gt; test.log
+</code></pre></div>
+
+<p>However in tcsh that results in: </p>
+<div class="highlight"><pre><span></span><code>Invalid …</code></pre></div>
+                        <a class="readmore" href="../shell-redirection.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../iterm-exit-fullscreen.html" rel="bookmark"
+                               title="Permalink to "iTerm Exit Fullscreen"">"iTerm Exit Fullscreen"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-08T19:27:00+01:00">
+                Published: Tue 08 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/os-x.html">OS X</a> <a href="../tag/iterm.html">iTerm</a> <a href="../tag/mavericks.html">Mavericks</a> </p>        
+</footer><!-- /.post-info -->                        <p><code>⌘-Enter</code> toggles fullscreen in <a href="http://www.iterm2.com/">iTerm</a>.</p>
+                        <a class="readmore" href="../iterm-exit-fullscreen.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../fixing-mangled-octopress-tags.html" rel="bookmark"
+                               title="Permalink to "Fixing Mangled Octopress Tags"">"Fixing Mangled Octopress Tags"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-01T20:59:40+01:00">
+                Published: Tue 01 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/octopress.html">Octopress</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>When creating my blog I have been inconsistent with the tag <code>command line</code>, <code>Command line</code> and
+<code>Command Line</code> the case …</p>
+                        <a class="readmore" href="../fixing-mangled-octopress-tags.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../screen-scrollback.html" rel="bookmark"
+                               title="Permalink to "Screen Scrollback"">"Screen Scrollback"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-25T20:57:28+00:00">
+                Published: Tue 25 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/screen.html">Screen</a> </p>        
+</footer><!-- /.post-info -->                        <p>Enter copy mode</p>
+<div class="highlight"><pre><span></span><code>ctrl-a [
+</code></pre></div>
+
+<p>Use cursors of vim motions to move to relevant area.</p>
+<p>Space to start selection, space again …</p>
+                        <a class="readmore" href="../screen-scrollback.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../mavericks-disable-mail-sound.html" rel="bookmark"
+                               title="Permalink to "Mavericks Disable Mail Sound"">"Mavericks Disable Mail Sound"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-18T17:41:49+00:00">
+                Published: Tue 18 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/os-x.html">OS X</a> <a href="../tag/mavericks.html">Mavericks</a> </p>        
+</footer><!-- /.post-info -->                        <p>Since upgrading to Mavericks I get a sound whenever I get mail. I find this very annoying so first port …</p>
+                        <a class="readmore" href="../mavericks-disable-mail-sound.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../git-tag-and-push-to-github.html" rel="bookmark"
+                               title="Permalink to "Git tag and push to Github"">"Git tag and push to Github"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-13T19:16:57+00:00">
+                Published: Thu 13 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>git tag -a 0.0.1 -m &quot;Tag comment&quot;
+git push --tags
+</code></pre></div>
+
+<p><em>Note: The use of <a href="http://semver.org/">major.minor.patch Semantic …</a></em></p>
+                        <a class="readmore" href="../git-tag-and-push-to-github.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../bash-string-manipulation.html" rel="bookmark"
+                               title="Permalink to "Bash String Manipulation"">"Bash String Manipulation"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-05T21:32:14+00:00">
+                Published: Wed 05 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/bash.html">bash</a> </p>        
+</footer><!-- /.post-info -->                        <p>Removal of substring:</p>
+<div class="highlight"><pre><span></span><code>string=&quot;test<span class="w"> </span>string&quot;
+echo<span class="w"> </span><span class="nv">$string</span>
+
+remove=&quot;test&quot;
+short_string=<span class="cp">${</span><span class="n">string</span><span class="c1">#$remove</span><span class="cp">}</span>
+echo<span class="w"> </span>short_string
+</code></pre></div>
+
+<p>Note that inside the <code>${}</code> <code>string …</code></p>
+                        <a class="readmore" href="../bash-string-manipulation.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../octopress-pages-and-custom-domain.html" rel="bookmark"
+                               title="Permalink to "Octopress, Pages and Custom Domain"">"Octopress, Pages and Custom Domain"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-04T18:19:25+00:00">
+                Published: Tue 04 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/octopress.html">Octopress</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>In your <code>sources</code> branch, which is the main branch for writing creating posts, create a <code>CNAME</code> file in the sources …</p>
+                        <a class="readmore" href="../octopress-pages-and-custom-domain.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../revert-in-git.html" rel="bookmark"
+                               title="Permalink to "Revert in Git"">"Revert in Git"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-03T19:42:12+00:00">
+                Published: Mon 03 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <h1>and Remove Orphaned Commits.</h1>
+<p>I use <code>gitx</code> graphical tool on OS X to find the SHAs for commits. Revert back …</p>
+                        <a class="readmore" href="../revert-in-git.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../gnome-disable-focus-tracking.html" rel="bookmark"
+                               title="Permalink to "Gnome: disable focus tracking"">"Gnome: disable focus tracking"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-02-20T20:31:44+00:00">
+                Published: Thu 20 February 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/gnome.html">Gnome</a> </p>        
+</footer><!-- /.post-info -->                        <p>Sometime ago I enabled focus tracking the mouse on Gnome. It took a while to find how to disable it …</p>
+                        <a class="readmore" href="../gnome-disable-focus-tracking.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../brew-update-fail.html" rel="bookmark"
+                               title="Permalink to "brew update fail"">"brew update fail"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-02-11T21:17:24+00:00">
+                Published: Tue 11 February 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/os-x.html">OS X</a> <a href="../tag/brew.html">brew</a> </p>        
+</footer><!-- /.post-info -->                        <p>Received the following errors when doing <code>brew update</code> on mountain lion:</p>
+<div class="highlight"><pre><span></span><code><span class="n">error</span><span class="o">:</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">following</span><span class="w"> </span><span class="n">untracked</span><span class="w"> </span><span class="n">working</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">would</span><span class="w"> </span><span class="n">be …</span></code></pre></div>
+                        <a class="readmore" href="../brew-update-fail.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../git-submodule-update-fatal.html" rel="bookmark"
+                               title="Permalink to "git submodule update fatal"">"git submodule update fatal"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-01-21T20:32:16+00:00">
+                Published: Tue 21 January 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>submodule<span class="w"> </span>update
+fatal:<span class="w"> </span>Needed<span class="w"> </span>a<span class="w"> </span>single<span class="w"> </span>revision
+Unable<span class="w"> </span>to<span class="w"> </span>find<span class="w"> </span>current<span class="w"> </span>revision<span class="w"> </span><span class="k">in</span><span class="w"> </span>submodule<span class="w"> </span>path<span class="w"> </span><span class="s1">&#39;vim/bundle/systemverilog&#39;</span>
+</code></pre></div>
+
+<p>To …</p>
+                        <a class="readmore" href="../git-submodule-update-fatal.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///248/Reverting_in_git" rel="bookmark"
+                               title="Permalink to "Reverting in git"">"Reverting in git"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-01-08T20:10:31+00:00">
+                Published: Wed 08 January 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p>I use to use <code>svn revert</code> to roll back local modification and get back to the state I was in …</p>
+                        <a class="readmore" href="..///248/Reverting_in_git">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///246/Check_you_current_Vim_colorscheme" rel="bookmark"
+                               title="Permalink to "Check you current Vim colorscheme"">"Check you current Vim colorscheme"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-12-20T19:43:16+00:00">
+                Published: Fri 20 December 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>This is not a foolproof method, as vim colorschemes are just vim commands but by default they set:</p>
+<div class="highlight"><pre><span></span><code>let g …</code></pre></div>
+                        <a class="readmore" href="..///246/Check_you_current_Vim_colorscheme">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///245/Cshrc_alias_loop" rel="bookmark"
+                               title="Permalink to "Cshrc alias loop"">"Cshrc alias loop"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-12-19T22:04:45+00:00">
+                Published: Thu 19 December 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>Here are some aliased commands which stop line wrapping on really long lines, making the output much more readable:</p>
+<div class="highlight"><pre><span></span><code><span class="gh">#</span> Stop …</code></pre></div>
+                        <a class="readmore" href="..///245/Cshrc_alias_loop">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///244/Vim%3A_Status_line" rel="bookmark"
+                               title="Permalink to "Vim: Status line"">"Vim: Status line"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-12-17T19:04:42+00:00">
+                Published: Tue 17 December 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>Deciding to see if I could make my vim status line a bit more practical for myself. I decided to …</p>
+                        <a class="readmore" href="..///244/Vim%3A_Status_line">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///237/VIM%3A_Convert_tabs_to_spaces" rel="bookmark"
+                               title="Permalink to "VIM: Convert tabs to spaces"">"VIM: Convert tabs to spaces"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-10-14T09:23:03+01:00">
+                Published: Mon 14 October 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>Good programming practice is to use spaces to indent code rather than tabs. Due to tabs often being rendered differently …</p>
+                        <a class="readmore" href="..///237/VIM%3A_Convert_tabs_to_spaces">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///236/set_vs_setenv" rel="bookmark"
+                               title="Permalink to "set vs setenv"">"set vs setenv"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-10-11T12:34:15+01:00">
+                Published: Fri 11 October 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>setenv allows sub shells to inherit the value.</p>
+<h2>Set</h2>
+<div class="highlight"><pre><span></span><code><span class="n">set</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;twenty&quot;</span>
+<span class="n">echo</span><span class="w"> </span><span class="o">$</span><span class="n">x</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="n">twenty</span>
+
+<span class="c1">## New Shell</span>
+<span class="n">csh</span>
+<span class="n">echo</span><span class="w"> </span><span class="o">$</span><span class="n">x …</span></code></pre></div>
+                        <a class="readmore" href="..///236/set_vs_setenv">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///235/For_loops_in_csh%2Ftcsh" rel="bookmark"
+                               title="Permalink to "For loops in csh/tcsh"">"For loops in csh/tcsh"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-10-11T12:25:42+01:00">
+                Published: Fri 11 October 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/linux.html">Linux</a> </p>        
+</footer><!-- /.post-info -->                        <p>To count from 1 up to 20 in steps of 5</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">#!/bin/csh</span>
+<span class="k">foreach </span>x <span class="o">(</span><span class="sb">`</span>seq …</code></pre></div></td></tr></table></div>
+                        <a class="readmore" href="..///235/For_loops_in_csh%2Ftcsh">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///232/Find_RedHat_Version" rel="bookmark"
+                               title="Permalink to "Find RedHat Version"">"Find RedHat Version"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-09-04T08:13:33+01:00">
+                Published: Wed 04 September 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>cat /etc/redhat-release
+</code></pre></div>
+
+<p>Returns some thing like:</p>
+<div class="highlight"><pre><span></span><code>Red Hat Enterprise Linux Client release 5.7 (Tikanga)
+</code></pre></div>
+
+<p>Find Kernel version using …</p>
+                        <a class="readmore" href="..///232/Find_RedHat_Version">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///231/Unlocking_a_Nokia_8310" rel="bookmark"
+                               title="Permalink to "Unlocking a Nokia 8310"">"Unlocking a Nokia 8310"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-08-31T12:54:53+01:00">
+                Published: Sat 31 August 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+        
+</footer><!-- /.post-info -->                        <p>After deciding to try out <a href="">OVIVO</a> network for my phone I realised that the my Nokia 8310 was network locked …</p>
+                        <a class="readmore" href="..///231/Unlocking_a_Nokia_8310">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///229/tcsh_check_a_var_exists" rel="bookmark"
+                               title="Permalink to "tcsh check a var exists"">"tcsh check a var exists"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-08-07T07:04:38+01:00">
+                Published: Wed 07 August 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>To check if an environment variable exists in .mycshrc or shell scripts</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="ss">(</span>$?<span class="nv">TERM</span><span class="ss">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nv">echo</span><span class="w"> </span><span class="s2">&quot;TERM is $TERM&quot;</span><span class="w"> </span>
+<span class="k">endif …</span></code></pre></div>
+                        <a class="readmore" href="..///229/tcsh_check_a_var_exists">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///226/Terminal_Colours" rel="bookmark"
+                               title="Permalink to "Terminal Colours"">"Terminal Colours"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-07-12T19:16:31+01:00">
+                Published: Fri 12 July 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have decided to clean up my vim colorschemes. I have been using ir_black for sometime but it does not …</p>
+                        <a class="readmore" href="..///226/Terminal_Colours">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///224/Stackoverflow_sites_and_images" rel="bookmark"
+                               title="Permalink to "Stackoverflow sites and images"">"Stackoverflow sites and images"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-06-16T12:32:54+01:00">
+                Published: Sun 16 June 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>Stackoverflow have supported markdown for a while. The syntax for showing an image is :</p>
+<div class="highlight"><pre><span></span><code>![Holes in Leaf 1][1]
+[1 …</code></pre></div>
+                        <a class="readmore" href="..///224/Stackoverflow_sites_and_images">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///221/Push_local_folder_to_remote_server_over_ssh" rel="bookmark"
+                               title="Permalink to "Push local folder to remote server over ssh"">"Push local folder to remote server over ssh"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-05-10T21:30:00+01:00">
+                Published: Fri 10 May 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>After struggling to get the rake task for octopress to deploy I decided to fall back to the command line …</p>
+                        <a class="readmore" href="..///221/Push_local_folder_to_remote_server_over_ssh">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///214/ISO_8601_-_Standardised_Date_Format_YYYY-MM-DD" rel="bookmark"
+                               title="Permalink to "ISO 8601 - Standardised Date Format YYYY-MM-DD"">"ISO 8601 - Standardised Date Format YYYY-MM-DD"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-04-12T14:47:28+01:00">
+                Published: Fri 12 April 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://xkcd.com/1179/"> <img alt="ISO 8601" src="http://imgs.xkcd.com/comics/iso_8601.png"> </a></p>
+<p>ISO 8601, to me looks a lot like reversed British format which has been my standard for including in file …</p>
+                        <a class="readmore" href="..///214/ISO_8601_-_Standardised_Date_Format_YYYY-MM-DD">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///210/Vim_Code_Folding" rel="bookmark"
+                               title="Permalink to "Vim Code Folding"">"Vim Code Folding"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-01-22T16:37:17+00:00">
+                Published: Tue 22 January 2013
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>To enable code folding in Vim type (from normal mode):</p>
+<div class="highlight"><pre><span></span><code>:set foldmethod=marker
+</code></pre></div>
+
+<p>Or add this to your <code>.vimrc</code></p>
+<div class="highlight"><pre><span></span><code>set …</code></pre></div>
+                        <a class="readmore" href="..///210/Vim_Code_Folding">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///206/Reverting_rtorrent_version_on_Snow_Leopard" rel="bookmark"
+                               title="Permalink to "Reverting rtorrent version on Snow Leopard"">"Reverting rtorrent version on Snow Leopard"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-12-06T20:22:33+00:00">
+                Published: Thu 06 December 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/bittorrent.html">BitTorrent</a> <a href="../tag/leopard.html">Leopard</a> <a href="../tag/snow-leopard.html">Snow Leopard</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/rtorrent.html">rtorrent</a> <a href="../tag/homebrew.html">Homebrew</a> </p>        
+</footer><!-- /.post-info -->                        <p>After running  a <code>brew upgrade</code> rtorrent was plagued with segmentation faults. Which look something like :</p>
+<div class="highlight"><pre><span></span><code>Caught Segmentation fault, dumping stack …</code></pre></div>
+                        <a class="readmore" href="..///206/Reverting_rtorrent_version_on_Snow_Leopard">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///203/OS_X_Screen_Capture" rel="bookmark"
+                               title="Permalink to "OS X Screen Capture"">"OS X Screen Capture"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-10-15T19:28:16+01:00">
+                Published: Mon 15 October 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>To capture the screen on OS X :</p>
+<p>⇧⌘4 : Selected area to capture.<br>
+⇧⌘4-space : Capture a window.</p>
+<p>These are defined in …</p>
+                        <a class="readmore" href="..///203/OS_X_Screen_Capture">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///199/Safari_6_not_playing_YouTube_content" rel="bookmark"
+                               title="Permalink to "Safari 6 not playing YouTube content"">"Safari 6 not playing YouTube content"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-30T08:30:42+01:00">
+                Published: Sun 30 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/safari.html">Safari</a> </p>        
+</footer><!-- /.post-info -->                        <p>After getting Safari 6 it seems that YouTube is no longer letting my watch video as html5 video formats and …</p>
+                        <a class="readmore" href="..///199/Safari_6_not_playing_YouTube_content">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///197/Git_Submodules" rel="bookmark"
+                               title="Permalink to "Git Submodules"">"Git Submodules"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-28T11:40:17+01:00">
+                Published: Fri 28 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>For code reuse within I have found Subversion externals really nice to work with. Instead of copy and pasting code …</p>
+                        <a class="readmore" href="..///197/Git_Submodules">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///196/Retina_Support_for_background_images" rel="bookmark"
+                               title="Permalink to "Retina Support for background images"">"Retina Support for background images"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-26T21:07:35+01:00">
+                Published: Wed 26 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/css.html">CSS</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>This is based on a <a href="http://www.kylejlarson.com/blog/2012/creating-retina-images-for-your-website/">guide to adding retina support to websites</a>.</p>
+<p>To add a tiled (repeating) background cretae 2 …</p>
+                        <a class="readmore" href="..///196/Retina_Support_for_background_images">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///195/Speed_up_Mission_Control_Animation" rel="bookmark"
+                               title="Permalink to "Speed up Mission Control Animation"">"Speed up Mission Control Animation"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-18T16:18:56+01:00">
+                Published: Tue 18 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/productivity.html">Productivity</a> </p>        
+</footer><!-- /.post-info -->                        <p>If entering Mission Control (ctrl-up) is taking to long you can speed up the animation entering the following in the …</p>
+                        <a class="readmore" href="..///195/Speed_up_Mission_Control_Animation">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///194/Syncing_Google_Contacts_in_Mountain_Lion" rel="bookmark"
+                               title="Permalink to "Syncing Google Contacts in Mountain Lion"">"Syncing Google Contacts in Mountain Lion"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-18T08:40:53+01:00">
+                Published: Tue 18 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/contacts.html">Contacts</a> </p>        
+</footer><!-- /.post-info -->                        <p>A the time of writing Google exchange syncing only works on mobile devices, which is slightly annoying but mail, contacts …</p>
+                        <a class="readmore" href="..///194/Syncing_Google_Contacts_in_Mountain_Lion">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///193/Syncing_Safari_via_dropbox_for_pre_iCloud_OS_X" rel="bookmark"
+                               title="Permalink to "Syncing Safari via dropbox for pre iCloud OS X"">"Syncing Safari via dropbox for pre iCloud OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-15T18:39:27+01:00">
+                Published: Sat 15 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/safari.html">Safari</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p><em>THIS NO LONGER WORKS, IF IT EVER DID :(</em></p>
+<p>When you add a link to safari, it replaces the link to …</p>
+                        <a class="readmore" href="..///193/Syncing_Safari_via_dropbox_for_pre_iCloud_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///192/Vim_consistent_spelling_correction_highlighting" rel="bookmark"
+                               title="Permalink to "Vim consistent spelling correction highlighting"">"Vim consistent spelling correction highlighting"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-11T11:09:36+01:00">
+                Published: Tue 11 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>In gvim and mvim incorrect spellings are highlighted with a squiggly underscore ala MS Word. vim in a terminal (xterm …</p>
+                        <a class="readmore" href="..///192/Vim_consistent_spelling_correction_highlighting">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///191/Get_snipMate_working%2C_a_%23vim_plugin" rel="bookmark"
+                               title="Permalink to "Get snipMate working, a #vim plugin"">"Get snipMate working, a #vim plugin"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-05T00:45:31+01:00">
+                Published: Wed 05 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://www.vim.org/scripts/script.php?script_id=2540">snipMate</a> is a useful vim plugin which allows short cuts like for'tab' to be set up which will insert the …</p>
+                        <a class="readmore" href="..///191/Get_snipMate_working%2C_a_%23vim_plugin">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///190/OS_X_Installing_R" rel="bookmark"
+                               title="Permalink to "OS X Installing R"">"OS X Installing R"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-09-03T20:11:46+01:00">
+                Published: Mon 03 September 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/r.html">R</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://www.r-project.org/">R</a> is a language for statistical computing and graphics. It is the choice of <a href="http://coursera.org">Coursera</a> Statistics One.</p>
+<p>It can be …</p>
+                        <a class="readmore" href="..///190/OS_X_Installing_R">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///189/Mountain_Lion_Setup%2C_Part_5_%2Fetc%2Fhosts" rel="bookmark"
+                               title="Permalink to "Mountain Lion Setup, Part 5 /etc/hosts"">"Mountain Lion Setup, Part 5 /etc/hosts"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-30T20:28:12+01:00">
+                Published: Thu 30 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/network.html">Network</a> </p>        
+</footer><!-- /.post-info -->                        <p>For ssh and ping to local machines with out the .local extension I added them to my /ets/hosts file …</p>
+                        <a class="readmore" href="..///189/Mountain_Lion_Setup%2C_Part_5_%2Fetc%2Fhosts">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///188/OS_X_Get_Info_Summary_for_multiple_items" rel="bookmark"
+                               title="Permalink to "OS X Get Info Summary for multiple items"">"OS X Get Info Summary for multiple items"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-29T21:02:22+01:00">
+                Published: Wed 29 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/lion.html">Lion</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> </p>        
+</footer><!-- /.post-info -->                        <p>If you use the ⌘I shortcut in finder with a file selected you get a 'Get Info' window. If you …</p>
+                        <a class="readmore" href="..///188/OS_X_Get_Info_Summary_for_multiple_items">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///187/%23vim_toggle_between_last_2_edited_buffers" rel="bookmark"
+                               title="Permalink to "#vim toggle between last 2 edited buffers"">"#vim toggle between last 2 edited buffers"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-29T11:22:06+01:00">
+                Published: Wed 29 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>ctrl-6
+</code></pre></div>
+
+<h1>Demo</h1>
+<p>For the example we will create 3 new temp files and then open them in vim.</p>
+<div class="highlight"><pre><span></span><code>touch vim_test1 …</code></pre></div>
+                        <a class="readmore" href="..///187/%23vim_toggle_between_last_2_edited_buffers">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///186/Mountain_Lion_finding_the_Library_folder" rel="bookmark"
+                               title="Permalink to "Mountain Lion finding the Library folder"">"Mountain Lion finding the Library folder"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T23:56:02+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> </p>        
+</footer><!-- /.post-info -->                        <p>From OS X Lion the Users Library folder has been hidden. To find it make Finder the active application, that …</p>
+                        <a class="readmore" href="..///186/Mountain_Lion_finding_the_Library_folder">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///184/Mountain_Lion_Setup%2C_Part_4_Apps" rel="bookmark"
+                               title="Permalink to "Mountain Lion Setup, Part 4 Apps"">"Mountain Lion Setup, Part 4 Apps"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T14:06:30+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> </p>        
+</footer><!-- /.post-info -->                        <p>A better Terminal <a href="http://www.iterm2.com/">iTerm2</a>.<br>
+Media Player <a href="http://www.videolan.org/vlc/index.html">VLC</a>.<br>
+<a href="http://db.tt/ZZzJ5LBq">Dropbox</a>.  </p>
+<h2>Developer Apps</h2>
+<p><a href="http://www.gitx.org/">GitX</a>, <a href="http://gitx.org/redirect/rowanj">rowanj fork</a>. <br>
+FTP Client <a href="http://cyberduck.ch/">Cyberduck</a>, use to be a …</p>
+                        <a class="readmore" href="..///184/Mountain_Lion_Setup%2C_Part_4_Apps">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///183/Mountain_Lion_Setup%2C_Part_3_%3A_Little_Snitch_%26_Dotfiles" rel="bookmark"
+                               title="Permalink to "Mountain Lion Setup, Part 3 : Little Snitch & Dotfiles"">"Mountain Lion Setup, Part 3 : Little Snitch & Dotfiles"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T12:44:04+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> </p>        
+</footer><!-- /.post-info -->                        <h2>Little Snitch</h2>
+<p>There is currently a preview (Beta) of [Little Snitch 3][littelsnitch3]. If you have not come across Little …</p>
+                        <a class="readmore" href="..///183/Mountain_Lion_Setup%2C_Part_3_%3A_Little_Snitch_%26_Dotfiles">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///181/Xcode_4_Install%2C_Disk_Usage" rel="bookmark"
+                               title="Permalink to "Xcode 4 Install, Disk Usage"">"Xcode 4 Install, Disk Usage"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T10:27:48+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/xcode.html">XCode</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://developer.apple.com/library/ios/#documentation/DeveloperTools/Conceptual/WhatsNewXcode/Articles/xcode_4_3.html">Some info on what has changed in Xcode 4.3</a>. Latest is 4.4 but a lot changed in 4 …</p>
+                        <a class="readmore" href="..///181/Xcode_4_Install%2C_Disk_Usage">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///179/Mountain_Lion_default_%24PATH" rel="bookmark"
+                               title="Permalink to "Mountain Lion default $PATH"">"Mountain Lion default $PATH"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T09:25:37+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
+</code></pre></div>
+
+<p>To Reset it back to this value run (from /Applications/Utilities …</p>
+                        <a class="readmore" href="..///179/Mountain_Lion_default_%24PATH">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///178/Lion_default_%24PATH" rel="bookmark"
+                               title="Permalink to "Lion default $PATH"">"Lion default $PATH"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T09:22:58+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/lion.html">Lion</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
+</code></pre></div>
+
+<p>To Reset it back to this value run …</p>
+                        <a class="readmore" href="..///178/Lion_default_%24PATH">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///176/Transferring_a_Memory_Map_2012_map_to_iOS" rel="bookmark"
+                               title="Permalink to "Transferring a Memory Map 2012 map to iOS"">"Transferring a Memory Map 2012 map to iOS"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-07-17T21:34:30+01:00">
+                Published: Tue 17 July 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/memory-map.html">Memory Map</a> <a href="../tag/ipad.html">iPad</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have specifically been trying to find out how to transfer my full GB Memory Map OS 1:50K 2012 …</p>
+                        <a class="readmore" href="..///176/Transferring_a_Memory_Map_2012_map_to_iOS">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///175/Mac_Mountain_Lion_Compatibility" rel="bookmark"
+                               title="Permalink to "Mac Mountain Lion Compatibility"">"Mac Mountain Lion Compatibility"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-07-16T06:52:09+01:00">
+                Published: Mon 16 July 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>One of the limitations of mountain lion is that they are only going to support 64 bit Kernel extensions, the …</p>
+                        <a class="readmore" href="..///175/Mac_Mountain_Lion_Compatibility">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///172/Subscribe_to_a_channel_on_YouTube_iPad" rel="bookmark"
+                               title="Permalink to "Subscribe to a channel on YouTube iPad"">"Subscribe to a channel on YouTube iPad"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-06-10T09:40:13+01:00">
+                Published: Sun 10 June 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/ipad.html">iPad</a> </p>        
+</footer><!-- /.post-info -->                        <p>The subscribe button on the iPad youtube app is quite well hidden.</p>
+<p>View a video from the channel you are …</p>
+                        <a class="readmore" href="..///172/Subscribe_to_a_channel_on_YouTube_iPad">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///171/Gelaskins_iPad_cases" rel="bookmark"
+                               title="Permalink to "Gelaskins iPad cases"">"Gelaskins iPad cases"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-06-07T18:27:40+01:00">
+                Published: Thu 07 June 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/ipad.html">iPad</a> </p>        
+</footer><!-- /.post-info -->                        <p>Got the steam punk Gelaskins case yesterday, they can be a fiddle to fit but incredibly thin and adds grippines …</p>
+                        <a class="readmore" href="..///171/Gelaskins_iPad_cases">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///170/iTunes_Match_and_Genius%2C_Why_cant_we_have_both%3F" rel="bookmark"
+                               title="Permalink to "iTunes Match and Genius, Why cant we have both?"">"iTunes Match and Genius, Why cant we have both?"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-06-06T20:54:56+01:00">
+                Published: Wed 06 June 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/ipad.html">iPad</a> </p>        
+</footer><!-- /.post-info -->                        <p>In iOS 5 If you have iTunes Match enabled ie to download your songs from the iCloud while on the …</p>
+                        <a class="readmore" href="..///170/iTunes_Match_and_Genius%2C_Why_cant_we_have_both%3F">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///162/Big_Monitor_Litmus_Test" rel="bookmark"
+                               title="Permalink to "Big Monitor Litmus Test"">"Big Monitor Litmus Test"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-18T07:09:21+01:00">
+                Published: Fri 18 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/culture.html">Culture</a> </p>        
+</footer><!-- /.post-info -->                        <p>A <a href="http://sef.kloninger.com/2012/05/engineering-culture-litmus-tests/">recent article by sef</a> about how to judge an engineering companies respect engineers and the strength of the engineering …</p>
+                        <a class="readmore" href="..///162/Big_Monitor_Litmus_Test">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///160/Vim_Terminal_Colours" rel="bookmark"
+                               title="Permalink to "Vim Terminal Colours"">"Vim Terminal Colours"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-11T19:55:25+01:00">
+                Published: Fri 11 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>I use the <a href="http://blog.infinitered.com/entries/show/8">ir_black</a> for vim (<a href="http://code.google.com/p/macvim/">MacVim</a> mainly). Recently have been doing a lot of work in the terminal over …</p>
+                        <a class="readmore" href="..///160/Vim_Terminal_Colours">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///159/Using_Github_behind_a_restrictive_firewall" rel="bookmark"
+                               title="Permalink to "Using Github behind a restrictive firewall"">"Using Github behind a restrictive firewall"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-10T20:24:08+01:00">
+                Published: Thu 10 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>When working behind a restrictive firewall, which limits ssh connections you may be running into some of the following errors …</p>
+                        <a class="readmore" href="..///159/Using_Github_behind_a_restrictive_firewall">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///158/Ubuntu%2C_formatting_a_3TB_drive" rel="bookmark"
+                               title="Permalink to "Ubuntu, formatting a 3TB drive"">"Ubuntu, formatting a 3TB drive"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-05-03T21:34:20+01:00">
+                Published: Thu 03 May 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/ubuntu.html">Ubuntu</a> </p>        
+</footer><!-- /.post-info -->                        <p>I started off following <a href="https://help.ubuntu.com/community/InstallingANewHardDrive">the ubuntu guide for installing a new drive</a>, which uses fdsik to create the partitions how …</p>
+                        <a class="readmore" href="..///158/Ubuntu%2C_formatting_a_3TB_drive">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///147/Bash_script_get_current_script_directory" rel="bookmark"
+                               title="Permalink to "Bash script get current script directory"">"Bash script get current script directory"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-07T13:45:37+01:00">
+                Published: Sat 07 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/css.html">CSS</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>Sometime a script needs to now the directory that it is executing from, the best solution for this is:</p>
+<div class="highlight"><pre><span></span><code>DIR …</code></pre></div>
+                        <a class="readmore" href="..///147/Bash_script_get_current_script_directory">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///145/Trying_to_disable_Caps_Lock_on_Unix_systems" rel="bookmark"
+                               title="Permalink to "Trying to disable Caps Lock on Unix systems"">"Trying to disable Caps Lock on Unix systems"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-04-02T09:45:19+01:00">
+                Published: Mon 02 April 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>Entering the following command in to your .bashrc seems like a simple way forward.</p>
+<div class="highlight"><pre><span></span><code>xmodmap -e &quot;remove lock = Caps_Lock&quot;
+</code></pre></div>
+
+<p>However …</p>
+                        <a class="readmore" href="..///145/Trying_to_disable_Caps_Lock_on_Unix_systems">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///142/What_shell_am_i_using%3F" rel="bookmark"
+                               title="Permalink to "What shell am i using?"">"What shell am i using?"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-03-28T20:43:20+01:00">
+                Published: Wed 28 March 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>If you are working on a new system or with multiple environments it is good to know what type of …</p>
+                        <a class="readmore" href="..///142/What_shell_am_i_using%3F">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///141/SVN_multi-line_comments_on_the_command_line_" rel="bookmark"
+                               title="Permalink to "SVN multi-line comments on the command line "">"SVN multi-line comments on the command line "</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-03-28T13:32:53+01:00">
+                Published: Wed 28 March 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/subversion.html">Subversion</a> </p>        
+</footer><!-- /.post-info -->                        <p>Answer:</p>
+<div class="highlight"><pre><span></span><code>svn commit -m $&#39;Line 1 \nLine 2&#39;
+</code></pre></div>
+
+<h2>The Problem</h2>
+<p>Committing to subversion on the command line and using escaped …</p>
+                        <a class="readmore" href="..///141/SVN_multi-line_comments_on_the_command_line_">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///140/unix_mail_command%2C_delete_all_messages" rel="bookmark"
+                               title="Permalink to "unix mail command, delete all messages"">"unix mail command, delete all messages"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-03-01T20:44:36+00:00">
+                Published: Thu 01 March 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> </p>        
+</footer><!-- /.post-info -->                        <p>Cron jobs can have there results returned as mail via the unix mail system. If left unchecked for a while …</p>
+                        <a class="readmore" href="..///140/unix_mail_command%2C_delete_all_messages">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///139/list_temp_files_script" rel="bookmark"
+                               title="Permalink to "list_temp_files script"">"list_temp_files script"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-02-20T12:18:21+00:00">
+                Published: Mon 20 February 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>A simple script for finding temp files from the current directory and below. I often run this before adding a …</p>
+                        <a class="readmore" href="..///139/list_temp_files_script">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///137/Vim%2C_paste_from_insert_mode" rel="bookmark"
+                               title="Permalink to "Vim, paste from insert mode"">"Vim, paste from insert mode"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-01-27T15:00:55+00:00">
+                Published: Fri 27 January 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>ctrl-r &quot;
+</code></pre></div>
+
+<p>Actually <code>ctrl-r reg</code>, where " is the unnamed register from the last yank or delete.</p>
+<h2>Why</h2>
+<p>If you have done …</p>
+                        <a class="readmore" href="..///137/Vim%2C_paste_from_insert_mode">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///135/Recursive_grep%2C_with_filtering" rel="bookmark"
+                               title="Permalink to "Recursive grep, with filtering"">"Recursive grep, with filtering"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-01-19T15:56:31+00:00">
+                Published: Thu 19 January 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>I noticed today that greps recursive function is different to finds recursion. </p>
+<div class="highlight"><pre><span></span><code>find ./ -name <span class="gs">*.txt</span>
+<span class="gs">grep -R &#39;text&#39; *</span>.text
+</code></pre></div>
+
+<p>The …</p>
+                        <a class="readmore" href="..///135/Recursive_grep%2C_with_filtering">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///134/Finding_Tracks_not_in_iTunes" rel="bookmark"
+                               title="Permalink to "Finding Tracks not in iTunes"">"Finding Tracks not in iTunes"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-01-14T18:19:45+00:00">
+                Published: Sat 14 January 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/audio.html">Audio</a> </p>        
+</footer><!-- /.post-info -->                        <p>After switching my Audio ripper (<a href="http://sbooth.org/Max">Max</a>) accidentally to 'AAC Low Delay' rather than plain 'AAC' I realised too late after …</p>
+                        <a class="readmore" href="..///134/Finding_Tracks_not_in_iTunes">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///127/Tagging_a_git_repo_and_pushing_tag_to_github" rel="bookmark"
+                               title="Permalink to "Tagging a git repo and pushing tag to github"">"Tagging a git repo and pushing tag to github"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-10-25T21:46:13+01:00">
+                Published: Tue 25 October 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>This assumes that <code>origin</code> is the label for github. <br>
+Tagging a github repo for my gem releases I do:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>git …</code></pre></div>
+                        <a class="readmore" href="..///127/Tagging_a_git_repo_and_pushing_tag_to_github">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../homebrew-list-outdated-packages.html" rel="bookmark"
+                               title="Permalink to "Homebrew list outdated packages"">"Homebrew list outdated packages"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-09-21T20:58:22+00:00">
+                Published: Wed 21 September 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/homebrew.html">Homebrew</a> </p>        
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>brew update
+brew outdated
+</code></pre></div>
+
+<p><a href="https://github.com/Homebrew/homebrew/wiki/FAQ">Homebrew</a>.</p>
+                        <a class="readmore" href="../homebrew-list-outdated-packages.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///119/New_Macbook_Air_%282011%29_%26_OS_X_Lion" rel="bookmark"
+                               title="Permalink to "New Macbook Air (2011) & OS X Lion"">"New Macbook Air (2011) & OS X Lion"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-22T12:05:36+01:00">
+                Published: Fri 22 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> </p>        
+</footer><!-- /.post-info -->                        <p>The new (July 2011) <a href="http://www.apple.com/macbookair/">Mac Book Air</a> is now out, shipping with Lion.</p>
+<p>The combination of these two fixes some …</p>
+                        <a class="readmore" href="..///119/New_Macbook_Air_%282011%29_%26_OS_X_Lion">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///117/Using_%7E%2F.ssh%2Fconfig_and_no_passowrds_with_Mac_OS_X" rel="bookmark"
+                               title="Permalink to "Using ~/.ssh/config and no passowrds with Mac OS X"">"Using ~/.ssh/config and no passowrds with Mac OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-14T21:56:03+01:00">
+                Published: Thu 14 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>Using ssh to securely connect with servers from the terminal is pretty easy. set up a public key and a …</p>
+                        <a class="readmore" href="..///117/Using_%7E%2F.ssh%2Fconfig_and_no_passowrds_with_Mac_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///116/Using_%7E%2F.ssh%2Fconfig_and_no_passwords_with_Mac_OS_X" rel="bookmark"
+                               title="Permalink to "Using ~/.ssh/config and no passwords with Mac OS X"">"Using ~/.ssh/config and no passwords with Mac OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-07-14T21:55:31+01:00">
+                Published: Thu 14 July 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> </p>        
+</footer><!-- /.post-info -->                        <p>Using ssh to securely connect with servers from the terminal is pretty easy. set up a public key and a …</p>
+                        <a class="readmore" href="..///116/Using_%7E%2F.ssh%2Fconfig_and_no_passwords_with_Mac_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///109/Setting_up_PostgreSQL_on_OS_X" rel="bookmark"
+                               title="Permalink to "Setting up PostgreSQL on OS X"">"Setting up PostgreSQL on OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-06-20T11:35:31+01:00">
+                Published: Mon 20 June 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/database.html">Database</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+</footer><!-- /.post-info -->                        <p>An old guide is written on the <a href="http://developer.apple.com/internet/opensource/postgres.htmlhttp://developer.apple.com/internet/opensource/postgres.html">Apple Developer Forum</a> however if you are using <a href="https://github.com/mxcl/homebrew">Homebrew</a> it is much simpler …</p>
+                        <a class="readmore" href="..///109/Setting_up_PostgreSQL_on_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///107/Installing_gist.vim" rel="bookmark"
+                               title="Permalink to "Installing gist.vim"">"Installing gist.vim"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-05-20T20:32:05+01:00">
+                Published: Fri 20 May 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/vim.html">Vim</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>This vim plugin will allow you to gist directly from vim, simple way is just :Gist to gist entire file …</p>
+                        <a class="readmore" href="..///107/Installing_gist.vim">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///103/bash_scripts_and_cron" rel="bookmark"
+                               title="Permalink to "bash scripts and cron"">"bash scripts and cron"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-28T20:01:13+01:00">
+                Published: Thu 28 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have not fully read it but it looks like this is a <a href="http://mywiki.wooledge.org/BashGuide">good guide to bash scripting</a>. A few …</p>
+                        <a class="readmore" href="..///103/bash_scripts_and_cron">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///102/vimfu_end_of_line_character_placement" rel="bookmark"
+                               title="Permalink to "vimfu end of line character placement"">"vimfu end of line character placement"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-24T12:07:07+01:00">
+                Published: Sun 24 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>In Vim to insert text before the cursor press 'i', to insert text after cursor 'a' or to edit at …</p>
+                        <a class="readmore" href="..///102/vimfu_end_of_line_character_placement">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///101/Vimfu_Reindent" rel="bookmark"
+                               title="Permalink to "Vimfu Reindent"">"Vimfu Reindent"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-19T19:55:19+01:00">
+                Published: Tue 19 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>The latest addition to <a href="https://github.com/morganp/dotfiles/blob/master/dotfiles/.vimrc#L197">my .vimrc</a> below, allows ;g to smart indent the current file. It is the same as …</p>
+                        <a class="readmore" href="..///101/Vimfu_Reindent">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///96/%27unregistered_torrent%27_flush_the_DNS" rel="bookmark"
+                               title="Permalink to "'unregistered torrent' flush the DNS"">"'unregistered torrent' flush the DNS"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-03-31T10:45:20+01:00">
+                Published: Thu 31 March 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/bittorrent.html">BitTorrent</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>If a torrent application has been running and torrents start showing a status of 'unregistered torrent' a likely cause is …</p>
+                        <a class="readmore" href="..///96/%27unregistered_torrent%27_flush_the_DNS">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///86/My_Backup_Strategy" rel="bookmark"
+                               title="Permalink to "My Backup Strategy"">"My Backup Strategy"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-01-18T10:25:12+00:00">
+                Published: Tue 18 January 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/automation.html">Automation</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/ubuntu.html">Ubuntu</a> </p>        
+</footer><!-- /.post-info -->                        <p>Considering various raid strategies I decided that Raid 5 would be too limiting and have previously found raid striping systems …</p>
+                        <a class="readmore" href="..///86/My_Backup_Strategy">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///85/screen_-x_not_connecting_when_running_as_an_other_user" rel="bookmark"
+                               title="Permalink to "screen -x not connecting when running as an other user"">"screen -x not connecting when running as an other user"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-30T13:06:42+00:00">
+                Published: Thu 30 December 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/screen.html">Screen</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have been running into issues with screen when switching to another user:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>su<span class="w"> </span>otheruser
+&gt;<span class="w"> </span>password
+$<span class="w"> </span>screen<span class="w"> </span>-x
+&gt;<span class="w"> </span>Cannot<span class="w"> </span>open …</code></pre></div>
+                        <a class="readmore" href="..///85/screen_-x_not_connecting_when_running_as_an_other_user">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///83/Tagging_a_git_repo_for_a_Release_" rel="bookmark"
+                               title="Permalink to "Tagging a git repo for a Release "">"Tagging a git repo for a Release "</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-18T04:07:46+00:00">
+                Published: Sat 18 December 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>I think it is good practise to create a read only tag when releasing an application. This allows you to …</p>
+                        <a class="readmore" href="..///83/Tagging_a_git_repo_for_a_Release_">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///82/Fixing_Ncursers_on_OS_X_10.6.3%2B" rel="bookmark"
+                               title="Permalink to "Fixing Ncursers on OS X 10.6.3+"">"Fixing Ncursers on OS X 10.6.3+"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-13T13:59:47+00:00">
+                Published: Mon 13 December 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix \& Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>Currently OS X 10.6.3 - 10.6.5 the ncursers library is broken. A hacky fix is to copy …</p>
+                        <a class="readmore" href="..///82/Fixing_Ncursers_on_OS_X_10.6.3%2B">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///81/Mac_OS_X_libSystem_cache_out_of_sync" rel="bookmark"
+                               title="Permalink to "Mac OS X libSystem cache out of sync"">"Mac OS X libSystem cache out of sync"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-13T11:52:06+00:00">
+                Published: Mon 13 December 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>For various reasons Mac OS X (at least 10.6) can get the system cache out of sync with the …</p>
+                        <a class="readmore" href="..///81/Mac_OS_X_libSystem_cache_out_of_sync">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///75/OS_X_open_finder_from_command_line" rel="bookmark"
+                               title="Permalink to "OS X open finder from command line"">"OS X open finder from command line"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-10-13T11:08:40+01:00">
+                Published: Wed 13 October 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>Just discovered this: from <a href="http://grx.no/kb/2009/01/09/open-finder-for-current-directory-from-command-line/">source</a>.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>open<span class="w"> </span>.
+</code></pre></div>
+                        <a class="readmore" href="..///75/OS_X_open_finder_from_command_line">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///70/Remove_sensitive_data_from_git" rel="bookmark"
+                               title="Permalink to "Remove sensitive data from git"">"Remove sensitive data from git"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-10T04:16:56+01:00">
+                Published: Fri 10 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://help.github.com/removing-sensitive-data/">Removing Sensitive data from git and eliminate history</a></p>
+                        <a class="readmore" href="..///70/Remove_sensitive_data_from_git">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///69/Amazon_Drops_EC2_Web_Service_Prices" rel="bookmark"
+                               title="Permalink to "Amazon Drops EC2 Web Service Prices"">"Amazon Drops EC2 Web Service Prices"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-09T02:24:49+01:00">
+                Published: Thu 09 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
+</footer><!-- /.post-info -->                        <p>The new <a href="http://aws.amazon.com/ec2/#pricing">EC2-Pricing</a> also includes a new Micro service. This micro service is intended for small apps servicing tens of …</p>
+                        <a class="readmore" href="..///69/Amazon_Drops_EC2_Web_Service_Prices">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///66/Mac_OS_X_Harddrive_Spin_Down_Time" rel="bookmark"
+                               title="Permalink to "Mac OS X Harddrive Spin Down Time"">"Mac OS X Harddrive Spin Down Time"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-01T13:05:32+01:00">
+                Published: Wed 01 September 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/power.html">Power</a> </p>        
+</footer><!-- /.post-info -->                        <p>The Preferences menu in OS x give you the option to turn off Hard Disks whenever possible to save power …</p>
+                        <a class="readmore" href="..///66/Mac_OS_X_Harddrive_Spin_Down_Time">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///65/Mac_OS_X_Default_Path" rel="bookmark"
+                               title="Permalink to "Mac OS X Default Path"">"Mac OS X Default Path"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-26T09:36:06+01:00">
+                Published: Thu 26 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>As this seemed to be a useful post on my old blog I am reposting it.
+Just in case the …</p>
+                        <a class="readmore" href="..///65/Mac_OS_X_Default_Path">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///63/Basic_grep_usage" rel="bookmark"
+                               title="Permalink to "Basic grep usage"">"Basic grep usage"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-20T07:20:22+01:00">
+                Published: Fri 20 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/linux.html">Linux</a> </p>        
+</footer><!-- /.post-info -->                        <p>Grep is a unix (and mac os x) command line tool to search files for text.<br>
+1) Search for all …</p>
+                        <a class="readmore" href="..///63/Basic_grep_usage">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///62/Removing_Ports_OS_X" rel="bookmark"
+                               title="Permalink to "Removing Ports OS X"">"Removing Ports OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-08-17T12:18:48+01:00">
+                Published: Tue 17 August 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have previously mentioned I installed <a href="http://amaras-tech.co.uk/people/morgan/article/44">Homebrew</a> for installing unix packages, I left Ports in place, but removed from my …</p>
+                        <a class="readmore" href="..///62/Removing_Ports_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///55/Turn_a_.jar_file_into_a_mac_.app" rel="bookmark"
+                               title="Permalink to "Turn a .jar file into a mac .app"">"Turn a .jar file into a mac .app"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-18T05:59:31+01:00">
+                Published: Sun 18 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/java.html">Java</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>Following <a href="http://www.centerkey.com/mac/java/">this article</a> lets you turn a executable java .jar into a mac appliction (.app). The Tools are only available …</p>
+                        <a class="readmore" href="..///55/Turn_a_.jar_file_into_a_mac_.app">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///54/Adding_USB_drives_to_a_headless_Ubuntu_Linux_box" rel="bookmark"
+                               title="Permalink to "Adding USB drives to a headless Ubuntu Linux box"">"Adding USB drives to a headless Ubuntu Linux box"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-17T04:03:10+01:00">
+                Published: Sat 17 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/ubuntu.html">Ubuntu</a> </p>        
+</footer><!-- /.post-info -->                        <p>After adding some USB2 (NTFS formatted) drives to a headless Ubuntu server, they were not auto-mounted so I had to …</p>
+                        <a class="readmore" href="..///54/Adding_USB_drives_to_a_headless_Ubuntu_Linux_box">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///53/Installing_git_on_a_clean_build_of_OS_X" rel="bookmark"
+                               title="Permalink to "Installing git on a clean build of OS X"">"Installing git on a clean build of OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-16T11:44:11+01:00">
+                Published: Fri 16 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>Having a clean build of Mac OS X Snow Leopard I thought I would give the <a href="http://github.com/mxcl/homebrew">Homebrew</a> method of installing …</p>
+                        <a class="readmore" href="..///53/Installing_git_on_a_clean_build_of_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///50/%5Bvim%5D_Indenting_with_Vim_" rel="bookmark"
+                               title="Permalink to "[vim] Indenting with Vim "">"[vim] Indenting with Vim "</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-07T07:50:53+01:00">
+                Published: Wed 07 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>Vim is a great text editor but has quite a steep learning curve. <a href="http://vimcasts.org">VimCasts</a> is a great podcast for learning …</p>
+                        <a class="readmore" href="..///50/%5Bvim%5D_Indenting_with_Vim_">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///49/OS_X_iTunes_play_.ogg_videos" rel="bookmark"
+                               title="Permalink to "OS X iTunes play .ogg videos"">"OS X iTunes play .ogg videos"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-06T09:18:22+01:00">
+                Published: Tue 06 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/audio.html">Audio</a> <a href="../tag/itunes.html">iTunes</a> <a href="../tag/ogg.html">Ogg</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://pragmatic.tv">Pragmatic TV</a> release there screen casts in iPod, Quicktime and Theora Ogg formats. Since Theora Ogg seems to be the …</p>
+                        <a class="readmore" href="..///49/OS_X_iTunes_play_.ogg_videos">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///46/Vim_show_lines_over_80_charaters_long." rel="bookmark"
+                               title="Permalink to "Vim show lines over 80 charaters long."">"Vim show lines over 80 charaters long."</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-26T07:13:52+01:00">
+                Published: Sat 26 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>This snippet can be added to you ~/.vimrc to highlight long lines.</p>
+<div class="highlight"><pre><span></span><code>&quot; Highlight lines over 80 characters long with red …</code></pre></div>
+                        <a class="readmore" href="..///46/Vim_show_lines_over_80_charaters_long.">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///45/Vim_search_and_replace" rel="bookmark"
+                               title="Permalink to "Vim search and replace"">"Vim search and replace"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-24T09:37:37+01:00">
+                Published: Thu 24 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>To search in Vim just press (apple-f for macvim) / then search string.  </p>
+<div class="highlight"><pre><span></span><code>/search
+</code></pre></div>
+
+<p>This will highlight all occurrences of 'search' …</p>
+                        <a class="readmore" href="..///45/Vim_search_and_replace">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///44/Homebrew_package_management_for_Mac_OS_X" rel="bookmark"
+                               title="Permalink to "Homebrew package management for Mac OS X"">"Homebrew package management for Mac OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-22T07:45:14+01:00">
+                Published: Tue 22 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/command-line.html">Command Line</a> </p>        
+</footer><!-- /.post-info -->                        <p>Homebrew is a new package management system for Mac OS X. <a href="http://www.engineyard.com/blog/2010/homebrew-os-xs-missing-package-manager/">A good review/tutorial on EngineYard</a>.</p>
+<p>Update 20-August-2010<br>
+Then …</p>
+                        <a class="readmore" href="..///44/Homebrew_package_management_for_Mac_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///41/Save_space_on_your_Mac_by_going_Monolingual" rel="bookmark"
+                               title="Permalink to "Save space on your Mac by going Monolingual"">"Save space on your Mac by going Monolingual"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-16T10:43:30+01:00">
+                Published: Wed 16 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/os-x.html">OS X</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have just looked through <a href="http://www.minervity.com/features/designer_apps/10-useful-and-free-mac-apps-for-any-designer/">this list</a> of 10 free mac apps I have used most of them in the …</p>
+                        <a class="readmore" href="..///41/Save_space_on_your_Mac_by_going_Monolingual">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///39/MacBook_Power_Consumption" rel="bookmark"
+                               title="Permalink to "MacBook Power Consumption"">"MacBook Power Consumption"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-14T10:18:29+01:00">
+                Published: Mon 14 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/performance.html">Performance</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/power.html">Power</a> <a href="../tag/vlc.html">VLC</a> </p>        
+</footer><!-- /.post-info -->                        <p>MacBook3,1 (2007) Intel Core 2 Duo 2.2GHz Hard drive and memory upgraded to 320GB and 4GB</p>
+<p>Graphics GMA …</p>
+                        <a class="readmore" href="..///39/MacBook_Power_Consumption">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///37/M4B_Audiobooks_on_Android" rel="bookmark"
+                               title="Permalink to "M4B Audiobooks on Android"">"M4B Audiobooks on Android"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-07T11:15:46+01:00">
+                Published: Mon 07 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/audio.html">Audio</a> <a href="../tag/itunes.html">iTunes</a> <a href="../tag/audiobook.html">Audiobook</a> <a href="../tag/android.html">Android</a> </p>        
+</footer><!-- /.post-info -->                        <p>The *.m4b extension is used for audiobooks on the iTunes Store and is a convenient (if you have an iPod …</p>
+                        <a class="readmore" href="..///37/M4B_Audiobooks_on_Android">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///35/GitHub_command_line_tools_with_static_paths" rel="bookmark"
+                               title="Permalink to "GitHub command line tools with static paths"">"GitHub command line tools with static paths"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-04T23:19:58+01:00">
+                Published: Fri 04 June 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>I have written a few command line tools in ruby which I use to perform file system maintenance. Mainly sorting …</p>
+                        <a class="readmore" href="..///35/GitHub_command_line_tools_with_static_paths">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///34/Open_Office_Impress_AutoStart" rel="bookmark"
+                               title="Permalink to "Open Office Impress AutoStart"">"Open Office Impress AutoStart"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-31T10:27:17+01:00">
+                Published: Mon 31 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/openoffice.html">OpenOffice</a> </p>        
+</footer><!-- /.post-info -->                        <p>Open office by default does not have a mode to auto start the presentation when launched. With the ImpressRunner plugin …</p>
+                        <a class="readmore" href="..///34/Open_Office_Impress_AutoStart">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///32/Mac_OS_X_run_nginx_as_a_user_process" rel="bookmark"
+                               title="Permalink to "Mac OS X run nginx as a user process"">"Mac OS X run nginx as a user process"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-11T12:51:49+01:00">
+                Published: Tue 11 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/nginx.html">nginx</a> <a href="../tag/web.html">Web</a> </p>        
+</footer><!-- /.post-info -->                        <p>I do not like having to use sudo to run development servers for testing web applications. sudo should be reserved …</p>
+                        <a class="readmore" href="..///32/Mac_OS_X_run_nginx_as_a_user_process">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///30/Nginx_Enable_Directory_Listing" rel="bookmark"
+                               title="Permalink to "Nginx Enable Directory Listing"">"Nginx Enable Directory Listing"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-10T14:07:23+01:00">
+                Published: Mon 10 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/web.html">Web</a> <a href="../tag/nginx.html">nginx</a> </p>        
+</footer><!-- /.post-info -->                        <p>Directory listing can be enabled (disabled by default) by adding this:</p>
+<div class="highlight"><pre><span></span><code>autoindex on;
+</code></pre></div>
+
+<p>Example usage</p>
+<div class="highlight"><pre><span></span><code>http{
+   server {
+     #Server with no …</code></pre></div>
+                        <a class="readmore" href="..///30/Nginx_Enable_Directory_Listing">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///29/Stop_git_status_monitoring_file_permissions" rel="bookmark"
+                               title="Permalink to "Stop git status monitoring file permissions"">"Stop git status monitoring file permissions"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-08T06:52:33+01:00">
+                Published: Sat 08 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> </p>        
+</footer><!-- /.post-info -->                        <p>By default git status returned differences in file permissions. To turn if off run:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>config<span class="w"> </span>core.filemode<span class="w"> </span><span class="nb">false</span>
+</code></pre></div>
+                        <a class="readmore" href="..///29/Stop_git_status_monitoring_file_permissions">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///28/How_to_test_subdomains_on_a_development_machine" rel="bookmark"
+                               title="Permalink to "How to test subdomains on a development machine"">"How to test subdomains on a development machine"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-08T05:04:51+01:00">
+                Published: Sat 08 May 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/web.html">Web</a> <a href="../tag/nginx.html">nginx</a> </p>        
+</footer><!-- /.post-info -->                        <p>I recently documented how I <a href="http://amaras-tech.co.uk/people/morgan/article/26">installed Ruby Enterprise and nginx on Mac OS X</a>. Here we see how to make …</p>
+                        <a class="readmore" href="..///28/How_to_test_subdomains_on_a_development_machine">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///17/iTunes_play_FLAC_on_OS_X" rel="bookmark"
+                               title="Permalink to "iTunes play FLAC on OS X"">"iTunes play FLAC on OS X"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-04-18T07:33:36+01:00">
+                Published: Sun 18 April 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/itunes.html">iTunes</a> <a href="../tag/flac.html">FLAC</a> <a href="../tag/audio.html">Audio</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://code.google.com/p/flukeformac/">Fluke for mac</a> can be used to get iTunes playing <a href="http://flac.sourceforge.net/">FLAC</a> audio files. However it is currently broken for Snow …</p>
+                        <a class="readmore" href="..///17/iTunes_play_FLAC_on_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
