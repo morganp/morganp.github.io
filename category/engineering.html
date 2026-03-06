@@ -26,7 +26,146 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../fsm-diagrams-in-pelican-and-claude-code.html">FSM Diagrams in Pelican and Claude Code</a></h1>
+                        <h1 class="entry-title"><a href="../requirements-writing.html">Requirements Writing</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-03-06T18:00:00+00:00">
+                Published: Fri 06 March 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/design.html">Design</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/verification.html">Verification</a> </p>        
+</footer><!-- /.post-info --><p>Good requirements engineering is fundamental to delivering products that meet customer needs within cost and schedule. A well-formed requirement identifies a specific user or stakeholder, defines a positive end result, and states a measurable success criterion -- for example: <em>"The internet user shall be able to access their current account balance in less than 5 seconds."</em> Requirements must be unambiguous, singular (one requirement per statement), and free of escape clauses such as "unless", "except", or "if possible". They should avoid designing the solution, speculating about future needs, or using vague qualitative terms like "user-friendly" or "flexible" that cannot be verified. The normative terms shall, should, and may carry specific and distinct meanings -- using them precisely is critical to a traceable and verifiable requirement set.</p>
+<blockquote>
+<p><strong>Note:</strong> The IBM Requirements Writing Training document uses 'shall' or 'will' interchangeably to signal a mandatory requirement. The IEEE Standards Style Manual (also referenced below) deprecates the use of 'will' for mandatory requirements, reserving it for statements of fact only. The IEEE definition is the preferred usage.</p>
+</blockquote>
+<h2>Normative Terms</h2>
+<p>Normative requirements are normally phrased using one of the three terms below: shall, should, or may. All normative elements that are requirements (shall) are to be followed in all cases in order to be in conformity.</p>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Priority</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>'Shall'</td>
+<td>High</td>
+<td>'Must-have' for minimum viable product (MVP)</td>
+</tr>
+<tr>
+<td>'Should'</td>
+<td>Medium</td>
+<td>'Desirable' in product and to be considered for phase 1, including any impact</td>
+</tr>
+<tr>
+<td>'May'</td>
+<td>Low</td>
+<td>'Nice-to-have' and could be included if no impact to key metrics. Should log decision.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Use of Special Terms (from IEEE Standards Style Manual)</strong></p>
+<blockquote>
+<p>The word <strong>shall</strong> is used to indicate mandatory requirements strictly to be followed in order to conform to the Specification and from which no deviation is permitted (shall equals is required to).</p>
+<p>The use of the word <strong>must</strong> is deprecated and shall not be used when stating mandatory requirements; must is used only to describe unavoidable situations.</p>
+<p>The use of the word <strong>will</strong> is deprecated and shall not be used when stating mandatory requirements; will is only used in statements of fact.</p>
+<p>The word <strong>should</strong> is used to indicate that among several possibilities one is recommended as particularly suitable, without mentioning or excluding others; or that a certain course of action is preferred but not necessarily required; or that (in the negative form) a certain course of action is deprecated but not prohibited (should equals is recommended that).</p>
+<p>The word <strong>may</strong> is used to indicate a course of action permissible within the limits of the Specification (may equals is permitted to).</p>
+<p>The word <strong>can</strong> is used for statements of possibility and capability, whether material, physical, or causal (can equals is able to).</p>
+<p>All sections are normative, unless they are explicitly indicated to be informative.</p>
+</blockquote>
+<h2>Requirement Categories</h2>
+<p><em>The following categories reflect a common industry classification used in semiconductor product development.</em></p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Definition</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CR</td>
+<td><strong>Customer Requirement</strong> -- A customer need that the product needs to meet. Gathered from customer interaction, field channels or market research. May not be possible to meet all CRs on a product due to risk or resources.</td>
+<td>Marketing, Systems</td>
+</tr>
+<tr>
+<td>SR</td>
+<td><strong>System Requirement</strong> -- Describes the required black-box behaviour of the device. Customer visible SRs are the primary basis for the datasheet. Often, an SR translates a CR into the plan-of-record for a product. Captures the negotiated attribute. May not fully meet the ideal CR.</td>
+<td>Systems</td>
+</tr>
+<tr>
+<td>DR</td>
+<td><strong>Design Requirement</strong> -- Result of distillation of SR, driven by implementation choices that do not affect the black-box behaviour but need to be defined for the design or verification team. Capture constraints required to implement the SRs.</td>
+<td>Design</td>
+</tr>
+<tr>
+<td>VR</td>
+<td><strong>Verification Requirement</strong> -- Description of what needs to be done to ensure an SR and/or DR is implemented correctly. Linked to at least one SR and/or DR. Checks and coverage information is recorded in VRs.</td>
+<td>Verification</td>
+</tr>
+<tr>
+<td>VAR</td>
+<td><strong>Validation Requirement</strong> -- A concise description of how an SR or DR of any requirement type will be covered with a test case during the emulation or post-silicon phase of development. Validation requirements check whether we implemented the right thing through means of functional testing or parametric silicon measurements. Test conditions are recorded in a VAR. Linked to at least one SR.</td>
+<td>Validation</td>
+</tr>
+</tbody>
+</table>
+<h2>Requirement Types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Functional</td>
+<td>Normative functional requirements that can be verified and/or validated.</td>
+</tr>
+<tr>
+<td>Parametric</td>
+<td>Normative parametric requirements that can be verified and/or validated.</td>
+</tr>
+<tr>
+<td>Register Field</td>
+<td>Normative register field requirements.</td>
+</tr>
+<tr>
+<td>Informative</td>
+<td>Informative requirement content, not actionable, but provides context for better interpretation of normative requirements. Informative elements are illustrations, examples, or suggestions that explain the meaning and implications of requirements, as well as case studies on their application. May include diagrams and other attachments which are not to be treated as normative.</td>
+</tr>
+<tr>
+<td>Use Case</td>
+<td>System-level use cases. Commonly captured as diagrams and set context (informative) but can require verification and distillation into further requirements (normative).</td>
+</tr>
+</tbody>
+</table>
+<h2>Resources</h2>
+<ul>
+<li><a href="../pdf/IBM_Requirements_Writing_Training.pdf">IBM Requirements Writing Training (PDF)</a></li>
+<li><a href="../pdf/2021-IEEE-Standards-Style-Manual.pdf">2021 IEEE Standards Style Manual (PDF)</a></li>
+</ul>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../fsm-diagrams-in-pelican-and-claude-code.html" rel="bookmark"
+                               title="Permalink to FSM Diagrams in Pelican and Claude Code">FSM Diagrams in Pelican and Claude Code</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-02-22T18:00:00+00:00">
                 Published: Sun 22 February 2026
@@ -37,204 +176,10 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/fsm.html">FSM</a> <a href="../tag/pelican.html">Pelican</a> <a href="../tag/mermaid.html">Mermaid</a> <a href="../tag/graphviz.html">Graphviz</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/python.html">Python</a> <a href="../tag/git.html">Git</a> <a href="../tag/bash.html">Bash</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/ubuntu.html">Ubuntu</a> <a href="../tag/rtl.html">RTL</a> </p>        
-</footer><!-- /.post-info --><p>Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious. This post covers two tools I've built: a Pelican plugin that renders FSM diagrams at build time so they appear as images in published posts, and a Claude Code skill that generates diagrams from plain-English descriptions.</p>
-<p>The pattern is identical to the <a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom plugin and skill</a>: describe what you want, get a fenced code block, paste it into a post, and the build renders it to SVG automatically.</p>
-<h2>The Pelican plugin</h2>
-<p>The plugin is at <a href="https://github.com/morganp/pelican-fsm">github.com/morganp/pelican-fsm</a>, cloned to <code>~/Code/pelican-fsm</code> (a sibling directory to the blog repo). It intercepts fenced <code>```mermaid ```</code> and <code>```dot ```</code> code blocks before Pelican's standard Markdown processing, renders each one to an SVG using the appropriate CLI tool, caches the result by content hash in <code>content/images/fsm/</code>, and replaces the block with a standard image reference. Pelican then copies the SVG to <code>output/images/fsm/</code> as a static asset.</p>
-<p>SVGs are cached across builds, so only diagrams whose source has changed are re-rendered.</p>
-<h3>Requirements</h3>
-<ul>
-<li><a href="https://github.com/mermaid-js/mermaid-cli">Mermaid CLI</a> for <code>mermaid</code> blocks:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@mermaid-js/mermaid-cli
-</code></pre></div>
-
-<ul>
-<li><a href="https://graphviz.org/">Graphviz</a> for <code>dot</code> blocks:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>graphviz<span class="w">      </span><span class="c1"># macOS</span>
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>graphviz<span class="w">  </span><span class="c1"># Debian/Ubuntu</span>
-</code></pre></div>
-
-<p>Both tools are optional. If one is missing, blocks for that type fall back gracefully to a fenced <code>text</code> block without failing the build.</p>
-<h3>Installation</h3>
-<p>Clone the plugin alongside your Pelican project and install it into the Pelican virtualenv in editable mode:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/pelican-fsm<span class="w"> </span>../pelican-fsm
-<span class="nb">source</span><span class="w"> </span>venv/bin/activate
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>../pelican-fsm<span class="w"> </span>--config-settings<span class="w"> </span><span class="nv">editable_mode</span><span class="o">=</span>compat
-</code></pre></div>
-
-<p>The <code>editable_mode=compat</code> flag is required. Without it, modern setuptools editable installs use a path-hook mechanism that prevents Pelican's namespace plugin auto-discovery from finding the plugin.</p>
-<p>Pelican 4.5+ auto-discovers namespace plugins, so no changes to <code>pelicanconf.py</code> are needed.</p>
-<h3>Optional config</h3>
-<p>If <code>mmdc</code> or <code>dot</code> are not on your <code>PATH</code> during the build, set their full paths in <code>pelicanconf.py</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">FSM_MERMAID_CLI</span> <span class="o">=</span> <span class="s1">&#39;/opt/homebrew/bin/mmdc&#39;</span>
-<span class="n">FSM_DOT_CLI</span> <span class="o">=</span> <span class="s1">&#39;/opt/homebrew/bin/dot&#39;</span>
-</code></pre></div>
-
-<h3>Using it in a post</h3>
-<p>Write a fenced code block with the language set to <code>mermaid</code> or <code>dot</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="sb">```mermaid</span>
-<span class="s">stateDiagram-v2</span>
-<span class="s">    [*] --&gt; Idle</span>
-<span class="s">    Idle --&gt; Running : start</span>
-<span class="s">    Running --&gt; Idle : stop</span>
-<span class="s">    Running --&gt; Error : fault</span>
-<span class="s">    Error --&gt; Idle : reset</span>
-<span class="sb">```</span>
-</code></pre></div>
-
-<p>At build time this becomes an SVG embedded in the page:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg"></p>
-<p>Graphviz DOT works the same way, and is a better fit for hardware and RTL documentation where the compact box-and-arrow style is conventional:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_d33619e8d6e9ae49f343c57a8f6db1e1.svg"></p>
-<p>If the CLI is not found or rendering fails, the block falls back to fenced <code>text</code> — the post still builds, you just see the raw source instead of a diagram.</p>
-<h2>The Claude Code skill</h2>
-<p>The skill lives at <a href="https://github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm">github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm</a>. Claude Code auto-discovers skills from <code>~/.claude/skills/</code> and loads them on demand.</p>
-<p>The skill triggers automatically when you describe anything involving states, transitions, or control flow: protocol implementations, UI flows, hardware FSMs, parsers, game logic. You describe the system in plain English and Claude generates the diagram.</p>
-<p>The skill knows:</p>
-<ul>
-<li>Full Mermaid <code>stateDiagram-v2</code> syntax: plain states, display labels, transitions with events/guards/actions, composite (nested) states, choice pseudostates, fork/join for parallel regions, concurrent regions (<code>--</code>), notes, direction, and classDef styling</li>
-<li>Graphviz DOT FSM conventions: Moore vs Mealy annotation, initial pseudostate arrow, accepting states as double circles</li>
-<li>When to prefer each format: Mermaid for software/web docs, DOT for hardware/RTL</li>
-</ul>
-<h3>Example workflow</h3>
-<p>Describe the system:</p>
-<blockquote>
-<p>"Draw the states for a TCP connection"</p>
-</blockquote>
-<p>Claude produces:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_03bf39c43e71e98bd12e737558c3f9e3.svg"></p>
-<p>Because the skill outputs a <code>mermaid</code> fenced block, you can paste it directly into a blog post and the Pelican plugin renders it automatically.</p>
-<h3>Installing the skill</h3>
-<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.claude/skills/fsm
-curl<span class="w"> </span>-o<span class="w"> </span>~/.claude/skills/fsm/SKILL.md<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://raw.githubusercontent.com/morganp/dotfiles/main/config/claude/skills/fsm/SKILL.md
-</code></pre></div>
-
-<p>Or clone the dotfiles repo and symlink:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/dotfiles<span class="w"> </span>~/dotfiles
-ln<span class="w"> </span>-s<span class="w"> </span>~/dotfiles/config/claude/skills/fsm<span class="w"> </span>~/.claude/skills/fsm
-</code></pre></div>
-
-<h2>Syntax quick reference</h2>
-<p>Both formats can express the same FSM concepts, but use different syntax. The table below maps them side by side.</p>
-<table>
-<thead>
-<tr>
-<th>Concept</th>
-<th>Mermaid <code>stateDiagram-v2</code></th>
-<th>Graphviz DOT</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Graph declaration</td>
-<td><code>stateDiagram-v2</code></td>
-<td><code>digraph FSM { ... }</code></td>
-</tr>
-<tr>
-<td>Default node style</td>
-<td>automatic</td>
-<td><code>node [shape=circle]</code></td>
-</tr>
-<tr>
-<td>Left-to-right layout</td>
-<td><code>direction LR</code></td>
-<td><code>rankdir=LR</code></td>
-</tr>
-<tr>
-<td>Comment</td>
-<td><code>%% comment</code></td>
-<td><code>// comment</code></td>
-</tr>
-<tr>
-<td>Plain state</td>
-<td><code>StateName</code></td>
-<td><code>StateName</code></td>
-</tr>
-<tr>
-<td>State with display label</td>
-<td><code>state "Label" as Name</code></td>
-<td><code>Name [label="Label"]</code></td>
-</tr>
-<tr>
-<td>Initial pseudostate</td>
-<td><code>[*] --&gt; State</code></td>
-<td><code>__start [shape=point width=0.2]</code> + <code>__start -&gt; State</code></td>
-</tr>
-<tr>
-<td>Final/accepting state</td>
-<td><code>State --&gt; [*]</code></td>
-<td><code>State [shape=doublecircle]</code></td>
-</tr>
-<tr>
-<td>Transition</td>
-<td><code>A --&gt; B</code></td>
-<td><code>A -&gt; B</code></td>
-</tr>
-<tr>
-<td>Transition with event</td>
-<td><code>A --&gt; B : event</code></td>
-<td><code>A -&gt; B [label="event"]</code></td>
-</tr>
-<tr>
-<td>Transition with action</td>
-<td><code>A --&gt; B : event / action()</code></td>
-<td><code>A -&gt; B [label="event / action()"]</code></td>
-</tr>
-<tr>
-<td>Guarded transition</td>
-<td><code>A --&gt; B : [guard]</code></td>
-<td><code>A -&gt; B [label="[guard]"]</code></td>
-</tr>
-<tr>
-<td>Composite (nested) state</td>
-<td><code>state S { ... }</code></td>
-<td><code>subgraph cluster_S { ... }</code></td>
-</tr>
-<tr>
-<td>Choice pseudostate</td>
-<td><code>state C &lt;&lt;choice&gt;&gt;</code></td>
-<td><code>C [shape=diamond]</code></td>
-</tr>
-<tr>
-<td>Fork pseudostate</td>
-<td><code>state F &lt;&lt;fork&gt;&gt;</code></td>
-<td>invisible node + multiple outgoing edges</td>
-</tr>
-<tr>
-<td>Join pseudostate</td>
-<td><code>state J &lt;&lt;join&gt;&gt;</code></td>
-<td>invisible node + multiple incoming edges</td>
-</tr>
-<tr>
-<td>Concurrent regions</td>
-<td><code>--</code> inside composite</td>
-<td>parallel <code>subgraph</code> blocks</td>
-</tr>
-</tbody>
-</table>
-<h2>Project structure</h2>
-<div class="highlight"><pre><span></span><code><span class="o">~/</span><span class="n">Code</span><span class="o">/</span>
-<span class="err">├──</span><span class="w"> </span><span class="n">morganp</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="w">              </span><span class="c1"># blog source (main branch)</span>
-<span class="err">│</span><span class="w">   </span><span class="err">└──</span><span class="w"> </span><span class="n">content</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">fsm</span><span class="o">/</span><span class="w">         </span><span class="c1"># SVG cache (persists across make clean)</span>
-<span class="err">└──</span><span class="w"> </span><span class="n">pelican</span><span class="o">-</span><span class="n">fsm</span><span class="o">/</span><span class="w">                    </span><span class="c1"># github.com/morganp/pelican-fsm</span>
-<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">pelican</span><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">fsm_renderer</span><span class="o">/</span>
-<span class="w">        </span><span class="err">├──</span><span class="w"> </span><span class="n">__init__</span><span class="o">.</span><span class="n">py</span><span class="w">             </span><span class="c1"># plugin entry point, signal registration</span>
-<span class="w">        </span><span class="err">└──</span><span class="w"> </span><span class="n">preprocessor</span><span class="o">.</span><span class="n">py</span><span class="w">        </span><span class="c1"># Markdown extension + preprocessor</span>
-
-<span class="o">~/.</span><span class="n">claude</span><span class="o">/</span><span class="n">skills</span><span class="o">/</span>
-<span class="err">└──</span><span class="w"> </span><span class="n">fsm</span><span class="o">/</span>
-<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">SKILL</span><span class="o">.</span><span class="n">md</span><span class="w">                    </span><span class="c1"># Claude Code skill definition</span>
-</code></pre></div>
-
-<p>The combination is useful for any documentation that involves control flow: describe the behaviour, get the diagram from Claude, drop it into a post, and the plugin renders it at build time. No manual editing of diagram syntax, no copy-pasting between browser tabs.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious …</p>
+                        <a class="readmore" href="../fsm-diagrams-in-pelican-and-claude-code.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
