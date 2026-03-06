@@ -20,13 +20,416 @@
                                                 <li><a href="../category/music.html">Music</a></li>
                                                 <li><a href="../category/photography.html">Photography</a></li>
                                                 <li><a href="../category/programming.html">Programming</a></li>
-                                                <li><a href="../category/unix-tools.html">Unix \& Tools</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../list-files-ignored-by-git.html">"List files ignored by git"</a></h1>
+                        <h1 class="entry-title"><a href="../installing-homebrew-on-a-debian-13-trixie-lxc-container.html">Installing Homebrew on a Debian 13 (Trixie) LXC Container</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-02-25T00:00:00+00:00">
+                Published: Wed 25 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/homelab.html">Homelab</a>.</p>
+<p>tags: <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/debian.html">Debian</a> <a href="../tag/lxc.html">LXC</a> <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/git.html">Git</a> <a href="../tag/bash.html">Bash</a> </p>        
+</footer><!-- /.post-info --><p>This tutorial documents a working, verified installation of Homebrew (Linuxbrew) on a
+Debian 13 "trixie" LXC container. Every step reflects what was actually done on this system;
+nothing has been invented or copied from generic guides without verification.</p>
+<p><strong>Tested environment:</strong>
+- Debian GNU/Linux 13 (trixie), amd64
+- LXC unprivileged container
+- Homebrew 5.0.15
+- Primary non-root user: <code>morgan</code> (uid=1000)</p>
+<hr>
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#1-prerequisites">Prerequisites</a></li>
+<li><a href="#2-installation-steps">Installation Steps</a></li>
+<li><a href="#3-per-user-shell-setup">Per-User Shell Setup</a></li>
+<li><a href="#4-verification">Verification</a></li>
+<li><a href="#5-adding-future-users">Adding Future Users</a></li>
+<li><a href="#6-troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr>
+<h2>1. Prerequisites</h2>
+<h3>System packages</h3>
+<p>The Homebrew installer requires these packages. Install them as root before running the
+installer:</p>
+<div class="highlight"><pre><span></span><code>apt-get<span class="w"> </span>update
+apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>build-essential<span class="w"> </span>git<span class="w"> </span>curl<span class="w"> </span>file<span class="w"> </span>procps
+</code></pre></div>
+
+<p>Verify all five are present:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">ii</span><span class="w">  </span><span class="nx">build</span><span class="o">-</span><span class="nx">essential</span><span class="w"> </span><span class="m m-Double">12.12</span><span class="w">              </span><span class="nx">amd64</span><span class="w">  </span><span class="nx">Informational</span><span class="w"> </span><span class="nx">list</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="nx">build</span><span class="o">-</span><span class="nx">essential</span><span class="w"> </span><span class="nx">packages</span>
+<span class="nx">ii</span><span class="w">  </span><span class="nx">curl</span><span class="w">            </span><span class="m m-Double">8.14.1</span><span class="o">-</span><span class="mi">2</span><span class="o">+</span><span class="nx">deb13u2</span><span class="w">   </span><span class="nx">amd64</span><span class="w">  </span><span class="nx">command</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="nx">tool</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">transferring</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="nx">with</span><span class="w"> </span><span class="nx">URL</span><span class="w"> </span><span class="nx">syntax</span>
+<span class="nx">ii</span><span class="w">  </span><span class="nx">file</span><span class="w">            </span><span class="mi">1</span><span class="p">:</span><span class="m m-Double">5.46</span><span class="o">-</span><span class="mi">5</span><span class="w">           </span><span class="nx">amd64</span><span class="w">  </span><span class="nx">Recognize</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="nx">file</span><span class="w"> </span><span class="nx">using</span><span class="w"> </span><span class="s">&quot;magic&quot;</span><span class="w"> </span><span class="nx">numbers</span>
+<span class="nx">ii</span><span class="w">  </span><span class="nx">git</span><span class="w">             </span><span class="mi">1</span><span class="p">:</span><span class="m m-Double">2.47.3</span><span class="o">-</span><span class="mi">0</span><span class="o">+</span><span class="nx">deb13u1</span><span class="w"> </span><span class="nx">amd64</span><span class="w">  </span><span class="nx">fast</span><span class="p">,</span><span class="w"> </span><span class="nx">scalable</span><span class="p">,</span><span class="w"> </span><span class="nx">distributed</span><span class="w"> </span><span class="nx">revision</span><span class="w"> </span><span class="nx">control</span><span class="w"> </span><span class="nx">system</span>
+<span class="nx">ii</span><span class="w">  </span><span class="nx">procps</span><span class="w">          </span><span class="mi">2</span><span class="p">:</span><span class="m m-Double">4.0.4</span><span class="o">-</span><span class="mi">9</span><span class="w">          </span><span class="nx">amd64</span><span class="w">  </span><span class="o">/</span><span class="nx">proc</span><span class="w"> </span><span class="nx">file</span><span class="w"> </span><span class="nx">system</span><span class="w"> </span><span class="nx">utilities</span>
+</code></pre></div>
+
+<h3>PATH gotcha: /usr/sbin must be in root's PATH</h3>
+<p>On Debian 13, <code>/usr/sbin</code> is <strong>not</strong> automatically in the PATH of non-login shells (including
+those invoked by <code>su</code> without <code>-l</code>). The installer calls <code>useradd</code>, which lives at
+<code>/usr/sbin/useradd</code>. If <code>/usr/sbin</code> is missing from your PATH the installer will fail with a
+confusing "command not found" error.</p>
+<p>Before running the installer, confirm your PATH includes <code>/usr/sbin</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+</code></pre></div>
+
+<p>If it does not, prepend it for the session:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/sbin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>Or simply run the installer from a full login shell (<code>su -</code> rather than <code>su</code>).</p>
+<hr>
+<h2>2. Installation Steps</h2>
+<p>All steps in this section are run as <strong>root</strong>.</p>
+<h3>Step 1 — Create the dedicated <code>linuxbrew</code> group</h3>
+<p>Homebrew on Linux uses a shared group so that multiple users can write to the installation
+prefix. Create it before the installer runs so you control its GID:</p>
+<div class="highlight"><pre><span></span><code>groupadd<span class="w"> </span>linuxbrew
+</code></pre></div>
+
+<h3>Step 2 — Pre-create the Homebrew prefix directory</h3>
+<p>The Homebrew installer expects to own <code>/home/linuxbrew/.linuxbrew</code>. In an LXC container the
+installer sometimes cannot create <code>/home/linuxbrew</code> itself due to ownership constraints on
+<code>/home</code>. Pre-create it and set the correct ownership <strong>before</strong> running the installer:</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>/home/linuxbrew/.linuxbrew
+chown<span class="w"> </span>-R<span class="w"> </span>morgan:linuxbrew<span class="w"> </span>/home/linuxbrew
+chmod<span class="w"> </span><span class="m">2775</span><span class="w"> </span>/home/linuxbrew
+chmod<span class="w"> </span><span class="m">2775</span><span class="w"> </span>/home/linuxbrew/.linuxbrew
+</code></pre></div>
+
+<p>The <code>2775</code> mode sets the <strong>setgid bit</strong> (<code>s</code>) on the directory. This causes all files and
+subdirectories created inside to inherit the <code>linuxbrew</code> group automatically, which is what
+allows multiple users to install and update packages.</p>
+<p>After this step, <code>ls -la /home/linuxbrew/</code> should show:</p>
+<div class="highlight"><pre><span></span><code>drwxrwxr-x  3 morgan linuxbrew 4096 Feb 25 15:31 .
+drwxr-xr-x  4 root   root      4096 Feb 25 15:31 ..
+drwxrwsr-x 14 morgan linuxbrew 4096 Feb 25 15:31 .linuxbrew
+</code></pre></div>
+
+<p>And <code>stat /home/linuxbrew/.linuxbrew</code> confirms the setgid bit:</p>
+<div class="highlight"><pre><span></span><code>Access: (2775/drwxrwsr-x)  Uid: ( 1000/  morgan)   Gid: ( 1001/linuxbrew)
+</code></pre></div>
+
+<h3>Step 3 — Add the primary user to the linuxbrew group</h3>
+<div class="highlight"><pre><span></span><code>usermod<span class="w"> </span>-aG<span class="w"> </span>linuxbrew<span class="w"> </span>morgan
+</code></pre></div>
+
+<p>The <code>-a</code> flag is critical — without it <code>usermod -G</code> <strong>replaces</strong> all supplementary groups
+instead of appending to them.</p>
+<h3>Step 4 — Run the Homebrew installer as the primary user</h3>
+<p>Switch to the non-root user and run the official installer. Do <strong>not</strong> run it as root:</p>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>morgan
+/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="k">)</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>Because the prefix directory already exists and is writable by the <code>linuxbrew</code> group (and
+<code>morgan</code> is a member), the installer will populate it without needing to create it or change
+system-level ownership.</p>
+<h3>Step 5 — Create the system-wide profile.d script</h3>
+<p>To activate Homebrew automatically for every user who logs in, create a shell script in
+<code>/etc/profile.d/</code> as root:</p>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span>&gt;<span class="w"> </span>/etc/profile.d/homebrew.sh<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">if [ -d &quot;/home/linuxbrew/.linuxbrew&quot; ]; then</span>
+<span class="s">    eval &quot;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&quot;</span>
+<span class="s">fi</span>
+<span class="s">EOF</span>
+chmod<span class="w"> </span>+x<span class="w"> </span>/etc/profile.d/homebrew.sh
+</code></pre></div>
+
+<p>This is exactly the file present on this system:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># /etc/profile.d/homebrew.sh</span>
+<span class="c1">#!/bin/bash</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;/home/linuxbrew/.linuxbrew&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>/home/linuxbrew/.linuxbrew/bin/brew<span class="w"> </span>shellenv<span class="k">)</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>The <code>if</code> guard makes the script safe on systems where the prefix does not exist (e.g., before
+installation, or if the directory is removed).</p>
+<hr>
+<h2>3. Per-User Shell Setup</h2>
+<p>The <code>/etc/profile.d/homebrew.sh</code> script runs automatically for <strong>login shells</strong>. This covers
+<code>su - username</code>, SSH logins, and console logins.</p>
+<p>For interactive non-login shells (e.g., a new terminal tab that sources <code>~/.bashrc</code> instead of
+<code>~/.bash_profile</code>), a user may need to add the following to their <code>~/.bashrc</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Homebrew (Linuxbrew)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;/home/linuxbrew/.linuxbrew&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>/home/linuxbrew/.linuxbrew/bin/brew<span class="w"> </span>shellenv<span class="k">)</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+<p><code>brew shellenv</code> sets these environment variables:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HOMEBREW_PREFIX</code></td>
+<td><code>/home/linuxbrew/.linuxbrew</code></td>
+</tr>
+<tr>
+<td><code>HOMEBREW_CELLAR</code></td>
+<td><code>/home/linuxbrew/.linuxbrew/Cellar</code></td>
+</tr>
+<tr>
+<td><code>HOMEBREW_REPOSITORY</code></td>
+<td><code>/home/linuxbrew/.linuxbrew/Homebrew</code></td>
+</tr>
+<tr>
+<td><code>PATH</code></td>
+<td>prepends <code>/home/linuxbrew/.linuxbrew/bin</code> and <code>.../sbin</code></td>
+</tr>
+<tr>
+<td><code>MANPATH</code></td>
+<td>prepends <code>.../share/man</code></td>
+</tr>
+<tr>
+<td><code>INFOPATH</code></td>
+<td>prepends <code>.../share/info</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>4. Verification</h2>
+<h3>Confirm the installation prefix layout</h3>
+<div class="highlight"><pre><span></span><code>ls<span class="w"> </span>-la<span class="w"> </span>/home/linuxbrew/.linuxbrew/
+</code></pre></div>
+
+<p>Expected output (all entries owned by <code>morgan:linuxbrew</code>, setgid <code>s</code> visible):</p>
+<div class="highlight"><pre><span></span><code><span class="n">total</span><span class="w"> </span><span class="mi">56</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">14</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="o">.</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="o">..</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">Caskroom</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">Cellar</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">Frameworks</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">Homebrew</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">bin</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">32</span><span class="w"> </span><span class="n">etc</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">include</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">lib</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">opt</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="n">sbin</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">6</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">32</span><span class="w"> </span><span class="n">share</span>
+<span class="n">drwxrwsr</span><span class="o">-</span><span class="n">x</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="n">morgan</span><span class="w"> </span><span class="n">linuxbrew</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="n">Feb</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">31</span><span class="w"> </span><span class="k">var</span>
+</code></pre></div>
+
+<h3>Check the Homebrew version</h3>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew --version&#39;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>Homebrew 5.0.15
+</code></pre></div>
+
+<h3>Run brew doctor</h3>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew doctor&#39;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>Your system is ready to brew.
+</code></pre></div>
+
+<h3>Confirm group membership</h3>
+<div class="highlight"><pre><span></span><code>getent<span class="w"> </span>group<span class="w"> </span>linuxbrew
+<span class="c1"># linuxbrew:x:1001:morgan</span>
+
+id<span class="w"> </span>morgan
+<span class="c1"># uid=1000(morgan) gid=1000(morgan) groups=1000(morgan),100(users),1001(linuxbrew)</span>
+</code></pre></div>
+
+<h3>Test installing a package (dry run)</h3>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew install --dry-run hello&#39;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>==&gt; Would install 1 formula:
+hello
+</code></pre></div>
+
+<hr>
+<h2>5. Adding Future Users</h2>
+<p>When a new user needs Homebrew access:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># As root — add the new user to the linuxbrew group</span>
+usermod<span class="w"> </span>-aG<span class="w"> </span>linuxbrew<span class="w"> </span>newuser
+</code></pre></div>
+
+<p>The user must log out and back in (or start a new login shell) for the group change to take
+effect. The <code>/etc/profile.d/homebrew.sh</code> script will activate <code>brew</code> for them automatically
+on their next login. No other changes are needed.</p>
+<p>To verify the new user can reach Homebrew:</p>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w"> </span>newuser<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew --version&#39;</span>
+</code></pre></div>
+
+<hr>
+<h2>6. Troubleshooting</h2>
+<h3><code>brew: command not found</code> in a non-login shell</h3>
+<p>The <code>/etc/profile.d/homebrew.sh</code> script only runs in login shells. In a non-login shell
+(typical terminal emulators, <code>su username</code> without the <code>-</code>), Homebrew will not be on the PATH.</p>
+<p>Fix: source the script manually, or add the <code>eval</code> line to <code>~/.bashrc</code> as shown in
+<a href="#3-per-user-shell-setup">Section 3</a>.</p>
+<p>Quick test — if this works but <code>brew</code> does not:</p>
+<div class="highlight"><pre><span></span><code>/home/linuxbrew/.linuxbrew/bin/brew<span class="w"> </span>--version
+</code></pre></div>
+
+<p>then the issue is purely PATH/environment, not the installation.</p>
+<h3><code>useradd: command not found</code> during installation</h3>
+<p><code>useradd</code> lives at <code>/usr/sbin/useradd</code>. On Debian 13, <code>/usr/sbin</code> is not in the PATH of
+non-login root shells. Run the installer from a full login shell:</p>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-<span class="w">        </span><span class="c1"># note the hyphen — this gives a login shell with /usr/sbin in PATH</span>
+</code></pre></div>
+
+<p>Or prepend it explicitly before running the installer:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/sbin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<h3>Installer fails to create <code>/home/linuxbrew</code></h3>
+<p>In LXC containers, the installer may not be able to create the prefix directory itself because
+<code>/home</code> is owned by <code>root:root</code> with mode <code>755</code>. The installer does not have write access to
+<code>/home</code> when running as a non-root user.</p>
+<p>Solution: pre-create the directory as root before running the installer (see
+<a href="#step-2--pre-create-the-homebrew-prefix-directory">Step 2</a>).</p>
+<h3>Permission denied errors when running <code>brew install</code></h3>
+<p>The user must be in the <code>linuxbrew</code> group <strong>and</strong> must have started a new session after being
+added. Check:</p>
+<div class="highlight"><pre><span></span><code>id<span class="w">          </span><span class="c1"># linuxbrew should appear in the groups list</span>
+</code></pre></div>
+
+<p>If <code>linuxbrew</code> is absent, either the <code>usermod -aG linuxbrew username</code> step was skipped, or
+the user has not logged out and back in since being added.</p>
+<h3><code>brew doctor</code> reports warnings about <code>/usr/local</code></h3>
+<p>On Linux, Homebrew uses <code>/home/linuxbrew/.linuxbrew</code> as its prefix, not <code>/usr/local</code>. Warnings
+about <code>/usr/local</code> being absent or not owned by the current user are normal and harmless on a
+Linux installation.</p>
+<hr>
+<h2>Quick-Reference: Full Root-Side Install Sequence</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Install dependencies</span>
+apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>build-essential<span class="w"> </span>git<span class="w"> </span>curl<span class="w"> </span>file<span class="w"> </span>procps
+
+<span class="c1"># 2. Ensure /usr/sbin is in PATH (run as login shell or set manually)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/sbin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+
+<span class="c1"># 3. Create the linuxbrew group</span>
+groupadd<span class="w"> </span>linuxbrew
+
+<span class="c1"># 4. Pre-create the prefix and set ownership/permissions</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>/home/linuxbrew/.linuxbrew
+chown<span class="w"> </span>-R<span class="w"> </span>morgan:linuxbrew<span class="w"> </span>/home/linuxbrew
+chmod<span class="w"> </span><span class="m">2775</span><span class="w"> </span>/home/linuxbrew
+chmod<span class="w"> </span><span class="m">2775</span><span class="w"> </span>/home/linuxbrew/.linuxbrew
+
+<span class="c1"># 5. Add the primary user to the group</span>
+usermod<span class="w"> </span>-aG<span class="w"> </span>linuxbrew<span class="w"> </span>morgan
+
+<span class="c1"># 6. Run the installer as the non-root user</span>
+su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;&#39;</span>
+
+<span class="c1"># 7. Install the system-wide profile.d activation script</span>
+cat<span class="w"> </span>&gt;<span class="w"> </span>/etc/profile.d/homebrew.sh<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">if [ -d &quot;/home/linuxbrew/.linuxbrew&quot; ]; then</span>
+<span class="s">    eval &quot;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&quot;</span>
+<span class="s">fi</span>
+<span class="s">EOF</span>
+chmod<span class="w"> </span>+x<span class="w"> </span>/etc/profile.d/homebrew.sh
+
+<span class="c1"># 8. Verify</span>
+su<span class="w"> </span>-<span class="w"> </span>morgan<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;brew --version &amp;&amp; brew doctor&#39;</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../fsm-diagrams-in-pelican-and-claude-code.html" rel="bookmark"
+                               title="Permalink to FSM Diagrams in Pelican and Claude Code">FSM Diagrams in Pelican and Claude Code</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-02-22T18:00:00+00:00">
+                Published: Sun 22 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/fsm.html">FSM</a> <a href="../tag/pelican.html">Pelican</a> <a href="../tag/mermaid.html">Mermaid</a> <a href="../tag/graphviz.html">Graphviz</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/python.html">Python</a> <a href="../tag/git.html">Git</a> <a href="../tag/bash.html">Bash</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/ubuntu.html">Ubuntu</a> <a href="../tag/rtl.html">RTL</a> </p>        
+</footer><!-- /.post-info -->                        <p>Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious …</p>
+                        <a class="readmore" href="../fsm-diagrams-in-pelican-and-claude-code.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html" rel="bookmark"
+                               title="Permalink to WaveDrom Timing Diagrams in Pelican with Claude Code">WaveDrom Timing Diagrams in Pelican with Claude Code</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-02-20T12:00:00+00:00">
+                Published: Fri 20 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/wavedrom.html">WaveDrom</a> <a href="../tag/timing.html">Timing</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/pelican.html">Pelican</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/python.html">Python</a> <a href="../tag/git.html">Git</a> <a href="../tag/bash.html">Bash</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/rtl.html">RTL</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="https://wavedrom.com">WaveDrom</a> is a JavaScript library that renders digital timing diagrams from a simple JSON-based format called WaveJSON. It's widely used …</p>
+                        <a class="readmore" href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../command-line-disk-usage.html" rel="bookmark"
+                               title="Permalink to Command Line Disk Usage">Command Line Disk Usage</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-09-06T13:19:00+01:00">
+                Published: Sat 06 September 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/os-x.html">OS X</a> <a href="../tag/cli.html">CLI</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <h1>NCurses Disk Usage</h1>
+<p>A useful Command Line Iterface (CLI) for exploring disk usage:</p>
+<div class="highlight"><pre><span></span><code>ncdu
+</code></pre></div>
+
+<p>Example output.</p>
+<div class="highlight"><pre><span></span><code>ncdu 2.9.1 …</code></pre></div>
+                        <a class="readmore" href="../command-line-disk-usage.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../list-files-ignored-by-git.html" rel="bookmark"
+                               title="Permalink to "List files ignored by git"">"List files ignored by git"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2014-07-30T20:18:07+01:00">
                 Published: Wed 30 July 2014
@@ -36,15 +439,35 @@
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
-<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/git.html">Git</a> </p>        
-</footer><!-- /.post-info --><p><a href="https://www.youtube.com/watch?v=4VBG9FlyiOw">From Github Training &amp; Guides</a>.  </p>
+<p>tags: <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="https://www.youtube.com/watch?v=4VBG9FlyiOw">From Github Training &amp; Guides</a>.  </p>
 <div class="highlight"><pre><span></span><code>git ls-files --others --ignored --exclude-standard
-</code></pre></div>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</code></pre></div>
+                        <a class="readmore" href="../list-files-ignored-by-git.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../thor-variable-arguments.html" rel="bookmark"
+                               title="Permalink to "Thor Variable Arguments"">"Thor Variable Arguments"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-01T19:39:19+01:00">
+                Published: Tue 01 April 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p><a href="http://whatisthor.com/">Thor</a> is a Ruby Gem, which allows you to build command line applications which accept commands, in the same way …</p>
+                        <a class="readmore" href="../thor-variable-arguments.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -74,6 +497,28 @@ git push --tags
 
                 <li><article class="hentry">
                     <header>
+                        <h1><a href="../octopress-pages-and-custom-domain.html" rel="bookmark"
+                               title="Permalink to "Octopress, Pages and Custom Domain"">"Octopress, Pages and Custom Domain"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-04T18:19:25+00:00">
+                Published: Tue 04 March 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/octopress.html">Octopress</a> <a href="../tag/web.html">Web</a> <a href="../tag/git.html">Git</a> <a href="../tag/vim.html">Vim</a> </p>        
+</footer><!-- /.post-info -->                        <p>In your <code>sources</code> branch, which is the main branch for writing creating posts, create a <code>CNAME</code> file in the sources …</p>
+                        <a class="readmore" href="../octopress-pages-and-custom-domain.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
                         <h1><a href="../revert-in-git.html" rel="bookmark"
                                title="Permalink to "Revert in Git"">"Revert in Git"</a></h1>
                     </header>
@@ -97,6 +542,29 @@ git push --tags
 
                 <li><article class="hentry">
                     <header>
+                        <h1><a href="../brew-update-fail.html" rel="bookmark"
+                               title="Permalink to "brew update fail"">"brew update fail"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-02-11T21:17:24+00:00">
+                Published: Tue 11 February 2014
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/os-x.html">OS X</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p>Received the following errors when doing <code>brew update</code> on mountain lion:</p>
+<div class="highlight"><pre><span></span><code><span class="n">error</span><span class="o">:</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">following</span><span class="w"> </span><span class="n">untracked</span><span class="w"> </span><span class="n">working</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">would</span><span class="w"> </span><span class="n">be …</span></code></pre></div>
+                        <a class="readmore" href="../brew-update-fail.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
                         <h1><a href="../git-submodule-update-fatal.html" rel="bookmark"
                                title="Permalink to "git submodule update fatal"">"git submodule update fatal"</a></h1>
                     </header>
@@ -111,7 +579,7 @@ git push --tags
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
-<p>tags: <a href="../tag/git.html">Git</a> </p>        
+<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/systemverilog.html">SystemVerilog</a> <a href="../tag/vim.html">Vim</a> </p>        
 </footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>submodule<span class="w"> </span>update
 fatal:<span class="w"> </span>Needed<span class="w"> </span>a<span class="w"> </span>single<span class="w"> </span>revision
 Unable<span class="w"> </span>to<span class="w"> </span>find<span class="w"> </span>current<span class="w"> </span>revision<span class="w"> </span><span class="k">in</span><span class="w"> </span>submodule<span class="w"> </span>path<span class="w"> </span><span class="s1">&#39;vim/bundle/systemverilog&#39;</span>
@@ -146,6 +614,29 @@ Unable<span class="w"> </span>to<span class="w"> </span>find<span class="w"> </s
 
                 <li><article class="hentry">
                     <header>
+                        <h1><a href="..///206/Reverting_rtorrent_version_on_Snow_Leopard" rel="bookmark"
+                               title="Permalink to "Reverting rtorrent version on Snow Leopard"">"Reverting rtorrent version on Snow Leopard"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-12-06T20:22:33+00:00">
+                Published: Thu 06 December 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/bittorrent.html">BitTorrent</a> <a href="../tag/leopard.html">Leopard</a> <a href="../tag/snow-leopard.html">Snow Leopard</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/rtorrent.html">rTorrent</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p>After running  a <code>brew upgrade</code> rtorrent was plagued with segmentation faults. Which look something like :</p>
+<div class="highlight"><pre><span></span><code>Caught Segmentation fault, dumping stack …</code></pre></div>
+                        <a class="readmore" href="..///206/Reverting_rtorrent_version_on_Snow_Leopard">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
                         <h1><a href="..///197/Git_Submodules" rel="bookmark"
                                title="Permalink to "Git Submodules"">"Git Submodules"</a></h1>
                     </header>
@@ -159,10 +650,33 @@ Unable<span class="w"> </span>to<span class="w"> </span>find<span class="w"> </s
                 <address class="vcard author">
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
-        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
-<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> </p>        
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> </p>        
 </footer><!-- /.post-info -->                        <p>For code reuse within I have found Subversion externals really nice to work with. Instead of copy and pasting code …</p>
                         <a class="readmore" href="..///197/Git_Submodules">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///183/Mountain_Lion_Setup%2C_Part_3_%3A_Little_Snitch_%26_Dotfiles" rel="bookmark"
+                               title="Permalink to "Mountain Lion Setup, Part 3 : Little Snitch & Dotfiles"">"Mountain Lion Setup, Part 3 : Little Snitch & Dotfiles"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-08-16T12:44:04+01:00">
+                Published: Thu 16 August 2012
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/mountain-lion.html">Mountain Lion</a> <a href="../tag/git.html">Git</a> <a href="../tag/vim.html">Vim</a> <a href="../tag/bash.html">Bash</a> </p>        
+</footer><!-- /.post-info -->                        <h2>Little Snitch</h2>
+<p>There is currently a preview (Beta) of [Little Snitch 3][littelsnitch3]. If you have not come across Little …</p>
+                        <a class="readmore" href="..///183/Mountain_Lion_Setup%2C_Part_3_%3A_Little_Snitch_%26_Dotfiles">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
 
@@ -181,10 +695,32 @@ Unable<span class="w"> </span>to<span class="w"> </span>find<span class="w"> </s
                 <address class="vcard author">
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
-        <p>In <a href="../category/unix-tools.html">Unix\ \&\ Tools</a>.</p>
-<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> </p>        
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> </p>        
 </footer><!-- /.post-info -->                        <p>When working behind a restrictive firewall, which limits ssh connections you may be running into some of the following errors …</p>
                         <a class="readmore" href="..///159/Using_Github_behind_a_restrictive_firewall">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///132/Ruby_get_a_users_real_name" rel="bookmark"
+                               title="Permalink to "Ruby get a users real name"">"Ruby get a users real name"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-12-22T12:06:08+00:00">
+                Published: Thu 22 December 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p>There does not appear to be a nice way to get a current users real name in ruby. The best …</p>
+                        <a class="readmore" href="..///132/Ruby_get_a_users_real_name">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
 
@@ -204,7 +740,7 @@ Unable<span class="w"> </span>to<span class="w"> </span>find<span class="w"> </s
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
-<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/gem.html">Gem</a> <a href="../tag/git.html">Git</a> <a href="../tag/ruby.html">Ruby</a> </p>        
 </footer><!-- /.post-info -->                        <p>This assumes that <code>origin</code> is the label for github. <br>
 Tagging a github repo for my gem releases I do:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>git …</code></pre></div>
@@ -228,7 +764,7 @@ Tagging a github repo for my gem releases I do:</p>
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/programming.html">Programming</a>.</p>
-<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/database.html">Database</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+<p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/database.html">Database</a> <a href="../tag/git.html">Git</a> <a href="../tag/ruby.html">Ruby</a> </p>        
 </footer><!-- /.post-info -->                        <p>To connect to a rails style DB config outside of the normal workflow, or using a database.yml in a …</p>
                         <a class="readmore" href="..///110/Ruby_script_connect_to_DB_using_database.yml">read more</a>
                     </div><!-- /.entry-content -->
@@ -250,9 +786,32 @@ Tagging a github repo for my gem releases I do:</p>
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
-<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/vim.html">Vim</a> <a href="../tag/web.html">Web</a> </p>        
+<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/vim.html">Vim</a> <a href="../tag/web.html">Web</a> </p>        
 </footer><!-- /.post-info -->                        <p>This vim plugin will allow you to gist directly from vim, simple way is just :Gist to gist entire file …</p>
                         <a class="readmore" href="..///107/Installing_gist.vim">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///99/Better_Open_Source_Project_Setup%2C_with_RVM_%26_Bundler" rel="bookmark"
+                               title="Permalink to "Better Open Source Project Setup, with RVM & Bundler"">"Better Open Source Project Setup, with RVM & Bundler"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-10T06:35:10+01:00">
+                Published: Sun 10 April 2011
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/bundler.html">Bundler</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/rvm.html">RVM</a> <a href="../tag/open-source.html">Open Source</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p>Based on 'Raise the bar, lower the pressure' given by Durran Jordan at ScotRubyConf 2011.</p>
+<p>There has been some debate …</p>
+                        <a class="readmore" href="..///99/Better_Open_Source_Project_Setup%2C_with_RVM_%26_Bundler">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
 
@@ -272,7 +831,7 @@ Tagging a github repo for my gem releases I do:</p>
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
-<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> </p>        
+<p>tags: <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> </p>        
 </footer><!-- /.post-info -->                        <p>I think it is good practise to create a read only tag when releasing an application. This allows you to …</p>
                         <a class="readmore" href="..///83/Tagging_a_git_repo_for_a_Release_">read more</a>
                     </div><!-- /.entry-content -->
@@ -294,7 +853,7 @@ Tagging a github repo for my gem releases I do:</p>
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/programming.html">Programming</a>.</p>
-<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> <a href="../tag/ruby.html">Ruby</a> </p>        
+<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/ruby.html">Ruby</a> </p>        
 </footer><!-- /.post-info -->                        <p>I have for a while wondered about an ideal (good) approach to storing api keys in config files in ruby …</p>
                         <a class="readmore" href="..///71/Storing_secret_keys_in_Ruby_config_files_an_approach">read more</a>
                     </div><!-- /.entry-content -->
@@ -338,9 +897,31 @@ Tagging a github repo for my gem releases I do:</p>
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
-<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/programming.html">Programming</a> </p>        
+<p>tags: <a href="../tag/apple.html">Apple</a> <a href="../tag/command-line.html">Command Line</a> <a href="../tag/git.html">Git</a> <a href="../tag/os-x.html">OS X</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/homebrew.html">Homebrew</a> </p>        
 </footer><!-- /.post-info -->                        <p>Having a clean build of Mac OS X Snow Leopard I thought I would give the <a href="http://github.com/mxcl/homebrew">Homebrew</a> method of installing …</p>
                         <a class="readmore" href="..///53/Installing_git_on_a_clean_build_of_OS_X">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///51/Sinatra_running_on_Heroku" rel="bookmark"
+                               title="Permalink to "Sinatra running on Heroku"">"Sinatra running on Heroku"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-07-09T08:37:13+01:00">
+                Published: Fri 09 July 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/web.html">Web</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p>For running small webapps <a href="http://heroku.com/">heroku</a> is free. The real attraction is the simplicity of deployment, if you are use to …</p>
+                        <a class="readmore" href="..///51/Sinatra_running_on_Heroku">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
 
@@ -360,11 +941,33 @@ Tagging a github repo for my gem releases I do:</p>
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
-<p>tags: <a href="../tag/git.html">Git</a> <a href="../tag/programming.html">Programming</a> </p>        
+<p>tags: <a href="../tag/git.html">Git</a> </p>        
 </footer><!-- /.post-info -->                        <p>By default git status returned differences in file permissions. To turn if off run:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>config<span class="w"> </span>core.filemode<span class="w"> </span><span class="nb">false</span>
 </code></pre></div>
                         <a class="readmore" href="..///29/Stop_git_status_monitoring_file_permissions">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="..///4/FourThirds_Sinatra_RESTful_example" rel="bookmark"
+                               title="Permalink to "FourThirds Sinatra RESTful example"">"FourThirds Sinatra RESTful example"</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-03-30T14:50:00+00:00">
+                Published: Tue 30 March 2010
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/git.html">Git</a> </p>        
+</footer><!-- /.post-info -->                        <p>This is an example of efficient use of views in <a href="http://www.sinatrarb.com">Sinatra</a> covering RESTful actions. This is a copy of my …</p>
+                        <a class="readmore" href="..///4/FourThirds_Sinatra_RESTful_example">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
 
@@ -384,7 +987,7 @@ Tagging a github repo for my gem releases I do:</p>
                         By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
                 </address>
         <p>In <a href="../category/programming.html">Programming</a>.</p>
-<p>tags: <a href="../tag/programming.html">Programming</a> <a href="../tag/git.html">Git</a> </p>        
+<p>tags: <a href="../tag/git.html">Git</a> </p>        
 </footer><!-- /.post-info -->                        <p>Git has a hand full of GUIs available on Mac OS X, gitk proved a little tricky to use but …</p>
                         <a class="readmore" href="..///10/GitX">read more</a>
                     </div><!-- /.entry-content -->
