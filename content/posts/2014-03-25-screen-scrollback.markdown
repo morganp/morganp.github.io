@@ -3,7 +3,7 @@ layout: post
 title: "Screen Scrollback"
 date: 2014-03-25 20:57:28 +0000
 comments: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Screen,
 ---
 

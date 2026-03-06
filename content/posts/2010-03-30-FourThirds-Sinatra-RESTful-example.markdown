@@ -5,7 +5,7 @@ date: 2010-03-30T14:50:00+00:00
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Sinatra,
 discuss_url: //4
 url: //4/FourThirds_Sinatra_RESTful_example

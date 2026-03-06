@@ -5,7 +5,7 @@ date: 2010-07-18 05:59:31 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Command Line, Java, OS X, Programming,
 discuss_url: //55
 url: //55/Turn_a_.jar_file_into_a_mac_.app

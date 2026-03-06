@@ -5,7 +5,7 @@ date: 2012-08-16 23:56:02 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Mountain Lion,
 discuss_url: //186
 url: //186/Mountain_Lion_finding_the_Library_folder

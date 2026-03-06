@@ -5,7 +5,7 @@ date: 2012-08-30 20:28:12 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Apple, Mountain Lion, Network,
 discuss_url: //189
 url: //189/Mountain_Lion_Setup%2C_Part_5_%2Fetc%2Fhosts

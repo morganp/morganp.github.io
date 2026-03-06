@@ -1,6 +1,6 @@
 Title: Python merge PDFs
 Date: 2024-04-22 18:49
-Category: Tech
+Category: Programming
 Tags: python
 Author: morganp
 

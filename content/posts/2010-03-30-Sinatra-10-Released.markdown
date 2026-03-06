@@ -5,7 +5,7 @@ date: 2010-03-30T14:50:00+00:00
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Ruby, Sinatra, Programming,
 discuss_url: //8
 url: //8/Sinatra_1.0_Released

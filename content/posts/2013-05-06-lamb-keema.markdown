@@ -3,8 +3,8 @@ layout: recipe
 title: "Lamb Keema"
 date: 2013-05-06 23:03
 comments: true
-Category: Cooking
-tags:  Recipe, Meat, Lamb, Curry, Spicy,
+Category: Home \& Garden
+tags:  Recipe, Meat, Lamb, Curry, Spicy,, Cooking
 ---
 
 Lamb curry (£1.95 a serving) time to table ~1 hour.

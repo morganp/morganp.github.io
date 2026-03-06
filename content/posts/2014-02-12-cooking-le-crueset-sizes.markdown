@@ -3,7 +3,7 @@ layout: post
 title: "Kitchen: Le Creuset"
 date: 2014-02-12 21:03:49 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 tags: Kitchen,
 ---
 

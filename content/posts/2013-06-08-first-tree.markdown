@@ -3,7 +3,7 @@ layout: post
 title: "First Tree"
 date: 2013-06-08 15:38:55 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 tags: Tree, Cherry, Garden
 ---
 

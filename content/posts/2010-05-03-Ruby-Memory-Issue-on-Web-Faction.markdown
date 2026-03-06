@@ -5,7 +5,7 @@ date: 2010-05-03 13:19:02 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Sinatra, Ruby, Performance, Programming, WebFaction,
 discuss_url: //25
 url: //25/Ruby_Memory_Issue_on_Web_Faction

@@ -5,7 +5,7 @@ date: 2012-07-17 21:34:30 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Memory Map, iPad,
 discuss_url: //176
 url: //176/Transferring_a_Memory_Map_2012_map_to_iOS

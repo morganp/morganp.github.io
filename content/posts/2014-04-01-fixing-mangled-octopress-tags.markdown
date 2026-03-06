@@ -3,7 +3,7 @@ layout: post
 title: "Fixing Mangled Octopress Tags"
 date: 2014-04-01 20:59:40 +0100
 comments: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: Octopress, Command Line,
 ---
 

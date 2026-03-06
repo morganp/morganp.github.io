@@ -5,7 +5,7 @@ date: 2010-05-16 08:14:52 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //33
 url: //33/Super_simple_Ruby_list_directory_contents

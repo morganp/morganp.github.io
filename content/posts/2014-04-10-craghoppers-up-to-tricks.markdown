@@ -3,7 +3,7 @@ layout: post
 title: "Craghoppers Pro Stretch"
 date: 2014-04-10 18:12:22 +0100
 comments: true
-Category:  Outdoor
+Category: Home \& Garden
 tags: Craghoppers, Review,
 sharing: true
 footer: true

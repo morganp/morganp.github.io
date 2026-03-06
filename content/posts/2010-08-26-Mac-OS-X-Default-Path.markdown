@@ -5,7 +5,7 @@ date: 2010-08-26 09:36:06 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Command Line, OS X,
 discuss_url: //65
 url: //65/Mac_OS_X_Default_Path

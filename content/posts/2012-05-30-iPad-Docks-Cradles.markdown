@@ -5,7 +5,7 @@ date: 2012-05-30 20:58:27 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Engineering
 tags: iPad,
 discuss_url: //169
 url: //169/iPad_Docks_%2F_Cradles

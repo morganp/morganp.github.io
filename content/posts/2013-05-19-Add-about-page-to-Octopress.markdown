@@ -5,7 +5,7 @@ date: 2013-05-19 08:41:53 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Octopress, Programming, Web,
 discuss_url: //222
 url: //222/Add_about_page_to_Octopress

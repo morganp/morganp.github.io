@@ -5,7 +5,7 @@ date: 2011-02-12 14:10:56 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Gem, Programming, Ruby, WebFaction,
 discuss_url: //89
 url: //89/gem_permissions_on_WebFaction

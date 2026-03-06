@@ -5,7 +5,7 @@ date: 2013-10-11 12:34:15 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Programming,
 discuss_url: //236
 url: //236/set_vs_setenv

@@ -5,7 +5,7 @@ date: 2010-07-12 07:41:32 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Heroku, Programming, Ruby, Sinatra, Web, Rack,
 discuss_url: //52
 url: //52/Get_client_IP_on_Heroku

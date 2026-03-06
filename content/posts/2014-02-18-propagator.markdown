@@ -3,7 +3,7 @@ layout: post
 title: "Propagator"
 date: 2014-02-18 20:43:00 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 tags: Propagator, Kitchen Garden
 ---
 

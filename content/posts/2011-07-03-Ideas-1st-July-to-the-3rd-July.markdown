@@ -5,7 +5,7 @@ date: 2011-07-03 22:38:38 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags:
 discuss_url: //114
 url: //114/Ideas_1st_July_to_the_3rd_July

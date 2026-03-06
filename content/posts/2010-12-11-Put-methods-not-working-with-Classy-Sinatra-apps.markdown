@@ -5,7 +5,7 @@ date: 2010-12-11 05:38:06 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Ruby, Sinatra,
 discuss_url: //80
 url: //80/Put_methods_not_working_with_Classy_Sinatra_apps

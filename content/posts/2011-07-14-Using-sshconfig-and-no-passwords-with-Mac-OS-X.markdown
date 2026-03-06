@@ -5,7 +5,7 @@ date: 2011-07-14 21:55:31 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Automation,
 discuss_url: //116
 url: //116/Using_%7E%2F.ssh%2Fconfig_and_no_passwords_with_Mac_OS_X

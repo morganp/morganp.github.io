@@ -5,7 +5,7 @@ date: 2010-12-30 13:06:42 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Command Line, OS X, Screen,
 discuss_url: //85
 url: //85/screen_-x_not_connecting_when_running_as_an_other_user

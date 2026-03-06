@@ -5,7 +5,7 @@ date: 2011-10-06 00:57:30 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Programming, Ruby,
 discuss_url: //123
 url: //123/warning%3A_already_initialized_constant

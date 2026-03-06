@@ -1,6 +1,6 @@
 Title: Pythonista pip install pelican 
 Date: 2024-04-20 12:04
-Category: Tech
+Category: Programming
 Tags: python
 Author: morganp
 

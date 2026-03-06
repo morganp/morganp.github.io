@@ -5,7 +5,7 @@ date: 2010-04-18 11:13:51 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //18
 url: //18/Ruby_incase_sensitive_sort

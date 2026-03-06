@@ -3,7 +3,7 @@ layout: post
 title: "Ruby iterate over lines in a string"
 date: 2014-03-13 21:03:54 +0000
 comments: true
-Category: Tech
+Category: Programming
 tags: Ruby, Programming,
 ---
 

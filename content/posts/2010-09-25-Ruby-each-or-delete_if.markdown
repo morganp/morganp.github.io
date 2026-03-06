@@ -5,7 +5,7 @@ date: 2010-09-25 12:38:50 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //72
 url: //72/Ruby_each_or_delete_if

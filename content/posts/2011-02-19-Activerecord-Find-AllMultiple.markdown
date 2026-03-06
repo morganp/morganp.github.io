@@ -5,7 +5,7 @@ date: 2011-02-19 06:31:03 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Active Record, Ruby,
 discuss_url: //91
 url: //91/Activerecord_Find_All%2FMultiple

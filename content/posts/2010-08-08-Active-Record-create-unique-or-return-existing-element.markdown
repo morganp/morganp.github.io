@@ -5,7 +5,7 @@ date: 2010-08-08 09:20:39 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Active Record, Programming, Ruby,
 discuss_url: //60
 url: //60/Active_Record_create_unique_or_return_existing_element

@@ -1,6 +1,6 @@
 Title: Reduce Rack Drum Kit Size
 Date: 2025-12-05 14:50 
-Category: Tech
+Category: Music
 Tags: Drum
 Author: morganp
 Status: published

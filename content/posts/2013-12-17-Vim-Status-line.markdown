@@ -5,7 +5,7 @@ date: 2013-12-17 19:04:42 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Vim,
 discuss_url: //244
 url: //244/Vim%3A_Status_line

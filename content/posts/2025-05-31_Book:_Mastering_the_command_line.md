@@ -1,6 +1,6 @@
 Title: Book: Mastering the command line
 Date: 2025-05-31 10:11 
-Category: Tech
+Category: Programming
 Tags: python
 Author: morganp
 Status: published

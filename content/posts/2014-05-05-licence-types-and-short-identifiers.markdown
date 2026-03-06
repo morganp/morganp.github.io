@@ -5,7 +5,7 @@ date: 2014-05-05 20:17:43 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Tech
+Category:  Programming
 tags: Ruby, Gem, Programming,
 ---
 

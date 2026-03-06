@@ -3,7 +3,7 @@ layout: post
 title: "brew update fail"
 date: 2014-02-11 21:17:24 +0000
 comments: true
-Category: Tech
+Category: Unix & Tools
 tags: OS X, brew,
 ---
 

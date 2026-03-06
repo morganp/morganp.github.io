@@ -5,7 +5,7 @@ date: 2013-12-20 19:43:16 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Vim,
 discuss_url: //246
 url: //246/Check_you_current_Vim_colorscheme

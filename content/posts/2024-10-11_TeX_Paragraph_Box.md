@@ -1,6 +1,6 @@
 Title: TeX Paragraph Box
 Date: 2024-10-11 14:18 
-Category: Tech
+Category: Unix & Tools
 Tags: TeX 
 Author: morganp
 

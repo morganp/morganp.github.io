@@ -5,7 +5,7 @@ date: 2013-01-22 16:37:17 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Vim,
 discuss_url: //210
 url: //210/Vim_Code_Folding

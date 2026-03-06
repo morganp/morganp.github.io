@@ -5,7 +5,7 @@ date: 2015-03-24 19:17:45 +0000
 comments: true
 sharing: true
 footer: true
-Category: Home
+Category: Home & Garden
 tags: DIY, Garden, Woodwork
 ---
 Decorative raised bed for lavender:

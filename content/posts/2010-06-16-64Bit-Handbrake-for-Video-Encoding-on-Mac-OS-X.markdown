@@ -5,7 +5,7 @@ date: 2010-06-16 00:59:24 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: VLC, Handbrake,
 discuss_url: //40
 url: //40/64Bit_Handbrake_for_Video_Encoding_on_Mac_OS_X

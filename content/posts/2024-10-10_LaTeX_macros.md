@@ -1,6 +1,6 @@
 Title: LaTeX macros
 Date: 2024-10-10 14:17 
-Category: Tech
+Category: Unix & Tools
 Tags: TeX
 Author: morganp
 

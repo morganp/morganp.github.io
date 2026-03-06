@@ -5,7 +5,7 @@ date: 2012-04-04 20:37:01 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, SASS, Sinatra, Web,
 discuss_url: //146
 url: //146/Encoding%3A%3AUndefinedConversionError_-_

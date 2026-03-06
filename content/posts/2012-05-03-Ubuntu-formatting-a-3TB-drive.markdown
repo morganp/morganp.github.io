@@ -5,7 +5,7 @@ date: 2012-05-03 21:34:20 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Command Line, Linux, Memory, Ubuntu,
 discuss_url: //158
 url: //158/Ubuntu%2C_formatting_a_3TB_drive

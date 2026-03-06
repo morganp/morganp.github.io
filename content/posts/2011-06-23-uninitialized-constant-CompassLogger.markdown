@@ -5,7 +5,7 @@ date: 2011-06-23 20:21:03 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Active Record, Automation, Compass, Database, Gem, Migrations, Programming, Sinatra, Sequel,
 discuss_url: //112
 url: //112/uninitialized_constant_Compass%3A%3ALogger

@@ -5,7 +5,7 @@ date: 2014-06-19 20:10:57 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Tech
+Category:  Unix & Tools
 tags: Programming, Bash, Tcsh, Command Line,
 published: true
 ---

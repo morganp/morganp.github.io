@@ -5,7 +5,7 @@ date: 2010-05-08 05:04:51 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Web, nginx,
 discuss_url: //28
 url: //28/How_to_test_subdomains_on_a_development_machine

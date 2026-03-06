@@ -5,7 +5,7 @@ date: 2010-04-10 14:11:26 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Gem,
 discuss_url: //13
 url: //13/gem_install_with_out_the_docs

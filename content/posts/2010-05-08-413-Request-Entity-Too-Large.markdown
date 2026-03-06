@@ -5,7 +5,7 @@ date: 2010-05-08 03:22:08 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Web, nginx,
 discuss_url: //27
 url: //27/413_Request_Entity_Too_Large

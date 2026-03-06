@@ -5,7 +5,7 @@ date: 2012-07-16 06:52:09 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Command Line, Mountain Lion, OS X,
 discuss_url: //175
 url: //175/Mac_Mountain_Lion_Compatibility

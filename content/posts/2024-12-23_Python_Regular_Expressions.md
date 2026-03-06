@@ -1,6 +1,6 @@
 Title: Python Regular Expressions
 Date: 2024-12-23 10:21 
-Category: Tech
+Category: Programming
 Tags: python
 Author: morganp
 

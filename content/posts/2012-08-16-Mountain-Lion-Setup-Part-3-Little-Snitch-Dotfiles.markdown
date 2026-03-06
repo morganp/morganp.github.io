@@ -5,7 +5,7 @@ date: 2012-08-16 12:44:04 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Command Line, Mountain Lion,
 discuss_url: //183
 url: //183/Mountain_Lion_Setup%2C_Part_3_%3A_Little_Snitch_%26_Dotfiles

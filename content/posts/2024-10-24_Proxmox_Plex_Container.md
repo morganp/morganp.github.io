@@ -1,6 +1,6 @@
 Title: Proxmox Plex Container
 Date: 2024-10-24 13:10 
-Category: Tech
+Category: Homelab
 Tags: proxmox, plex
 Author: morganp
 

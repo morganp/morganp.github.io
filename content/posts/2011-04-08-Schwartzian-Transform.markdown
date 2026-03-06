@@ -5,7 +5,7 @@ date: 2011-04-08 10:37:44 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Memory, Performance, Programming, Ruby, Perl,
 discuss_url: //98
 url: //98/Schwartzian_Transform

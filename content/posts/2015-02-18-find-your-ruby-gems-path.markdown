@@ -5,7 +5,7 @@ date: 2015-02-18 16:39:32 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Tech
+Category:  Programming
 tags: Ruby       , Programming,
 ---
 

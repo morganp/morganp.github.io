@@ -5,7 +5,7 @@ date: 2010-11-04 11:24:05 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Heroku, Migrations, Ruby, Sinatra,
 discuss_url: //79
 url: //79/rake_aborted%21_undefined_method_%60info%27_for_nil%3ANilClass

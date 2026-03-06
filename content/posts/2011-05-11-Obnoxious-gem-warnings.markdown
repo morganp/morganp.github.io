@@ -5,7 +5,7 @@ date: 2011-05-11 17:11:47 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Gem, Programming, Ruby,
 discuss_url: //106
 url: //106/Obnoxious_gem_warnings

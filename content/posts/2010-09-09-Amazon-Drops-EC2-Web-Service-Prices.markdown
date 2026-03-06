@@ -5,7 +5,7 @@ date: 2010-09-09 02:24:49 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Heroku, Memory, Performance, Programming, Web, WebFaction,
 discuss_url: //69
 url: //69/Amazon_Drops_EC2_Web_Service_Prices

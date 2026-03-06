@@ -5,7 +5,7 @@ date: 2013-06-16 12:32:54 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Web,
 discuss_url: //224
 url: //224/Stackoverflow_sites_and_images

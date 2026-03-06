@@ -5,7 +5,7 @@ date: 2011-02-12 06:41:10 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Sinatra,
 discuss_url: //88
 url: //88/Sinatra_regex_routes

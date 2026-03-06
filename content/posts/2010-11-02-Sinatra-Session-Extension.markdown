@@ -5,7 +5,7 @@ date: 2010-11-02 12:49:03 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Gem, Programming, Ruby, Sinatra,
 discuss_url: //77
 url: //77/Sinatra_Session_Extension

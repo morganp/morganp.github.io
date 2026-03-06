@@ -5,7 +5,7 @@ date: 2010-04-26 07:48:47 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Ruby, Programming,
 discuss_url: //20
 url: //20/Ruby%2C_Ruby%2C_Ruby%2C_why_are_you_so_wierd_at_times%3F

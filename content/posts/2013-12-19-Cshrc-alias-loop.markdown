@@ -5,7 +5,7 @@ date: 2013-12-19 22:04:45 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line,
 discuss_url: //245
 url: //245/Cshrc_alias_loop

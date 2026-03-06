@@ -5,7 +5,7 @@ date: 2012-10-03 20:11:12 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //200
 url: //200/Converting_flat_structure_into_a_nested_structure

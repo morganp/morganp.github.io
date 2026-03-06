@@ -5,7 +5,7 @@ date: 2013-05-10 21:30:00 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Programming, Web,
 discuss_url: //221
 url: //221/Push_local_folder_to_remote_server_over_ssh

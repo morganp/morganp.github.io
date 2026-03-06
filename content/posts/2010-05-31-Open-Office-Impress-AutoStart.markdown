@@ -5,7 +5,7 @@ date: 2010-05-31 10:27:17 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: OpenOffice,
 discuss_url: //34
 url: //34/Open_Office_Impress_AutoStart

@@ -5,7 +5,7 @@ date: 2012-05-19 14:56:56 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //164
 url: //164/Ruby_special_exception_variables_made_mnemonic

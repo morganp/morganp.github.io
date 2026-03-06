@@ -3,7 +3,7 @@ layout: post
 title: "Edit Octopress Posts"
 date: 2014-03-01 19:28:17 +0000
 comments: true
-Category: Tech
+Category: Programming
 tags: Octopress, Vim, Command Line,
 ---
 

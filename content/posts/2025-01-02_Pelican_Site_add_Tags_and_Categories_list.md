@@ -1,6 +1,6 @@
 Title: Pelican Site add Tags and Categories list
 Date: 2025-01-02 15:39 
-Category: Tech
+Category: Programming
 Tags: python, pelican
 Author: morganp
 

@@ -5,7 +5,7 @@ date: 2010-06-27 10:57:35 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, jQuery, Web,
 discuss_url: //48
 url: //48/jQuery_clear_form_on_focus_and_restore_on_exit

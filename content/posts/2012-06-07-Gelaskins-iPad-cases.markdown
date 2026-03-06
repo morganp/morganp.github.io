@@ -5,7 +5,7 @@ date: 2012-06-07 18:27:40 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, iPad,
 discuss_url: //171
 url: //171/Gelaskins_iPad_cases

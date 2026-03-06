@@ -3,7 +3,7 @@ layout: post
 title: "Garden Design Books"
 date: 2014-02-08 15:14:15 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 tags: Design, Books, Garden
 ---
 

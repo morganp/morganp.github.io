@@ -5,7 +5,7 @@ date: 2011-12-22 12:06:08 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //132
 url: //132/Ruby_get_a_users_real_name

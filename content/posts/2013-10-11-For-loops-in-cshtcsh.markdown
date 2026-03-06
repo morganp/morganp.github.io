@@ -5,7 +5,7 @@ date: 2013-10-11 12:25:42 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Programming, Linux,
 discuss_url: //235
 url: //235/For_loops_in_csh%2Ftcsh

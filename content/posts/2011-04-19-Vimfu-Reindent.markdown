@@ -5,7 +5,7 @@ date: 2011-04-19 19:55:19 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Programming, Vim,
 discuss_url: //101
 url: //101/Vimfu_Reindent

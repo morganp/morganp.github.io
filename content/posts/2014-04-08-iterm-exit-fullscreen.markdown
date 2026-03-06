@@ -3,7 +3,7 @@ layout: post
 title: "iTerm Exit Fullscreen"
 date: 2014-04-08 19:27:00 +0100
 comments: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: OS X, iTerm, Mavericks,
 ---
 

@@ -5,7 +5,7 @@ date: 2010-12-28 22:42:03 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Automation, Programming, Ruby, Vim,
 discuss_url: //84
 url: //84/Ruby_Block_Selection_in_Vim_%28Plugin%29

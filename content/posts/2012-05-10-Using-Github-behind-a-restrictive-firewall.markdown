@@ -5,7 +5,7 @@ date: 2012-05-10 20:24:08 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: Command Line, Git, Programming,
 discuss_url: //159
 url: //159/Using_Github_behind_a_restrictive_firewall

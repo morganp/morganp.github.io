@@ -5,7 +5,7 @@ date: 2010-06-27 09:39:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: nginx, Sinatra, Web, WebFaction,
 discuss_url: //47
 url: //47/WebFaction_problems_restarting_nginx

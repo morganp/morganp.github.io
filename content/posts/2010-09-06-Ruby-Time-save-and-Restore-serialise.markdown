@@ -5,7 +5,7 @@ date: 2010-09-06 16:25:45 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //67
 url: //67/Ruby_Time_save_and_Restore_%28serialise%29

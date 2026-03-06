@@ -5,7 +5,7 @@ date: 2011-01-18 10:25:12 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Automation, Command Line, Linux, OS X, Performance, Ubuntu,
 discuss_url: //86
 url: //86/My_Backup_Strategy

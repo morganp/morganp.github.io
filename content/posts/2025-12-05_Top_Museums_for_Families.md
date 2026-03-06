@@ -1,6 +1,6 @@
 Title: Top Museums for Families
 Date: 2025-12-05 15:06 
-Category: Outdoor
+Category: Home & Garden
 Tags: Family
 Author: morganp
 Status:  published

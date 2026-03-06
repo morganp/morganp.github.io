@@ -5,7 +5,7 @@ date: 2010-03-30 14:50:30 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //9
 url: //9/Ruby_Time_Formats

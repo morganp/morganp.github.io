@@ -5,7 +5,7 @@ date: 2011-06-20 11:35:31 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Database, Ruby,
 discuss_url: //109
 url: //109/Setting_up_PostgreSQL_on_OS_X

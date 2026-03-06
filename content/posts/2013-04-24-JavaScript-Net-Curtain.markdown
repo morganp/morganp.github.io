@@ -5,7 +5,7 @@ date: 2013-04-24 07:44:19 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Javascript, Programming, Web,
 discuss_url: //217
 url: //217/JavaScript_Net_Curtain

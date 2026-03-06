@@ -5,7 +5,7 @@ date: 2011-12-02 10:13:29 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Programming, Ruby,
 discuss_url: //130
 url: //130/Suppressing_Warnings_in_Ruby_Scripts

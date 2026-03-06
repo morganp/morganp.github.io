@@ -5,7 +5,7 @@ date: 2013-05-02 17:02:37 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Homelab
 tags: Linux, Ubuntu,
 discuss_url: //220
 url: //220/Ubuntu_and_the_Jetway_ADPE4S

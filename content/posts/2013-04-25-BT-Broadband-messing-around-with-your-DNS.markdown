@@ -5,7 +5,7 @@ date: 2013-04-25 09:02:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Homelab
 tags: Network,
 discuss_url: //218
 url: //218/BT_Broadband_messing_around_with_your_DNS

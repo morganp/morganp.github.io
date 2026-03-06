@@ -5,7 +5,7 @@ date: 2010-09-10 04:16:56 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Git,
 discuss_url: //70
 url: //70/Remove_sensitive_data_from_git

@@ -5,7 +5,7 @@ date: 2012-04-20 23:26:34 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Heroku, Programming, Rack, Ruby, Sinatra, Web, WebFaction,
 discuss_url: //149
 url: //149/Sinatra_application_in_.%2Flib_and_views%2C_public_routes_not_working

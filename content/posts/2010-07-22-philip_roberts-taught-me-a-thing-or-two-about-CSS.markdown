@@ -5,7 +5,7 @@ date: 2010-07-22 10:15:50 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Web, CSS,
 discuss_url: //56
 url: //56/%40philip_roberts_taught_me_a_thing_or_two_about_CSS

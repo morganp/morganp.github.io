@@ -5,7 +5,7 @@ date: 2011-07-01 20:38:27 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //113
 url: //113/Ruby_Basic_File_Read_and_Write

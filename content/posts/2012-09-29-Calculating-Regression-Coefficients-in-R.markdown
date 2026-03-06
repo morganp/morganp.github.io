@@ -5,7 +5,7 @@ date: 2012-09-29 12:10:18 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: R, Statistics,
 discuss_url: //198
 url: //198/Calculating_Regression_Coefficients_in_R

@@ -3,7 +3,7 @@ layout: post
 title: "Tool Acquisition"
 date: 2014-03-16 19:37:57 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 tags: Tools, Joseph Bently, Garden
 ---
 ![Garden](/images/Gardening/morganp-20140316-Garden-_MG_7012.jpg)

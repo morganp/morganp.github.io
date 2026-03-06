@@ -5,7 +5,7 @@ date: 2012-09-30 08:30:42 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Safari,
 discuss_url: //199
 url: //199/Safari_6_not_playing_YouTube_content

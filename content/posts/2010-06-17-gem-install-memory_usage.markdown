@@ -5,7 +5,7 @@ date: 2010-06-17 13:01:14 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Gem, Memory, OS X, Performance, Programming, Ruby,
 discuss_url: //42
 url: //42/gem_install_memory_usage

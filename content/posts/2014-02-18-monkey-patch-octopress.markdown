@@ -3,7 +3,7 @@ layout: post
 title: "Monkey Patch Octopress"
 date: 2014-02-18 19:46:55 +0000
 comments: true
-Category: Tech
+Category: Programming
 tags: Web, Octopress, Ruby,
 ---
 Based on [post_filters by imathis](https://github.com/imathis/octopress/blob/master/plugins/post_filters.rb).

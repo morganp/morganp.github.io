@@ -5,7 +5,7 @@ date: 2012-03-01 20:44:36 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: Apple, Command Line, Linux,
 discuss_url: //140
 url: //140/unix_mail_command%2C_delete_all_messages

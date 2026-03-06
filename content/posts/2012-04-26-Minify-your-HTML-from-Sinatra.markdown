@@ -5,7 +5,7 @@ date: 2012-04-26 15:13:49 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Performance, Programming, Ruby, Sinatra, Web,
 discuss_url: //155
 url: //155/Minify_your_HTML_from_Sinatra

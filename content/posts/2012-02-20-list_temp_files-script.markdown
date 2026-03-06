@@ -5,7 +5,7 @@ date: 2012-02-20 12:18:21 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Automation, Command Line, Programming,
 discuss_url: //139
 url: //139/list_temp_files_script

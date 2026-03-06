@@ -5,7 +5,7 @@ date: 2011-10-25 12:44:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //126
 url: //126/Arrays_3%2C_write_idiomatic_Ruby

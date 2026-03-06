@@ -5,7 +5,7 @@ date: 2011-12-22 11:56:25 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //131
 url: //131/Ruby_send_message_to_stderr

@@ -5,7 +5,7 @@ date: 2011-03-31 10:45:20 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: BitTorrent, Command Line,
 discuss_url: //96
 url: //96/%27unregistered_torrent%27_flush_the_DNS

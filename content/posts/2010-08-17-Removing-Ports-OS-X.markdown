@@ -5,7 +5,7 @@ date: 2010-08-17 12:18:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, OS X,
 discuss_url: //62
 url: //62/Removing_Ports_OS_X

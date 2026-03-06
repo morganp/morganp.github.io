@@ -5,7 +5,7 @@ date: 2013-06-05 11:46:58 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //223
 url: //223/Ruby%3A_optionally_add_path_separator

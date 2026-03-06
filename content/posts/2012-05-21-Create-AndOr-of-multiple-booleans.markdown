@@ -5,7 +5,7 @@ date: 2012-05-21 11:35:19 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //167
 url: //167/Create_And%2COr_of_multiple_booleans

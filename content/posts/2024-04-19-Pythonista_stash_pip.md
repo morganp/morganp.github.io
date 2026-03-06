@@ -1,6 +1,6 @@
 Title: Pythonista using stash for pip
 Date: 2024-04-19 17:04
-Category: Tech
+Category: Programming
 Tags: python
 Author: morganp
 Summary: Installing stash on pythonista

@@ -5,7 +5,7 @@ date: 2010-12-18 04:07:46 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Git, Programming,
 discuss_url: //83
 url: //83/Tagging_a_git_repo_for_a_Release_

@@ -3,7 +3,7 @@ layout: post
 title: "Revert in Git"
 date: 2014-03-03 19:42:12 +0000
 comments: true
-Category: Tech
+Category: Unix & Tools
 tags: Git, Command Line,
 ---
 

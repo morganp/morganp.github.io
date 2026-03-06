@@ -5,7 +5,7 @@ date: 2012-09-18 08:40:53 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Mountain Lion, Contacts,
 discuss_url: //194
 url: //194/Syncing_Google_Contacts_in_Mountain_Lion

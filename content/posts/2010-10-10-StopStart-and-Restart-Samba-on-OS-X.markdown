@@ -5,7 +5,7 @@ date: 2010-10-10 10:13:52 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Homelab
 tags: Command Line, OS X,
 discuss_url: //74
 url: //74/Stop%2FStart_and_Restart_Samba_on_OS_X

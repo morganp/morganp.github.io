@@ -5,7 +5,7 @@ date: 2010-03-30T14:50:00+00:00
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Matlab, Performance,
 discuss_url: //6
 url: //6/Ruby_Performance_Measure

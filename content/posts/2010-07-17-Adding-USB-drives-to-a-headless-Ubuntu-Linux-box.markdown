@@ -5,7 +5,7 @@ date: 2010-07-17 04:03:10 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Linux, Ubuntu,
 discuss_url: //54
 url: //54/Adding_USB_drives_to_a_headless_Ubuntu_Linux_box

@@ -5,7 +5,7 @@ date: 2010-05-08 06:52:33 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Git, Programming,
 discuss_url: //29
 url: //29/Stop_git_status_monitoring_file_permissions

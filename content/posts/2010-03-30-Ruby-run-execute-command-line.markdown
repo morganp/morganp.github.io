@@ -5,7 +5,7 @@ date: 2010-03-30T14:50:00+00:00
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby
 discuss_url: //5
 url: //5/Ruby_run_%28execute%29_command_line

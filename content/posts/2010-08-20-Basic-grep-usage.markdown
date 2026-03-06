@@ -5,7 +5,7 @@ date: 2010-08-20 07:20:22 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, OS X, Linux,
 discuss_url: //63
 url: //63/Basic_grep_usage

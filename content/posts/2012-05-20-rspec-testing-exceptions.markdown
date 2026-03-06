@@ -5,7 +5,7 @@ date: 2012-05-20 15:24:34 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Rspec,
 discuss_url: //166
 url: //166/rspec_testing_exceptions

@@ -5,7 +5,7 @@ date: 2012-08-16 14:06:30 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Mountain Lion,
 discuss_url: //184
 url: //184/Mountain_Lion_Setup%2C_Part_4_Apps

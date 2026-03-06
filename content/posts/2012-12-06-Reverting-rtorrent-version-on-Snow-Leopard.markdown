@@ -5,7 +5,7 @@ date: 2012-12-06 20:22:33 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: Apple, BitTorrent, Leopard, Snow Leopard, OS X, rtorrent, Homebrew,
 discuss_url: //206
 url: //206/Reverting_rtorrent_version_on_Snow_Leopard

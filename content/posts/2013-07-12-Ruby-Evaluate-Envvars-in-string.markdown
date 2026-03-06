@@ -5,7 +5,7 @@ date: 2013-07-12 22:59:37 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Ruby, Programming,
 discuss_url: //228
 url: //228/Ruby_Evaluate_Envvars_in_string.

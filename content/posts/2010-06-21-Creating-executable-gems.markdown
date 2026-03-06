@@ -5,7 +5,7 @@ date: 2010-06-21 08:43:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Gem, Programming, Ruby,
 discuss_url: //43
 url: //43/Creating_executable_gems

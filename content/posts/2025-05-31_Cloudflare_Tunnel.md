@@ -1,6 +1,6 @@
 Title: Cloudflare Tunnel
 Date: 2025-05-31 11:50 
-Category: Tech
+Category: Homelab
 Tags: Networking
 Author: morganp
 Status: draft

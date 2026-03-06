@@ -5,7 +5,7 @@ date: 2015-10-10 12:23:15 +0100
 comments: true
 sharing: true
 footer: true
-Category: Home
+Category: Home & Garden
 tags: DIY, Garden 
 ---
 

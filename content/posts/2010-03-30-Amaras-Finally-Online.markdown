@@ -5,7 +5,7 @@ date: 2010-03-30T14:50:00+00:00
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: WebFaction,
 discuss_url: //1
 url: //1/Amaras_Finally_Online

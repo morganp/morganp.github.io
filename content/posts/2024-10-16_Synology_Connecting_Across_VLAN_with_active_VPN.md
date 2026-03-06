@@ -1,6 +1,6 @@
 Title: Synology Connecting Across VLAN with active VPN
 Date: 2024-10-16 11:30 
-Category: Tech 
+Category: Homelab
 Tags: Synology, networking, VLAN, VPN
 Author: morganp
 

@@ -5,7 +5,7 @@ date: 2010-08-21 07:20:40 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Active Record, Command Line, Programming, Sequel,
 discuss_url: //64
 url: //64/Error%3A_NoMethodError%3A_undefined_method_%60compact%27_for_nil%3ANilClass

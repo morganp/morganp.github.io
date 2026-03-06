@@ -5,7 +5,7 @@ date: 2010-05-01 07:54:03 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Sinatra,
 discuss_url: //23
 url: //23/Sinatra_File_Upload

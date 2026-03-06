@@ -5,7 +5,7 @@ date: 2010-07-07 07:50:53 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Programming, Vim,
 discuss_url: //50
 url: //50/%5Bvim%5D_Indenting_with_Vim_

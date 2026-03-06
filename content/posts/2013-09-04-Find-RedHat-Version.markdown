@@ -5,7 +5,7 @@ date: 2013-09-04 08:13:33 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Linux,
 discuss_url: //232
 url: //232/Find_RedHat_Version

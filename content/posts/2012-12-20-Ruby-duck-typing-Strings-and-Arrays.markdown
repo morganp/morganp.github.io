@@ -5,7 +5,7 @@ date: 2012-12-20 16:12:08 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Ruby, Programming,
 discuss_url: //207
 url: //207/Ruby_duck_typing_Strings_and_Arrays

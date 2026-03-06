@@ -5,7 +5,7 @@ date: 2012-01-14 18:19:45 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Automation, Audio,
 discuss_url: //134
 url: //134/Finding_Tracks_not_in_iTunes

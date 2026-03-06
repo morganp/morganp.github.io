@@ -5,7 +5,7 @@ date: 2010-06-26 07:13:52 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Programming, Vim,
 discuss_url: //46
 url: //46/Vim_show_lines_over_80_charaters_long.

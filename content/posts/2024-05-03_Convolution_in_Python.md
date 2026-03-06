@@ -1,6 +1,6 @@
 Title: Convolution in Python
 Date: 2024-05-03 14:25 
-Category: Tech
+Category: Programming
 Tages: python
 Author: morganp
 

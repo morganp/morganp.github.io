@@ -5,7 +5,7 @@ date: 2010-05-10 14:07:23 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Web, nginx,
 discuss_url: //30
 url: //30/Nginx_Enable_Directory_Listing

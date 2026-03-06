@@ -1,6 +1,6 @@
 Title: Pyhton_virtual_env
 Date: 2024-05-30 16:03 
-Category: Tech
+Category: Programming
 Tages: python
 Author: morganp
 

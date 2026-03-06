@@ -5,7 +5,7 @@ date: 2013-04-12 14:47:28 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: Automation,
 discuss_url: //214
 url: //214/ISO_8601_-_Standardised_Date_Format_YYYY-MM-DD

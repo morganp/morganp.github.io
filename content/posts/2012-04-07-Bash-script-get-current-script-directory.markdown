@@ -5,7 +5,7 @@ date: 2012-04-07 13:45:37 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Automation, Command Line, CSS, Programming,
 discuss_url: //147
 url: //147/Bash_script_get_current_script_directory

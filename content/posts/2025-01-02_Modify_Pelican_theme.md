@@ -1,6 +1,6 @@
 Title: Modify Pelican theme
 Date: 2025-01-02 16:53 
-Category: Tech
+Category: Programming
 Tags: python, pelican
 Author: morganp
 

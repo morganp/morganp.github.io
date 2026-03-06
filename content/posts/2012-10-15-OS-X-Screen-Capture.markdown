@@ -5,7 +5,7 @@ date: 2012-10-15 19:28:16 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Apple, Command Line, Mountain Lion, OS X,
 discuss_url: //203
 url: //203/OS_X_Screen_Capture

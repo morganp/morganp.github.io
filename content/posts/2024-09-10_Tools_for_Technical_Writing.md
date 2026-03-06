@@ -1,6 +1,6 @@
 Title: Tools for Technical Writing
 Date: 2024-09-10 10:17 
-Category: Tech
+Category: Unix & Tools
 Tags: TeX
 Author: morganp
 

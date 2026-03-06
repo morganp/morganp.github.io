@@ -5,7 +5,7 @@ date: 2012-10-03 20:47:13 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Ruby, Programming,
 discuss_url: //201
 url: //201/Print_nested_array_structures_in_table_format

@@ -5,7 +5,7 @@ date: 2013-10-30 12:38:35 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Handbrake, OS X, VLC,
 discuss_url: //239
 url: //239/OS_X_Handbrake_install_libdvdcss_%28Decryption%29

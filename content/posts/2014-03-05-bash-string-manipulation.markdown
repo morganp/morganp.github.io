@@ -3,7 +3,7 @@ layout: post
 title: "Bash String Manipulation"
 date: 2014-03-05 21:32:14 +0000
 comments: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, bash,
 ---
 Removal of substring:

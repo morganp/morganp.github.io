@@ -5,7 +5,7 @@ date: 2010-06-24 09:37:37 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Programming, Vim,
 discuss_url: //45
 url: //45/Vim_search_and_replace

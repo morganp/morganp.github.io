@@ -5,7 +5,7 @@ date: 2013-07-12 19:16:31 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Programming, Vim,
 discuss_url: //226
 url: //226/Terminal_Colours

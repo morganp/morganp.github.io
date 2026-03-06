@@ -5,7 +5,7 @@ date: 2013-08-07 07:04:38 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Programming,
 discuss_url: //229
 url: //229/tcsh_check_a_var_exists

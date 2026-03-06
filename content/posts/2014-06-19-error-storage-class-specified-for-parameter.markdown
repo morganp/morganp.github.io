@@ -5,7 +5,7 @@ date: 2014-06-19 20:42:33 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Tech
+Category:  Programming
 tags: Programming, C,
 published: true
 ---

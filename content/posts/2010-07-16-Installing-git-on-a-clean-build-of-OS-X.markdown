@@ -5,7 +5,7 @@ date: 2010-07-16 11:44:11 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Command Line, Git, OS X, Programming,
 discuss_url: //53
 url: //53/Installing_git_on_a_clean_build_of_OS_X

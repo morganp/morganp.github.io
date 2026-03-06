@@ -5,7 +5,7 @@ date: 2011-07-25 20:35:18 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Homelab
 tags: Apple, Command Line, Linux, Ubuntu,
 discuss_url: //120
 url: //120/Make_Ubuntu_Samba_share_show_up_on_OS_X_10.6_finder

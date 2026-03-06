@@ -5,7 +5,7 @@ date: 2011-10-25 12:06:36 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Automation, Command Line, Programming, Ruby,
 discuss_url: //125
 url: //125/Ruby_Search_and_Replace_Script.

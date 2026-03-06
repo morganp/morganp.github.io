@@ -5,7 +5,7 @@ date: 2014-01-08 19:53:02 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Homelab
 tags: rtorrent, Programming,
 discuss_url: //247
 url: //247/rtorrent_move_on_download_completion

@@ -5,7 +5,7 @@ date: 2015-10-22 10:32:44 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 Tags: Filesystem, Organised
 ---
 

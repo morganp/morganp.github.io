@@ -5,7 +5,7 @@ date: 2010-03-31 09:07:51 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Sinatra, Sequel, Migrations,
 discuss_url: //11
 url: //11/Sequel_ORM_Migrations

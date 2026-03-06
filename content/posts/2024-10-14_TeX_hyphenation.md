@@ -1,6 +1,6 @@
 Title: TeX hyphenation
 Date: 2024-10-14 14:45 
-Category: Tech 
+Category: Unix & Tools
 Tags: TeX,
 Author: morganp
 

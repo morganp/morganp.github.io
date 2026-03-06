@@ -5,7 +5,7 @@ date: 2013-02-14 17:57:46 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Math,
 discuss_url: //211
 url: //211/Algebra_%3A_Properties_of_Real_%28%26%23x211D%29_Numbers

@@ -1,6 +1,6 @@
 Title: Python read a CSV file 
 Date: 2024-04-19 12:34
-Category: Tech
+Category: Programming
 Tags: pelican, python
 Author: morganp
 

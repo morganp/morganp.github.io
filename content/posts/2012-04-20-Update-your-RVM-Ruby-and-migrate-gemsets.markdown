@@ -5,7 +5,7 @@ date: 2012-04-20 22:08:43 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Programming, Ruby, RVM,
 discuss_url: //148
 url: //148/Update_your_RVM_Ruby_and_migrate_gemsets

@@ -5,7 +5,7 @@ date: 2012-06-10 09:40:13 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: iPad,
 discuss_url: //172
 url: //172/Subscribe_to_a_channel_on_YouTube_iPad

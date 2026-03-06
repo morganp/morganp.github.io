@@ -5,7 +5,7 @@ date: 2010-03-30T14:50:00+00:00
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Sinatra, Compass, SASS, CSS,
 discuss_url: //3
 url: //3/Sinatra_and_compass_sending_compressed_cached_CSS

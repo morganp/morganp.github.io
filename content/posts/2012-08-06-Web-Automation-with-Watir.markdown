@@ -5,7 +5,7 @@ date: 2012-08-06 13:30:06 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Automation, Gem, OS X, Programming, Ruby, Web,
 discuss_url: //177
 url: //177/Web_Automation_with_Watir

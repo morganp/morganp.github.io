@@ -5,7 +5,7 @@ date: 2011-05-07 23:25:34 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Gem, Programming, Ruby,
 discuss_url: //105
 url: //105/Recent_issue_with_building_Gems

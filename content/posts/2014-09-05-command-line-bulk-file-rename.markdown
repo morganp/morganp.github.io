@@ -5,7 +5,7 @@ date: 2014-09-05 18:06:05 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Tech
+Category:  Unix & Tools
 tags: Programming, Command Line,
 published: false
 ---

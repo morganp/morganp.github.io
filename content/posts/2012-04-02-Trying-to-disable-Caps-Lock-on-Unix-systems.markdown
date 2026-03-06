@@ -5,7 +5,7 @@ date: 2012-04-02 09:45:19 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: Command Line,
 discuss_url: //145
 url: //145/Trying_to_disable_Caps_Lock_on_Unix_systems

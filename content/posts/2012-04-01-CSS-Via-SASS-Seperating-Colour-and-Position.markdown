@@ -5,7 +5,7 @@ date: 2012-04-01 16:15:15 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: CSS, SASS, Web, Sinatra,
 discuss_url: //144
 url: //144/CSS_%28Via_SASS%29_Seperating_Colour_and_Position

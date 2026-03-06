@@ -5,7 +5,7 @@ date: 2013-04-24 07:11:47 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Homelab
 tags:
 discuss_url: //216
 url: //216/BitTorrent_Sync%2C_free_rival_to_DropBox

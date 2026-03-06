@@ -5,7 +5,7 @@ date: 2011-05-23 23:37:26 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //108
 url: //108/Ruby_Arrays%2C_Part_1

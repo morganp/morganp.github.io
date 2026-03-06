@@ -3,8 +3,8 @@ layout: recipe
 title: "Sweet and Sour Pork"
 date: 2013-12-08 19:51
 comments: true
-Category: Cooking
-tags: Recipe, Meat, Pork, Spicy, Chinese ,
+Category: Home \& Garden
+tags: Recipe, Meat, Pork, Spicy, Chinese ,, Cooking
 ---
 
 {% img centre /images/SweetSourPork/morganp-20130925-SweetSour-IMG_4134.jpg %}

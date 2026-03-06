@@ -5,7 +5,7 @@ date: 2010-06-16 10:43:30 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Performance, OS X,
 discuss_url: //41
 url: //41/Save_space_on_your_Mac_by_going_Monolingual

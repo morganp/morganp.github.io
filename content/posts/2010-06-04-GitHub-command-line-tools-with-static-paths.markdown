@@ -5,7 +5,7 @@ date: 2010-06-04 23:19:58 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Ruby, Programming,
 discuss_url: //35
 url: //35/GitHub_command_line_tools_with_static_paths

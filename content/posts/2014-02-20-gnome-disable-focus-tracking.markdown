@@ -3,7 +3,7 @@ layout: post
 title: "Gnome: disable focus tracking"
 date: 2014-02-20 20:31:44 +0000
 comments: true
-Category: Tech
+Category: Unix & Tools
 tags: Gnome,
 ---
 

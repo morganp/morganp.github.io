@@ -5,7 +5,7 @@ date: 2011-02-02 08:30:24 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Engineering
 tags: Memory, OS X, Performance,
 discuss_url: //87
 url: //87/Mac_mini_%28mid_2010%29_8GB_memory_upgrade

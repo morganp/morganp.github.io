@@ -3,7 +3,7 @@ layout: post
 title: "Propagator trays"
 date: 2014-03-16 19:23:48 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 tags:  Propagator, Marryhatton, Garden
 ---
 

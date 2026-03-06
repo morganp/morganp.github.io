@@ -5,7 +5,7 @@ date: 2010-04-16 10:01:58 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Gem,
 discuss_url: //16
 url: //16/Ruby_and_gemspec

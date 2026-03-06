@@ -5,7 +5,7 @@ date: 2012-06-19 09:13:07 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Apple, iPad, Kindle, PragProg,
 discuss_url: //174
 url: //174/Pragmatic_Programmers%2C_Dropbox_integration

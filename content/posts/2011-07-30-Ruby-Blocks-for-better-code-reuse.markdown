@@ -5,7 +5,7 @@ date: 2011-07-30 13:51:28 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //121
 url: //121/Ruby_Blocks_for_better_code_reuse

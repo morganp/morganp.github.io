@@ -5,7 +5,7 @@ date: 2012-06-06 20:54:56 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, iPad,
 discuss_url: //170
 url: //170/iTunes_Match_and_Genius%2C_Why_cant_we_have_both%3F

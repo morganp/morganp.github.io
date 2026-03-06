@@ -5,7 +5,7 @@ date: 2013-08-15 12:17:08 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Homelab
 tags: Plants, Weather,
 discuss_url: //230
 url: //230/Weather_alerts_via_eMail_from_the_MetOffice

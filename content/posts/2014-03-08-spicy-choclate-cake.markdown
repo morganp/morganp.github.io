@@ -3,8 +3,8 @@ layout: recipe
 title: "Spicy Chocolate Cake"
 date: 2014-03-08 09:12:04 +0000
 comments: true
-Category: Cooking
-tags: Recipe, Cake, Dessert,
+Category: Home \& Garden
+tags: Recipe, Cake, Dessert,, Cooking
 ---
 
 ![Spicy Choclate Cake](/images/Cooking/SpicyChocolateCake/morganp-20131123-SpicyChoclateCake-IMG_5189.jpg)

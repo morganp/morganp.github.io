@@ -5,7 +5,7 @@ date: 2010-08-13 02:13:17 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Active Record, Programming,
 discuss_url: //61
 url: //61/Active_Record__attributes_simplify_update_and_create.

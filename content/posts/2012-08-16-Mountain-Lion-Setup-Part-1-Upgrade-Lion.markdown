@@ -5,7 +5,7 @@ date: 2012-08-16 10:00:14 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Apple, Lion, Mountain Lion,
 discuss_url: //180
 url: //180/Mountain_Lion_Setup%2C_Part_1_%3A_Upgrade_Lion

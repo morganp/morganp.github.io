@@ -5,7 +5,7 @@ date: 2012-01-20 12:09:05 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Math, Ruby, Programming,
 discuss_url: //136
 url: //136/matrix%3A_A_Ruby_Standard_Library

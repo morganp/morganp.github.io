@@ -5,7 +5,7 @@ date: 2014-01-08 20:10:31 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line, Git,
 discuss_url: //248
 url: //248/Reverting_in_git

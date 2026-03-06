@@ -1,6 +1,6 @@
 Title: Better Python Iterators
 Date: 2025-03-01 12:24 
-Category: Tech
+Category: Programming
 Tags: python
 Author: morganp
 Status: published

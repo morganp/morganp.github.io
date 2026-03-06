@@ -5,7 +5,7 @@ date: 2010-04-28 09:24:58 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: WebFaction,
 discuss_url: //21
 url: //21/Webfaction_new_user_with_access_to_their_own_site

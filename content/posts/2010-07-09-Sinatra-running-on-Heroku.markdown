@@ -5,7 +5,7 @@ date: 2010-07-09 08:37:13 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Ruby, Sinatra, Heroku, Web,
 discuss_url: //51
 url: //51/Sinatra_running_on_Heroku

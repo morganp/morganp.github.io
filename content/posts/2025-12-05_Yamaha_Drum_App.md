@@ -1,6 +1,6 @@
 Title: Yamaha Drum App
 Date: 2025-12-05 14:38 
-Category: Tech
+Category: Music
 Tags: Drum
 Author: morganp
 Status:published 

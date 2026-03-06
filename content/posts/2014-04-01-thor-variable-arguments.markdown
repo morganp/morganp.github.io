@@ -3,7 +3,7 @@ layout: post
 title: "Thor Variable Arguments"
 date: 2014-04-01 19:39:19 +0100
 comments: true
-Category: Tech
+Category: Programming
 tags: Ruby, Command Line,
 ---
 

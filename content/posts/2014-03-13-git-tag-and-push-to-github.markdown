@@ -3,7 +3,7 @@ layout: post
 title: "Git tag and push to Github"
 date: 2014-03-13 19:16:57 +0000
 comments: true
-Category: Tech
+Category: Unix & Tools
 tags: Git,
 ---
 

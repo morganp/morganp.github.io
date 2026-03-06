@@ -5,7 +5,7 @@ date: 2013-10-14 09:23:03 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Programming, Vim,
 discuss_url: //237
 url: //237/VIM%3A_Convert_tabs_to_spaces

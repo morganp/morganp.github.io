@@ -5,7 +5,7 @@ date: 2010-09-11 19:04:53 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Git, Programming, Ruby,
 discuss_url: //71
 url: //71/Storing_secret_keys_in_Ruby_config_files_an_approach

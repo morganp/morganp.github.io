@@ -5,7 +5,7 @@ date: 2011-03-27 06:04:31 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Programming, Ruby,
 discuss_url: //95
 url: //95/Ruby_CLI_user_input_using_gets

@@ -3,7 +3,7 @@ layout: post
 title: "Ruby Print Array"
 date: 2014-04-01 18:36:00 +0100
 comments: true
-Category: Tech
+Category: Programming
 tags: Ruby,
 ---
 

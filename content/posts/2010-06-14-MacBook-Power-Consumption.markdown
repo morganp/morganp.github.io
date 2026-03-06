@@ -5,7 +5,7 @@ date: 2010-06-14 10:18:29 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Performance, Memory, Power, VLC,
 discuss_url: //39
 url: //39/MacBook_Power_Consumption

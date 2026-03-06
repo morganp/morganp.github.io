@@ -5,7 +5,7 @@ date: 2012-05-14 11:37:04 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Engineering
 tags: Apple, iPad,
 discuss_url: //161
 url: //161/iPad_3_Tethering

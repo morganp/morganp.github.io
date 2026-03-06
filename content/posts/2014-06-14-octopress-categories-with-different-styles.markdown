@@ -5,7 +5,7 @@ date: 2014-06-14 08:24:01 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Tech
+Category:  Programming
 tags: Programming, Octopress,
 published: true
 ---

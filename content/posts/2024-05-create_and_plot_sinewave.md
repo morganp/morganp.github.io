@@ -1,6 +1,6 @@
 Title: Python Sinewave
 Date: 2024-04-19 12:34
-Category: Tech
+Category: Programming
 Tags: python, signal, DSP
 Author: morganp
 Summary: Create and plot a sinewave in python

@@ -5,7 +5,7 @@ date: 2014-10-08 21:15:43 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Tech
+Category:  Unix & Tools
 tags: Programming,
 ---
 

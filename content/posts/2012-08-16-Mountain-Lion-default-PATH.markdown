@@ -5,7 +5,7 @@ date: 2012-08-16 09:25:37 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, Command Line, Mountain Lion,
 discuss_url: //179
 url: //179/Mountain_Lion_default_%24PATH

@@ -3,7 +3,7 @@ layout: post
 title: "Ruby Methods and Splat"
 date: 2014-04-09 19:47:47 +0100
 comments: true
-Category:  Tech
+Category:  Programming
 tags: Programming, Ruby,
 comments: true
 sharing: true

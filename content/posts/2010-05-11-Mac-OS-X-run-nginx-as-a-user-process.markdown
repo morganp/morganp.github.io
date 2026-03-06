@@ -5,7 +5,7 @@ date: 2010-05-11 12:51:49 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: nginx, Web,
 discuss_url: //32
 url: //32/Mac_OS_X_run_nginx_as_a_user_process

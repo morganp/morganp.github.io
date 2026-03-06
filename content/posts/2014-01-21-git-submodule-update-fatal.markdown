@@ -3,7 +3,7 @@ layout: post
 title: "git submodule update fatal"
 date: 2014-01-21 20:32:16 +0000
 comments: true
-Category: Tech
+Category: Unix & Tools
 tags: Git,
 ---
 

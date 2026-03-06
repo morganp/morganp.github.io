@@ -5,7 +5,7 @@ date: 2010-04-15 07:43:50 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //15
 url: //15/Ruby_.nil%3F_tests_fail_%3F_you_really_want_%7C%7C%3D

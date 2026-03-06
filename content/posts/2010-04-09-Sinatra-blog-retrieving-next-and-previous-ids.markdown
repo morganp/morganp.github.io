@@ -5,7 +5,7 @@ date: 2010-04-09 10:13:17 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Sinatra,
 discuss_url: //12
 url: //12/Sinatra_blog_retrieving_next_and_previous_ids

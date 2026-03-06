@@ -5,7 +5,7 @@ date: 2010-06-11 13:24:06 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //38
 url: //38/Ruby_runnable_and_includeable

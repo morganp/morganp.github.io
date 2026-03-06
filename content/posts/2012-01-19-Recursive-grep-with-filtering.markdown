@@ -5,7 +5,7 @@ date: 2012-01-19 15:56:31 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Command Line,
 discuss_url: //135
 url: //135/Recursive_grep%2C_with_filtering

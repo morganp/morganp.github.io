@@ -3,7 +3,7 @@ layout: post
 title: "Mavericks Disable Mail Sound"
 date: 2014-03-18 17:41:49 +0000
 comments: true
-Category: Tech
+Category: Unix & Tools
 tags: OS X, Mavericks,
 ---
 

@@ -5,7 +5,7 @@ date: 2014-05-28 18:32:43 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Home
+Category: Home & Garden
 tags: Kettlebell, Woodwork,
 published: true
 ---

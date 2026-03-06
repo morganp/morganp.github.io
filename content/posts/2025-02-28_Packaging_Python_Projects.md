@@ -1,6 +1,6 @@
 Title: Packaging Python Projects
 Date: 2025-02-28 15:22 
-Category: Tech
+Category: Programming
 Tags: python
 Author: morganp
 Status: published

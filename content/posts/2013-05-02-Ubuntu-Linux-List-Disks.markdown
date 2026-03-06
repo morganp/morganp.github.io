@@ -5,7 +5,7 @@ date: 2013-05-02 13:39:24 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Homelab
 tags: Command Line, Linux, Ubuntu,
 discuss_url: //219
 url: //219/Ubuntu_%28Linux%29_List_Disks

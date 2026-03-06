@@ -5,7 +5,7 @@ date: 2012-09-28 11:40:17 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: Command Line, Git, Programming,
 discuss_url: //197
 url: //197/Git_Submodules

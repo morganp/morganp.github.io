@@ -3,7 +3,7 @@ layout: post
 title: "Raised Bed, Update"
 date: 2014-03-16 21:36:59 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 tags: DIY, Kitchen Garden, Woodwork
 ---
 

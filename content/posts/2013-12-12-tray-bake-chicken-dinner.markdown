@@ -3,8 +3,8 @@ layout: recipe
 title: "Tray Bake Chicken Dinner"
 date: 2013-12-12 12:59
 comments: true
-Category: Cooking
-tags: Recipe, Meat, Chicken,
+Category: Home \& Garden
+tags: Recipe, Meat, Chicken,, Cooking
 ---
 
 Tray Bake Chicken Dinner.

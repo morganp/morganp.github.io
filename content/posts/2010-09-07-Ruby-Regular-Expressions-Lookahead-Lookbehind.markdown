@@ -5,7 +5,7 @@ date: 2010-09-07 01:39:28 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Gem, Programming, Ruby, Regex,
 discuss_url: //68
 url: //68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind

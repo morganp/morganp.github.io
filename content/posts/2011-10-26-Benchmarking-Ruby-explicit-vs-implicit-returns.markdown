@@ -5,7 +5,7 @@ date: 2011-10-26 09:12:29 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //128
 url: //128/Benchmarking_Ruby%2C_explicit_vs_implicit_returns

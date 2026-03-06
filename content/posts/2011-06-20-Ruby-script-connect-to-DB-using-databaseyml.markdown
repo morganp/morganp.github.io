@@ -5,7 +5,7 @@ date: 2011-06-20 12:07:51 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Active Record, Database, Git, Programming, Ruby,
 discuss_url: //110
 url: //110/Ruby_script_connect_to_DB_using_database.yml

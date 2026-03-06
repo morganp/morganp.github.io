@@ -3,7 +3,7 @@ layout: post
 title: "Exact Fit Blinds"
 date: 2014-01-12 19:25:37 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 Tags: Blinds, DIY,
 ---
 

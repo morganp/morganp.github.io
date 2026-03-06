@@ -5,7 +5,7 @@ date: 2011-04-16 17:59:44 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //100
 url: //100/Behaviour_and_State

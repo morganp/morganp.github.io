@@ -5,7 +5,7 @@ date: 2010-06-22 07:45:14 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Apple, OS X, Performance, Command Line,
 discuss_url: //44
 url: //44/Homebrew_package_management_for_Mac_OS_X

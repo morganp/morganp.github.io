@@ -1,6 +1,6 @@
 Title: Pelican New Post script
 Date: 2025-01-03 16:44 
-Category: Tech
+Category: Programming
 Tags: python
 Author: morganp
 Status: published

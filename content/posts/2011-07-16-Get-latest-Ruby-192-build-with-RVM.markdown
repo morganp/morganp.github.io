@@ -5,7 +5,7 @@ date: 2011-07-16 07:47:23 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Gem, Ruby, RVM,
 discuss_url: //118
 url: //118/Get_latest_Ruby_1.9.2_build_with_RVM

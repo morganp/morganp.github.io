@@ -5,7 +5,7 @@ date: 2011-08-24 22:08:02 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby,
 discuss_url: //122
 url: //122/Ruby_Arrays_Concatenation_and_Subtraction

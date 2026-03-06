@@ -5,7 +5,7 @@ date: 2012-03-28 13:32:53 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix\ \&\ Tools
 tags: Command Line, Automation, Subversion,
 discuss_url: //141
 url: //141/SVN_multi-line_comments_on_the_command_line_

@@ -5,7 +5,7 @@ date: 2010-07-27 16:09:53 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Command Line, Linux, Memory, nginx, OS X, Performance, Programming, Sinatra, WebFaction, Web,
 discuss_url: //57
 url: //57/Benchmark_your_website_for_load_times.

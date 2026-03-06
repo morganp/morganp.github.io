@@ -5,7 +5,7 @@ date: 2010-12-13 13:59:47 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Apple, Command Line, OS X,
 discuss_url: //82
 url: //82/Fixing_Ncursers_on_OS_X_10.6.3%2B

@@ -5,7 +5,7 @@ date: 2010-11-02 11:03:26 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming 
 tags: Gem, Programming, Rack, Ruby, Sinatra,
 discuss_url: //76
 url: //76/Sinatra_reload_source_file_changes_in_development_mode

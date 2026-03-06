@@ -5,7 +5,7 @@ date: 2010-04-12 10:33:21 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Programming, Ruby, Gem, WebFaction, Twitter,
 discuss_url: //14
 url: //14/Installing_the_ruby_gem_twitter_on_webfaction

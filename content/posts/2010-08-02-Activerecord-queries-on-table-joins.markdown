@@ -5,7 +5,7 @@ date: 2010-08-02 11:33:16 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Migrations, Programming, Ruby, Active Record,
 discuss_url: //59
 url: //59/Activerecord_queries_on_table_joins

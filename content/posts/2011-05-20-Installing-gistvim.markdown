@@ -5,7 +5,7 @@ date: 2011-05-20 20:32:05 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Git, Programming, Ruby, Vim, Web,
 discuss_url: //107
 url: //107/Installing_gist.vim

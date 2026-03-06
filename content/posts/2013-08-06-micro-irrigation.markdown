@@ -3,7 +3,7 @@ layout: post
 title: "Micro Irrigation"
 date: 2013-08-06 23:16:21 +0000
 comments: true
-Category: Home
+Category: Home & Garden
 Tags: Gardena, Micro Irrigation, Garden
 ---
 As the growhouse stops the plants recieving rain I decided to try micro-irrigtion. 

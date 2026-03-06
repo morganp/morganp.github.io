@@ -5,7 +5,7 @@ date: 2011-02-20 02:19:17 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Active Record, Performance, Programming, Ruby,
 discuss_url: //92
 url: //92/ORM%28Activerecord%29_or_Ruby_Sort

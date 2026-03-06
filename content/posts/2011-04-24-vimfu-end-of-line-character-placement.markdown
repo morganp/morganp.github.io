@@ -5,7 +5,7 @@ date: 2011-04-24 12:07:07 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix \& Tools
 tags: Programming, Vim,
 discuss_url: //102
 url: //102/vimfu_end_of_line_character_placement

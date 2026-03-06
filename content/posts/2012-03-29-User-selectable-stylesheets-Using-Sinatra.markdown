@@ -5,7 +5,7 @@ date: 2012-03-29 21:49:23 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: CSS, Design, Programming, SASS, Sinatra, Web,
 discuss_url: //143
 url: //143/User_selectable_stylesheets_%28Using_Sinatra%29

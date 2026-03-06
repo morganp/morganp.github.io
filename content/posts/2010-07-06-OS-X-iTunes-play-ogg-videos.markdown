@@ -5,7 +5,7 @@ date: 2010-07-06 09:18:22 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Audio, iTunes, Ogg,
 discuss_url: //49
 url: //49/OS_X_iTunes_play_.ogg_videos

@@ -5,7 +5,7 @@ date: 2015-02-18 18:26:07 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Tech
+Category:  Unix & Tools
 tags: OS X,
 ---
 

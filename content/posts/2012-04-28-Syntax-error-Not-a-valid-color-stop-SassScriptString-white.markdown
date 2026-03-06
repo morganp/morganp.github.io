@@ -5,7 +5,7 @@ date: 2012-04-28 19:02:50 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Bundler, Gem, Programming, Ruby, SASS, Web,
 discuss_url: //156
 url: //156/Syntax_error%3A_Not_a_valid_color_stop%3A_Sass%3A%3AScript%3A%3AString%3A_white

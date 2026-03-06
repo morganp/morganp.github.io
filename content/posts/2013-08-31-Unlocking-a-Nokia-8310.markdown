@@ -5,7 +5,7 @@ date: 2013-08-31 12:54:53 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags:
 discuss_url: //231
 url: //231/Unlocking_a_Nokia_8310

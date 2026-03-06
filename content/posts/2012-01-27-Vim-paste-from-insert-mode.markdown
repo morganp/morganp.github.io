@@ -5,7 +5,7 @@ date: 2012-01-27 15:00:55 +0000
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: Vim,
 discuss_url: //137
 url: //137/Vim%2C_paste_from_insert_mode

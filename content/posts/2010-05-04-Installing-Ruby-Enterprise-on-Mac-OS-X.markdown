@@ -5,7 +5,7 @@ date: 2010-05-04 11:13:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Ruby, Performance,
 discuss_url: //26
 url: //26/Installing_Ruby_Enterprise_on_Mac_OS_X

@@ -5,7 +5,7 @@ date: 2011-04-10 06:35:10 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Programming
 tags: Bundler, Programming, Ruby, RVM, Open Source,
 discuss_url: //99
 url: //99/Better_Open_Source_Project_Setup%2C_with_RVM_%26_Bundler

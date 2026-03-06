@@ -5,7 +5,7 @@ date: 2010-04-18 07:33:36 +0100
 comments: true
 sharing: true
 footer: true
-Category: Tech
+Category: Unix & Tools
 tags: iTunes, FLAC, Audio,
 discuss_url: //17
 url: //17/iTunes_play_FLAC_on_OS_X
