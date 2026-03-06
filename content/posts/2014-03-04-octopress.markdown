@@ -3,8 +3,8 @@ layout: post
 title: "Octopress, Pages and Custom Domain"
 date: 2014-03-04 18:19:25 +0000
 comments: true
-Category: Unix \& Tools
-tags: Octopress, Web,
+Category: Unix & Tools
+tags: Octopress, Web, Git, Vim
 ---
 In your `sources` branch, which is the main branch for writing creating posts, create a `CNAME` file in the sources directory.
 

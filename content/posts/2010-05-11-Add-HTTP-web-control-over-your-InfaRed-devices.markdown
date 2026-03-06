@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Homelab
-tags: Audio, Web, Automation,
+tags: Audio, Web, Automation
 discuss_url: //31
 url: //31/Add_HTTP_%28web%29_control_over_your_InfaRed_devices
 id: 31

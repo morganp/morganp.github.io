@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: OpenOffice,
+tags: OpenOffice
 discuss_url: //34
 url: //34/Open_Office_Impress_AutoStart
 id: 34

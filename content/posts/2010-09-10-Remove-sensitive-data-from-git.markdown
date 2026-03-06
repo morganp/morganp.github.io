@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Git,
+tags: Git
 discuss_url: //70
 url: //70/Remove_sensitive_data_from_git
 id: 70

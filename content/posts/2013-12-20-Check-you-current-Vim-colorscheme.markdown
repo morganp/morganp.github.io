@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Vim,
+tags: Vim
 discuss_url: //246
 url: //246/Check_you_current_Vim_colorscheme
 id: 246

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //113
 url: //113/Ruby_Basic_File_Read_and_Write
 id: 113

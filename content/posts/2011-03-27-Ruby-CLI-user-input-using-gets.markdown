@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Command Line, Programming, Ruby,
+tags: Command Line, Ruby
 discuss_url: //95
 url: //95/Ruby_CLI_user_input_using_gets
 id: 95

@@ -5,8 +5,8 @@ date: 2015-02-18 18:26:07 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Unix & Tools
-tags: OS X,
+Category: Unix & Tools
+tags: OS X
 ---
 
 After accidentally scrolling back a page when browsing the web in chrome too many times. Figured out how to disable it: from your terminal

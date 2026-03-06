@@ -5,8 +5,8 @@ date: 2014-05-05 20:36:43 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Photography
-tags: LEE, Filters,
+Category: Photography
+tags: Filters
 ---
 Available to buy from [WEX][]. Also see [Lee Wide Angle Hood][].
 

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Home & Garden
-tags: DIY, Garden 
+tags: DIY, Garden
 ---
 
 Homemade potting bench, using 15 2.4M Fence boards (£45).

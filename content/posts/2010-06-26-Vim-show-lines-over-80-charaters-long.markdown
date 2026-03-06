@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Programming, Vim,
+tags: Vim
 discuss_url: //46
 url: //46/Vim_show_lines_over_80_charaters_long.
 id: 46

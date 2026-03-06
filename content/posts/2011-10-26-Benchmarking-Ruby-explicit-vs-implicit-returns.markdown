@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //128
 url: //128/Benchmarking_Ruby%2C_explicit_vs_implicit_returns
 id: 128

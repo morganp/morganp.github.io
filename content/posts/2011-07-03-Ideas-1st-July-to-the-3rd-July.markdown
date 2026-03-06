@@ -7,7 +7,7 @@ sharing: true
 footer: true
 Category: Programming
 tags:
-discuss_url: //114
+discuss_url: //114, Verilog, Ruby
 url: //114/Ideas_1st_July_to_the_3rd_July
 id: 114
 ---

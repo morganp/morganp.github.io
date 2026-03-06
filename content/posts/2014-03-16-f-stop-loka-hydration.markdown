@@ -4,7 +4,7 @@ title: "F-Stop Loka Hydration"
 date: 2014-03-16 18:13:55 +0000
 comments: true
 Category: Photography
-tags: fstop, Loka,
+tags: fstop
 ---
 
 Not a review, just noting the default position of the velcro hydration loop, before I remove it.

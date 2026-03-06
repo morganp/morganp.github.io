@@ -4,7 +4,7 @@ title: "Beyond the LSB"
 date: 2014-03-13 19:07:42 +0000
 comments: true
 Category: Engineering
-tags: LFSR, Random,
+tags: LFSR
 ---
 
 If we truncate a number, that is to throw away the LSBs (least significant bits) we loose resolution.

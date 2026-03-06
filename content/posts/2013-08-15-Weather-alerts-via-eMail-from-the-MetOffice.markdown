@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Homelab
-tags: Plants, Weather,
+tags: Plants, Weather
 discuss_url: //230
 url: //230/Weather_alerts_via_eMail_from_the_MetOffice
 id: 230

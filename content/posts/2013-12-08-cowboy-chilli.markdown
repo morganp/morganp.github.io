@@ -3,8 +3,8 @@ layout: recipe
 title: "Cowboy Chilli"
 date: 2013-12-08 21:04
 comments: true
-Category: Home \& Garden
-tags: Recipe, Meat, Beef, Spicy,, Cooking
+Category: Home & Garden
+tags: Recipe, Meat, Beef, Spicy, Cooking
 ---
 
 Cowboy Style Chilli

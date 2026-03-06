@@ -1,7 +1,7 @@
 Title: Python Web Parsing
 Date: 2025-01-05 11:15 
 Category: Programming
-Tags: python
+Tags: Python
 Author: morganp
 Status: draft
 <!--to publish change draft to published-->

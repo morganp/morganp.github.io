@@ -5,8 +5,8 @@ date: 2014-06-14 08:08:26 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Verilog,
+Category: Engineering
+tags: Verilog
 published: true
 ---
 

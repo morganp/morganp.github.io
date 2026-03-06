@@ -5,8 +5,8 @@ date: 2014-07-30 20:08:10 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Simulink,
+Category: Engineering
+tags: Simulink, Matlab
 ---
 
 On Mac OS X matlab behaves quite oddly with the track pad zooming

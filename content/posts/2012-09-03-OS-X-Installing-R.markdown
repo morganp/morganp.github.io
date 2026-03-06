@@ -5,8 +5,8 @@ date: 2012-09-03 20:11:46 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Apple, Command Line, OS X, Programming, R, Mountain Lion,
+Category: Unix & Tools
+tags: Apple, Command Line, OS X, R, Mountain Lion, Homebrew
 discuss_url: //190
 url: //190/OS_X_Installing_R
 id: 190

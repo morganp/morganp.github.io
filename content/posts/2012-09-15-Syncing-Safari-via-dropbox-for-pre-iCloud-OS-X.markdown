@@ -5,8 +5,8 @@ date: 2012-09-15 18:39:27 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Apple, Command Line, Safari, Web,
+Category: Unix & Tools
+tags: Apple, Command Line, Safari, Web
 discuss_url: //193
 url: //193/Syncing_Safari_via_dropbox_for_pre_iCloud_OS_X
 id: 193

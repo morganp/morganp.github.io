@@ -5,8 +5,8 @@ date: 2011-07-14 21:56:03 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix\ \&\ Tools
-tags: Automation, Command Line, OS X,
+Category: Unix & Tools
+tags: Automation, Command Line, OS X
 discuss_url: //117
 url: //117/Using_%7E%2F.ssh%2Fconfig_and_no_passowrds_with_Mac_OS_X
 id: 117

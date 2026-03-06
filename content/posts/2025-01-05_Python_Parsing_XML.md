@@ -1,7 +1,7 @@
 Title: Python Parsing XML
 Date: 2025-01-05 13:31 
 Category: Programming
-Tags: python
+Tags: Python
 Author: morganp
 Status: draft
 <!--to publish change draft to published-->

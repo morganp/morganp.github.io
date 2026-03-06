@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Programming,
+tags: Command Line
 discuss_url: //229
 url: //229/tcsh_check_a_var_exists
 id: 229

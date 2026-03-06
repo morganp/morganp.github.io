@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Automation, Command Line, CSS, Programming,
+tags: Automation, Command Line, CSS, Bash
 discuss_url: //147
 url: //147/Bash_script_get_current_script_directory
 id: 147

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //15
 url: //15/Ruby_.nil%3F_tests_fail_%3F_you_really_want_%7C%7C%3D
 id: 15

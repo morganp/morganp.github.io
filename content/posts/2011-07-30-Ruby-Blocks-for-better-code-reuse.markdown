@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //121
 url: //121/Ruby_Blocks_for_better_code_reuse
 id: 121

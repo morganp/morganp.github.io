@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //154
 url: //154/Joe_Cornish%2C_Book_Series
 id: 154

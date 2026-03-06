@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Lightroom, Photography,
+tags: Lightroom
 discuss_url: //243
 url: //243/Lightroom_Library_Metadata_Panel
 id: 243

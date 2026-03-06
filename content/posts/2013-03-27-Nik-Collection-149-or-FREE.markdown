@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography, Nik, Lightroom,
+tags: Nik, Lightroom
 discuss_url: //213
 url: //213/Nik_Collection_%28%24149_or_FREE%29
 id: 213

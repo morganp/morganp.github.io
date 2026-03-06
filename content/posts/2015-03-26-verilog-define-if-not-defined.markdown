@@ -5,8 +5,8 @@ date: 2015-03-26 19:45:10 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Verilog,
+Category: Engineering
+tags: Verilog
 ---
 
 To set a default define option while allowing it to be overridden from the command line.

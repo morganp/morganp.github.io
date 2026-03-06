@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Performance, Programming, Ruby,
+tags: Performance, Ruby
 discuss_url: //129
 url: //129/Setting_Ruby_Defaults_%27%7C%7C%27_vs_%27fetch%28%29%7B%7D%27
 id: 129

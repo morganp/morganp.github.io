@@ -1,7 +1,7 @@
 Title: Python read a CSV file 
 Date: 2024-04-19 12:34
 Category: Programming
-Tags: pelican, python
+Tags: Pelican, Python
 Author: morganp
 
 Python example for reading data from a csv file.

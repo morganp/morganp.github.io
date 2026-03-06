@@ -4,7 +4,7 @@ title: "Macbook keyboard light not working"
 date: 2014-03-13 20:00:47 +0000
 comments: true
 Category: Engineering
-tags: OS X, Mavericks, Macbook,
+tags: OS X, Mavericks, Macbook
 ---
 
 Checkout : [Apple support](http://support.apple.com/kb/HT4882).

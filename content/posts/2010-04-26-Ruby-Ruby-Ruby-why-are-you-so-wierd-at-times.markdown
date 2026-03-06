@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Ruby, Programming,
+tags: Ruby
 discuss_url: //20
 url: //20/Ruby%2C_Ruby%2C_Ruby%2C_why_are_you_so_wierd_at_times%3F
 id: 20

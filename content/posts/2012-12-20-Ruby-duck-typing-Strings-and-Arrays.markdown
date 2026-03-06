@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Ruby, Programming,
+tags: Ruby
 discuss_url: //207
 url: //207/Ruby_duck_typing_Strings_and_Arrays
 id: 207

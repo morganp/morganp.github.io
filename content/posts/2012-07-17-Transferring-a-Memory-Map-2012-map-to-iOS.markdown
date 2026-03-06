@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Memory Map, iPad,
+tags: Memory Map, iPad
 discuss_url: //176
 url: //176/Transferring_a_Memory_Map_2012_map_to_iOS
 id: 176

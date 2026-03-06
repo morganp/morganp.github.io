@@ -5,8 +5,8 @@ date: 2014-05-07 18:13:24 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Matlab,
+Category: Engineering
+tags: Matlab
 ---
 
 Checking if an Array contains a number:

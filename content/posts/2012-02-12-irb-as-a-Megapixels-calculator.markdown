@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Command Line, Photography, Ruby,
+tags: Command Line, Ruby
 discuss_url: //138
 url: //138/irb_as_a_Megapixels_calculator
 id: 138

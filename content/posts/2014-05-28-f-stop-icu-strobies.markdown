@@ -5,8 +5,8 @@ date: 2014-05-28 18:44:55 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Photography
-tags: fstop, ICU, Canon,
+Category: Photography
+tags: fstop, Canon
 published: true
 ---
 

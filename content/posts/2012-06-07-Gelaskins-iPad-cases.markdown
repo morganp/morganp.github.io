@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, iPad,
+tags: Apple, iPad
 discuss_url: //171
 url: //171/Gelaskins_iPad_cases
 id: 171

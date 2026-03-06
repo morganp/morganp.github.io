@@ -5,8 +5,8 @@ date: 2012-08-16 09:22:58 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix\ \&\ Tools
-tags: Apple, Command Line, Lion,
+Category: Unix & Tools
+tags: Apple, Command Line, Lion
 discuss_url: //178
 url: //178/Lion_default_%24PATH
 id: 178

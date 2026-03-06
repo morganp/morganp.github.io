@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, OS X, Performance, Command Line,
+tags: Apple, OS X, Performance, Command Line, Ruby, Homebrew
 discuss_url: //44
 url: //44/Homebrew_package_management_for_Mac_OS_X
 id: 44

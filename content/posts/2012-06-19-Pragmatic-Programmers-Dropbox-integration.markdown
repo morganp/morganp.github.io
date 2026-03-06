@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Apple, iPad, Kindle, PragProg,
+tags: Apple, iPad, Kindle, PragProg
 discuss_url: //174
 url: //174/Pragmatic_Programmers%2C_Dropbox_integration
 id: 174

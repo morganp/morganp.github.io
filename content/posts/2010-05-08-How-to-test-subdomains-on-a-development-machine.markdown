@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Web, nginx,
+tags: Web, nginx, Ruby, Sinatra, Vim
 discuss_url: //28
 url: //28/How_to_test_subdomains_on_a_development_machine
 id: 28

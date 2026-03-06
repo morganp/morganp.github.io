@@ -5,8 +5,8 @@ date: 2014-07-30 20:01:49 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Matlab, Simulink,
+Category: Engineering
+tags: Matlab, Simulink
 ---
 
 To set each constant in a model to sample time -1:

@@ -3,8 +3,8 @@ layout: recipe
 title: "Puy Lentil Wellington"
 date: 2014-03-04 18:24:42 +0000
 comments: true
-Category: Home \& Garden
-tags: Recipe, Put Lentil, Wellington, Rosemary, Thyme, Onion, Vegetarian,, Cooking
+Category: Home & Garden
+tags: Recipe, Puy Lentil, Rosemary, Vegetarian, Cooking
 ---
 
 Based on a [uktv recipe](http://uktv.co.uk/food/recipe/aid/516620).

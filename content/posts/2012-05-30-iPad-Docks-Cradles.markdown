@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Engineering
-tags: iPad,
+tags: iPad
 discuss_url: //169
 url: //169/iPad_Docks_%2F_Cradles
 id: 169

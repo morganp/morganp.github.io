@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Command Line, Gem, Programming, Ruby,
+tags: Command Line, Gem, Ruby, Heroku
 discuss_url: //106
 url: //106/Obnoxious_gem_warnings
 id: 106

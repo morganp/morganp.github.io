@@ -4,7 +4,7 @@ title: "brew update fail"
 date: 2014-02-11 21:17:24 +0000
 comments: true
 Category: Unix & Tools
-tags: OS X, brew,
+tags: OS X, Homebrew, Git
 ---
 
 Received the following errors when doing `brew update` on mountain lion:

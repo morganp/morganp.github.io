@@ -4,7 +4,7 @@ title: "Matlab benchmarking"
 date: 2014-02-12 20:55:42 +0000
 comments: true
 Category: Engineering
-tags: Matlab, Benchmark,
+tags: Matlab, Benchmark
 ---
 
 In the following example we test the allocation speed of different types:

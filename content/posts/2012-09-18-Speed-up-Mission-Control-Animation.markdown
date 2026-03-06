@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, Mountain Lion, Productivity,
+tags: Apple, Mountain Lion
 discuss_url: //195
 url: //195/Speed_up_Mission_Control_Animation
 id: 195

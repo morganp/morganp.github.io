@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Automation, Command Line, Programming, Ruby,
+tags: Automation, Command Line, Ruby
 discuss_url: //125
 url: //125/Ruby_Search_and_Replace_Script.
 id: 125

@@ -6,8 +6,8 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
-discuss_url: //90
+tags: 
+discuss_url: //90, Lightroom
 url: //90/Beginning_Astro_Photography
 id: 90
 ---

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //151
 url: //151/Understanding_Colour_Spaces_%28Digital_Imaging%29
 id: 151

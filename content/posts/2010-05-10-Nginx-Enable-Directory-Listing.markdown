@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Web, nginx,
+tags: Web, nginx
 discuss_url: //30
 url: //30/Nginx_Enable_Directory_Listing
 id: 30

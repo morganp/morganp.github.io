@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line,
+tags: Command Line
 discuss_url: //245
 url: //245/Cshrc_alias_loop
 id: 245

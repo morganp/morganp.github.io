@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Web, nginx,
+tags: Web, nginx
 discuss_url: //27
 url: //27/413_Request_Entity_Too_Large
 id: 27

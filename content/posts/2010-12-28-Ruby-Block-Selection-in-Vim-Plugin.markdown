@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Automation, Programming, Ruby, Vim,
+tags: Automation, Ruby, Vim
 discuss_url: //84
 url: //84/Ruby_Block_Selection_in_Vim_%28Plugin%29
 id: 84

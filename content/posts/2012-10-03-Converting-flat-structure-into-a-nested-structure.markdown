@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //200
 url: //200/Converting_flat_structure_into_a_nested_structure
 id: 200

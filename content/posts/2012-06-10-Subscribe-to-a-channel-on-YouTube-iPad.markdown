@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: iPad,
+tags: iPad
 discuss_url: //172
 url: //172/Subscribe_to_a_channel_on_YouTube_iPad
 id: 172

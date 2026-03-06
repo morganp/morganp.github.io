@@ -3,8 +3,8 @@ layout: recipe
 title: "Chicken Tikka Masala"
 date: 2013-12-08 16:44
 comments: true
-Category: Home \& Garden
-tags: Recipe, Meat, Chicken, Curry, Spicy,, Cooking
+Category: Home & Garden
+tags: Recipe, Meat, Chicken, Curry, Spicy, Cooking
 ---
 
 {% img centre /images/ChickenTikkaMasala/morganp-20130910-ChickenTikkaMasala-IMG_3991.jpg %}

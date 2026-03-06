@@ -5,8 +5,8 @@ date: 2012-08-29 21:02:22 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix\ \&\ Tools
-tags: Apple, Lion, Mountain Lion,
+Category: Unix & Tools
+tags: Apple, Lion, Mountain Lion
 discuss_url: //188
 url: //188/OS_X_Get_Info_Summary_for_multiple_items
 id: 188

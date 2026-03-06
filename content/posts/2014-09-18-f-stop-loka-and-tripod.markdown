@@ -5,8 +5,8 @@ date: 2014-09-18 11:28:47 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Photography
-tags: fstop, Loka,
+Category: Photography
+tags: fstop
 published: true
 ---
 

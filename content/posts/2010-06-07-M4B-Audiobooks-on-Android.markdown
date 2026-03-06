@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Audio, iTunes, Audiobook, Android,
+tags: Audio, iTunes, Audiobook, Android
 discuss_url: //37
 url: //37/M4B_Audiobooks_on_Android
 id: 37

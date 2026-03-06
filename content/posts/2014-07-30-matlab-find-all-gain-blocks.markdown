@@ -5,8 +5,8 @@ date: 2014-07-30 19:58:53 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Matlab, Simulink,
+Category: Engineering
+tags: Matlab, Simulink
 ---
 
     find_system('BlockType', 'Gain')

@@ -5,8 +5,8 @@ date: 2012-08-29 11:22:06 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Vim,
+Category: Unix & Tools
+tags: Vim
 discuss_url: //187
 url: //187/%23vim_toggle_between_last_2_edited_buffers
 id: 187

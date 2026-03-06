@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby
+tags: Ruby
 discuss_url: //5
 url: //5/Ruby_run_%28execute%29_command_line
 id: 5

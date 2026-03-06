@@ -4,7 +4,7 @@ title: "Matlab: leading 0's"
 date: 2014-03-25 20:52:35 +0000
 comments: true
 Category: Engineering
-tags: Matlab, Programming,
+tags: Matlab
 ---
 
 For adding leading zeros to a number the following can be used for 4 decimal places with integer input:

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //204
 url: //204/Canon_2012_Winter_Cash_Back
 id: 204

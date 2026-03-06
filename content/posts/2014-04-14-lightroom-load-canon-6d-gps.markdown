@@ -5,8 +5,8 @@ date: 2014-04-14 19:01:06 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Photography
-tags: GPS, Lightroom,
+Category: Photography
+tags: GPS, Lightroom
 ---
 
 Adobe Lightroom will only load GPX, Canon 6D only saves NMEA data.

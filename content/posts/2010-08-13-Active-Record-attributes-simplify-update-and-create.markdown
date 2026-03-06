@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Active Record, Programming,
+tags: Active Record
 discuss_url: //61
 url: //61/Active_Record__attributes_simplify_update_and_create.
 id: 61

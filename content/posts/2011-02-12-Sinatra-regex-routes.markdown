@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Sinatra,
+tags: Ruby, Sinatra
 discuss_url: //88
 url: //88/Sinatra_regex_routes
 id: 88

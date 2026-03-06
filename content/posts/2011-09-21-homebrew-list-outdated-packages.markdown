@@ -4,7 +4,7 @@ title: "Homebrew list outdated packages"
 date: 2011-09-21 20:58:22 +0000
 comments: true
 Category: Unix & Tools
-tags: Homebrew,
+tags: Homebrew
 ---
     brew update
     brew outdated

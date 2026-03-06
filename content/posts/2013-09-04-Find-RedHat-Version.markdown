@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Linux,
+tags: Command Line, Linux
 discuss_url: //232
 url: //232/Find_RedHat_Version
 id: 232

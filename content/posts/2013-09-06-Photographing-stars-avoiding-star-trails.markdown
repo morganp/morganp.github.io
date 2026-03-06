@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //233
 url: //233/Photographing_stars_avoiding_star_trails
 id: 233

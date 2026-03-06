@@ -5,8 +5,8 @@ date: 2012-09-11 11:09:36 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Vim,
+Category: Unix & Tools
+tags: Vim
 discuss_url: //192
 url: //192/Vim_consistent_spelling_correction_highlighting
 id: 192

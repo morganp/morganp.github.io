@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Filters, LEE,
+tags: Filters
 discuss_url: //202
 url: //202/LEE_Wide_Angle_Hood
 id: 202

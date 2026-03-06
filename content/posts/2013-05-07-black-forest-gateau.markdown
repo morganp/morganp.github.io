@@ -3,8 +3,8 @@ layout: recipe
 title: "Black Forest Gateau"
 date: 2013-05-07 12:29
 comments: true
-Category: Home \& Garden
-tags:  Recipe, Dessert, Cake,, Cooking
+Category: Home & Garden
+tags:  Recipe, Dessert, Cake, Cooking
 ---
 Cake (£1.23 a portion) time to table  ~1 hour 30 minutes.
 

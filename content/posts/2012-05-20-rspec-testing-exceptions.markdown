@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Rspec,
+tags: Ruby, Rspec
 discuss_url: //166
 url: //166/rspec_testing_exceptions
 id: 166

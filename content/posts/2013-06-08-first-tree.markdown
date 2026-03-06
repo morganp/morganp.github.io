@@ -4,7 +4,7 @@ title: "First Tree"
 date: 2013-06-08 15:38:55 +0000
 comments: true
 Category: Home & Garden
-tags: Tree, Cherry, Garden
+tags: Tree, Garden
 ---
 
 The first tree I purchased was this Yoshino Cherry: Prunus x yedoensis Ivensii for £40 from [Smeaton Nursery](http://www.smeatonnurserygardens.co.uk/).

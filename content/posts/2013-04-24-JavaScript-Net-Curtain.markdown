@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Javascript, Programming, Web,
+tags: Javascript, Web
 discuss_url: //217
 url: //217/JavaScript_Net_Curtain
 id: 217

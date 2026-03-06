@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, Command Line, Git, OS X, Programming,
+tags: Apple, Command Line, Git, OS X, Ruby, Homebrew
 discuss_url: //53
 url: //53/Installing_git_on_a_clean_build_of_OS_X
 id: 53

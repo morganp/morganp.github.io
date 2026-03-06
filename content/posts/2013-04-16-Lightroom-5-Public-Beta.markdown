@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Lightroom, Photography,
+tags: Lightroom
 discuss_url: //215
 url: //215/Lightroom_5_Public_Beta
 id: 215

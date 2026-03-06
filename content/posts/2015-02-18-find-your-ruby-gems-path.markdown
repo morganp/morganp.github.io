@@ -5,8 +5,8 @@ date: 2015-02-18 16:39:32 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Programming
-tags: Ruby       , Programming,
+Category: Programming
+tags: Ruby
 ---
 
      ruby -r rubygems -e "p Gem.path"

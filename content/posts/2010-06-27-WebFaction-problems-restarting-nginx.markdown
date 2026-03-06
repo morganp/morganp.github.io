@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: nginx, Sinatra, Web, WebFaction,
+tags: nginx, Sinatra, Web, WebFaction
 discuss_url: //47
 url: //47/WebFaction_problems_restarting_nginx
 id: 47

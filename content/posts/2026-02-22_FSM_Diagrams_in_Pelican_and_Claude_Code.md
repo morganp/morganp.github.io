@@ -1,7 +1,7 @@
 Title: FSM Diagrams in Pelican and Claude Code
 Date: 2026-02-22 18:00
 Category: Engineering
-Tags: fsm, pelican, mermaid, graphviz, claude, ai
+Tags: FSM, Pelican, Mermaid, Graphviz, claude, ai, Python, Git, Bash, Homebrew, Ubuntu, RTL
 Author: morganp
 Status: published
 

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, SASS, Sinatra, Web,
+tags: Ruby, SASS, Sinatra, Web
 discuss_url: //146
 url: //146/Encoding%3A%3AUndefinedConversionError_-_
 id: 146

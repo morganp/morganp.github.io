@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Programming, Web,
+tags: Command Line, Web
 discuss_url: //221
 url: //221/Push_local_folder_to_remote_server_over_ssh
 id: 221

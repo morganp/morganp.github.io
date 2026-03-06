@@ -4,7 +4,7 @@ title: "Matlab Shuffle Array"
 date: 2014-03-06 20:42:57 +0000
 comments: true
 Category: Engineering
-tags: Matlab,
+tags: Matlab
 ---
 To shuffle a:
 

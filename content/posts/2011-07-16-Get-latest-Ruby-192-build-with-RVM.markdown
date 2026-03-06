@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Command Line, Gem, Ruby, RVM,
+tags: Command Line, Gem, Ruby, RVM, Bash
 discuss_url: //118
 url: //118/Get_latest_Ruby_1.9.2_build_with_RVM
 id: 118

@@ -1,7 +1,7 @@
 Title: Modify Pelican theme
 Date: 2025-01-02 16:53 
 Category: Programming
-Tags: python, pelican
+Tags: Python, Pelican
 Author: morganp
 
 First figure out which theme you are using.

@@ -4,7 +4,7 @@ title: "Navigate Verilog with VIM"
 date: 2013-06-04 21:08:39 +0000
 comments: true
 Category: Engineering
-tags: Vim, Verilog,
+tags: Vim, Verilog
 ---
 
 Using `gf`

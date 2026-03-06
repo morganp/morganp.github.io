@@ -4,7 +4,7 @@ title: "Matlab Function Outputs"
 date: 2014-03-08 08:02:27 +0000
 comments: true
 Category: Engineering
-tags: Matlab, Programming,
+tags: Matlab
 ---
 
 Handling functions with extraneous leading outputs. For example:

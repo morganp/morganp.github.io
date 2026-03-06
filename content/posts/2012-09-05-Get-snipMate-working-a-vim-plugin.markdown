@@ -5,8 +5,8 @@ date: 2012-09-05 00:45:31 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Programming, Vim,
+Category: Unix & Tools
+tags: Vim
 discuss_url: //191
 url: //191/Get_snipMate_working%2C_a_%23vim_plugin
 id: 191

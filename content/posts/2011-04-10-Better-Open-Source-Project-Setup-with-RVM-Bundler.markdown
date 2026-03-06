@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Bundler, Programming, Ruby, RVM, Open Source,
+tags: Bundler, Ruby, RVM, Open Source, Sinatra, Git
 discuss_url: //99
 url: //99/Better_Open_Source_Project_Setup%2C_with_RVM_%26_Bundler
 id: 99

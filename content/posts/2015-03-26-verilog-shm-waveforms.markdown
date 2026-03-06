@@ -5,8 +5,8 @@ date: 2015-03-26 19:38:29 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Verilog,
+Category: Engineering
+tags: Verilog
 ---
 The best practice is to use a tcl file:
 

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Engineering
-tags: Matlab, plot,
+tags: Matlab, Plot
 discuss_url: //24
 url: //24/Matlab_Scripting_Axes_Properties
 id: 24

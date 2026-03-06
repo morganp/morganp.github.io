@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-Tags: Filesystem, Organised
+Tags: Filesystem
 ---
 
 Apples default directory structure is :

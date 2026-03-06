@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //167
 url: //167/Create_And%2COr_of_multiple_booleans
 id: 167

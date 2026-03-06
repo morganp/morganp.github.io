@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Active Record, Database, Git, Programming, Ruby,
+tags: Active Record, Database, Git, Ruby
 discuss_url: //110
 url: //110/Ruby_script_connect_to_DB_using_database.yml
 id: 110

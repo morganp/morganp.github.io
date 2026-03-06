@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, Performance, Memory, Power, VLC,
+tags: Apple, Performance, Memory, Power, VLC
 discuss_url: //39
 url: //39/MacBook_Power_Consumption
 id: 39

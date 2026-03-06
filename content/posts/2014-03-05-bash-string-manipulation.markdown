@@ -4,7 +4,7 @@ title: "Bash String Manipulation"
 date: 2014-03-05 21:32:14 +0000
 comments: true
 Category: Unix & Tools
-tags: Command Line, bash,
+tags: Command Line, Bash
 ---
 Removal of substring:
 

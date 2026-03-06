@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Command Line, Heroku, Programming, Rack, Ruby, Sinatra,
+tags: Command Line, Heroku, Rack, Ruby, Sinatra
 discuss_url: //78
 url: //78/Sinatra_Heroku_and_config.ru
 id: 78

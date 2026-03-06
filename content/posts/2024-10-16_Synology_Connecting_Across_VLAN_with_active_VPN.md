@@ -1,7 +1,7 @@
 Title: Synology Connecting Across VLAN with active VPN
 Date: 2024-10-16 11:30 
 Category: Homelab
-Tags: Synology, networking, VLAN, VPN
+Tags: Synology, Networking, VLAN, VPN
 Author: morganp
 
 When a Synology NAS creates a VPN connection it overides the default gateway, except for devices listed as contained within its subnet. According to the [a post][syn] on the synology forum even if the subnet is changed to 255.255.0.0 it will not see devices on another VLAN. It feels like a subnet mask of 255.255.255.0 is hardcoded.

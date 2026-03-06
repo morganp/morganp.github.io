@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Gem, Programming, Ruby, Sinatra,
+tags: Gem, Ruby, Sinatra
 discuss_url: //77
 url: //77/Sinatra_Session_Extension
 id: 77

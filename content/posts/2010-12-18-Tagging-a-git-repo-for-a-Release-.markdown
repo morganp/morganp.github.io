@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Git, Programming,
+tags: Command Line, Git
 discuss_url: //83
 url: //83/Tagging_a_git_repo_for_a_Release_
 id: 83

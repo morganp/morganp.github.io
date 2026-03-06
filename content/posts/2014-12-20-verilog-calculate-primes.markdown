@@ -5,8 +5,8 @@ date: 2014-12-20 07:28:41 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Math, Verilog,
+Category: Engineering
+tags: Math, Verilog
 ---
 
 Based on my answer to [this SO Question](http://stackoverflow.com/q/27461173/97073).

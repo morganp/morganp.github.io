@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Automation, Gem, OS X, Programming, Ruby, Web,
+tags: Automation, Gem, OS X, Ruby, Web, Homebrew
 discuss_url: //177
 url: //177/Web_Automation_with_Watir
 id: 177

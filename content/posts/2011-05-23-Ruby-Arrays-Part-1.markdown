@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //108
 url: //108/Ruby_Arrays%2C_Part_1
 id: 108

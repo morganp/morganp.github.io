@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Gem, WebFaction, Twitter,
+tags: Ruby, Gem, WebFaction, Twitter, Sinatra, nginx, Linux
 discuss_url: //14
 url: //14/Installing_the_ruby_gem_twitter_on_webfaction
 id: 14

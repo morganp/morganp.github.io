@@ -5,8 +5,8 @@ date: 2014-07-30 20:00:28 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Simulink,
+Category: Engineering
+tags: Simulink, Matlab
 ---
 
 Select a block ie gain in Simulink then in Matlab type:

@@ -6,8 +6,8 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Reading List, Photography, Programming,
-discuss_url: //97
+tags: 
+discuss_url: //97, Ruby, Git, Lightroom
 url: //97/Reading_List
 id: 97
 ---

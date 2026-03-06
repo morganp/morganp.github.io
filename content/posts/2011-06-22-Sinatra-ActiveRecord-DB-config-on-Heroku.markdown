@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Active Record, Automation, Database, Heroku, Regex, Ruby, Sequel, Sinatra, Web,
+tags: Active Record, Automation, Database, Heroku, Regex, Ruby, Sequel, Sinatra, Web
 discuss_url: //111
 url: //111/Sinatra_ActiveRecord_DB_config_on_Heroku
 id: 111

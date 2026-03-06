@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Programming, Vim,
+tags: Command Line, Vim, Python, Bash
 discuss_url: //226
 url: //226/Terminal_Colours
 id: 226

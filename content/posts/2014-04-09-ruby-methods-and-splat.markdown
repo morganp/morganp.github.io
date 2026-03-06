@@ -3,8 +3,8 @@ layout: post
 title: "Ruby Methods and Splat"
 date: 2014-04-09 19:47:47 +0100
 comments: true
-Category:  Programming
-tags: Programming, Ruby,
+Category: Programming
+tags: Ruby
 comments: true
 sharing: true
 footer: true

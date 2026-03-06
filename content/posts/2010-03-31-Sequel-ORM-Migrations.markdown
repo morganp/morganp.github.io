@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Sinatra, Sequel, Migrations,
+tags: Ruby, Sinatra, Sequel, Migrations
 discuss_url: //11
 url: //11/Sequel_ORM_Migrations
 id: 11

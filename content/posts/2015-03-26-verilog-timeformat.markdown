@@ -5,8 +5,8 @@ date: 2015-03-26 19:21:25 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Verilog,
+Category: Engineering
+tags: Verilog
 ---
 
 Time can be displayed during simulation using `%t`.

@@ -3,8 +3,8 @@ layout: recipe
 title: "Beef Wellington"
 date: 2014-02-17 20:28:28 +0000
 comments: true
-Category: Home \& Garden
-tags: Recipe, Meat, Beef, Rosemary,, Cooking
+Category: Home & Garden
+tags: Recipe, Meat, Beef, Rosemary, Cooking
 ---
 ![Beef Wellington](/images/Cooking/BeefWellington/morganp-20140217-BeefWellington-IMG_6820.jpg)
 

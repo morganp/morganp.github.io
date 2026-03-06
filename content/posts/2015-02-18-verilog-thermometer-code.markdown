@@ -5,8 +5,8 @@ date: 2015-02-18 16:51:43 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Verilog, Programming,
+Category: Engineering
+tags: Verilog
 ---
 
 Efficiently create a [thermometer code][wiki] in verilog:

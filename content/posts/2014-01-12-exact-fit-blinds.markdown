@@ -4,7 +4,7 @@ title: "Exact Fit Blinds"
 date: 2014-01-12 19:25:37 +0000
 comments: true
 Category: Home & Garden
-Tags: Blinds, DIY,
+Tags: Blinds, DIY
 ---
 
 <object type="application/x-shockwave-flash" width="750" height="425" data="http://www.flickr.com/apps/video/stewart.swf?v=140315" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"> <param name="flashvars" value="intl_lang=en-us&photo_secret=8e95f1d3e2&photo_id=12015486316&hd_default=false"></param> <param name="movie" value="http://www.flickr.com/apps/video/stewart.swf?v=140315"></param> <param name="bgcolor" value="#000000"></param> <param name="allowFullScreen" value="true"></param><embed type="application/x-shockwave-flash" src="http://www.flickr.com/apps/video/stewart.swf?v=140315" bgcolor="#000000" allowfullscreen="true" flashvars="intl_lang=en-us&photo_secret=8e95f1d3e2&photo_id=12015486316&hd_default=false" height="272" width="480"></embed></object>

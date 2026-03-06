@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Sinatra, Ruby, Performance, Programming, WebFaction,
+tags: Sinatra, Ruby, Performance, WebFaction, Heroku
 discuss_url: //25
 url: //25/Ruby_Memory_Issue_on_Web_Faction
 id: 25

@@ -3,8 +3,8 @@ layout: post
 title: "Verilog importing envvar"
 date: 2014-04-03 18:22:00 +0100
 comments: true
-Category:  Engineering
-tags: Verilog, Programming,
+Category: Engineering
+tags: Verilog
 comments: true
 sharing: true
 footer: true

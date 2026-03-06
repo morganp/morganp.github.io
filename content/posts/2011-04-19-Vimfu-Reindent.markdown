@@ -5,8 +5,8 @@ date: 2011-04-19 19:55:19 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Programming, Vim,
+Category: Unix & Tools
+tags: Vim
 discuss_url: //101
 url: //101/Vimfu_Reindent
 id: 101

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Programming, Vim,
+tags: Vim, Linux
 discuss_url: //45
 url: //45/Vim_search_and_replace
 id: 45

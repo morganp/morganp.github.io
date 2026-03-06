@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //153
 url: //153/Light_and_Land%2C_Book_Series
 id: 153

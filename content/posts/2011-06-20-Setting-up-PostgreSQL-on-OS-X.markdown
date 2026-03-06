@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, Database, Ruby,
+tags: Apple, Database, Ruby, Homebrew
 discuss_url: //109
 url: //109/Setting_up_PostgreSQL_on_OS_X
 id: 109

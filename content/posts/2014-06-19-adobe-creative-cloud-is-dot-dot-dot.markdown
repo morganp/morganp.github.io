@@ -5,8 +5,8 @@ date: 2014-06-19 18:15:59 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Photography
-tags: CC, Creative Cloud,
+Category: Photography
+tags: Creative Cloud, Lightroom
 published: true
 ---
 

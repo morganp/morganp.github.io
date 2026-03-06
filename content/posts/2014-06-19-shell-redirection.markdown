@@ -5,8 +5,8 @@ date: 2014-06-19 20:10:57 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Unix & Tools
-tags: Programming, Bash, Tcsh, Command Line,
+Category: Unix & Tools
+tags: Bash, Tcsh, Command Line
 published: true
 ---
 To redirect stdout and stderr in bash we use:

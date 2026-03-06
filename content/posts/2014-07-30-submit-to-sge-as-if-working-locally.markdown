@@ -5,8 +5,8 @@ date: 2014-07-30 20:13:23 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, SGE,
+Category: Engineering
+tags: SGE, Bash
 ---
 
 

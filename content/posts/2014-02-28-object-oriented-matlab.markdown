@@ -4,7 +4,7 @@ title: "Object-Oriented Matlab"
 date: 2014-02-28 19:58:53 +0000
 comments: true
 Category: Engineering
-tags: Matlab,
+tags: Matlab
 ---
 [Mathworks Article on Object-Oriented programming for Matlab](http://www.mathworks.co.uk/help/matlab/matlab_oop/using-objects-to-write-data-to-a-file.html).
 

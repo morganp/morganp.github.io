@@ -4,7 +4,7 @@ title: "Matlab Wrapper Scripts"
 date: 2014-03-17 19:48:57 +0000
 comments: true
 Category: Engineering
-tags: Matlab, Programming,
+tags: Matlab
 ---
 
 To wrap a function with variable input arguments and pass them all on to the wrapped function.

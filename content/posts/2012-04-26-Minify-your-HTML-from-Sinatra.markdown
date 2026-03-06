@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Performance, Programming, Ruby, Sinatra, Web,
+tags: Performance, Ruby, Sinatra, Web
 discuss_url: //155
 url: //155/Minify_your_HTML_from_Sinatra
 id: 155

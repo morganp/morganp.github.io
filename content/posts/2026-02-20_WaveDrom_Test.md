@@ -1,7 +1,7 @@
 Title: WaveDrom Timing Diagrams in Pelican with Claude Code
 Date: 2026-02-20 12:00
 Category: Engineering
-Tags: wavedrom, timing, electronics, pelican, claude, ai
+Tags: WaveDrom, Timing, Electronics, Pelican, claude, ai, Verilog, Python, Git, Bash, Homebrew, RTL
 Author: morganp
 Status: published
 

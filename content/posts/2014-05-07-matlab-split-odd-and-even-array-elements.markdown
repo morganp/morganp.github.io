@@ -5,8 +5,8 @@ date: 2014-05-07 17:58:33 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Matlab, Programming,
+Category: Engineering
+tags: Matlab
 ---
 Using Matlab to splitting data into odd and even samples.
 

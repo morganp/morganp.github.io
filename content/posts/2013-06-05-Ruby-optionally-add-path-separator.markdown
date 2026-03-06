@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //223
 url: //223/Ruby%3A_optionally_add_path_separator
 id: 223

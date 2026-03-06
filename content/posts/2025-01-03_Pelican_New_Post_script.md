@@ -1,7 +1,7 @@
 Title: Pelican New Post script
 Date: 2025-01-03 16:44 
 Category: Programming
-Tags: python
+Tags: Python, Vim, Pelican
 Author: morganp
 Status: published
 

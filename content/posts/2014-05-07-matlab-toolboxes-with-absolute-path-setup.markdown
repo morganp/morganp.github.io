@@ -5,8 +5,8 @@ date: 2014-05-07 18:22:48 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Matlab,
+Category: Engineering
+tags: Matlab
 ---
 
 When a script or function is called with `run(./relative/path/script)` the working directory is changed to the `./relative/path`. This means `pwd` it can be used to specify absolute paths:

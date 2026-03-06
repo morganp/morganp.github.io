@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Git, Programming, Ruby, Vim, Web,
+tags: Git, Ruby, Vim, Web
 discuss_url: //107
 url: //107/Installing_gist.vim
 id: 107

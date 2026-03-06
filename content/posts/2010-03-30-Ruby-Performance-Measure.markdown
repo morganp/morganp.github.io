@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Matlab, Performance,
+tags: Ruby, Matlab, Performance
 discuss_url: //6
 url: //6/Ruby_Performance_Measure
 id: 6

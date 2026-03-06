@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: nginx, Web,
+tags: nginx, Web, Ruby, Vim
 discuss_url: //32
 url: //32/Mac_OS_X_run_nginx_as_a_user_process
 id: 32

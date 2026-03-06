@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Ruby, Programming,
+tags: Ruby
 discuss_url: //228
 url: //228/Ruby_Evaluate_Envvars_in_string.
 id: 228

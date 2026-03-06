@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //126
 url: //126/Arrays_3%2C_write_idiomatic_Ruby
 id: 126

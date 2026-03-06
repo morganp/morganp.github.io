@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //150
 url: //150/On_Location_with_Jeremy_Cowart_%28Kelby_Training%29
 id: 150

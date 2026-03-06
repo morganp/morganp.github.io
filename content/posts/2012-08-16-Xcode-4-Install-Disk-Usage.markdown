@@ -5,8 +5,8 @@ date: 2012-08-16 10:27:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Apple, Mountain Lion, XCode,
+Category: Unix & Tools
+tags: Apple, Mountain Lion, XCode
 discuss_url: //181
 url: //181/Xcode_4_Install%2C_Disk_Usage
 id: 181

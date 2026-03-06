@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: CSS, Design, Programming, SASS, Sinatra, Web,
+tags: CSS, Design, SASS, Sinatra, Web
 discuss_url: //143
 url: //143/User_selectable_stylesheets_%28Using_Sinatra%29
 id: 143

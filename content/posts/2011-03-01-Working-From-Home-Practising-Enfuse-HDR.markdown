@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //94
 url: //94/Working_From_Home%2C_Practising_Enfuse_HDR
 id: 94

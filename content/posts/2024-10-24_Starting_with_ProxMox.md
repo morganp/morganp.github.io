@@ -1,7 +1,7 @@
 Title: Starting with ProxMox
 Date: 2024-10-24 12:56 
 Category: Homelab
-Tags: proxmox
+Tags: Proxmox, Docker
 Author: morganp
 
 

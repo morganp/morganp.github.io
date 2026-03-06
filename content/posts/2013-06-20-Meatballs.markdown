@@ -3,8 +3,8 @@ layout: recipe
 title: "Pork and Beef Meatballs"
 date: 2013-06-20 09:24
 comments: true
-Category: Home \& Garden
-tags:  Recipe, Main, Meat, Pork, Beef,, Cooking
+Category: Home & Garden
+tags:  Recipe, Meat, Pork, Beef, Cooking
 published: false
 ---
 

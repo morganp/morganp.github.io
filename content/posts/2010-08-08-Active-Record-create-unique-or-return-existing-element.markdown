@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Active Record, Programming, Ruby,
+tags: Active Record, Ruby
 discuss_url: //60
 url: //60/Active_Record_create_unique_or_return_existing_element
 id: 60

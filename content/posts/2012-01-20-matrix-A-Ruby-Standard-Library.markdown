@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Math, Ruby, Programming,
+tags: Math, Ruby
 discuss_url: //136
 url: //136/matrix%3A_A_Ruby_Standard_Library
 id: 136

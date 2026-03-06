@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Gem, Git, Programming, Ruby,
+tags: Command Line, Gem, Git, Ruby
 discuss_url: //127
 url: //127/Tagging_a_git_repo_and_pushing_tag_to_github
 id: 127

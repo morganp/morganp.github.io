@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, OS X, Performance, Power,
+tags: Apple, OS X, Performance, Power
 discuss_url: //66
 url: //66/Mac_OS_X_Harddrive_Spin_Down_Time
 id: 66

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Engineering
-tags: Matlab,
+tags: Matlab
 discuss_url: //212
 url: //212/Testing_Matlab_Arrays_for_Equality.
 id: 212

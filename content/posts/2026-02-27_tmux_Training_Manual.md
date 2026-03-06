@@ -1,7 +1,7 @@
 Title: tmux Training Manual: Ghostty, xterm and PVE LXC Terminals
 Date: 2026-02-27 12:00
-Category: Unix \& Tools
-Tags: tmux, terminal, ghostty, xterm, proxmox, lxc, linux
+Category: Unix & Tools
+Tags: tmux, Terminal, Ghostty, xterm, Proxmox, LXC, Linux, Vim, Bash, Ubuntu
 Author: morganp
 Status: published
 

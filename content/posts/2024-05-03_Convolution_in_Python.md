@@ -1,6 +1,7 @@
 Title: Convolution in Python
 Date: 2024-05-03 14:25 
 Category: Programming
+Tags: Python, Signal, Matlab
 Tages: python
 Author: morganp
 

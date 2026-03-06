@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Memory, Performance, Programming, Ruby, Perl,
+tags: Memory, Performance, Ruby, Perl
 discuss_url: //98
 url: //98/Schwartzian_Transform
 id: 98

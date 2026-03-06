@@ -3,8 +3,8 @@ layout: post
 title: "Creating Lightroom Metadata Views"
 date: 2014-04-09 01:28:27 +0100
 comments: true
-Category:  Photography
-tags: Lightroom, Programming,
+Category: Photography
+tags: Lightroom
 ---
 Lightroom plugins for metadata views are called metadata tag sets and only require 2 text files.
 

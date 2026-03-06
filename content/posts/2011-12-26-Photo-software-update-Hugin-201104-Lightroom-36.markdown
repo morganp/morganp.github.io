@@ -6,8 +6,8 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
-discuss_url: //133
+tags: 
+discuss_url: //133, Lightroom
 url: //133/Photo_software_update%2C_Hugin_2011.04_%26_Lightroom_3.6
 id: 133
 ---

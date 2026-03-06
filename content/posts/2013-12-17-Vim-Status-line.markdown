@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Vim,
+tags: Vim
 discuss_url: //244
 url: //244/Vim%3A_Status_line
 id: 244

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Heroku, Programming, Rack, Ruby, Sinatra, Web, WebFaction,
+tags: Heroku, Rack, Ruby, Sinatra, Web, WebFaction
 discuss_url: //149
 url: //149/Sinatra_application_in_.%2Flib_and_views%2C_public_routes_not_working
 id: 149

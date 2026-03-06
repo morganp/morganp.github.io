@@ -5,8 +5,8 @@ date: 2012-08-30 20:28:12 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Apple, Mountain Lion, Network,
+Category: Unix & Tools
+tags: Apple, Mountain Lion, Networking, Vim
 discuss_url: //189
 url: //189/Mountain_Lion_Setup%2C_Part_5_%2Fetc%2Fhosts
 id: 189

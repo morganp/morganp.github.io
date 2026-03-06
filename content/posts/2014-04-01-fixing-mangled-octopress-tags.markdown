@@ -3,8 +3,8 @@ layout: post
 title: "Fixing Mangled Octopress Tags"
 date: 2014-04-01 20:59:40 +0100
 comments: true
-Category: Unix\ \&\ Tools
-tags: Octopress, Command Line,
+Category: Unix & Tools
+tags: Octopress, Command Line
 ---
 
 When creating my blog I have been inconsistent with the tag `command line`, `Command line` and

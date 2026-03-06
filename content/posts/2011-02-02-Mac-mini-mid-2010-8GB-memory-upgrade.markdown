@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Engineering
-tags: Memory, OS X, Performance,
+tags: Memory, OS X, Performance
 discuss_url: //87
 url: //87/Mac_mini_%28mid_2010%29_8GB_memory_upgrade
 id: 87

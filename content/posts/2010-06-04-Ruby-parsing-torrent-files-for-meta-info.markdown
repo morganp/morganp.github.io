@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Homelab
-tags: Performance, Ruby, BitTorrent,
+tags: Performance, Ruby, BitTorrent
 discuss_url: //36
 url: //36/Ruby_parsing_torrent_files_for_meta_info
 id: 36

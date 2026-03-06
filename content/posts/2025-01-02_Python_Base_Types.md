@@ -1,7 +1,7 @@
 Title: Python Base Types
 Date: 2025-01-02 18:09 
 Category: Programming
-Tags: python
+Tags: Python
 Author: morganp
 
 

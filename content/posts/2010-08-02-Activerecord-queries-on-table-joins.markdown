@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Migrations, Programming, Ruby, Active Record,
+tags: Migrations, Ruby, Active Record
 discuss_url: //59
 url: //59/Activerecord_queries_on_table_joins
 id: 59

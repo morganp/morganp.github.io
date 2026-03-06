@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, OS X,
+tags: Command Line, OS X, Homebrew
 discuss_url: //62
 url: //62/Removing_Ports_OS_X
 id: 62

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: iTunes, FLAC, Audio,
+tags: iTunes, FLAC, Audio, Python
 discuss_url: //17
 url: //17/iTunes_play_FLAC_on_OS_X
 id: 17

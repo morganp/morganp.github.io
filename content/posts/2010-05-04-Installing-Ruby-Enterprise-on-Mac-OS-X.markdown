@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Ruby, Performance,
+tags: Ruby, Performance, Sinatra, nginx
 discuss_url: //26
 url: //26/Installing_Ruby_Enterprise_on_Mac_OS_X
 id: 26

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple,
+tags: Apple, Lightroom, Linux
 discuss_url: //119
 url: //119/New_Macbook_Air_%282011%29_%26_OS_X_Lion
 id: 119

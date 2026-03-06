@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Bundler, Performance, Programming, Rack, Ruby, Sinatra, Web,
+tags: Bundler, Performance, Rack, Ruby, Sinatra, Web
 discuss_url: //163
 url: //163/Handle_www._and_no-www_for_better_google_juice
 id: 163

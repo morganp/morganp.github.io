@@ -5,8 +5,8 @@ date: 2015-03-26 20:08:34 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Verilog, Programming,
+Category: Engineering
+tags: Verilog, SystemVerilog, RTL
 ---
 `reg` and `wire` were the original synthesisable types. Wires are constantly assigned and regs are evaluated at particular points, the advantage here is for the simulator to make optimisations.
 

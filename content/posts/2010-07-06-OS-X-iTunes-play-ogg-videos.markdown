@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Audio, iTunes, Ogg,
+tags: Audio, iTunes, Ogg
 discuss_url: //49
 url: //49/OS_X_iTunes_play_.ogg_videos
 id: 49

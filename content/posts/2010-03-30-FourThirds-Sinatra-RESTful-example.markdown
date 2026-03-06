@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Sinatra,
+tags: Ruby, Sinatra, Git
 discuss_url: //4
 url: //4/FourThirds_Sinatra_RESTful_example
 id: 4

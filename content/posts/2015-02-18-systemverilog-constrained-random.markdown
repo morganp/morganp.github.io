@@ -5,8 +5,8 @@ date: 2015-02-18 17:01:56 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Verilog, SystemVerilog, Verification, Programming,
+Category: Engineering
+tags: Verilog, SystemVerilog, Verification
 ---
 
 A minimal example of constrained random to constraining a 4 bit value to 0 to 11 when randomised.

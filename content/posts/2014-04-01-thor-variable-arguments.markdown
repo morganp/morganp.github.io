@@ -4,7 +4,7 @@ title: "Thor Variable Arguments"
 date: 2014-04-01 19:39:19 +0100
 comments: true
 Category: Programming
-tags: Ruby, Command Line,
+tags: Ruby, Command Line, Git
 ---
 
 [Thor][] is a Ruby Gem, which allows you to build command line applications which accept commands, in the same way `git` accepts `add` as a command.

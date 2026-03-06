@@ -4,7 +4,7 @@ title: "Matlab sort_by"
 date: 2014-03-17 18:55:11 +0000
 comments: true
 Category: Engineering
-tags: Matlab,
+tags: Matlab, Ruby
 ---
 
 In ruby we can perform schwartzian transforms easily with the sort_by method. This allows sorting enumerators by any property.

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Gem, Programming, Ruby,
+tags: Gem, Ruby
 discuss_url: //105
 url: //105/Recent_issue_with_building_Gems
 id: 105

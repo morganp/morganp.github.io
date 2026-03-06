@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: WebFaction,
+tags: WebFaction, nginx, Bash
 discuss_url: //21
 url: //21/Webfaction_new_user_with_access_to_their_own_site
 id: 21

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Engineering
-tags: Microsoft, Network,
+tags: Microsoft, Networking
 discuss_url: //168
 url: //168/Device_Ownership_Password
 id: 168

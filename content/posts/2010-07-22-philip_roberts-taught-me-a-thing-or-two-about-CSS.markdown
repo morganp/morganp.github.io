@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Web, CSS,
+tags: Web, CSS
 discuss_url: //56
 url: //56/%40philip_roberts_taught_me_a_thing_or_two_about_CSS
 id: 56

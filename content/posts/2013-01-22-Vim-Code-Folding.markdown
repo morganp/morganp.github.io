@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Vim,
+tags: Vim
 discuss_url: //210
 url: //210/Vim_Code_Folding
 id: 210

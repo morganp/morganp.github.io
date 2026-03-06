@@ -1,7 +1,7 @@
 Title: TeX Paragraph Box
 Date: 2024-10-11 14:18 
 Category: Unix & Tools
-Tags: TeX 
+Tags: TeX
 Author: morganp
 
 `parbox` is a LaTeX command used to place a box around text. 

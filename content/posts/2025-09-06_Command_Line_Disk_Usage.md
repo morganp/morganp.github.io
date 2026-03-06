@@ -1,7 +1,7 @@
 Title: Command Line Disk Usage
 Date: 2025-09-06 13:19 
 Category: Unix & Tools
-Tags: MacOS, OSX, CLI  
+Tags: OS X, CLI, Git
 Author: morganp
 Status: published
 

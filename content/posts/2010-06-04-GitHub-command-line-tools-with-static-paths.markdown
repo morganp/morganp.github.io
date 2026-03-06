@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Ruby, Programming,
+tags: Ruby
 discuss_url: //35
 url: //35/GitHub_command_line_tools_with_static_paths
 id: 35

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Flickr, Microsoft, Windows,
+tags: Flickr, Microsoft, Windows
 discuss_url: //58
 url: //58/Recover_%28Bulk_Download%29_your_Pictures_from_Flickr
 id: 58

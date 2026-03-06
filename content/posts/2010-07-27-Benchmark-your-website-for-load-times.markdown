@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Command Line, Linux, Memory, nginx, OS X, Performance, Programming, Sinatra, WebFaction, Web,
+tags: Command Line, Linux, Memory, nginx, OS X, Performance, Sinatra, WebFaction, Web, Heroku
 discuss_url: //57
 url: //57/Benchmark_your_website_for_load_times.
 id: 57

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Programming, Linux,
+tags: Command Line, Linux
 discuss_url: //235
 url: //235/For_loops_in_csh%2Ftcsh
 id: 235

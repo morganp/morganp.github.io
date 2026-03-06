@@ -5,8 +5,8 @@ date: 2014-05-05 20:17:43 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Programming
-tags: Ruby, Gem, Programming,
+Category: Programming
+tags: Ruby, Gem
 ---
 
 Some time ago [gemspec](http://guides.rubygems.org/specification-reference/) files for ruby gems added the ability to

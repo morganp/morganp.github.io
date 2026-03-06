@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, OS X,
+tags: Command Line, OS X
 discuss_url: //81
 url: //81/Mac_OS_X_libSystem_cache_out_of_sync
 id: 81

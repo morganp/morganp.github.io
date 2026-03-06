@@ -5,8 +5,8 @@ date: 2012-03-28 20:43:20 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Command Line,
+Category: Unix & Tools
+tags: Command Line, Bash
 discuss_url: //142
 url: //142/What_shell_am_i_using%3F
 id: 142

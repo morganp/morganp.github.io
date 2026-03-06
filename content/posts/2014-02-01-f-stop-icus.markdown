@@ -4,7 +4,7 @@ title: "F-stop ICUs"
 date: 2014-02-01 21:27:32 +0000
 comments: true
 Category: Photography
-tags: fstop, icu,
+tags: fstop
 ---
 
 F-Stop camera bags have an adaptable system for trading camera space for other outdoor gear. The swappable section are called ICUs or Internal Camera Units.

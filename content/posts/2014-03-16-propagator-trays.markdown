@@ -4,7 +4,7 @@ title: "Propagator trays"
 date: 2014-03-16 19:23:48 +0000
 comments: true
 Category: Home & Garden
-tags:  Propagator, Marryhatton, Garden
+tags:  Propagator, Garden
 ---
 
 Sunday trip to [Marryhatton](http://www.merryhatton.co.uk/). Getting serious about propagation now, got these seed trays to move the seedlings to after they have germinated in the heated propagator.

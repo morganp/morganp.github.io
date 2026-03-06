@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, Command Line, OS X,
+tags: Apple, Command Line, OS X
 discuss_url: //65
 url: //65/Mac_OS_X_Default_Path
 id: 65

@@ -1,7 +1,7 @@
 Title: Verilog Lint Skill for Claude Code
 Date: 2026-02-22 12:00
 Category: Engineering
-Tags: verilog, systemverilog, rtl, claude, ai, hardware, linting
+Tags: Verilog, SystemVerilog, RTL, claude, ai, Hardware, Linting
 Author: morganp
 Status: published
 

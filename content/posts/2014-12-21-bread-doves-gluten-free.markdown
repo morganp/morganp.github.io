@@ -5,8 +5,8 @@ date: 2014-12-21 20:12:44 +0000
 comments: true
 sharing: true
 footer: true
-Category:  Home \& Garden
-tags: Recipe, Bread, Gluten Free,, Cooking
+Category: Home & Garden
+tags: Recipe, Bread, Gluten Free, Cooking
 published: true
 ---
 

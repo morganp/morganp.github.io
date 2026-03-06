@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Heroku, Programming, Ruby, Sinatra, Web, Rack,
+tags: Heroku, Ruby, Sinatra, Web, Rack
 discuss_url: //52
 url: //52/Get_client_IP_on_Heroku
 id: 52

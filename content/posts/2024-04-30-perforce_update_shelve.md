@@ -1,6 +1,7 @@
 Title: Perforce Update files in a Shelve 
 Date: 2024-04-30 11:04 
 Category: Programming
+Tags: Revision Control, Command Line
 Tages: perforce
 Author: morganp
 

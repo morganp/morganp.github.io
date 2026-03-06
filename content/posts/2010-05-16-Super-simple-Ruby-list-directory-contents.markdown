@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //33
 url: //33/Super_simple_Ruby_list_directory_contents
 id: 33

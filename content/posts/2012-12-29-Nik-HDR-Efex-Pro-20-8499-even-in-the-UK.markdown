@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //209
 url: //209/Nik_HDR_Efex_Pro_2.0_%2484.99_%28even_in_the_UK%29
 id: 209

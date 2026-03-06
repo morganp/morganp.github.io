@@ -4,7 +4,7 @@ title: "Rocket &amp; Chilli"
 date: 2014-02-25 21:23:40 +0000
 comments: true
 Category: Home & Garden
-tags: Propagator, Rocket, Chilli, Cayenne, Kitchen Garden,
+tags: Propagator, Rocket, Kitchen Garden
 ---
 
 The first batch of seeds in the propagator are off to a good start.

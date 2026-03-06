@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Apple, Command Line, Homebrew, Mountain Lion, Ruby, RVM,
+tags: Apple, Command Line, Homebrew, Mountain Lion, Ruby, RVM
 discuss_url: //182
 url: //182/Mountain_Lion_Setup%2C_Part_2_Homebrew_%26_RVM
 id: 182

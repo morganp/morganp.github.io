@@ -1,7 +1,7 @@
 Title: Python Regular Expressions
 Date: 2024-12-23 10:21 
 Category: Programming
-Tags: python
+Tags: Python
 Author: morganp
 
 Python Regular Expressions Quick Guide: 

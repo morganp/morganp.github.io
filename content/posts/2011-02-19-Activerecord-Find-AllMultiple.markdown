@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Active Record, Ruby,
+tags: Active Record, Ruby
 discuss_url: //91
 url: //91/Activerecord_Find_All%2FMultiple
 id: 91

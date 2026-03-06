@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //122
 url: //122/Ruby_Arrays_Concatenation_and_Subtraction
 id: 122

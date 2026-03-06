@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Lightroom, Photography,
+tags: Lightroom
 discuss_url: //173
 url: //173/Lightroom_4.1_Available
 id: 173

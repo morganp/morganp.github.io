@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Photography,
+tags: 
 discuss_url: //152
 url: //152/Printing_Photos%2C_UK_cost_analysis_for_larger_formats.
 id: 152

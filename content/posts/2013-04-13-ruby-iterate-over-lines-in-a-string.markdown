@@ -4,7 +4,7 @@ title: "Ruby iterate over lines in a string"
 date: 2014-03-13 21:03:54 +0000
 comments: true
 Category: Programming
-tags: Ruby, Programming,
+tags: Ruby
 ---
 
     str.each_line do |line|

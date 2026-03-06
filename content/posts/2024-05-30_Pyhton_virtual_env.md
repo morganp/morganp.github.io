@@ -1,6 +1,7 @@
 Title: Pyhton_virtual_env
 Date: 2024-05-30 16:03 
 Category: Programming
+Tags: Python, Command Line
 Tages: python
 Author: morganp
 

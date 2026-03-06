@@ -3,8 +3,8 @@ layout: post
 title: "Thor Adding --verbose"
 date: 2014-04-09 19:26:44 +0100
 comments: true
-Category:  Programming
-tags: Programming, Ruby, Command Line,
+Category: Programming
+tags: Ruby, Command Line
 comments: true
 sharing: true
 footer: true

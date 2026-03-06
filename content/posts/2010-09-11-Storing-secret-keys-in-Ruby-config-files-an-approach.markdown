@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Git, Programming, Ruby,
+tags: Git, Ruby
 discuss_url: //71
 url: //71/Storing_secret_keys_in_Ruby_config_files_an_approach
 id: 71

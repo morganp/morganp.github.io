@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Programming, Vim,
+tags: Vim
 discuss_url: //50
 url: //50/%5Bvim%5D_Indenting_with_Vim_
 id: 50

@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Culture,
+tags: 
 discuss_url: //162
 url: //162/Big_Monitor_Litmus_Test
 id: 162

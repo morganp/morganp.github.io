@@ -1,7 +1,7 @@
 Title: Beelink N200 Proxmox and Plex
 Date: 2024-10-24 11:43 
 Category: Homelab
-Tags: Networking Plex Proxmox
+Tags: Networking, Plex, Proxmox, Docker
 Author: morganp
 
 To improve the Plex transcoding options and off load the computation from the NAS, the plan is purchase a BeeLink EQ13 Alder Lake N200 16GB Ram and 500GB Drive, currently for sale at £215.

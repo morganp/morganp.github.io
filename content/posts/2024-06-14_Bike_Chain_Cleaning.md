@@ -1,7 +1,7 @@
 Title: Bike Chain Cleaning
 Date: 2024-06-14 12:27 
 Category: Home & Garden
-Tags: outdoors, bike
+Tags: Outdoors, Bike
 Author: morganp
 
 Chain Cleaning method:

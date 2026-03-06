@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Apple, iPad, Photography,
+tags: Apple, iPad, Lightroom
 discuss_url: //208
 url: //208/The_unworkable_Lightroom_to_iPad_workflow
 id: 208

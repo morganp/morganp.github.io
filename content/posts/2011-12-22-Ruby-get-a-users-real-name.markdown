@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby, Git
 discuss_url: //132
 url: //132/Ruby_get_a_users_real_name
 id: 132

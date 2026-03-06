@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Lightroom, Photography,
+tags: Lightroom
 discuss_url: //227
 url: //227/Lightroom_Collections_Whats_the_Point%3F
 id: 227

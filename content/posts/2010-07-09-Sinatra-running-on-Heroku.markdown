@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Ruby, Sinatra, Heroku, Web,
+tags: Ruby, Sinatra, Heroku, Web, Git
 discuss_url: //51
 url: //51/Sinatra_running_on_Heroku
 id: 51

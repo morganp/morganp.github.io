@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Sinatra,
+tags: Ruby, Sinatra
 discuss_url: //12
 url: //12/Sinatra_blog_retrieving_next_and_previous_ids
 id: 12

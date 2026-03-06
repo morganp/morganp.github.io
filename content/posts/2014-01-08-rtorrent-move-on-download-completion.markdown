@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Homelab
-tags: rtorrent, Programming,
+tags: rTorrent
 discuss_url: //247
 url: //247/rtorrent_move_on_download_completion
 id: 247

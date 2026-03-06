@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Active Record, Performance, Programming, Ruby,
+tags: Active Record, Performance, Ruby
 discuss_url: //92
 url: //92/ORM%28Activerecord%29_or_Ruby_Sort
 id: 92

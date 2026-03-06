@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Gem,
+tags: Ruby, Gem
 discuss_url: //16
 url: //16/Ruby_and_gemspec
 id: 16

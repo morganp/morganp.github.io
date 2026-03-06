@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Web,
+tags: Web
 discuss_url: //224
 url: //224/Stackoverflow_sites_and_images
 id: 224

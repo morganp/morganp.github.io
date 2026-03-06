@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Command Line, Gem, Programming, Ruby, WebFaction,
+tags: Command Line, Gem, Ruby, WebFaction, Sinatra, Linux
 discuss_url: //89
 url: //89/gem_permissions_on_WebFaction
 id: 89

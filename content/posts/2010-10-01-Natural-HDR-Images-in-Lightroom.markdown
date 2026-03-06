@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Lightroom, Photography,
+tags: Lightroom
 discuss_url: //73
 url: //73/Natural_HDR_Images_in_Lightroom
 id: 73

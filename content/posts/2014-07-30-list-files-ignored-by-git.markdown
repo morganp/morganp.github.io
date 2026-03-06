@@ -5,8 +5,8 @@ date: 2014-07-30 20:18:07 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Unix & Tools
-tags: Programming, Git,
+Category: Unix & Tools
+tags: Git
 ---
 [From Github Training & Guides](https://www.youtube.com/watch?v=4VBG9FlyiOw).  
 

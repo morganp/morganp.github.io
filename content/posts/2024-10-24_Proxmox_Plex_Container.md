@@ -1,7 +1,7 @@
 Title: Proxmox Plex Container
 Date: 2024-10-24 13:10 
 Category: Homelab
-Tags: proxmox, plex
+Tags: Proxmox, Plex
 Author: morganp
 
 With Proxmox installed time to setup Plex in a container, and migrate from Synology NAS.

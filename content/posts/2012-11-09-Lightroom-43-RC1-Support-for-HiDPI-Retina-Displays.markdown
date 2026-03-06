@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Lightroom, Photography,
+tags: Lightroom
 discuss_url: //205
 url: //205/Lightroom_4.3_RC1%2C_Support_for_HiDPI_%28Retina%29_Displays
 id: 205

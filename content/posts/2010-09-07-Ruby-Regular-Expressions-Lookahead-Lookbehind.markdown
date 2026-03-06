@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Gem, Programming, Ruby, Regex,
+tags: Gem, Ruby, Regex
 discuss_url: //68
 url: //68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind
 id: 68

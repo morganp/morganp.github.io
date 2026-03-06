@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: WebFaction,
+tags: WebFaction, Sinatra
 discuss_url: //1
 url: //1/Amaras_Finally_Online
 id: 1

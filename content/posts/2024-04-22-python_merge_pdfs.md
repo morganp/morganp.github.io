@@ -1,7 +1,7 @@
 Title: Python merge PDFs
 Date: 2024-04-22 18:49
 Category: Programming
-Tags: python
+Tags: Python
 Author: morganp
 
 Using python script to merge pdfs together.

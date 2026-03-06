@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby,
+tags: Ruby
 discuss_url: //67
 url: //67/Ruby_Time_save_and_Restore_%28serialise%29
 id: 67

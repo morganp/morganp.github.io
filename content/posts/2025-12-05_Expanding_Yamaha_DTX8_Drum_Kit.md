@@ -1,7 +1,7 @@
 Title: Expanding Yamaha DTX8 Drum Kit
 Date: 2025-12-05 14:43 
 Category: Music
-Tags: Drum 
+Tags: Drum
 Author: morganp
 Status:  published
 

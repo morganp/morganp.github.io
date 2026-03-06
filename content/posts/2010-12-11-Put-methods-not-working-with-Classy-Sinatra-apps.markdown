@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Ruby, Sinatra,
+tags: Ruby, Sinatra
 discuss_url: //80
 url: //80/Put_methods_not_working_with_Classy_Sinatra_apps
 id: 80

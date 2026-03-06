@@ -5,8 +5,8 @@ date: 2014-08-19 06:27:30 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Unix & Tools
-tags: Vim,
+Category: Unix & Tools
+tags: Vim
 published: true
 ---
 

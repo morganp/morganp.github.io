@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Home & Garden
-tags: Kettlebell, Woodwork,
+tags: Kettlebell, Woodwork
 published: true
 ---
 

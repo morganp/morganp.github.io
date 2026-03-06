@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Programming,
+tags: Command Line
 discuss_url: //236
 url: //236/set_vs_setenv
 id: 236

@@ -1,7 +1,7 @@
 Title: Better Python Iterators
 Date: 2025-03-01 12:24 
 Category: Programming
-Tags: python
+Tags: Python
 Author: morganp
 Status: published
 <!--to publish change draft to published-->

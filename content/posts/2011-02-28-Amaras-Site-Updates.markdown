@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Design, Web,
+tags: Design, Web, Ruby
 discuss_url: //93
 url: //93/Amaras_Site_Updates
 id: 93

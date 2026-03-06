@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Gem,
+tags: Ruby, Gem
 discuss_url: //13
 url: //13/gem_install_with_out_the_docs
 id: 13

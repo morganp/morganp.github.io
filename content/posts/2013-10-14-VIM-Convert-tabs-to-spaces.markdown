@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Programming, Vim,
+tags: Vim
 discuss_url: //237
 url: //237/VIM%3A_Convert_tabs_to_spaces
 id: 237

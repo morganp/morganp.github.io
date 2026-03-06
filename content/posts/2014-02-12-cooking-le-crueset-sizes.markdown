@@ -4,7 +4,7 @@ title: "Kitchen: Le Creuset"
 date: 2014-02-12 21:03:49 +0000
 comments: true
 Category: Home & Garden
-tags: Kitchen,
+tags: Kitchen
 ---
 
 Le Creuset do not list pan volumes on there site so for **Round Cast Iron**:

@@ -1,7 +1,7 @@
 Title: TeX hyphenation
 Date: 2024-10-14 14:45 
 Category: Unix & Tools
-Tags: TeX,
+Tags: TeX
 Author: morganp
 
 When TeX/LaTeX is fully justifying text there are times when it could do better but it does not know how to hyphenate certain words. Here we can give it guidnace on how to split words.

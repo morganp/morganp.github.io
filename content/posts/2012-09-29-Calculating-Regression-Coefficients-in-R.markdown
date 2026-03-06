@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: R, Statistics,
+tags: R, Statistics
 discuss_url: //198
 url: //198/Calculating_Regression_Coefficients_in_R
 id: 198

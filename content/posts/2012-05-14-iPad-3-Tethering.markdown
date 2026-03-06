@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Engineering
-tags: Apple, iPad,
+tags: Apple, iPad
 discuss_url: //161
 url: //161/iPad_3_Tethering
 id: 161

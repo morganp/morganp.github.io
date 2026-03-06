@@ -4,7 +4,7 @@ title: "Gnome: disable focus tracking"
 date: 2014-02-20 20:31:44 +0000
 comments: true
 Category: Unix & Tools
-tags: Gnome,
+tags: Gnome
 ---
 
 Sometime ago I enabled focus tracking the mouse on Gnome. It took a while to find how to disable it again, so with out further a do the setting can be found in:

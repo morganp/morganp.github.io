@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Command Line, Git,
+tags: Command Line, Git
 discuss_url: //248
 url: //248/Reverting_in_git
 id: 248

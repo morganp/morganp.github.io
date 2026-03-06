@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Programming, Ruby, Sinatra,
+tags: Ruby, Sinatra
 discuss_url: //23
 url: //23/Sinatra_File_Upload
 id: 23

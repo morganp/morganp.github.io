@@ -5,8 +5,8 @@ date: 2015-06-10 20:19:05 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Matlab,
+Category: Engineering
+tags: Matlab
 ---
 
 Progressions can be created using the [Colon][] operator

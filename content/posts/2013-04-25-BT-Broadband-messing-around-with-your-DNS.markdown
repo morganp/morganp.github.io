@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Homelab
-tags: Network,
+tags: Networking
 discuss_url: //218
 url: //218/BT_Broadband_messing_around_with_your_DNS
 id: 218

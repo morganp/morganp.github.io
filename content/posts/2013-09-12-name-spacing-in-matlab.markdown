@@ -4,7 +4,7 @@ title: "Name Spacing in Matlab"
 date: 2013-09-12 19:51:19 +0000
 comments: true
 Category: Engineering
-tags: Matlab, Programming,
+tags: Matlab
 ---
 
 A typical work flow in Matlab involves a folder filled with scripts and functions.

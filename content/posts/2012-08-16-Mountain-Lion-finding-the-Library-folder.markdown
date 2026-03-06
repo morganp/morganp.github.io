@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Unix & Tools
-tags: Apple, Mountain Lion,
+tags: Apple, Mountain Lion
 discuss_url: //186
 url: //186/Mountain_Lion_finding_the_Library_folder
 id: 186

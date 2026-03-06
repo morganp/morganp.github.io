@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Photography
-tags: Apple, Flickr, Mountain Lion, Twitter,
+tags: Apple, Flickr, Mountain Lion, Twitter
 discuss_url: //185
 url: //185/Mountain_Lion%2C_Twitter_and_Flickr_integration
 id: 185

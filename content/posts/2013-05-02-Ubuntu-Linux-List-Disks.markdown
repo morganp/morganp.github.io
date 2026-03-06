@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Homelab
-tags: Command Line, Linux, Ubuntu,
+tags: Command Line, Linux, Ubuntu
 discuss_url: //219
 url: //219/Ubuntu_%28Linux%29_List_Disks
 id: 219

@@ -1,7 +1,7 @@
 Title: Pelican Site add Tags and Categories list
 Date: 2025-01-02 15:39 
 Category: Programming
-Tags: python, pelican
+Tags: Python, Pelican
 Author: morganp
 
 I think it improves website usability when they are navigatable via the URL.

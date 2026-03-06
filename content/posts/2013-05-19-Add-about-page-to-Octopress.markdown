@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 Category: Programming
-tags: Command Line, Octopress, Programming, Web,
+tags: Command Line, Octopress, Web
 discuss_url: //222
 url: //222/Add_about_page_to_Octopress
 id: 222

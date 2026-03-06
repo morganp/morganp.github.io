@@ -5,8 +5,8 @@ date: 2014-06-19 20:00:45 +0100
 comments: true
 sharing: true
 footer: true
-Category:  Engineering
-tags: Programming, Matlab,
+Category: Engineering
+tags: Matlab
 published: true
 ---
 

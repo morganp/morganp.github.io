@@ -5,8 +5,8 @@ date: 2011-04-28 20:01:13 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: Command Line, Programming,
+Category: Unix & Tools
+tags: Command Line, Bash, Linux
 discuss_url: //103
 url: //103/bash_scripts_and_cron
 id: 103

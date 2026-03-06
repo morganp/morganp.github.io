@@ -5,8 +5,8 @@ date: 2012-09-26 21:07:35 +0100
 comments: true
 sharing: true
 footer: true
-Category: Unix \& Tools
-tags: CSS, Web,
+Category: Unix & Tools
+tags: CSS, Web
 discuss_url: //196
 url: //196/Retina_Support_for_background_images
 id: 196
