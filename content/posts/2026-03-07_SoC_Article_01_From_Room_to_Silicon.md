@@ -16,7 +16,7 @@ There is a photograph from 1964 that captures the scale of computing at the time
 
 That machine cost around $3.5 million in 1964 dollars. It performed roughly 500,000 operations per second.
 
-The phone in your pocket performs about 15 *trillion* operations per second — thirty million times more — on a sliver of silicon roughly 100 mm² in area, weighing a fraction of a gram, drawing less than three watts. It fits comfortably in a jacket pocket.
+The phone in your pocket performs about 15 *trillion* operations per second - thirty million times more — on a sliver of silicon roughly 100 mm² in area, weighing a fraction of a gram, drawing less than three watts. It fits comfortably in a jacket pocket.
 
 This article is the story of how we got from there to here. It is not just a history lesson. Understanding the shape of that journey — what drove miniaturisation at each step, and what trade-offs were made along the way — is essential context for understanding why modern SoC design is structured the way it is.
 
@@ -28,9 +28,9 @@ Before discussing a *System* on Chip, we should understand what the word "system
 
 In engineering, a **system** is a collection of components that work together to perform a function greater than any single component could achieve alone. A computer *system*, in the classical sense, means all the hardware necessary to store, retrieve, and process information:
 
-- A **processor** — the arithmetic and logic engine
+- **processor** — the arithmetic and logic engine
 - **Memory** — where programs and data live
-- **Storage** — where data persists when power is off
+- **Storage** - where data persists when power is off
 - **Input/Output** — keyboards, displays, printers, serial ports
 - **Interconnect** — the buses and cables that tie it all together
 - **Power supply** — the electrical infrastructure
@@ -56,10 +56,10 @@ Approximate Physical Scale — 1950s Computer Systems
   │                                                                  │
   │  ENIAC (1945)                                                    │
   │                                                                  │
-  │  [██████████████████████████████████████████████████████████]   │  ← 30 metres
+  │  [██████████████████████████████████████████████████████████]    │  ← 30 metres
   │  [█ Accumulator █][█ Multiplier █][█ Divider █][█ I/O █][█...█]  │
   │                                                                  │
-  │  Weight: ~27 tonnes   Power: 150 kW   Speed: 5,000 ADD/sec      │
+  │  Weight: ~27 tonnes   Power: 150 kW   Speed: 5,000 ADD/sec       │
   │                                                                  │
   └──────────────────────────────────────────────────────────────────┘
 ```
@@ -78,14 +78,14 @@ IBM System/360 Model 50 Installation (1964):
   ┌───────────────────────────────────────────────────────────────┐
   │                    Computer Room (ground floor)               │
   │                                                               │
-  │   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-  │   │  CPU     │  │ Memory   │  │ I/O      │  │ Tape     │   │
-  │   │ Cabinet  │  │ Cabinet  │  │ Control  │  │ Drives   │   │
-  │   │ 1.8m × 1m│  │ 1.8m × 1m│  │          │  │          │   │
-  │   └────┬─────┘  └─────┬────┘  └─────┬────┘  └──────────┘   │
-  │        │              │              │                         │
+  │   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
+  │   │  CPU     │  │ Memory   │  │ I/O      │  │ Tape     │      │
+  │   │ Cabinet  │  │ Cabinet  │  │ Control  │  │ Drives   │      │
+  │   │ 1.8m × 1m│  │ 1.8m × 1m│  │          │  │          │      │
+  │   └────┬─────┘  └─────┬────┘  └─────┬────┘  └──────────┘      │
+  │        │              │              │                        │
   │  ──────┴──────────────┴──────────────┴──────── (raised floor) │
-  │                    (cables underneath)                         │
+  │                    (cables underneath)                        │
   │                                                               │
   │  Total weight: ~2 tonnes   Power: 30 kW   Cooling: Required   │
   │  Speed: ~500,000 ops/sec   Cost: ~$3.5M (1964)                │
@@ -150,14 +150,14 @@ The Microprocessor Compresses the CPU:
 
   PDP-11/20 CPU (1970):           Intel 4004 (1971):
   ┌───────────────────────────┐   ┌──────────────────────┐
-  │  ┌─────────────────────┐  │   │     ████████████      │
-  │  │   Board 1: ALU      │  │   │   ██████████████████  │
-  │  │   Board 2: Registers│  │   │  ████ 4004 CPU █████  │
-  │  │   Board 3: Control  │  │   │   ██████████████████  │
-  │  │   Board 4: Bus IF   │  │   │     ████████████      │
-  │  └─────────────────────┘  │   │                        │
-  └───────────────────────────┘   │  12 mm²    2,300 trans │
-  40 cm × 35 cm   ~10 kg          │  740 kHz   4-bit data  │
+  │  ┌─────────────────────┐  │   │     ████████████     │
+  │  │   Board 1: ALU      │  │   │   ██████████████████ │
+  │  │   Board 2: Registers│  │   │  ████ 4004 CPU █████ │
+  │  │   Board 3: Control  │  │   │   ██████████████████ │
+  │  │   Board 4: Bus IF   │  │   │     ████████████     │
+  │  └─────────────────────┘  │   │                      │
+  └───────────────────────────┘   │ 12 mm²    2,300 trans│
+  40 cm × 35 cm   ~10 kg          │ 740 kHz   4-bit data │
   Multiple boards, ~1000 chips    └──────────────────────┘
 ```
 
@@ -183,14 +183,14 @@ Apple II Motherboard (1977) — A Complete Computer System on One Board:
   ┌────────────────────────────────────────────────────────────────┐
   │                       Apple II Motherboard                     │
   │                                                                │
-  │  [6502 CPU]  [RAM chips × 8]  [ROM chips × 2]  [Video chip]   │
+  │  [6502 CPU]  [RAM chips × 8]  [ROM chips × 2]  [Video chip]    │
   │                                                                │
-  │  [Keyboard encoder]  [Cassette I/O]  [Speaker driver]         │
+  │  [Keyboard encoder]  [Cassette I/O]  [Speaker driver]          │
   │                                                                │
-  │  ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐   │
-  │  │Slot│ │Slot│ │Slot│ │Slot│ │Slot│ │Slot│ │Slot│ │Slot│   │
-  │  │  1 │ │  2 │ │  3 │ │  4 │ │  5 │ │  6 │ │  7 │ │  8 │   │
-  │  └────┘ └────┘ └────┘ └────┘ └────┘ └────┘ └────┘ └────┘   │
+  │  ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐       │
+  │  │Slot│ │Slot│ │Slot│ │Slot│ │Slot│ │Slot│ │Slot│ │Slot│       │
+  │  │  1 │ │  2 │ │  3 │ │  4 │ │  5 │ │  6 │ │  7 │ │  8 │       │
+  │  └────┘ └────┘ └────┘ └────┘ └────┘ └────┘ └────┘ └────┘       │
   │                (expansion cards for disk, serial, etc.)        │
   │                                                                │
   │  Board size: ~30 cm × 25 cm    Number of chips: ~66            │
@@ -250,22 +250,22 @@ A phone of the early 2000s had several separate chips: a **baseband processor** 
 Early Smartphone Board Architecture (c. 2003):
 
   ┌─────────────────────────────────────────────────────┐
-  │              Smartphone PCB (~6 cm × 4 cm)           │
-  │                                                       │
+  │              Smartphone PCB (~6 cm × 4 cm)          │
+  │                                                     │
   │  ┌──────────────┐  ┌──────────────┐  ┌───────────┐  │
   │  │  Application │  │   Baseband   │  │   PMIC    │  │
   │  │  Processor   │  │  Processor   │  │  (Power   │  │
   │  │  (ARM9,      │  │  (DSP +      │  │  Mgmt IC) │  │
   │  │   ~200 MHz)  │  │   protocol)  │  │           │  │
   │  └──────┬───────┘  └──────┬───────┘  └───────────┘  │
-  │         │                  │                          │
+  │         │                 │                         │
   │  ┌──────┴───────┐  ┌──────┴───────┐  ┌───────────┐  │
   │  │  DRAM        │  │  Flash NOR   │  │  LCD      │  │
-  │  │  (SDRAM chip)│  │  (code/data) │  │  Controller│  │
+  │  │  (SDRAM chip)│  │  (code/data) │  │ Controller│  │
   │  └──────────────┘  └──────────────┘  └───────────┘  │
-  │                                                       │
-  │  ~6–8 chips + passives + RF front-end                 │
-  │  Total system power: ~200 mW (active)                 │
+  │                                                     │
+  │  ~6–8 chips + passives + RF front-end               │
+  │  Total system power: ~200 mW (active)               │
   └─────────────────────────────────────────────────────┘
 ```
 
