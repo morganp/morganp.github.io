@@ -27,7 +27,340 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../verilog-lint-skill-for-claude-code.html">Verilog Lint Skill for Claude Code</a></h1>
+                        <h1 class="entry-title"><a href="../soc-article-01-from-room-to-silicon.html">Article 01: From Room to Silicon — The Story of the Computer System</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-03-07T00:00:00+00:00">
+                Published: Sat 07 March 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/history.html">History</a> <a href="../tag/electronics.html">Electronics</a> </p>        
+</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 1 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>There is a photograph from 1964 that captures the scale of computing at the time. It shows two engineers installing an IBM System/360 Model 50. They are not sitting at desks. They are standing in a large, air-conditioned room, surrounded by cabinets the size of wardrobe closets, connected by thick bundles of cabling snaking under a raised false floor. The computer weighs approximately two tonnes. It required specialist riggers with cranes and fork trucks to move into the building. It draws 30 kilowatts of power — enough to heat several homes.</p>
+<p>That machine cost around $3.5 million in 1964 dollars. It performed roughly 500,000 operations per second.</p>
+<p>The phone in your pocket performs about 15 <em>trillion</em> operations per second — thirty million times more — on a sliver of silicon roughly 100 mm² in area, weighing a fraction of a gram, drawing less than three watts. It fits comfortably in a jacket pocket.</p>
+<p>This article is the story of how we got from there to here. It is not just a history lesson. Understanding the shape of that journey — what drove miniaturisation at each step, and what trade-offs were made along the way — is essential context for understanding why modern SoC design is structured the way it is.</p>
+<hr>
+<h2>What is a "System"?</h2>
+<p>Before discussing a <em>System</em> on Chip, we should understand what the word "system" means in this context.</p>
+<p>In engineering, a <strong>system</strong> is a collection of components that work together to perform a function greater than any single component could achieve alone. A computer <em>system</em>, in the classical sense, means all the hardware necessary to store, retrieve, and process information:</p>
+<ul>
+<li>A <strong>processor</strong> — the arithmetic and logic engine</li>
+<li><strong>Memory</strong> — where programs and data live</li>
+<li><strong>Storage</strong> — where data persists when power is off</li>
+<li><strong>Input/Output</strong> — keyboards, displays, printers, serial ports</li>
+<li><strong>Interconnect</strong> — the buses and cables that tie it all together</li>
+<li><strong>Power supply</strong> — the electrical infrastructure</li>
+</ul>
+<p>For decades, each of these was a separate physical unit, often made by different vendors, assembled on a raised floor in a dedicated machine room. The history of computing is largely the story of these components shrinking, converging, and ultimately merging.</p>
+<hr>
+<h2>Era 1: The Room-Sized Machine (1950s–1960s)</h2>
+<h3>Valves and Racks</h3>
+<p>The earliest electronic computers used <strong>vacuum tubes</strong> (valves) as their switching elements. A vacuum tube is roughly the size of a light bulb. A computer that needs hundreds of thousands of switching elements built from vacuum tubes fills a building.</p>
+<p><strong>ENIAC</strong> (1945) is the canonical example: 17,468 vacuum tubes, 70,000 resistors, 10,000 capacitors, filling a room 2.4 m × 1.8 m × 30 m. It consumed 150 kilowatts of power and broke down regularly — with so many valves, a failure every few hours was normal. Operators spent more time repairing it than computing with it.</p>
+<p>The <strong>Manchester Baby</strong> (1948), while tiny by comparison, still occupied a substantial rack of equipment and required skilled operators to program it using switches and plugboards.</p>
+<div class="highlight"><pre><span></span><code>Approximate Physical Scale — 1950s Computer Systems
+
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                                                                  │
+  │  ENIAC (1945)                                                    │
+  │                                                                  │
+  │  [██████████████████████████████████████████████████████████]   │  ← 30 metres
+  │  [█ Accumulator █][█ Multiplier █][█ Divider █][█ I/O █][█...█]  │
+  │                                                                  │
+  │  Weight: ~27 tonnes   Power: 150 kW   Speed: 5,000 ADD/sec      │
+  │                                                                  │
+  └──────────────────────────────────────────────────────────────────┘
+</code></pre></div>
+
+<h3>The Transistor Changes Everything</h3>
+<p>In 1947, Bell Labs invented the transistor. It did the same job as a vacuum tube — acting as an electronic switch — but was smaller, faster, cooler, more reliable, and consumed far less power. By the late 1950s, computers began to be built from transistors instead.</p>
+<p><strong>IBM System/360</strong> (1964) was a landmark: the first family of computers with a common instruction set, so that programs written for one model would run on any other. But it was still a room-scale machine. The System/360 Model 50 filled multiple cabinets, required dedicated air conditioning, and had to be craned into the computer room through specially widened doorways or lowered through the roof.</p>
+<p>The economics were equally extreme: only universities, large corporations, government agencies, and national laboratories could afford to own one. Everyone else bought time-shares, submitting jobs on punched cards and waiting hours for results.</p>
+<div class="highlight"><pre><span></span><code>IBM System/360 Model 50 Installation (1964):
+
+  ┌───────────────────────────────────────────────────────────────┐
+  │                    Computer Room (ground floor)               │
+  │                                                               │
+  │   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+  │   │  CPU     │  │ Memory   │  │ I/O      │  │ Tape     │   │
+  │   │ Cabinet  │  │ Cabinet  │  │ Control  │  │ Drives   │   │
+  │   │ 1.8m × 1m│  │ 1.8m × 1m│  │          │  │          │   │
+  │   └────┬─────┘  └─────┬────┘  └─────┬────┘  └──────────┘   │
+  │        │              │              │                         │
+  │  ──────┴──────────────┴──────────────┴──────── (raised floor) │
+  │                    (cables underneath)                         │
+  │                                                               │
+  │  Total weight: ~2 tonnes   Power: 30 kW   Cooling: Required   │
+  │  Speed: ~500,000 ops/sec   Cost: ~$3.5M (1964)                │
+  └───────────────────────────────────────────────────────────────┘
+</code></pre></div>
+
+<hr>
+<h2>Era 2: The Minicomputer (1965–1975)</h2>
+<h3>Thinking Small</h3>
+<p>The <strong>minicomputer</strong> was not called "mini" because it was small by today's standards. It was called mini because it was dramatically smaller than the mainframes it accompanied — small enough to fit in a single large cabinet, deliverable in a standard lift, operable without a dedicated air-conditioned room.</p>
+<p><strong>Digital Equipment Corporation (DEC)</strong> pioneered this category. Their <strong>PDP-8</strong> (1965) was a 12-bit machine that cost $18,000 — expensive, but accessible to a laboratory, university department, or medium-sized company without a dedicated data centre.</p>
+<p>The <strong>PDP-11</strong> (1970) is one of the most important computers ever designed. It was a 16-bit machine that fit in a single rack about the size of a tall filing cabinet. It had a clean, elegant instruction set that influenced virtually every processor architecture that followed — including Unix, which was first developed on a PDP-7 and PDP-11.</p>
+<div class="highlight"><pre><span></span><code>DEC PDP-11 (1970) — Physical Footprint:
+
+  ┌─────────────────────┐
+  │  ┌───────────────┐  │
+  │  │  Backplane    │  │  ← Processor and memory cards slot in here
+  │  │  (UNIBUS)     │  │
+  │  │               │  │
+  │  │  CPU card     │  │  ← A single card, 30 cm × 25 cm
+  │  │  Memory cards │  │
+  │  │  I/O cards    │  │
+  │  └───────────────┘  │
+  │  Power supply       │
+  └─────────────────────┘
+    ~ 60 cm × 45 cm × 60 cm
+    Weight: ~30 kg
+    Power: ~300 W
+    Speed: ~1 million ops/sec
+    Cost: ~$10,000 (1970)
+</code></pre></div>
+
+<p>The PDP-11 introduced several ideas that persist in modern SoC design: memory-mapped I/O (where peripherals appear as addresses in the memory map), a bus standard (UNIBUS), and the concept of a clean separation between the processor and the rest of the system through a well-defined bus interface.</p>
+<h3>The Minicomputer Era's Legacy</h3>
+<p>The minicomputer era produced ideas that underpin every SoC today:</p>
+<ul>
+<li><strong>Bus standards</strong> — the UNIBUS, Multibus, and S-100 buses established the principle that components from different vendors could interoperate on a common bus</li>
+<li><strong>Operating systems</strong> — Unix was born on the PDP-11; its model of processes, file descriptors, and device drivers lives on in Linux running on modern SoCs</li>
+<li><strong>Modular architecture</strong> — CPU, memory, and I/O were separate cards in the same backplane, a precursor to the IP block model</li>
+</ul>
+<hr>
+<h2>Era 3: The Microprocessor (1971–1980)</h2>
+<h3>Everything on One Chip</h3>
+<p>In 1971, Intel introduced the <strong>4004</strong> — the first microprocessor. It placed the entire CPU — arithmetic unit, registers, control logic — onto a single chip about 12 mm². It ran at 740 kHz and processed 4-bit numbers.</p>
+<p>This was a revolutionary idea: previously, a "CPU" was a cabinet full of boards. Now it was a package you could hold between your fingers.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">The</span><span class="w"> </span><span class="nv">Microprocessor</span><span class="w"> </span><span class="nv">Compresses</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">CPU</span>:
+
+<span class="w">  </span><span class="nv">PDP</span><span class="o">-</span><span class="mi">11</span><span class="o">/</span><span class="mi">20</span><span class="w"> </span><span class="nv">CPU</span><span class="w"> </span><span class="ss">(</span><span class="mi">1970</span><span class="ss">)</span>:<span class="w">           </span><span class="nv">Intel</span><span class="w"> </span><span class="mi">4004</span><span class="w"> </span><span class="ss">(</span><span class="mi">1971</span><span class="ss">)</span>:
+<span class="w">  </span>┌───────────────────────────┐<span class="w">   </span>┌──────────────────────┐
+<span class="w">  </span>│<span class="w">  </span>┌─────────────────────┐<span class="w">  </span>│<span class="w">   </span>│<span class="w">     </span>████████████<span class="w">      </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">   </span><span class="nv">Board</span><span class="w"> </span><span class="mi">1</span>:<span class="w"> </span><span class="nv">ALU</span><span class="w">      </span>│<span class="w">  </span>│<span class="w">   </span>│<span class="w">   </span>██████████████████<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">   </span><span class="nv">Board</span><span class="w"> </span><span class="mi">2</span>:<span class="w"> </span><span class="nv">Registers</span>│<span class="w">  </span>│<span class="w">   </span>│<span class="w">  </span>████<span class="w"> </span><span class="mi">4004</span><span class="w"> </span><span class="nv">CPU</span><span class="w"> </span>█████<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">   </span><span class="nv">Board</span><span class="w"> </span><span class="mi">3</span>:<span class="w"> </span><span class="nv">Control</span><span class="w">  </span>│<span class="w">  </span>│<span class="w">   </span>│<span class="w">   </span>██████████████████<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">   </span><span class="nv">Board</span><span class="w"> </span><span class="mi">4</span>:<span class="w"> </span><span class="nv">Bus</span><span class="w"> </span><span class="k">IF</span><span class="w">   </span>│<span class="w">  </span>│<span class="w">   </span>│<span class="w">     </span>████████████<span class="w">      </span>│
+<span class="w">  </span>│<span class="w">  </span>└─────────────────────┘<span class="w">  </span>│<span class="w">   </span>│<span class="w">                        </span>│
+<span class="w">  </span>└───────────────────────────┘<span class="w">   </span>│<span class="w">  </span><span class="mi">12</span><span class="w"> </span><span class="nv">mm</span>²<span class="w">    </span><span class="mi">2</span>,<span class="mi">300</span><span class="w"> </span><span class="nv">trans</span><span class="w"> </span>│
+<span class="w">  </span><span class="mi">40</span><span class="w"> </span><span class="nv">cm</span><span class="w"> </span>×<span class="w"> </span><span class="mi">35</span><span class="w"> </span><span class="nv">cm</span><span class="w">   </span><span class="o">~</span><span class="mi">10</span><span class="w"> </span><span class="nv">kg</span><span class="w">          </span>│<span class="w">  </span><span class="mi">740</span><span class="w"> </span><span class="nv">kHz</span><span class="w">   </span><span class="mi">4</span><span class="o">-</span><span class="nv">bit</span><span class="w"> </span><span class="nv">data</span><span class="w">  </span>│
+<span class="w">  </span><span class="nv">Multiple</span><span class="w"> </span><span class="nv">boards</span>,<span class="w"> </span><span class="o">~</span><span class="mi">1000</span><span class="w"> </span><span class="nv">chips</span><span class="w">    </span>└──────────────────────┘
+</code></pre></div>
+
+<p>The <strong>8080</strong> (Intel, 1974), <strong>6502</strong> (MOS Technology, 1975), and <strong>Z80</strong> (Zilog, 1976) followed in rapid succession. These 8-bit processors became the engines of the personal computer revolution.</p>
+<p>The <strong>Intel 8086</strong> (1978) and <strong>Motorola 68000</strong> (1979) raised the bar to 16-bit, with the 68000 in particular earning a reputation for elegance and performance that made it the choice for the Apple Macintosh, the Amiga, the Atari ST, and countless workstations.</p>
+<p>But the microprocessor alone was just the CPU. Everything else — memory, storage, I/O — was still provided by separate chips on a board. The "system" was still a board, just a smaller one.</p>
+<hr>
+<h2>Era 4: The Personal Computer (1977–1990)</h2>
+<h3>The Desktop System</h3>
+<p>The first personal computers were kits for hobbyists. The <strong>Altair 8800</strong> (1975) was an 8080-based machine with no keyboard, no display, and no software beyond a bootloader — users programmed it by toggling switches on the front panel.</p>
+<p>Within a few years, <strong>Apple</strong>, <strong>Commodore</strong>, and <strong>Tandy</strong> produced complete personal computers: CPU, RAM, ROM, keyboard, display output, and storage on a single motherboard in a desktop enclosure. The <strong>Apple II</strong> (1977) sold as a complete system you could put on a desk.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Apple</span><span class="w"> </span><span class="n">II</span><span class="w"> </span><span class="n">Motherboard</span><span class="w"> </span><span class="p">(</span><span class="mi">1977</span><span class="p">)</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">Complete</span><span class="w"> </span><span class="n">Computer</span><span class="w"> </span><span class="n">System</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">One</span><span class="w"> </span><span class="n">Board</span><span class="o">:</span>
+
+<span class="w">  </span><span class="err">┌────────────────────────────────────────────────────────────────┐</span>
+<span class="w">  </span><span class="err">│</span><span class="w">                       </span><span class="n">Apple</span><span class="w"> </span><span class="n">II</span><span class="w"> </span><span class="n">Motherboard</span><span class="w">                     </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">                                                                </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="p">[</span><span class="mi">6502</span><span class="w"> </span><span class="n">CPU</span><span class="p">]</span><span class="w">  </span><span class="p">[</span><span class="n">RAM</span><span class="w"> </span><span class="n">chips</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mi">8</span><span class="p">]</span><span class="w">  </span><span class="p">[</span><span class="n">ROM</span><span class="w"> </span><span class="n">chips</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mi">2</span><span class="p">]</span><span class="w">  </span><span class="p">[</span><span class="n">Video</span><span class="w"> </span><span class="n">chip</span><span class="p">]</span><span class="w">   </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">                                                                </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="p">[</span><span class="n">Keyboard</span><span class="w"> </span><span class="n">encoder</span><span class="p">]</span><span class="w">  </span><span class="p">[</span><span class="n">Cassette</span><span class="w"> </span><span class="n">I</span><span class="o">/</span><span class="n">O</span><span class="p">]</span><span class="w">  </span><span class="p">[</span><span class="n">Speaker</span><span class="w"> </span><span class="n">driver</span><span class="p">]</span><span class="w">         </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">                                                                </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌────┐</span><span class="w">   </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="n">Slot</span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">Slot</span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">Slot</span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">Slot</span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">Slot</span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">Slot</span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">Slot</span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">Slot</span><span class="err">│</span><span class="w">   </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="mi">4</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="mi">5</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="mi">6</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="mi">7</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="mi">8</span><span class="w"> </span><span class="err">│</span><span class="w">   </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">└────┘</span><span class="w"> </span><span class="err">└────┘</span><span class="w"> </span><span class="err">└────┘</span><span class="w"> </span><span class="err">└────┘</span><span class="w"> </span><span class="err">└────┘</span><span class="w"> </span><span class="err">└────┘</span><span class="w"> </span><span class="err">└────┘</span><span class="w"> </span><span class="err">└────┘</span><span class="w">   </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">                </span><span class="p">(</span><span class="n">expansion</span><span class="w"> </span><span class="n">cards</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">disk</span><span class="p">,</span><span class="w"> </span><span class="n">serial</span><span class="p">,</span><span class="w"> </span><span class="n">etc</span><span class="p">.)</span><span class="w">        </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">                                                                </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">Board</span><span class="w"> </span><span class="n">size</span><span class="o">:</span><span class="w"> </span><span class="o">~</span><span class="mi">30</span><span class="w"> </span><span class="n">cm</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="n">cm</span><span class="w">    </span><span class="n">Number</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">chips</span><span class="o">:</span><span class="w"> </span><span class="o">~</span><span class="mi">66</span><span class="w">            </span><span class="err">│</span>
+<span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">System</span><span class="w"> </span><span class="n">power</span><span class="o">:</span><span class="w"> </span><span class="o">~</span><span class="mi">25</span><span class="w"> </span><span class="n">W</span><span class="w">           </span><span class="n">Speed</span><span class="o">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">MHz</span><span class="w">                    </span><span class="err">│</span>
+<span class="w">  </span><span class="err">└────────────────────────────────────────────────────────────────┘</span>
+</code></pre></div>
+
+<p>The <strong>IBM PC</strong> (1981) standardised the desktop architecture that dominated computing for three decades: a processor, a chipset handling memory and I/O, expansion slots for peripherals, and a shared bus (first ISA, later PCI). By the late 1980s, a PC could sit on a desk, consume 50–200 W, and perform millions of operations per second for a few thousand dollars.</p>
+<p>The chip count had fallen from thousands (mainframe) to hundreds (minicomputer) to dozens on a single motherboard. But a PC motherboard was still a system assembled from many chips: CPU, north bridge, south bridge, graphics chip, sound chip, network chip, storage controller, and many more.</p>
+<hr>
+<h2>Era 5: The Laptop — Mobile Demands Integration</h2>
+<h3>Batteries Change Everything</h3>
+<p>The first truly portable computers appeared around 1981. The <strong>Grid Compass</strong> (1982) was used by NASA and the US military — it was functional but cost $8,000 and ran for barely four hours on battery. The <strong>Compaq LTE</strong> (1987) was the first laptop to use a 3.5" hard drive and internal battery in a genuinely portable form factor.</p>
+<p>Mobile computing imposed a constraint that desktop design had never faced: <strong>batteries</strong>. A desktop computer plugged into the wall can draw as much power as needed. A laptop must run for hours on a battery with finite energy.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Power</span><span class="w"> </span><span class="nv">Budget</span><span class="w"> </span>—<span class="w"> </span><span class="nv">Desktop</span><span class="w"> </span><span class="nv">vs</span>.<span class="w"> </span><span class="nv">Laptop</span><span class="w"> </span><span class="ss">(</span><span class="nv">late</span><span class="w"> </span><span class="mi">1980</span><span class="nv">s</span><span class="ss">)</span>:
+
+<span class="w">  </span><span class="nv">Desktop</span><span class="w"> </span><span class="nv">PC</span><span class="w"> </span><span class="ss">(</span><span class="mi">1988</span><span class="ss">)</span>:<span class="w">         </span><span class="nv">Compaq</span><span class="w"> </span><span class="nv">LTE</span><span class="w"> </span><span class="ss">(</span><span class="mi">1987</span><span class="ss">)</span>:
+<span class="w">  </span><span class="nv">Power</span>:<span class="w"> </span><span class="o">~</span><span class="mi">150</span><span class="w"> </span><span class="nv">W</span><span class="w">              </span><span class="nv">Power</span>:<span class="w"> </span><span class="o">~</span><span class="mi">8</span><span class="w"> </span><span class="nv">W</span>
+<span class="w">  </span><span class="nv">Battery</span>:<span class="w"> </span><span class="nv">none</span><span class="w">              </span><span class="nv">Battery</span>:<span class="w"> </span><span class="nv">NiCd</span>,<span class="w"> </span><span class="o">~</span><span class="mi">2</span><span class="w"> </span><span class="nv">hr</span><span class="w"> </span><span class="nv">life</span>
+<span class="w">  </span><span class="nv">Weight</span>:<span class="w"> </span><span class="o">~</span><span class="mi">10</span><span class="w"> </span><span class="nv">kg</span><span class="w">             </span><span class="nv">Weight</span>:<span class="w"> </span><span class="o">~</span><span class="mi">3</span><span class="w"> </span><span class="nv">kg</span>
+<span class="w">  </span><span class="nv">Size</span>:<span class="w"> </span><span class="nv">tower</span><span class="w"> </span><span class="nv">case</span><span class="w">           </span><span class="nv">Size</span>:<span class="w"> </span><span class="mi">28</span><span class="w"> </span><span class="nv">cm</span><span class="w"> </span>×<span class="w"> </span><span class="mi">22</span><span class="w"> </span><span class="nv">cm</span><span class="w"> </span>×<span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="nv">cm</span>
+
+<span class="w">  </span><span class="nv">Problem</span>:<span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">same</span><span class="w"> </span><span class="nv">chips</span><span class="w"> </span><span class="nv">designed</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">desktop</span>
+<span class="w">  </span><span class="nv">drew</span><span class="w"> </span><span class="mi">150</span><span class="w"> </span><span class="nv">W</span><span class="w"> </span>—<span class="w"> </span><span class="nv">far</span><span class="w"> </span><span class="nv">too</span><span class="w"> </span><span class="nv">much</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">battery</span>.
+<span class="w">  </span><span class="nv">A</span><span class="w"> </span><span class="nv">new</span><span class="w"> </span><span class="nv">approach</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">chip</span><span class="w"> </span><span class="nv">design</span><span class="w"> </span><span class="nv">was</span><span class="w"> </span><span class="nv">needed</span>.
+</code></pre></div>
+
+<p>Power pressure drove two responses:</p>
+<p><strong>Low-voltage CMOS</strong> — designers switched from bipolar logic (powerful but power-hungry) to CMOS (Complementary Metal-Oxide-Semiconductor), which consumes power only when transistors switch, not when they are idle. This dramatically reduced both active and standby power.</p>
+<p><strong>Integration</strong> — every chip-to-chip interface wastes energy driving signals off-chip and back. Merging two chips into one removes those interfaces. The laptop era was the first time integration was driven primarily by power rather than just performance.</p>
+<hr>
+<h2>Era 6: The Mobile Phone and the ARM Architecture</h2>
+<h3>An Architecture Built for Efficiency</h3>
+<p>In 1983, Acorn Computers in Cambridge designed their own processor: the <strong>Acorn RISC Machine</strong>, or <strong>ARM</strong>. It was a 32-bit RISC processor designed to be simple, low-power, and fast enough for interactive computing in an inexpensive product. The original ARM1 ran at 6 MHz and consumed a fraction of a watt — remarkable for 1985.</p>
+<p>Acorn spun off <strong>Advanced RISC Machines Ltd</strong> in 1990 as a joint venture with Apple and VLSI Technology. Rather than manufacturing chips itself, ARM licenced its architecture to other companies — a business model that would eventually see ARM cores inside virtually every mobile device on the planet.</p>
+<p>The first mobile phones were large, power-hungry, and limited. As GSM digital mobile telephony spread in the 1990s, phones needed to perform signal processing (decoding the radio channel), handle the telephone UI, and manage a small battery. They could afford perhaps 200 mW of sustained power.</p>
+<p>A phone of the early 2000s had several separate chips: a <strong>baseband processor</strong> (running the radio protocols), an <strong>application processor</strong> (running the UI and apps), a <strong>power management IC</strong>, a <strong>display controller</strong>, and various analog front-ends for audio and radio. These chips communicated over a shared PCB — the "system" was a small board inside a plastic case.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Early</span><span class="w"> </span><span class="nv">Smartphone</span><span class="w"> </span><span class="nv">Board</span><span class="w"> </span><span class="nv">Architecture</span><span class="w"> </span><span class="ss">(</span><span class="nv">c</span>.<span class="w"> </span><span class="mi">2003</span><span class="ss">)</span>:
+
+<span class="w">  </span>┌─────────────────────────────────────────────────────┐
+<span class="w">  </span>│<span class="w">              </span><span class="nv">Smartphone</span><span class="w"> </span><span class="nv">PCB</span><span class="w"> </span><span class="ss">(</span><span class="o">~</span><span class="mi">6</span><span class="w"> </span><span class="nv">cm</span><span class="w"> </span>×<span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="nv">cm</span><span class="ss">)</span><span class="w">           </span>│
+<span class="w">  </span>│<span class="w">                                                       </span>│
+<span class="w">  </span>│<span class="w">  </span>┌──────────────┐<span class="w">  </span>┌──────────────┐<span class="w">  </span>┌───────────┐<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">  </span><span class="nv">Application</span><span class="w"> </span>│<span class="w">  </span>│<span class="w">   </span><span class="nv">Baseband</span><span class="w">   </span>│<span class="w">  </span>│<span class="w">   </span><span class="nv">PMIC</span><span class="w">    </span>│<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">  </span><span class="nv">Processor</span><span class="w">   </span>│<span class="w">  </span>│<span class="w">  </span><span class="nv">Processor</span><span class="w">   </span>│<span class="w">  </span>│<span class="w">  </span><span class="ss">(</span><span class="nv">Power</span><span class="w">   </span>│<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">  </span><span class="ss">(</span><span class="nv">ARM9</span>,<span class="w">      </span>│<span class="w">  </span>│<span class="w">  </span><span class="ss">(</span><span class="nv">DSP</span><span class="w"> </span><span class="o">+</span><span class="w">      </span>│<span class="w">  </span>│<span class="w">  </span><span class="nv">Mgmt</span><span class="w"> </span><span class="nv">IC</span><span class="ss">)</span><span class="w"> </span>│<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">   </span><span class="o">~</span><span class="mi">200</span><span class="w"> </span><span class="nv">MHz</span><span class="ss">)</span><span class="w">  </span>│<span class="w">  </span>│<span class="w">   </span><span class="nv">protocol</span><span class="ss">)</span><span class="w">  </span>│<span class="w">  </span>│<span class="w">           </span>│<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>└──────┬───────┘<span class="w">  </span>└──────┬───────┘<span class="w">  </span>└───────────┘<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">         </span>│<span class="w">                  </span>│<span class="w">                          </span>│
+<span class="w">  </span>│<span class="w">  </span>┌──────┴───────┐<span class="w">  </span>┌──────┴───────┐<span class="w">  </span>┌───────────┐<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">  </span><span class="nv">DRAM</span><span class="w">        </span>│<span class="w">  </span>│<span class="w">  </span><span class="nv">Flash</span><span class="w"> </span><span class="nv">NOR</span><span class="w">   </span>│<span class="w">  </span>│<span class="w">  </span><span class="nv">LCD</span><span class="w">      </span>│<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>│<span class="w">  </span><span class="ss">(</span><span class="nv">SDRAM</span><span class="w"> </span><span class="nv">chip</span><span class="ss">)</span>│<span class="w">  </span>│<span class="w">  </span><span class="ss">(</span><span class="nv">code</span><span class="o">/</span><span class="nv">data</span><span class="ss">)</span><span class="w"> </span>│<span class="w">  </span>│<span class="w">  </span><span class="nv">Controller</span>│<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">  </span>└──────────────┘<span class="w">  </span>└──────────────┘<span class="w">  </span>└───────────┘<span class="w">  </span>│
+<span class="w">  </span>│<span class="w">                                                       </span>│
+<span class="w">  </span>│<span class="w">  </span><span class="o">~</span><span class="mi">6</span>–<span class="mi">8</span><span class="w"> </span><span class="nv">chips</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">passives</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">RF</span><span class="w"> </span><span class="nv">front</span><span class="o">-</span><span class="k">end</span><span class="w">                 </span>│
+<span class="w">  </span>│<span class="w">  </span><span class="nv">Total</span><span class="w"> </span><span class="nv">system</span><span class="w"> </span><span class="nv">power</span>:<span class="w"> </span><span class="o">~</span><span class="mi">200</span><span class="w"> </span><span class="nv">mW</span><span class="w"> </span><span class="ss">(</span><span class="nv">active</span><span class="ss">)</span><span class="w">                 </span>│
+<span class="w">  </span>└─────────────────────────────────────────────────────┘
+</code></pre></div>
+
+<p>This was the moment before SoC. All the pieces existed — they just were not yet on the same die.</p>
+<hr>
+<h2>Era 7: The System on Chip (1995–present)</h2>
+<h3>Integration Crosses a Threshold</h3>
+<p>As process technology advanced through the 1990s — from 350 nm to 250 nm to 180 nm — the number of transistors that could be fabricated reliably on a single die crossed 100 million. That is enough transistors to implement not just a CPU, but everything around it: memory controllers, DSPs, display engines, USB, audio, and power management.</p>
+<p>The <strong>Texas Instruments OMAP</strong> series (early 2000s) was among the first true smartphone SoCs: ARM application processor, DSP, camera interface, display controller, and power management all on one die. This appeared in early Nokia smartphones and PDAs.</p>
+<p>Apple's acquisition of PA Semi in 2008 and its launch of the <strong>A4</strong> SoC in 2010 (the first iPhone 4 chip) signalled that the world's most valuable consumer electronics company was betting everything on the SoC model. Qualcomm, Samsung, MediaTek, and HiSilicon followed with their own vertical SoC programmes.</p>
+<p>The convergence was complete:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">The</span><span class="w"> </span><span class="nx">Integration</span><span class="w"> </span><span class="nx">Journey</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="nx">Same</span><span class="w"> </span><span class="nx">Computational</span><span class="w"> </span><span class="nx">Power</span><span class="p">,</span><span class="w"> </span><span class="nx">Shrinking</span><span class="w"> </span><span class="nx">Footprint</span><span class="p">:</span>
+
+<span class="w">  </span><span class="nx">Year</span><span class="w">   </span><span class="nx">System</span><span class="w">                      </span><span class="nx">Physical</span><span class="w"> </span><span class="nx">Size</span><span class="w">       </span><span class="nx">Power</span><span class="w">    </span><span class="nx">Transistors</span>
+<span class="w">  </span><span class="err">─────────────────────────────────────────────────────────────────────────</span>
+<span class="w">  </span><span class="mi">1964</span><span class="w">   </span><span class="nx">IBM</span><span class="w"> </span><span class="nx">System</span><span class="o">/</span><span class="mi">360</span><span class="w"> </span><span class="nx">Model</span><span class="w"> </span><span class="mi">50</span><span class="w">     </span><span class="mi">2</span><span class="w"> </span><span class="nx">rooms</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="nx">tonnes</span><span class="w">   </span><span class="mi">30</span><span class="w"> </span><span class="nx">kW</span><span class="w">    </span><span class="o">~</span><span class="mi">500</span><span class="p">,</span><span class="mi">000</span>
+<span class="w">  </span><span class="mi">1970</span><span class="w">   </span><span class="nx">DEC</span><span class="w"> </span><span class="nx">PDP</span><span class="o">-</span><span class="mi">11</span><span class="o">/</span><span class="mi">20</span><span class="w">               </span><span class="nx">Filing</span><span class="w"> </span><span class="nx">cabinet</span><span class="w">      </span><span class="mi">300</span><span class="w"> </span><span class="nx">W</span><span class="w">    </span><span class="o">~</span><span class="mi">20</span><span class="p">,</span><span class="mi">000</span><span class="w"> </span><span class="o">*</span>
+<span class="w">  </span><span class="mi">1977</span><span class="w">   </span><span class="nx">Apple</span><span class="w"> </span><span class="nx">II</span><span class="w"> </span><span class="p">(</span><span class="nx">full</span><span class="w"> </span><span class="nx">system</span><span class="p">)</span><span class="w">      </span><span class="nx">Desk</span><span class="w"> </span><span class="p">(</span><span class="mi">30</span><span class="err">×</span><span class="mi">25</span><span class="w"> </span><span class="nx">cm</span><span class="w"> </span><span class="nx">PCB</span><span class="p">)</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="nx">W</span><span class="w">     </span><span class="o">~</span><span class="mi">100</span><span class="p">,</span><span class="mi">000</span><span class="w"> </span><span class="o">*</span>
+<span class="w">  </span><span class="mi">1982</span><span class="w">   </span><span class="nx">Intel</span><span class="w"> </span><span class="mi">80286</span><span class="w"> </span><span class="nx">CPU</span><span class="w"> </span><span class="nx">alone</span><span class="w">       </span><span class="mi">28</span><span class="o">-</span><span class="nx">pin</span><span class="w"> </span><span class="nx">DIP</span><span class="w"> </span><span class="kn">package</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="nx">W</span><span class="w">      </span><span class="mi">134</span><span class="p">,</span><span class="mi">000</span>
+<span class="w">  </span><span class="mi">1993</span><span class="w">   </span><span class="nx">Intel</span><span class="w"> </span><span class="nx">Pentium</span><span class="w">               </span><span class="mi">273</span><span class="o">-</span><span class="nx">pin</span><span class="w"> </span><span class="nx">PGA</span><span class="w"> </span><span class="nx">chip</span><span class="w">    </span><span class="mi">15</span><span class="w"> </span><span class="nx">W</span><span class="w">     </span><span class="m m-Double">3.1</span><span class="w"> </span><span class="nx">M</span>
+<span class="w">  </span><span class="mi">2003</span><span class="w">   </span><span class="nx">Nokia</span><span class="w"> </span><span class="mi">6600</span><span class="w"> </span><span class="p">(</span><span class="mi">5</span><span class="w"> </span><span class="nx">chips</span><span class="w"> </span><span class="nx">total</span><span class="p">)</span><span class="w">  </span><span class="nx">PCB</span><span class="w"> </span><span class="nx">inside</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="nx">phone</span><span class="w">  </span><span class="mi">200</span><span class="w"> </span><span class="nx">mW</span><span class="w">   </span><span class="o">~</span><span class="mi">50</span><span class="w"> </span><span class="nx">M</span><span class="w"> </span><span class="nx">total</span>
+<span class="w">  </span><span class="mi">2010</span><span class="w">   </span><span class="nx">Apple</span><span class="w"> </span><span class="nx">A4</span><span class="w"> </span><span class="nx">SoC</span><span class="w">                </span><span class="mi">12</span><span class="w"> </span><span class="nx">mm</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="nx">mm</span><span class="w"> </span><span class="nx">die</span><span class="w">   </span><span class="o">~</span><span class="mi">1</span><span class="w"> </span><span class="nx">W</span><span class="w">     </span><span class="o">~</span><span class="mi">300</span><span class="w"> </span><span class="nx">M</span>
+<span class="w">  </span><span class="mi">2020</span><span class="w">   </span><span class="nx">Apple</span><span class="w"> </span><span class="nx">A14</span><span class="w"> </span><span class="nx">SoC</span><span class="w">               </span><span class="mi">88</span><span class="w"> </span><span class="nx">mm²</span><span class="w"> </span><span class="nx">die</span><span class="w">          </span><span class="o">~</span><span class="mi">3</span><span class="w"> </span><span class="nx">W</span><span class="w">     </span><span class="m m-Double">11.8</span><span class="w"> </span><span class="nx">B</span>
+<span class="w">  </span><span class="mi">2024</span><span class="w">   </span><span class="nx">Apple</span><span class="w"> </span><span class="nx">A18</span><span class="w"> </span><span class="nx">SoC</span><span class="w">               </span><span class="mi">90</span><span class="w"> </span><span class="nx">mm²</span><span class="w"> </span><span class="nx">die</span><span class="w">          </span><span class="o">~</span><span class="mi">3</span><span class="w"> </span><span class="nx">W</span><span class="w">     </span><span class="o">~</span><span class="mi">16</span><span class="w"> </span><span class="nx">B</span>
+<span class="w">  </span><span class="err">─────────────────────────────────────────────────────────────────────────</span>
+<span class="w">  </span><span class="o">*</span><span class="w"> </span><span class="nx">Approximate</span><span class="p">,</span><span class="w"> </span><span class="nx">counting</span><span class="w"> </span><span class="nx">discrete</span><span class="w"> </span><span class="nx">transistors</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="nx">SSI</span><span class="o">/</span><span class="nx">MSI</span><span class="w"> </span><span class="nx">chips</span>
+</code></pre></div>
+
+<hr>
+<h2>Moore's Law: The Engine of Miniaturisation</h2>
+<p>No account of this journey is complete without <strong>Moore's Law</strong>. In 1965, Gordon Moore (co-founder of Intel) observed that the number of transistors on a commercially practical integrated circuit doubled approximately every two years. This was an empirical observation about the economics of the semiconductor industry, but it became a self-fulfilling prophecy: the industry organised itself to deliver that doubling, and did so for more than fifty years.</p>
+<div class="highlight"><pre><span></span><code>Moore&#39;s Law — Transistor Count Over Time:
+
+  10^10 ┤                                                     ●  A18 (16B)
+        │                                                 ●  A14 (11.8B)
+  10^9  ┤                                         ●  A7  (1B, 2013)
+        │                                  ●  Core i7 (774M, 2008)
+  10^8  ┤                        ●  Pentium 4 (42M, 2000)
+        │                ●  Pentium (3.1M, 1993)
+  10^7  ┤        ●  386 (275K, 1985)
+        │    ●  8086 (29K, 1978)
+  10^6  ┤  ●  8080 (6K, 1974)
+        │ ●  4004 (2.3K, 1971)
+  10^3  ┴──────────────────────────────────────────────────────
+        1970   1980   1990   2000   2010   2020
+
+  Doubling every ~2 years (Moore&#39;s Law)
+</code></pre></div>
+
+<p>Each doubling meant that the same design could be shrunk to half the area (reducing cost), or that twice as much logic could fit in the same area (enabling integration). Both drove the SoC story.</p>
+<p>Moore's Law has slowed in recent years — physical limits make further miniaturisation increasingly difficult and expensive below 3 nm. The industry is responding with new techniques: <strong>3D stacking</strong> (chips stacked vertically), <strong>chiplets</strong> (multiple dies in one package), and new materials. But the principle — relentless pressure toward more integration per unit cost — continues.</p>
+<hr>
+<h2>What "System" Means Now</h2>
+<p>Return to where we started: the IBM System/360, craned into a dedicated machine room, requiring a team of operators and a purpose-built building to run.</p>
+<p>Today's SoC is a <em>more capable</em> system — more memory, faster clock, more peripherals, better networking — occupying an area smaller than a fingernail, drawing power measurable in milliwatts, costing a few dollars to manufacture at scale.</p>
+<p>But it is still a <em>system</em>: processor, memory controller, interconnect, peripherals, power management, security hardware. The same logical building blocks exist. They have simply been reimplemented in silicon, brought together on a single die, separated by wires measured in nanometres rather than copper cables measured in metres.</p>
+<p>Understanding that lineage — why the blocks exist, what problems they solve, where the trade-offs come from — is the context for everything that follows in this series.</p>
+<hr>
+<h2>Summary</h2>
+<p>Computer systems began as room-filling collections of vacuum tubes. The transistor enabled the minicomputer — a cabinet-scale machine accessible to laboratories and companies. The microprocessor collapsed the CPU onto a single chip and made the personal computer possible. Mobile computing added battery constraints that drove integration for power efficiency. The System on Chip emerged when transistor densities crossed the threshold that made fitting an entire system — CPU, memory, peripherals, and more — onto a single die both technically feasible and economically compelling. Moore's Law underpinned the entire journey, doubling integration density roughly every two years for five decades.</p>
+<hr>
+<h2>Series Roadmap</h2>
+<table>
+<thead>
+<tr>
+<th>Article</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>01</strong></td>
+<td><strong>From Room to Silicon — History of the Computer System (this article)</strong></td>
+</tr>
+<tr>
+<td>02</td>
+<td>What is a System on Chip? — Anatomy and Motivation</td>
+</tr>
+<tr>
+<td>03</td>
+<td>The SoC Design Stack: From Transistors to Software</td>
+</tr>
+<tr>
+<td>04</td>
+<td>Processor Cores: CPU, DSP, GPU and Hardware Accelerators</td>
+</tr>
+<tr>
+<td>05</td>
+<td>Memory Architecture: Caches, DRAM, and On-chip Storage</td>
+</tr>
+<tr>
+<td>06</td>
+<td>Interconnects and Bus Protocols: AXI, AHB, and APB</td>
+</tr>
+<tr>
+<td>07</td>
+<td>Clocking, Reset, and Power Domains</td>
+</tr>
+<tr>
+<td>08</td>
+<td>Peripherals and I/O: Connecting the SoC to the World</td>
+</tr>
+<tr>
+<td>09</td>
+<td>Hardware Description Languages and RTL Design</td>
+</tr>
+<tr>
+<td>10</td>
+<td>The SoC Design Flow: From Specification to Silicon</td>
+</tr>
+<tr>
+<td>11</td>
+<td>HW/SW Co-Design: Bridging Software and Silicon</td>
+</tr>
+</tbody>
+</table>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../verilog-lint-skill-for-claude-code.html" rel="bookmark"
+                               title="Permalink to Verilog Lint Skill for Claude Code">Verilog Lint Skill for Claude Code</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-02-22T12:00:00+00:00">
                 Published: Sun 22 February 2026
@@ -38,34 +371,12 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/verilog.html">Verilog</a> <a href="../tag/systemverilog.html">SystemVerilog</a> <a href="../tag/rtl.html">RTL</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/linting.html">Linting</a> </p>        
-</footer><!-- /.post-info --><p>I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code generation and linting. Writing Verilog by hand is tedious; having Claude generate it and immediately validate it with real tools closes that gap nicely.</p>
-<h2>What it does</h2>
-<p>The skill connects two open-source linters into an agentic write → lint → fix → re-lint loop:</p>
-<ul>
-<li><strong>Verilator</strong> (<code>--lint-only -Wall</code>) catches semantic errors: undeclared signals, bit-width mismatches, blocking assignments in <code>always_ff</code> blocks, multi-driven nets</li>
-<li><strong>Verible</strong> (<code>verible-verilog-lint</code>) enforces style: naming conventions, whitespace, port alignment, <code>always_ff</code>/<code>always_comb</code> discipline</li>
-</ul>
-<p>When Claude generates RTL, the skill automatically:</p>
-<ol>
-<li>Writes the code to a temp file</li>
-<li>Runs both linters</li>
-<li>Parses error messages with line numbers</li>
-<li>Applies fixes and re-lints — up to 3 times</li>
-<li>Reports clean status or surfaces a diagnostic table if errors remain</li>
-</ol>
-<h2>Why two tools</h2>
-<p>They complement each other. Verilator thinks like a synthesizer — it catches things that will fail elaboration or produce incorrect silicon. Verible doesn't simulate; it reads the source and checks against Google's SystemVerilog style guide. Together they cover both "will this work" and "is this readable".</p>
-<h2>Both are free and open source</h2>
-<ul>
-<li>Verilator: <code>brew install verilator</code> / <code>apt install verilator</code></li>
-<li>Verible: <code>brew tap chipsalliance/verible &amp;&amp; brew install verible</code> (macOS), or grab a binary from the <a href="https://github.com/chipsalliance/verible/releases">GitHub releases page</a></li>
-</ul>
-<h2>RTL patterns baked in</h2>
-<p>The skill includes reference patterns for mistake-free SystemVerilog: synchronous-reset flip-flops, <code>always_comb</code> combinational blocks, parameterized FSMs with <code>typedef enum</code>. Claude defaults to these when generating new modules, which avoids most of the common lint warnings before the first pass even runs.</p>
-<h2>Same pattern as WaveDrom</h2>
-<p>This follows the same skill format as the <a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom timing diagram skill</a> — a <code>SKILL.md</code> file that gives Claude structured instructions, reference tables, and workflow steps. Both skills live in <code>~/.claude/skills/</code> and are picked up automatically by Claude Code.</p>
-<p>The combination is handy for hardware work: describe a protocol, get a timing diagram, then generate and lint the RTL that implements it.</p>                    </article>
-                </aside><!-- /#featured -->
+</footer><!-- /.post-info -->                        <p>I've been using Claude Code for RTL generation lately, and the missing piece was a tight feedback loop between code …</p>
+                        <a class="readmore" href="../verilog-lint-skill-for-claude-code.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
                 <section id="extras" class="body">
                                 <div class="social">
                                         <h2>social</h2>
