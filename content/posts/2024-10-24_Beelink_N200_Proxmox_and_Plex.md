@@ -1,6 +1,6 @@
 Title: Beelink N200 Proxmox and Plex
 Date: 2024-10-24 11:43 
-Category: Homelab
+Category: Hardware & Homelab
 Tags: Networking, Plex, Proxmox, Docker
 Author: morganp
 

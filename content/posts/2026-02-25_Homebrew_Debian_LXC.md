@@ -1,6 +1,6 @@
 Title: Installing Homebrew on a Debian 13 (Trixie) LXC Container
 Date: 2026-02-25
-Category: Homelab
+Category: Hardware & Homelab
 Tags: Homebrew, Linux, Debian, LXC, Proxmox, Git, Bash
 Author: morganp
 Summary: A verified step-by-step guide to installing Homebrew (Linuxbrew) on a Debian 13 "trixie" LXC unprivileged container, including group setup, prefix pre-creation, and multi-user configuration.

@@ -1,6 +1,6 @@
 Title: Cloudflare Tunnel
 Date: 2025-05-31 11:50 
-Category: Homelab
+Category: Hardware & Homelab
 Tags: Networking, Proxmox, Docker, Linux
 Author: morganp
 Status: draft

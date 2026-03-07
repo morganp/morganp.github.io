@@ -1,7 +1,7 @@
 Title: reMarkable: Local File Transfer Without the Cloud
 Date: 2026-03-07
-Category: Tools
-Tags: reMarkable, eink, PDF, privacy, Linux
+Category: Hardware & Homelab
+Tags: reMarkable, eink, privacy
 Author: morganp
 Summary: How to use the reMarkable tablet without cloud sync by unpairing the device and enabling the built-in USB file server at http://10.11.99.1/.
 

@@ -1,6 +1,6 @@
 Title: Node Red vs Home Assistant
 Date: 2024-10-24 15:58 
-Category: Homelab
+Category: Hardware & Homelab
 Tags: HomeAssistant
 Author: morganp
 
