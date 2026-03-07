@@ -14,10 +14,18 @@ now = datetime.now()
 dt_string = now.strftime("%Y-%m-%d %H:%M")
 dt_string_simple = now.strftime("%Y-%m-%d")
 
-cat_dict = {1:"Cooking", 2:"Engineering", 3:"Home", 4:"Outdoor", 5:"Photography", 6:"Tech"}
-print( cat_dict )
-post_cat = input("Enter Post Category :")
-post_cat = int(post_cat.strip())
+cat_dict = {
+    2: "Engineering",
+    3: "Home & Garden",
+    4: "Hardware & Homelab",
+    5: "Music",
+    6: "Photography",
+    7: "Programming",
+    8: "Unix & Tools",
+}
+for k, v in cat_dict.items():
+    print(f"  {k}: {v}")
+post_cat = int(input("Enter Post Category number: ").strip())
 
 
 
