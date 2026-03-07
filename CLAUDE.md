@@ -12,6 +12,8 @@ Pelican static site generator blog, hosted on GitHub Pages at lizard-spock.co.uk
 
 ## Commands
 - before python, make commands run `source ./venv/bin/activate`
+- do not use em-dash in posts.
+- do not use tabs in post, spaces only.
 
 ### Creating New Posts
 
