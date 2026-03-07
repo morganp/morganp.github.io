@@ -105,8 +105,18 @@ Update site. Rebuid
     # All good ? push code
     git push -u origin main
 
+Plugins
+--
 
-Use 'gh' githubs command line tool which allows authorisation.
+This site uses 2 plugins listed in the requirments.txt the Wavedrom plugin requires npm to install a command line tool.
+
+    brew install nodejs npm
+    npm install wavedrom   
+
+Puch to Github
+--
+
+Use 'gh' githubs command line tool which allows authorisation. Github no longer allows passwords to be include in commands.
 
     brew install gh
 
