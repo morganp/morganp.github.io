@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/tools.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-03-07T00:00:00+00:00</updated><entry><title>reMarkable: Local File Transfer Without the Cloud</title><link href="http://lizard-spock.co.uk/remarkable-local-file-transfer-without-the-cloud.html" rel="alternate"/><published>2026-03-07T00:00:00+00:00</published><updated>2026-03-07T00:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-03-07:/remarkable-local-file-transfer-without-the-cloud.html</id><summary type="html">&lt;p&gt;How to use the reMarkable tablet without cloud sync by unpairing the device and enabling the built-in USB file server at http://10.11.99.1/.&lt;/p&gt;</summary><content type="html">&lt;p&gt;The reMarkable tablet is excellent for reading and annotating PDFs, but by default it routes
+everything through reMarkable's cloud. If you prefer to keep files local -- for privacy, or
+simply because you do not want a subscription -- you can unpair the device and use the
+built-in USB file server instead.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Table of Contents&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="#1-unpairing-from-the-cloud"&gt;Unpairing from the Cloud&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#2-enabling-the-usb-web-interface"&gt;Enabling the USB Web Interface&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#3-transferring-files"&gt;Transferring Files via http://10.11.99.1/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#4-tips-and-limitations"&gt;Tips and Limitations&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2&gt;1. Unpairing from the Cloud&lt;/h2&gt;
+&lt;p&gt;Unpairing stops the device from syncing to reMarkable's servers. Your existing documents
+remain on the device; they are simply no longer backed up or accessible from the reMarkable
+apps on other devices.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;On the tablet:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Open &lt;strong&gt;Settings&lt;/strong&gt; (gear icon, bottom-left of the home screen)&lt;/li&gt;
+&lt;li&gt;Go to &lt;strong&gt;Storage&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Tap &lt;strong&gt;Unpair device&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Confirm when prompted&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Once unpaired, the tablet no longer requires a reMarkable account or internet connection for
+normal use. The cloud sync icon will disappear from the top bar.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Unpairing is reversible. You can re-pair the device at any time from the same
+Settings screen by signing back in to your reMarkable account.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2&gt;2. Enabling the USB Web Interface&lt;/h2&gt;
+&lt;p&gt;The reMarkable has a built-in HTTP file server that becomes accessible over USB. When enabled,
+the tablet presents itself as a USB network adapter and serves files at &lt;code&gt;http://10.11.99.1/&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;On the tablet:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Open &lt;strong&gt;Settings&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Go to &lt;strong&gt;Storage&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Enable &lt;strong&gt;USB transfer&lt;/strong&gt; (the toggle may be labelled "USB web interface" depending on
+   firmware version)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Connect the tablet to your computer&lt;/strong&gt; using the supplied USB-C cable. The tablet will
+appear as a network device (USB Ethernet adapter) rather than a mass storage drive.&lt;/p&gt;
+&lt;p&gt;On Linux the interface typically appears as &lt;code&gt;usb0&lt;/code&gt; or &lt;code&gt;enp0s20u1&lt;/code&gt; and receives an address in
+the &lt;code&gt;10.11.99.0/24&lt;/code&gt; subnet automatically via DHCP from the tablet.&lt;/p&gt;
+&lt;p&gt;Verify connectivity:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ping&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.11.99.1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;3. Transferring Files&lt;/h2&gt;
+&lt;p&gt;Open a browser and navigate to:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;http://10.11.99.1/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The web interface shows all documents and notebooks currently on the device, organised in
+folders matching the tablet's home screen layout.&lt;/p&gt;
+&lt;h3&gt;Uploading PDFs&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Click &lt;strong&gt;Import&lt;/strong&gt; (or the upload button, top-right)&lt;/li&gt;
+&lt;li&gt;Select one or more PDF files from your computer&lt;/li&gt;
+&lt;li&gt;The files appear on the tablet home screen immediately -- no restart required&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Supported formats: &lt;strong&gt;PDF&lt;/strong&gt; and &lt;strong&gt;EPUB&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3&gt;Downloading annotated files&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Click on any document in the web interface&lt;/li&gt;
+&lt;li&gt;Select &lt;strong&gt;Download&lt;/strong&gt; to save the annotated PDF to your computer&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The downloaded file includes all pencil annotations, highlights, and notes made on the tablet.&lt;/p&gt;
+&lt;h3&gt;Command-line upload with curl&lt;/h3&gt;
+&lt;p&gt;For scripting or batch uploads:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;curl&lt;span class="w"&gt; &lt;/span&gt;-X&lt;span class="w"&gt; &lt;/span&gt;POST&lt;span class="w"&gt; &lt;/span&gt;http://10.11.99.1/documents/&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;-F&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;file=@/path/to/document.pdf&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To upload into a specific folder, first find the folder UUID from the web interface URL, then:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;curl&lt;span class="w"&gt; &lt;/span&gt;-X&lt;span class="w"&gt; &lt;/span&gt;POST&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;http://10.11.99.1/documents/{folder-uuid}&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;-F&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;file=@/path/to/document.pdf&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;4. Tips and Limitations&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;No Wi-Fi required.&lt;/strong&gt; The USB file server works entirely over the USB cable with no network
+  connection needed.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Cable must stay connected.&lt;/strong&gt; The web interface is only available while the tablet is
+  plugged in. Unplugging immediately drops the &lt;code&gt;10.11.99.1&lt;/code&gt; address.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;One client at a time.&lt;/strong&gt; The built-in server is minimal; avoid opening multiple browser
+  tabs uploading simultaneously.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Folder structure is flat internally.&lt;/strong&gt; The reMarkable stores documents with UUIDs
+  internally; the folder hierarchy you see in the web interface is a virtual view maintained
+  by the device.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Firmware updates still work offline.&lt;/strong&gt; Updates are downloaded over Wi-Fi separately from
+  the cloud sync; unpairing does not block firmware updates if Wi-Fi is available.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Annotations on existing PDFs&lt;/strong&gt; are exported as a new annotated PDF -- the original on-
+  device file is not modified.&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Tools"/><category term="reMarkable"/><category term="eink"/><category term="PDF"/><category term="privacy"/><category term="Linux"/></entry></feed>
