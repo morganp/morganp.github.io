@@ -10,7 +10,7 @@ OpenSCAD is a script-based 3D CAD modeller, well suited to parametric and printa
 
 ## Install Homebrew
 
-If Homebrew is not already installed, run the following in Terminal:
+If [Homebrew](https://brew.sh) is not already installed, run the following in Terminal:
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
