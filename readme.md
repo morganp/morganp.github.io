@@ -15,9 +15,13 @@ Create Virtual env
     python3 -m venv venv
     source venv/bin/activate
 
-install & run setup
+Install dependencies from requirements.txt
 
-    pip install pelican markdown ghp-import 
+    pip install -r requirements.txt
+
+Or to set up from scratch (first time only)
+
+    pip install pelican markdown ghp-import
     pelican-quickstart
     
 
