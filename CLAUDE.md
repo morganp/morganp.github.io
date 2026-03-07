@@ -1,8 +1,6 @@
 # Pelican Site Configuration and Rules
 
-This is a Pelican static site generator project using Python.
-Theme: [Mention your theme name]
-Markdown Parser: [e.g., Markdown or Pandoc]
+Pelican static site generator blog, hosted on GitHub Pages at lizard-spock.co.uk. Source lives on `main` branch; built HTML is deployed to `gh-pages` branch.
 
 ## Core Structure
 - `content/`: Contains all Markdown/reStructuredText articles and pages.
@@ -14,11 +12,28 @@ Markdown Parser: [e.g., Markdown or Pandoc]
 
 ## Commands
 - before python, make commands run `source ./venv/bin/activate`
-- `make html`: Generate site locally.
-- `make serve`: Serve site on localhost:8000.
-- `make publish`: Generate site for production.
-- `create_new_post.py`: create new post script.
-- If tools required missing use `brew install`
+
+### Creating New Posts
+
+```bash
+python create_new_post.py   # interactive CLI: pick category, enter title
+```
+
+This creates a draft post in `content/posts/` with filename `YYYY-MM-DD_Title.md`. Change `Status: draft` to `Status: published` to publish.
+
+### Build & Serve Commands
+
+```bash
+source venv/bin/activate    # activate Python 3.13 venv first
+
+make devserver              # build + serve with auto-regenerate at localhost:8000
+make html                   # one-off build
+make publish                # production build (uses publishconf.py)
+make github                 # build production + deploy to gh-pages branch
+make clean                  # remove output/
+```
+Run `make` with no args to see all targets.
+
 
 ## Rules for Claude
 1. **Content Creation**: When creating new posts, always use Markdown (`.md`) format.
@@ -29,7 +44,19 @@ Markdown Parser: [e.g., Markdown or Pandoc]
 6. **Themes**: Do not modify files inside `themes/` unless explicitly told to.
 7. **Configuration**: When updating settings, prefer modifying `pelicanconf.py` over `publishconf.py`.
 
-## Content Metadata Template
+## Architecture
+
+- **content/posts/** — Blog posts (~410 markdown files, `.md` and legacy `.markdown`)
+- **content/pages/** — Static pages (about.md, CNAME)
+- **content/images/** — Image assets organized by category subfolder
+- **content/pdf/** — pdf assets
+- **pelicanconf.py** — Development config (RELATIVE_URLS=True)
+- **publishconf.py** — Production config (absolute URLs, Atom feeds, DELETE_OUTPUT_DIRECTORY=True)
+- **output/** — Generated site (gitignored, deployed via ghp-import to gh-pages)
+
+Theme is Pelican's built-in "simple" theme with Jinja2 templates. Template pages for tag/index.html and category/index.html are configured in pelicanconf.py.
+
+## Post Metadata Template
 ```markdown
 Title: [Title]
 Date: 2025-02-19
@@ -38,6 +65,26 @@ Tags: [Tag1, Tag2]
 Slug: [slug-name]
 Author: [Your Name]
 Summary: [Short summary]
+Status: published
 
 Body goes here.
 
+Categories: Engineering, Home & Garden, Hardware & Homelab, Music, Photography, Programming, Unix & Tools
+
+
+## Image References in Posts
+
+```markdown
+![description]({attach}/images/SubFolder/photo.jpg)
+```
+
+Images go in `content/images/` and are configured as a static path.
+
+## Deployment Flow
+
+`make github` runs: `pelican content -s publishconf.py` → `ghp-import output -b gh-pages` → `git push origin gh-pages`
+
+## Utility Scripts
+
+- **python_search_and_replace.py** — Batch convert legacy `.markdown` metadata format
+- **python_search_category.py** — Filter/search posts by category
