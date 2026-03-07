@@ -5,7 +5,7 @@ date: 2013-04-24 07:11:47 +0100
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags:
 discuss_url: //216
 id: 216

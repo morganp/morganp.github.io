@@ -5,7 +5,7 @@ date: 2011-07-25 20:35:18 +0100
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags: Apple, Command Line, Linux, Ubuntu
 discuss_url: //120
 id: 120

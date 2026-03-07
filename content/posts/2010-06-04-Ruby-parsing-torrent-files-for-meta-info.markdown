@@ -5,7 +5,7 @@ date: 2010-06-04 10:03:26 +0100
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags: Performance, Ruby, BitTorrent
 discuss_url: //36
 id: 36

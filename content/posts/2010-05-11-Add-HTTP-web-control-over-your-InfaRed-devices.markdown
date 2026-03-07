@@ -5,7 +5,7 @@ date: 2010-05-11 01:49:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags: Audio, Web, Automation
 discuss_url: //31
 id: 31

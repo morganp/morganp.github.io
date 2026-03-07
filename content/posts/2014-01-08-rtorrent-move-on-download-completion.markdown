@@ -5,7 +5,7 @@ date: 2014-01-08 19:53:02 +0000
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags: rTorrent
 discuss_url: //247
 id: 247

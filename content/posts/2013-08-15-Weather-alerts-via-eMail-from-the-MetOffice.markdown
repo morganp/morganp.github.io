@@ -5,7 +5,7 @@ date: 2013-08-15 12:17:08 +0100
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags: Plants, Weather
 discuss_url: //230
 id: 230

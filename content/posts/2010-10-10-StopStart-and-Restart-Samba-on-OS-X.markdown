@@ -5,7 +5,7 @@ date: 2010-10-10 10:13:52 +0100
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags: Command Line, OS X
 discuss_url: //74
 id: 74

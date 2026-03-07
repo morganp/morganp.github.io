@@ -5,7 +5,7 @@ date: 2013-05-02 17:02:37 +0100
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags: Linux, Ubuntu
 discuss_url: //220
 id: 220

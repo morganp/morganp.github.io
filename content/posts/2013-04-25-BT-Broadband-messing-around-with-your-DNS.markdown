@@ -5,7 +5,7 @@ date: 2013-04-25 09:02:48 +0100
 comments: true
 sharing: true
 footer: true
-Category: Homelab
+Category: Hardware & Homelab
 tags: Networking
 discuss_url: //218
 id: 218
