@@ -8,7 +8,6 @@ footer: true
 Category: Homelab
 tags: Apple, Command Line, Linux, Ubuntu
 discuss_url: //120
-url: //120/Make_Ubuntu_Samba_share_show_up_on_OS_X_10.6_finder
 id: 120
 ---
 Install Avahi, it like bonjour auto discovery but for linux, then tell it about your servers samba service.

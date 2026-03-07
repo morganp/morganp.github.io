@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Git
 discuss_url: //70
-url: //70/Remove_sensitive_data_from_git
 id: 70
 ---
 [Removing Sensitive data from git and eliminate history][sgit]

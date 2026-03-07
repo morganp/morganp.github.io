@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Memory, Performance, Ruby, Perl
 discuss_url: //98
-url: //98/Schwartzian_Transform
 id: 98
 ---
 I recently heard about the Schwartzian transform, which is a sorting idiom from perl. It allows an array of objects to be efficiently sorted by any property. Part of the cleverness is the use of anonymous arrays which allows them to be garbage collected quickly. 

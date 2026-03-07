@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Migrations, Ruby, Active Record
 discuss_url: //59
-url: //59/Activerecord_queries_on_table_joins
 id: 59
 ---
 An example of joining tables through active record models. There is [a good tutorial on the basics][basics] of Activerecord joins.

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line
 discuss_url: //229
-url: //229/tcsh_check_a_var_exists
 id: 229
 ---
 To check if an environment variable exists in .mycshrc or shell scripts

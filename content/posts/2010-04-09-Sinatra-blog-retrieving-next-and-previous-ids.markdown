@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra
 discuss_url: //12
-url: //12/Sinatra_blog_retrieving_next_and_previous_ids
 id: 12
 ---
 When displaying blog/articles it is often nice to have previous and next posts. Simply -1 +1 from the current post.id is not enough because posts could be deleted or marked as private. These requirements should also be added into the :conditions statement. Below is a nice way I found of finding the previous and next ids.

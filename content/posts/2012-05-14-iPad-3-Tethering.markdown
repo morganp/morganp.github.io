@@ -8,7 +8,6 @@ footer: true
 Category: Engineering
 tags: Apple, iPad
 discuss_url: //161
-url: //161/iPad_3_Tethering
 id: 161
 ---
 Three now have tethering available for the iPad 3, which can be [read in the comments by moderators][Three] on the official post.

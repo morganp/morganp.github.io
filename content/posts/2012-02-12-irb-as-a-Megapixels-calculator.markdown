@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Command Line, Ruby
 discuss_url: //138
-url: //138/irb_as_a_Megapixels_calculator
 id: 138
 ---
 I have just added the method below to my ruby .irbrc file for quickly calculating image megapixels. from OS X the info panel gives the form of '23309 × 4412' this becomes '23309???4412' when pasted into iTerm.

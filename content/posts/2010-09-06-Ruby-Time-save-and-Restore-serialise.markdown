@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //67
-url: //67/Ruby_Time_save_and_Restore_%28serialise%29
 id: 67
 ---
 One method to save a time and restore it correctly:

@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Command Line, Heroku, Rack, Ruby, Sinatra
 discuss_url: //78
-url: //78/Sinatra_Heroku_and_config.ru
 id: 78
 ---
 Rack applications often require a config.ru for deployment. The standard config.ru for classic sinatra applications is well documented:

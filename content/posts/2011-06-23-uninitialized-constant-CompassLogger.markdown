@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Active Record, Automation, Compass, Database, Gem, Migrations, Sinatra, Sequel
 discuss_url: //112
-url: //112/uninitialized_constant_Compass%3A%3ALogger
 id: 112
 ---
 Working on a joint project an error started showing up when trying to perform migrations.

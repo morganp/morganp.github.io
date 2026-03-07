@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //50
-url: //50/%5Bvim%5D_Indenting_with_Vim_
 id: 50
 ---
 Vim is a great text editor but has quite a steep learning curve. [VimCasts][vimcast] is a great podcast for learning about vim. 

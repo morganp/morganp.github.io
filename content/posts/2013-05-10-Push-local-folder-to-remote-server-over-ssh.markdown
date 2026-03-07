@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Web
 discuss_url: //221
-url: //221/Push_local_folder_to_remote_server_over_ssh
 id: 221
 ---
 After struggling to get the rake task for octopress to deploy I decided to fall back to the command line and use rsync and ssh to push the static website to the server.

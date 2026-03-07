@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra, Heroku, Web, Git
 discuss_url: //51
-url: //51/Sinatra_running_on_Heroku
 id: 51
 ---
 For running small webapps [heroku][] is free. The real attraction is the simplicity of deployment, if you are use to git you just push to heroku.

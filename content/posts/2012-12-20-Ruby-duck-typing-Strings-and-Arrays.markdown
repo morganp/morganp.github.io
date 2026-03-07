@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //207
-url: //207/Ruby_duck_typing_Strings_and_Arrays
 id: 207
 ---
 How to get method which handles a single string input or an array of strings?

@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Automation, Command Line, Ruby
 discuss_url: //125
-url: //125/Ruby_Search_and_Replace_Script.
 id: 125
 ---
 A small standalone script that search through a file doing text substitutions.

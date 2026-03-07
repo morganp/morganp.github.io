@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Command Line, Ruby, RVM
 discuss_url: //148
-url: //148/Update_your_RVM_Ruby_and_migrate_gemsets
 id: 148
 ---
 Update RVM

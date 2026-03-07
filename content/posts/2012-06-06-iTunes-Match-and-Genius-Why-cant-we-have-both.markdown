@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, iPad
 discuss_url: //170
-url: //170/iTunes_Match_and_Genius%2C_Why_cant_we_have_both%3F
 id: 170
 ---
 In iOS 5 If you have iTunes Match enabled ie to download your songs from the iCloud while on the go then you can not have genius.

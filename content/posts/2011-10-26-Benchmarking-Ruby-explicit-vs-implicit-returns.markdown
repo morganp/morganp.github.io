@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //128
-url: //128/Benchmarking_Ruby%2C_explicit_vs_implicit_returns
 id: 128
 ---
 Back in 2009 [barkingiguana][source] wrote about how explicit returns `'return "String"'` was slower than an implicit return, ie just letting the last value get returned. The test was performed on ruby 1.8.6 and I thought I would just check with ruby 1.9.2-p290 to see if this still held true.

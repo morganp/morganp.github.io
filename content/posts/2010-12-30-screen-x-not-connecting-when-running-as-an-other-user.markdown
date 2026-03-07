@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, OS X, Screen, Linux
 discuss_url: //85
-url: //85/screen_-x_not_connecting_when_running_as_an_other_user
 id: 85
 ---
 I have been running into issues with screen when switching to another user:

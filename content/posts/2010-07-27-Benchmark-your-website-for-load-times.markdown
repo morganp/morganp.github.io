@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Command Line, Linux, Memory, nginx, OS X, Performance, Sinatra, WebFaction, Web, Heroku
 discuss_url: //57
-url: //57/Benchmark_your_website_for_load_times.
 id: 57
 ---
 I have been wondering how to do this for a while and accidentally discovered it while perusing [this heroku page][source]. ab is the ApacheBench marking tool, it lets you set how many requests (for better averaging) and how many concurrent requests (for load testing) to send to your website. ab id installed by default on most unix/linux/mac os x.

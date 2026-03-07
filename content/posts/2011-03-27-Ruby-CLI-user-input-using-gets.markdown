@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Command Line, Ruby
 discuss_url: //95
-url: //95/Ruby_CLI_user_input_using_gets
 id: 95
 ---
 Using a while true loop with 'gets' and a case statement, can create a compact command line interface for ruby scripts.

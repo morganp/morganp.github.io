@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Git
 discuss_url: //248
-url: //248/Reverting_in_git
 id: 248
 ---
 I use to use `svn revert` to roll back local modification and get back to the state I was in last time I checked out.

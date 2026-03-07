@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Heroku, Ruby, Sinatra, Web, Rack
 discuss_url: //52
-url: //52/Get_client_IP_on_Heroku
 id: 52
 ---
 I have been trying to use the [GeoIP Rack App][coderack], by copying this [gist][geogist] in my Rack stack with a Sinatra Application. Heroku has a lot of redirection in there Server farm so I have added the following lines to my instance of GeoIP:Rack to make it Heroku safe.

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: nginx, Web, Ruby, Vim
 discuss_url: //32
-url: //32/Mac_OS_X_run_nginx_as_a_user_process
 id: 32
 ---
 I do not like having to use sudo to run development servers for testing web applications. sudo should be reserved for commands that really need that level of privilege. After [installing passenger and nginx][passenger] on Mac OS X Snow Leopard I had trouble getting nginx to run without sudo.

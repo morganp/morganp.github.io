@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Apple, Lion, Mountain Lion, Ruby, Homebrew
 discuss_url: //180
-url: //180/Mountain_Lion_Setup%2C_Part_1_%3A_Upgrade_Lion
 id: 180
 ---
 MacBook Pro with Lion arrives, before installing any other software apply for the [Up-to-Date Programme][uptodate] for free a mountain lion upgrade.

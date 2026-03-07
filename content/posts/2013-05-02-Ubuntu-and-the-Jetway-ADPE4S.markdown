@@ -8,7 +8,6 @@ footer: true
 Category: Homelab
 tags: Linux, Ubuntu
 discuss_url: //220
-url: //220/Ubuntu_and_the_Jetway_ADPE4S
 id: 220
 ---
 **Still unresolved**

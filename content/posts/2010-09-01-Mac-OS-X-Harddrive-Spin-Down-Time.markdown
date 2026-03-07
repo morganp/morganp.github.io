@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, OS X, Performance, Power
 discuss_url: //66
-url: //66/Mac_OS_X_Harddrive_Spin_Down_Time
 id: 66
 ---
 The Preferences menu in OS x give you the option to turn off Hard Disks whenever possible to save power however the default 10 minutes idle before shutdown can not be adjusted from this panel. This could also be causing excessive ware on desktop 3.5" drives.

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Lightroom, Linux
 discuss_url: //119
-url: //119/New_Macbook_Air_%282011%29_%26_OS_X_Lion
 id: 119
 ---
 The new (July 2011) [Mac Book Air][air] is now out, shipping with Lion.

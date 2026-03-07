@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Web, nginx, Ruby, Sinatra, Vim
 discuss_url: //28
-url: //28/How_to_test_subdomains_on_a_development_machine
 id: 28
 ---
 I recently documented how I [installed Ruby Enterprise and nginx on Mac OS X][amaras-26]. Here we see how to make subdomains work on your local development machine using [nginx][]. These instructions should be relevant for most unix based systems. 

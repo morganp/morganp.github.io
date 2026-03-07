@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Sinatra, Ruby, Performance, WebFaction, Heroku
 discuss_url: //25
-url: //25/Ruby_Memory_Issue_on_Web_Faction
 id: 25
 ---
 I while ago I made [a post][ruby19] about installing ruby 1.9 on my webfaction shared host. They then pointed out to me that if I had gone into my webapps/passanger/bin folder I would have seen that it does not use the ruby and gems on my default path but is free to point to a different version.

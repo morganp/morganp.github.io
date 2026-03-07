@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: VLC, Handbrake
 discuss_url: //40
-url: //40/64Bit_Handbrake_for_Video_Encoding_on_Mac_OS_X
 id: 40
 ---
 If you are trying to use the [64 bit version of handbrake][handbrake64] on Snow Leopard do not for get that there is currently only [one compatible VLC build][vlc64] (Handbrake relies on VLC).

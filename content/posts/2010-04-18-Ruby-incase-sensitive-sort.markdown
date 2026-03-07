@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //18
-url: //18/Ruby_incase_sensitive_sort
 id: 18
 ---
 Ruby has a .sort method which sorts basic objects. it is case sensitive though so Zebra is before apple. Using sort_by instead you can specify the sort key.

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, Git, OS X, Ruby, Homebrew
 discuss_url: //53
-url: //53/Installing_git_on_a_clean_build_of_OS_X
 id: 53
 ---
 Having a clean build of Mac OS X Snow Leopard I thought I would give the [Homebrew][] method of installing git a try.

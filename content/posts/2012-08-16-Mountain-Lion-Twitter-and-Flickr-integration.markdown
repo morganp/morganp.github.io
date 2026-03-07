@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Apple, Flickr, Mountain Lion, Twitter
 discuss_url: //185
-url: //185/Mountain_Lion%2C_Twitter_and_Flickr_integration
 id: 185
 ---
 The settings for Twitter and Flickr feel a little hidden at first. To set them up go to `System Preferences` 'Internet & Wireless' -> 'Mail, Contacts & Calendars'.

@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //154
-url: //154/Joe_Cornish%2C_Book_Series
 id: 154
 ---
 Joe Cornish has been a great influence on my photography, he traditionally works with a large format field camera and is well renowned for his colour works of the british landscape. Trying to find his books in order can be tricky, so I have created this list.

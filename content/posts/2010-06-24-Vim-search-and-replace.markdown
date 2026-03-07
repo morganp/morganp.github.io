@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim, Linux
 discuss_url: //45
-url: //45/Vim_search_and_replace
 id: 45
 ---
 To search in Vim just press (apple-f for macvim) / then search string.  

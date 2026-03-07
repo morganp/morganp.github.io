@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Git
 discuss_url: //159
-url: //159/Using_Github_behind_a_restrictive_firewall
 id: 159
 ---
 When working behind a restrictive firewall, which limits ssh connections you may be running into some of the following errors:

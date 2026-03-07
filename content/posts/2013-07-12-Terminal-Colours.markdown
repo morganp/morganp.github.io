@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Vim, Python, Bash
 discuss_url: //226
-url: //226/Terminal_Colours
 id: 226
 ---
 I have decided to clean up my vim colorschemes. I have been using ir_black for sometime but it does not look the same as others who use it. I think I was forcing it into 256 or 16 color mode.

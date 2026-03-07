@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Memory Map, iPad
 discuss_url: //176
-url: //176/Transferring_a_Memory_Map_2012_map_to_iOS
 id: 176
 ---
 I have specifically been trying to find out how to transfer my full GB Memory Map OS 1:50K 2012 GB map to an iPad, finally found [a working solution here][ios].

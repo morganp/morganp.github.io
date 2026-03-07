@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //200
-url: //200/Converting_flat_structure_into_a_nested_structure
 id: 200
 ---
 Given a flat hierarchy of data comprising level and a label, aim to nest the lower level of objects in to the parents.

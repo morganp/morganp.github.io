@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Bundler, Gem, Ruby, SASS, Web
 discuss_url: //156
-url: //156/Syntax_error%3A_Not_a_valid_color_stop%3A_Sass%3A%3AScript%3A%3AString%3A_white
 id: 156
 ---
 After making a few updates to my site it stopped working after deploying. The issue was that the gem version of compass had not been tied down and the server was working with newer version.

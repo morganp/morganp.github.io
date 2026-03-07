@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //131
-url: //131/Ruby_send_message_to_stderr
 id: 131
 ---
 When creating applications normal messages should go to [stdout][] and error messages should go to [stderr][], unfortunately there is not a nice ruby way the cleanest I have found is:

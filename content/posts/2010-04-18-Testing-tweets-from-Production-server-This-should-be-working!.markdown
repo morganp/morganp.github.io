@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: 
 discuss_url: //19
-url: //19/Testing_tweets_from_Production_server_This_should_be_working%21
 id: 19
 ---
 

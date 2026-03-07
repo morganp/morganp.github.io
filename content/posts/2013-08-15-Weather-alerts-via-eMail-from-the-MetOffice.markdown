@@ -8,7 +8,6 @@ footer: true
 Category: Homelab
 tags: Plants, Weather
 discuss_url: //230
-url: //230/Weather_alerts_via_eMail_from_the_MetOffice
 id: 230
 ---
 In the UK you can now get regional weather alerts from the 

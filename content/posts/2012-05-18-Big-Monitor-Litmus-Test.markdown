@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: 
 discuss_url: //162
-url: //162/Big_Monitor_Litmus_Test
 id: 162
 ---
 A [recent article by sef][post] about how to judge an engineering companies respect engineers and the strength of the engineering culture, used the size of the monitors as a litmus test. This is actually one of the things I pay attention to when getting shown around a potential new company. Do they invest in hardware that lets you work more efficiently.

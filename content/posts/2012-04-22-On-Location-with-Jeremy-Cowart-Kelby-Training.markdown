@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //150
-url: //150/On_Location_with_Jeremy_Cowart_%28Kelby_Training%29
 id: 150
 ---
 While enjoy photography I am not that interested in portrait, fashion or lifestyle photography but for some reason I decided to watch the [Jeremy Cowart][] classes on [Kelby Training][]. The two classes I watched were the [On Location Part 1][] and [On Location Part 2][]. 

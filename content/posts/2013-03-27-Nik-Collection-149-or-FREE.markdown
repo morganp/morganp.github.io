@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Nik, Lightroom
 discuss_url: //213
-url: //213/Nik_Collection_%28%24149_or_FREE%29
 id: 213
 ---
 Nik Software (HDR Efex Pro, Silver Efex Pro) was recently [purchased by Google][googlebuy], since then not too much has happened. Well the HDR Efex Pro 2 was released but not much else.

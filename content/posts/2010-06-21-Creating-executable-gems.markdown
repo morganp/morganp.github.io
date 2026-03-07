@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Gem, Ruby, Linux
 discuss_url: //43
-url: //43/Creating_executable_gems
 id: 43
 ---
 This is not necessarily the correct way of creating executable gems but a method which worked for me.

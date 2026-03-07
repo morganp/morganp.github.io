@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Heroku, Migrations, Ruby, Sinatra
 discuss_url: //79
-url: //79/rake_aborted%21_undefined_method_%60info%27_for_nil%3ANilClass
 id: 79
 ---
 I am currently switching between runing migrations locally on an sqlite3 database and postgres for production on Heroku.

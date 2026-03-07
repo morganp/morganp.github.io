@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Bash, Linux
 discuss_url: //103
-url: //103/bash_scripts_and_cron
 id: 103
 ---
 I have not fully read it but it looks like this is a [good guide to bash scripting][bashguide]. A few things that normally catch me out trying to load modules inside a script, but they fail with:

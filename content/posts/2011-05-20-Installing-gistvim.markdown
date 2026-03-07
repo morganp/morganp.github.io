@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Git, Ruby, Vim, Web
 discuss_url: //107
-url: //107/Installing_gist.vim
 id: 107
 ---
 This vim plugin will allow you to gist directly from vim, simple way is just :Gist to gist entire file more options in the [Full Readme][readme].

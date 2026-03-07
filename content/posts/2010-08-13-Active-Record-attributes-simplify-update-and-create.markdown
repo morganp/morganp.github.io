@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Active Record
 discuss_url: //61
-url: //61/Active_Record__attributes_simplify_update_and_create.
 id: 61
 ---
 In Active Record when updating records I used to have an very manual process to this some thing like:

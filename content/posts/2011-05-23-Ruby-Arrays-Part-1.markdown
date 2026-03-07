@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //108
-url: //108/Ruby_Arrays%2C_Part_1
 id: 108
 ---
 Some uses of Arrays that were not apparent at first.

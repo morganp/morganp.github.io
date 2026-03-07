@@ -8,7 +8,6 @@ footer: true
 Category: Engineering
 tags: Matlab, Simulink
 discuss_url: //238
-url: //238/Matlab_setting_Simulink_simulation_stop_time
 id: 238
 ---
 Running the Simulink model model.mdl from matlab for a specified time: 

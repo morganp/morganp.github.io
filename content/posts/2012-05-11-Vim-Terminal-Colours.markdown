@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Vim
 discuss_url: //160
-url: //160/Vim_Terminal_Colours
 id: 160
 ---
 I use the [ir_black][] for vim ([MacVim][] mainly). Recently have been doing a lot of work in the terminal over ssh and have constantly been having to switch colouscheme to dessert, just to see the text properly.

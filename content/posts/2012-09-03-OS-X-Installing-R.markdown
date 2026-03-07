@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, OS X, R, Mountain Lion, Homebrew
 discuss_url: //190
-url: //190/OS_X_Installing_R
 id: 190
 ---
 [R][] is a language for statistical computing and graphics. It is the choice of [Coursera][] Statistics One.

@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //100
-url: //100/Behaviour_and_State
 id: 100
 ---
 Classes are a basic Object Orientated Structure which encapsulate state and behaviour. Some times you just require to capture state/storage of a data structure with out any behaviour, in this case Ruby's Stuct can be useful.

@@ -3,7 +3,7 @@ layout: post
 title: "Macbook keyboard light not working"
 date: 2014-03-13 20:00:47 +0000
 comments: true
-Category: Engineering
+Category: Hardware & Homelab
 tags: OS X, Mavericks, Macbook
 ---
 

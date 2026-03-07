@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //2
-url: //2/Ruby_include_%28require%29_local_files
 id: 2
 ---
 Also a [gist][ruby_example] on github. This is an example of how you can require files in a relative path to the script. As Ruby scripts execute from which ever path they were called.

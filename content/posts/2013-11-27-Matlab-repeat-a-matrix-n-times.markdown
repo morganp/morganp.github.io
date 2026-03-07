@@ -8,7 +8,6 @@ footer: true
 Category: Engineering
 tags: Matlab
 discuss_url: //241
-url: //241/Matlab_repeat_a_matrix_n_times
 id: 241
 ---
 repmat(matrix, [repeat_y, repeat_x])

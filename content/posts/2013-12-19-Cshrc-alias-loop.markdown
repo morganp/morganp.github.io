@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line
 discuss_url: //245
-url: //245/Cshrc_alias_loop
 id: 245
 ---
 Here are some aliased commands which stop line wrapping on really long lines, making the output much more readable:

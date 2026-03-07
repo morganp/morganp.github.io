@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //137
-url: //137/Vim%2C_paste_from_insert_mode
 id: 137
 ---
     ctrl-r "

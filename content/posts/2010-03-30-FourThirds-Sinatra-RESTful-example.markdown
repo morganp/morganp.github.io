@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra, Git
 discuss_url: //4
-url: //4/FourThirds_Sinatra_RESTful_example
 id: 4
 ---
 This is an example of efficient use of views in [Sinatra][sinatra] covering RESTful actions. This is a copy of my [original post on GitHub][source]. Data will retrieved and modified from a database using ORMs, I have a set of lessons and answers you can follow if you wish to [learn more about][ORMLesson] this.

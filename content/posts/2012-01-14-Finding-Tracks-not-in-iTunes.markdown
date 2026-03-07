@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Automation, Audio, Ruby
 discuss_url: //134
-url: //134/Finding_Tracks_not_in_iTunes
 id: 134
 ---
 After switching my Audio ripper ([Max][]) accidentally to 'AAC Low Delay' rather than plain 'AAC' I realised too late after about 20-30cd rips that they were not appearing in iTunes.

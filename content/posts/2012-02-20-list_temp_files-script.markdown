@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Automation, Command Line, Vim
 discuss_url: //139
-url: //139/list_temp_files_script
 id: 139
 ---
 A simple script for finding temp files from the current directory and below. I often run this before adding a new project to a revision control system to ensure temp files do not get added into the repo.

@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Filters
 discuss_url: //202
-url: //202/LEE_Wide_Angle_Hood
 id: 202
 ---
 Available to buy from [Dale Photographic][] or [WEX][].

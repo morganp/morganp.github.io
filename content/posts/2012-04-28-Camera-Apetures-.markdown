@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //157
-url: //157/Camera_Apetures_
 id: 157
 ---
 The camera aperture is how far the iris is kept open during the exposure. A wide aperture, large opening lets in more light so can have a faster shutter speed but also has a lower depth of field (DOF). That is less of the image will be in sharp focus.

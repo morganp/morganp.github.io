@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Command Line, Ruby
 discuss_url: //130
-url: //130/Suppressing_Warnings_in_Ruby_Scripts
 id: 130
 ---
 Suppressing warnings is usually a bad idea but if you understand the risk and want to carry on regardless. When ruby to call a script then the warning level can be set via:

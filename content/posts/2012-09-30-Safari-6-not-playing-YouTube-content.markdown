@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Safari
 discuss_url: //199
-url: //199/Safari_6_not_playing_YouTube_content
 id: 199
 ---
 After getting Safari 6 it seems that YouTube is no longer letting my watch video as html5 video formats and requires me to have flash installed.

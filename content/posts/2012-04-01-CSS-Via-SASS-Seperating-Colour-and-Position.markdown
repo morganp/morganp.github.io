@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: CSS, SASS, Web, Sinatra
 discuss_url: //144
-url: //144/CSS_%28Via_SASS%29_Seperating_Colour_and_Position
 id: 144
 ---
 While working on this site I wanted to find a simple way of trying out multiple stylesheets for different colour schemes. I originally thought a simple way to do this would be split it in to multiple stylesheets, one for position and another for colour.

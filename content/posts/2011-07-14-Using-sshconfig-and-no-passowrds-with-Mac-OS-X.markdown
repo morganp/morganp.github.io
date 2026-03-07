@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Automation, Command Line, OS X
 discuss_url: //117
-url: //117/Using_%7E%2F.ssh%2Fconfig_and_no_passowrds_with_Mac_OS_X
 id: 117
 ---
 Using ssh to securely connect with servers from the terminal is pretty easy. set up a public key and a private key using:

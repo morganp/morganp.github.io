@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: jQuery, Web
 discuss_url: //48
-url: //48/jQuery_clear_form_on_focus_and_restore_on_exit
 id: 48
 ---
 I used [this as a jQuery reference][jquery] to hide and show default text in forms.

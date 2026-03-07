@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Lightroom
 discuss_url: //240
-url: //240/Lightroom_5.3_RC_Beta_available
 id: 240
 ---
 

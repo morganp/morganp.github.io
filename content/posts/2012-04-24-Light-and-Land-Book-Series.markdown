@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //153
-url: //153/Light_and_Land%2C_Book_Series
 id: 153
 ---
 While the [Light and Land][] books do not have to be read in order I think it helps as they occasionally reference earlier work. Finding out the correct order is often tricky, searching amazon and comparing publishing dates. So I have compiled the list here. 

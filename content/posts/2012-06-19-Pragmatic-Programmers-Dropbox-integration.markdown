@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Apple, iPad, Kindle, PragProg
 discuss_url: //174
-url: //174/Pragmatic_Programmers%2C_Dropbox_integration
 id: 174
 ---
 After deciding to try out epub on the kindle, as I noticed people are listing epub as an apple format. I thought it was an open version of mobi, for other ebook readers, and since the iPad is good with pdfs did not really think apple would have been to interested.

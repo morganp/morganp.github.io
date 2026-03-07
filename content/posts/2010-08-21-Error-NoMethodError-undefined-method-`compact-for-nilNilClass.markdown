@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Active Record, Command Line, Sequel
 discuss_url: //64
-url: //64/Error%3A_NoMethodError%3A_undefined_method_%60compact%27_for_nil%3ANilClass
 id: 64
 ---
 When running a sequel migration I kept getting this error:   

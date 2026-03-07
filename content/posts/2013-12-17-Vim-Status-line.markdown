@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //244
-url: //244/Vim%3A_Status_line
 id: 244
 ---
 Deciding to see if I could make my vim status line a bit more practical for myself. I decided to try having the modification '[+]' warning as the first thing on the line. I do not want the rest of the line jumping about when it changes from empty to +, using min widths that should be no problem:

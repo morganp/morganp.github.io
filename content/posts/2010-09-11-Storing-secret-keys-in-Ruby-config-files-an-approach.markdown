@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Git, Ruby
 discuss_url: //71
-url: //71/Storing_secret_keys_in_Ruby_config_files_an_approach
 id: 71
 ---
 I have for a while wondered about an ideal (good) approach to storing api keys in config files in ruby projects. A few conditions must be met:  

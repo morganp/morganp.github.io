@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Command Line, Gem, Ruby, WebFaction, Sinatra, Linux
 discuss_url: //89
-url: //89/gem_permissions_on_WebFaction
 id: 89
 ---
 After making a few updates to my site I decided to upgrade the version of sinatra I was using in my web faction account. for some reason I started getting these errors:

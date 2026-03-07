@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line
 discuss_url: //135
-url: //135/Recursive_grep%2C_with_filtering
 id: 135
 ---
 I noticed today that greps recursive function is different to finds recursion. 

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Linux
 discuss_url: //235
-url: //235/For_loops_in_csh%2Ftcsh
 id: 235
 ---
 To count from 1 up to 20 in steps of 5

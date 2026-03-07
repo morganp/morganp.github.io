@@ -8,7 +8,6 @@ footer: true
 Category: Homelab
 tags: Networking
 discuss_url: //218
-url: //218/BT_Broadband_messing_around_with_your_DNS
 id: 218
 ---
 BT broadband has **BT Web Address Help** enabled by default. This allows then to redirect you to another site if they think you typed the URL incorrectly.

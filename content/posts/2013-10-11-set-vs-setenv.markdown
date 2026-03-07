@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line
 discuss_url: //236
-url: //236/set_vs_setenv
 id: 236
 ---
 setenv allows sub shells to inherit the value.

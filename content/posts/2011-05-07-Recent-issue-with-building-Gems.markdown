@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Gem, Ruby
 discuss_url: //105
-url: //105/Recent_issue_with_building_Gems
 id: 105
 ---
 When running gem build on a new library I have been working on I started getting the following error:

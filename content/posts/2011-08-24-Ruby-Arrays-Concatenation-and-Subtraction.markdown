@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //122
-url: //122/Ruby_Arrays_Concatenation_and_Subtraction
 id: 122
 ---
 Building on my [original Ruby Arrays article][article1] a few more things you can do with Ruby Arrays.

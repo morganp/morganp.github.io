@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Automation, Ruby, Vim
 discuss_url: //84
-url: //84/Ruby_Block_Selection_in_Vim_%28Plugin%29
 id: 84
 ---
 A new very cool plugin for Rubyists using Vim. [RubyBlock][rubyblock] TextObjects created by [Drew Neil][drewneil] from [Vimcasts.org][vimcast]. Once installed it will add the commands var, vir, sr & ir for selecting Ruby blocks, Drew Neil has explained it well on [VimCasts][rubyblock].

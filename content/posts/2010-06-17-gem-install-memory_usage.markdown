@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Gem, Memory, OS X, Performance, Ruby
 discuss_url: //42
-url: //42/gem_install_memory_usage
 id: 42
 ---
 Just released my first gem ['memory_usage'][gem] Version 0.0.1.

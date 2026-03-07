@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Lightroom
 discuss_url: //215
-url: //215/Lightroom_5_Public_Beta
 id: 215
 ---
 The [Lightroom 5 Beta][LR5] is out now, Free and active until June 2013.

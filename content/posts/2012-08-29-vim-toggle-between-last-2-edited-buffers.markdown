@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //187
-url: //187/%23vim_toggle_between_last_2_edited_buffers
 id: 187
 ---
     ctrl-6

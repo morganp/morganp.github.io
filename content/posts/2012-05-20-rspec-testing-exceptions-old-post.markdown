@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Rspec
 discuss_url: //165
-url: //165/rspec_testing_exceptions_%28old_post%29
 id: 165
 ---
 [Correct Post](http://amaras-tech.co.uk/article/166)

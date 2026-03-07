@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Web, CSS
 discuss_url: //56
-url: //56/%40philip_roberts_taught_me_a_thing_or_two_about_CSS
 id: 56
 ---
 CSS or Cascading Style Sheets are used for styling html elements. HTML elements can have id's, which must be unique to all other elements on the page. HTML elements can also have a type class, an item can belong to multiple classes and a page can have multiple items in a class.

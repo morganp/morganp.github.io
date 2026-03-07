@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, Mountain Lion, OS X
 discuss_url: //175
-url: //175/Mac_Mountain_Lion_Compatibility
 id: 175
 ---
 One of the limitations of mountain lion is that they are only going to support 64 bit Kernel extensions, the graphics drivers are are loaded as a kernel extension and some of the older macs (mac pro, iMac, MacBook, MacBook pro) only have a 32bit graphics driver (Kernel extension) avilable and so will not be supported by Mountain Lion.

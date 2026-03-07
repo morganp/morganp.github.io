@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Gem, Ruby, Sinatra
 discuss_url: //77
-url: //77/Sinatra_Session_Extension
 id: 77
 ---
 I have just started to use a [sinatra extensions][sinatra-extensions] called [Sinatra Session][sinatra-session]. The write up on the [main site][sinatra-session] is pretty good and only include a short summary below.

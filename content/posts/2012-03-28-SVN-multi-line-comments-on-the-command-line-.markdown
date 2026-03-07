@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Automation, Subversion
 discuss_url: //141
-url: //141/SVN_multi-line_comments_on_the_command_line_
 id: 141
 ---
 Answer:

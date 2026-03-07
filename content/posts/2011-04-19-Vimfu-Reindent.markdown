@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //101
-url: //101/Vimfu_Reindent
 id: 101
 ---
 The latest addition to [my .vimrc][vimrc] below, allows ;g to smart indent the current file. It is the same as gg=G but returning you to the same position. 

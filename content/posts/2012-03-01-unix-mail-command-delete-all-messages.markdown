@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, Linux
 discuss_url: //140
-url: //140/unix_mail_command%2C_delete_all_messages
 id: 140
 ---
 Cron jobs can have there results returned as mail via the unix mail system. If left unchecked for a while the number of mails can mount up and you probably do not care about the old results. the command `d *` will delete all mails

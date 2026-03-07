@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra
 discuss_url: //23
-url: //23/Sinatra_File_Upload
 id: 23
 ---
 A simple Sinatra web app to upload a single file. Also available as a [gist][], based on <http://pastie.caboo.se/134681>

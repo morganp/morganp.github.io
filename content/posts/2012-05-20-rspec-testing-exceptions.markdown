@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Rspec
 discuss_url: //166
-url: //166/rspec_testing_exceptions
 id: 166
 ---
 [rspec][] is a testing framework designed to make test-driven development enjoyable and productive. On the recent release of [RubyIt][] I wanted to improve the error reporting and cover this new functionality with tests.

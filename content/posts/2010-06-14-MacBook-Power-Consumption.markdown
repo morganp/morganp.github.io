@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Performance, Memory, Power, VLC
 discuss_url: //39
-url: //39/MacBook_Power_Consumption
 id: 39
 ---
 MacBook3,1 (2007) Intel Core 2 Duo 2.2GHz Hard drive and memory upgraded to 320GB and 4GB

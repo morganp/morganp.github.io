@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //46
-url: //46/Vim_show_lines_over_80_charaters_long.
 id: 46
 ---
 This snippet can be added to you ~/.vimrc to highlight long lines.

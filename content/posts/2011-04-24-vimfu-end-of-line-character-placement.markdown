@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //102
-url: //102/vimfu_end_of_line_character_placement
 id: 102
 ---
 In Vim to insert text before the cursor press 'i', to insert text after cursor 'a' or to edit at the end of line 'A'. To paste before the cursor 'p' to paste after the cursor 'P'. 

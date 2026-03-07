@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Heroku, Rack, Ruby, Sinatra, Web, WebFaction
 discuss_url: //149
-url: //149/Sinatra_application_in_.%2Flib_and_views%2C_public_routes_not_working
 id: 149
 ---
 I have been setting up my recent Sinatra projects with a standard ruby project layout putting all of the application code within a lib folder. When running locally I have been cding in to the lib folder and just running: 

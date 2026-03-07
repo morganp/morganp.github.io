@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //15
-url: //15/Ruby_.nil%3F_tests_fail_%3F_you_really_want_%7C%7C%3D
 id: 15
 ---
 I recently discovered ||= in ruby. Its main use is for initialising a variable if it does not already exists, this is great for extending templates with new functions and maintaining backwards compatibility.

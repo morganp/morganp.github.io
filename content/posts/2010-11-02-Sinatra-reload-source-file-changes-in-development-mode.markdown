@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Gem, Rack, Ruby, Sinatra
 discuss_url: //76
-url: //76/Sinatra_reload_source_file_changes_in_development_mode
 id: 76
 ---
 [Sinatra Reloader][github] is a sinatra extension which reloads source files while in development mode, this functionality was removed from base sinatra in 0.9.2

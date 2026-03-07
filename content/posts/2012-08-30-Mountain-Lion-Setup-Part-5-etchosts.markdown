@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Mountain Lion, Networking, Vim
 discuss_url: //189
-url: //189/Mountain_Lion_Setup%2C_Part_5_%2Fetc%2Fhosts
 id: 189
 ---
 For ssh and ping to local machines with out the .local extension I added them to my /ets/hosts file.

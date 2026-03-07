@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Web, nginx
 discuss_url: //27
-url: //27/413_Request_Entity_Too_Large
 id: 27
 ---
 The '413 Request Entity Too Large' Error message is because you have filled in a form and are submitting it with too much data in the form. Typically this comes from uploading files.

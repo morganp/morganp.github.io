@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags:
 discuss_url: //114, Verilog, Ruby
-url: //114/Ideas_1st_July_to_the_3rd_July
 id: 114
 ---
 When working with HDLs (Hardware Description Languages) there a few things that could be improved/made easier:

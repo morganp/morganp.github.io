@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Bundler, Performance, Rack, Ruby, Sinatra, Web
 discuss_url: //163
-url: //163/Handle_www._and_no-www_for_better_google_juice
 id: 163
 ---
 There was an interesting post on hacker news recently, [safeshepherd suddenly fell off the google][1] for their own name. The [comments][2] had some good answers especially the first by a google employee. 

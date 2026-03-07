@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //7
-url: //7/Ruby_Logger
 id: 7
 ---
 Ruby has a nice logging function, 

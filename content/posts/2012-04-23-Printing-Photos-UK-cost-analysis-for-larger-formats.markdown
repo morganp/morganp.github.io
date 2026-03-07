@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //152
-url: //152/Printing_Photos%2C_UK_cost_analysis_for_larger_formats.
 id: 152
 ---
 High quality printers actually have lower resolutions than you would expect. [Nothlight Images][nli] have a good article on it [here][nli]. The gist of it is that maximum image ppi (pixels per inch) at most needs to be 286 if viewing from 2 feet.

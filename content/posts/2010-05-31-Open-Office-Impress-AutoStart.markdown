@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: OpenOffice
 discuss_url: //34
-url: //34/Open_Office_Impress_AutoStart
 id: 34
 ---
 Open office by default does not have a mode to auto start the presentation when launched. With the ImpressRunner plugin you can: 

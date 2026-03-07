@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //167
-url: //167/Create_And%2COr_of_multiple_booleans
 id: 167
 ---
 To reduce an array of Booleans to a single Boolean using enumerables reduce method:

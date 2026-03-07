@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Bash
 discuss_url: //142
-url: //142/What_shell_am_i_using%3F
 id: 142
 ---
 If you are working on a new system or with multiple environments it is good to know what type of shell you are using. the answer is in the $0 variable.

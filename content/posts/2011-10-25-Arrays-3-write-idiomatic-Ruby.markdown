@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //126
-url: //126/Arrays_3%2C_write_idiomatic_Ruby
 id: 126
 ---
 Previous posts [arrays][] and [arrays2][]

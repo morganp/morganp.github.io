@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, Mountain Lion, Git, Vim, Bash
 discuss_url: //183
-url: //183/Mountain_Lion_Setup%2C_Part_3_%3A_Little_Snitch_%26_Dotfiles
 id: 183
 ---
 Little Snitch

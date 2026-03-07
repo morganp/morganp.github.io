@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Lion, Mountain Lion
 discuss_url: //188
-url: //188/OS_X_Get_Info_Summary_for_multiple_items
 id: 188
 ---
 If you use the ⌘I shortcut in finder with a file selected you get a 'Get Info' window. If you do this with 20 files selected you get 20 windows, In Snow Leopard if 10 or more file were selected you got a Summary window. I found this handy for getting the disk usage for a bunch of files. 

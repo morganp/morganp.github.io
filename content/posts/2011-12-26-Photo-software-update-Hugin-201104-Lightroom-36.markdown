@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //133, Lightroom
-url: //133/Photo_software_update%2C_Hugin_2011.04_%26_Lightroom_3.6
 id: 133
 ---
 Lightroom 3.6 has been released. Downloads for [Mac][lightroom-mac] and [Windows][lightroom-window].

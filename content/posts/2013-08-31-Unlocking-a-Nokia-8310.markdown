@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags:
 discuss_url: //231
-url: //231/Unlocking_a_Nokia_8310
 id: 231
 ---
 After deciding to try out [OVIVO]() network for my phone I realised that the my Nokia 8310 was network locked and prompted me to enter the 'restriction code'.

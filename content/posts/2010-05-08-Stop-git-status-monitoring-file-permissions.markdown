@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Git
 discuss_url: //29
-url: //29/Stop_git_status_monitoring_file_permissions
 id: 29
 ---
 By default git status returned differences in file permissions. To turn if off run:

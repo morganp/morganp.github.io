@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //124
-url: //124/Photography_Workshops
 id: 124
 ---
 Just making a note to self to check these regularly for updates

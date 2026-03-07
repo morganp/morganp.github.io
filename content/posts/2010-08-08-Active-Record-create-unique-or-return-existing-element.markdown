@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Active Record, Ruby
 discuss_url: //60
-url: //60/Active_Record_create_unique_or_return_existing_element
 id: 60
 ---
 When working with databases it is often a requirement to have unique elements (columns) which are not the primary key, this can be achieved in the active record model with:

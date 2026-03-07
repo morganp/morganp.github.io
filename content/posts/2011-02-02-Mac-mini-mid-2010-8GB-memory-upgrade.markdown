@@ -5,10 +5,9 @@ date: 2011-02-02 08:30:24 +0000
 comments: true
 sharing: true
 footer: true
-Category: Engineering
+Category: Hardware & Homelab
 tags: Memory, OS X, Performance
 discuss_url: //87
-url: //87/Mac_mini_%28mid_2010%29_8GB_memory_upgrade
 id: 87
 ---
 Finally got my mac mini to accept the 8GB kit I bought from [Crucial][] for £74 (apple upgrade is £409).

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, Java, OS X
 discuss_url: //55
-url: //55/Turn_a_.jar_file_into_a_mac_.app
 id: 55
 ---
 Following [this article][source] lets you turn a executable java .jar into a mac appliction (.app). The Tools are only available on Mac OS with Xcode installed.

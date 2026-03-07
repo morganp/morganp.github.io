@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //237
-url: //237/VIM%3A_Convert_tabs_to_spaces
 id: 237
 ---
 Good programming practice is to use spaces to indent code rather than tabs. Due to tabs often being rendered differently by editors and personal configurations. 

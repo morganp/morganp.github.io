@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, Safari, Web
 discuss_url: //193
-url: //193/Syncing_Safari_via_dropbox_for_pre_iCloud_OS_X
 id: 193
 ---
 *THIS NO LONGER WORKS, IF IT EVER DID :(*

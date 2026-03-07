@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra
 discuss_url: //8
-url: //8/Sinatra_1.0_Released
 id: 8
 ---
 Sinatra 1.0 has been released!

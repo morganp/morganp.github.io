@@ -8,7 +8,6 @@ footer: true
 Category: Homelab
 tags:
 discuss_url: //216
-url: //216/BitTorrent_Sync%2C_free_rival_to_DropBox
 id: 216
 ---
 [BitTorrent Sync][BTsync] although still in Beta offers a App and protocol for [DropBox][] like file syncing. As it is an app rather than a service you use you own disk space. Hope fully it can also be run on [webfaction][] to setup a private cloud.

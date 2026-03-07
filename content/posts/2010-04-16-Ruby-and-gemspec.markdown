@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Gem
 discuss_url: //16
-url: //16/Ruby_and_gemspec
 id: 16
 ---
 I have just forked and cloned a project on github and discovered \*.gemspec files. They are a nice way of specifying the gem dependencies in your project. once you have the copied/cloned a project before you run it just call:

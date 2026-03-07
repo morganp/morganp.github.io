@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: CSS, Design, SASS, Sinatra, Web
 discuss_url: //143
-url: //143/User_selectable_stylesheets_%28Using_Sinatra%29
 id: 143
 ---
 Working on my site design I thought it would be nice to have user selectable stylesheets, say a black text on white background or white text on black background. Once I had this working in development mode I ran into the problem with the stylesheet being cached. 

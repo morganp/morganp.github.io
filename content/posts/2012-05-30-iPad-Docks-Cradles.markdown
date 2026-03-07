@@ -5,10 +5,9 @@ date: 2012-05-30 20:58:27 +0100
 comments: true
 sharing: true
 footer: true
-Category: Engineering
+Category: Hardware & Homelab
 tags: iPad
 discuss_url: //169
-url: //169/iPad_Docks_%2F_Cradles
 id: 169
 ---
 Around up of nice looking ipad docks / cradles

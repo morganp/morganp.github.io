@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra, Compass, SASS, CSS
 discuss_url: //3
-url: //3/Sinatra_and_compass_sending_compressed_cached_CSS
 id: 3
 ---
 I have previously mentioned on [blogger][munkyblog] how to use Compass and SASS with Sinatra for rendering the stylesheets.

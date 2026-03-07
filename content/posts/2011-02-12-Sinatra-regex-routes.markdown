@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra
 discuss_url: //88
-url: //88/Sinatra_regex_routes
 id: 88
 ---
 The routes for my site have been growing since adding pagination (/articles/older/) and tag filtering. As well as the small amount of logic for each route was getting duplicated. 

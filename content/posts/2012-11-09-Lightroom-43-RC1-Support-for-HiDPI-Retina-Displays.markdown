@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Lightroom
 discuss_url: //205
-url: //205/Lightroom_4.3_RC1%2C_Support_for_HiDPI_%28Retina%29_Displays
 id: 205
 ---
 A new Release Candidate for Lightroom is out, [Lightroom 4.3 RC1][]. Expires 31st Jan 2013.

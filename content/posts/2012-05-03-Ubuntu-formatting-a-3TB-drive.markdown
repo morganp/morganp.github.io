@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Linux, Memory, Ubuntu, Vim
 discuss_url: //158
-url: //158/Ubuntu%2C_formatting_a_3TB_drive
 id: 158
 ---
 I started off following [the ubuntu guide for installing a new drive][ubuntu], which uses fdsik to create the partitions how ever after formatting and mounting I ran `df -h`:

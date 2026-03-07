@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Linux, Ubuntu
 discuss_url: //54
-url: //54/Adding_USB_drives_to_a_headless_Ubuntu_Linux_box
 id: 54
 ---
 After adding some USB2 (NTFS formatted) drives to a headless Ubuntu server, they were not auto-mounted so I had to find them and mount them, with only remote terminal access.

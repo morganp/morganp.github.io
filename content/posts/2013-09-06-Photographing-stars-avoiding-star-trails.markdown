@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //233
-url: //233/Photographing_stars_avoiding_star_trails
 id: 233
 ---
 While not attempted getting good images of the milkyway yet every so often I see some good examples and do a little bit more research.

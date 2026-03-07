@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //121
-url: //121/Ruby_Blocks_for_better_code_reuse
 id: 121
 ---
 While working on some disk space / folder structure scripts I had several functions which hierarchically search the disk then performed some custom function. When refactoring the code I realised that the specific functions could be contained in a block and passed to a generic search method.

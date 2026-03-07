@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: nginx, Sinatra, Web, WebFaction
 discuss_url: //47
-url: //47/WebFaction_problems_restarting_nginx
 id: 47
 ---
 After updating my website on [webfaction][] nginx kept saying permission denied and when I tried to view my site I got a 502 Bad Gateway error page.

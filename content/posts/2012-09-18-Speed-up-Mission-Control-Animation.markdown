@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Mountain Lion
 discuss_url: //195
-url: //195/Speed_up_Mission_Control_Animation
 id: 195
 ---
 If entering Mission Control (ctrl-up) is taking to long you can speed up the animation entering the following in the Terminal (/Applications/Utilities/Terminal.app):

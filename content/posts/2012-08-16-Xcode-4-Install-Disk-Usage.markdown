@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Mountain Lion, XCode
 discuss_url: //181
-url: //181/Xcode_4_Install%2C_Disk_Usage
 id: 181
 ---
 [Some info on what has changed in Xcode 4.3][xcode4.3]. Latest is 4.4 but a lot changed in 4.3 making this a good reference point.

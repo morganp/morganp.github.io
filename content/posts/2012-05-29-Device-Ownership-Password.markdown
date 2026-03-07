@@ -8,7 +8,6 @@ footer: true
 Category: Engineering
 tags: Microsoft, Networking
 discuss_url: //168
-url: //168/Device_Ownership_Password
 id: 168
 ---
 While using a pool laptop from work and trying to connect to my home wifi I am prompted for my Device Ownership Password. It will only accept numerics, I believe this is requesting the 'Security Pin' which is stamped on the bottom of my netgear router.

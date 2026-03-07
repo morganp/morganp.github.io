@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //192
-url: //192/Vim_consistent_spelling_correction_highlighting
 id: 192
 ---
 In gvim and mvim incorrect spellings are highlighted with a squiggly underscore ala MS Word. vim in a terminal (xterm) will highlight the word be default. The following snippet can be added to your .vimrc file after setting your colorscheme. If you do not set a colorscheme then you are likely using the default and this could be placed any where.

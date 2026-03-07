@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Flickr, Microsoft, Windows
 discuss_url: //58
-url: //58/Recover_%28Bulk_Download%29_your_Pictures_from_Flickr
 id: 58
 ---
 Flickr is a great way to backup your photos and other images for around £25 a year you get unlimited storage. There are numerous uploader tools but not many bulk download applications. 

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Web
 discuss_url: //224
-url: //224/Stackoverflow_sites_and_images
 id: 224
 ---
 Stackoverflow have supported markdown for a while. The syntax for showing an image is :

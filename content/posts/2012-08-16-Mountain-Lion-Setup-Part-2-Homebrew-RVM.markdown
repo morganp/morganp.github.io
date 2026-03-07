@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Apple, Command Line, Homebrew, Mountain Lion, Ruby, RVM
 discuss_url: //182
-url: //182/Mountain_Lion_Setup%2C_Part_2_Homebrew_%26_RVM
 id: 182
 ---
 Following on from [Macbook Pro Setup][setup1], Now it is time to install some of the command line tools.

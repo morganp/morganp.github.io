@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Heroku, Memory, Performance, Web, WebFaction
 discuss_url: //69
-url: //69/Amazon_Drops_EC2_Web_Service_Prices
 id: 69
 ---
 The new [EC2-Pricing][] also includes a new Micro service. This micro service is intended for small apps servicing tens of requests per second.

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line
 discuss_url: //145
-url: //145/Trying_to_disable_Caps_Lock_on_Unix_systems
 id: 145
 ---
 Entering the following command in to your .bashrc seems like a simple way forward.

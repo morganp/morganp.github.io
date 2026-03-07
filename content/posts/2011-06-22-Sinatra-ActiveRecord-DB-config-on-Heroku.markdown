@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Active Record, Automation, Database, Heroku, Regex, Ruby, Sequel, Sinatra, Web
 discuss_url: //111
-url: //111/Sinatra_ActiveRecord_DB_config_on_Heroku
 id: 111
 ---
 To make an automatic [ActiveRecord][] database connection using ENV\['DATABASE_URL'\] The following snippet can be used:

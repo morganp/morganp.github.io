@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Lightroom
 discuss_url: //104
-url: //104/Lightroom_Tip_press_%E2%8C%98%2F_to_see_all_possible_shortcuts
 id: 104
 ---
 I have captured all 5 lists here, but they are only a ⌘/ away.

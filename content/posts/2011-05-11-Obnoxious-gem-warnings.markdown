@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Command Line, Gem, Ruby, Heroku
 discuss_url: //106
-url: //106/Obnoxious_gem_warnings
 id: 106
 ---
 recenlty after updating rubygems Istarted getting a lot of warning like this when running ruby or executable gems:

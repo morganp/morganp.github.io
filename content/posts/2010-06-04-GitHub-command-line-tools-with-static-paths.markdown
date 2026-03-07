@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Ruby
 discuss_url: //35
-url: //35/GitHub_command_line_tools_with_static_paths
 id: 35
 ---
 I have written a few command line tools in ruby which I use to perform file system maintenance. Mainly sorting files and applying standard renames, because the the folders I want to sort are always in the same location I do not want to have to remember to run the command in the correct directory so I add the paths explicitly. This creates a problem with uploading to [GitHub][] as other people would then need to modify the script. 

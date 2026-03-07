@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Command Line, Ruby
 discuss_url: //123
-url: //123/warning%3A_already_initialized_constant
 id: 123
 ---
 Do you some times see:

@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Javascript, Web
 discuss_url: //217
-url: //217/JavaScript_Net_Curtain
 id: 217
 ---
 Normally this would just end up on [my link blog][], but thought it was worthy of a proper mention.

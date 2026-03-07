@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Audio, iTunes, Audiobook, Android
 discuss_url: //37
-url: //37/M4B_Audiobooks_on_Android
 id: 37
 ---
 The \*.m4b extension is used for audiobooks on the iTunes Store and is a convenient (if you have an iPod) format that other Audio books can be converted to. It is a wrapper for AAC encoded audio data with chapters.

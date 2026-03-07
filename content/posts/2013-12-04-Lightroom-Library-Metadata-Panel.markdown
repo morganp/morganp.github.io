@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Lightroom
 discuss_url: //243
-url: //243/Lightroom_Library_Metadata_Panel
 id: 243
 ---
 The metadata panel in Lightroom has always felt a little crowded to me. It shows too many dialog boxes or not the ones I want and have to scroll through many panes.

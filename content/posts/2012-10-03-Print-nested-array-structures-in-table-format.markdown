@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //201
-url: //201/Print_nested_array_structures_in_table_format
 id: 201
 ---
 Problem

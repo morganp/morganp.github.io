@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //210
-url: //210/Vim_Code_Folding
 id: 210
 ---
 To enable code folding in Vim type (from normal mode):

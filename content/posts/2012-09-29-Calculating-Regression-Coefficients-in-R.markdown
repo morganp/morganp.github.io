@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: R, Statistics
 discuss_url: //198
-url: //198/Calculating_Regression_Coefficients_in_R
 id: 198
 ---
 For this example we will have a data file with two columns of data labelled A and B. For example

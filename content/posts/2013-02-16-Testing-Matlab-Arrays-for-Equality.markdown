@@ -8,7 +8,6 @@ footer: true
 Category: Engineering
 tags: Matlab
 discuss_url: //212
-url: //212/Testing_Matlab_Arrays_for_Equality.
 id: 212
 ---
 Testing a matlab array for equality can be doen a few different was some have surprising side effects if your not use to working with vectorised testing.

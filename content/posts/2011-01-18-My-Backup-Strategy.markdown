@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Automation, Command Line, Linux, OS X, Performance, Ubuntu, Bash
 discuss_url: //86
-url: //86/My_Backup_Strategy
 id: 86
 ---
 Considering various raid strategies I decided that Raid 5 would be too limiting and have previously found raid striping systems to be too unreliable. I decided to have a bunch of disks (JBOD if you will) directly connected to a machine. At some point in the future I would like a merged view of the drives, potentially through a fuse file system or a soft linking script.

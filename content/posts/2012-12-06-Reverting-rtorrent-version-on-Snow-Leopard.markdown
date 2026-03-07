@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, BitTorrent, Leopard, Snow Leopard, OS X, rTorrent, Homebrew, Git
 discuss_url: //206
-url: //206/Reverting_rtorrent_version_on_Snow_Leopard
 id: 206
 ---
 After running  a `brew upgrade` rtorrent was plagued with segmentation faults. Which look something like :

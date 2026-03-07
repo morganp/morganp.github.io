@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra, Sequel, Migrations
 discuss_url: //11
-url: //11/Sequel_ORM_Migrations
 id: 11
 ---
 Available as a [gist][gist] a Sequel Migration to rename a database column.

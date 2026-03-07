@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Math
 discuss_url: //211
-url: //211/Algebra_%3A_Properties_of_Real_%28%26%23x211D%29_Numbers
 id: 211
 ---
 Commutative

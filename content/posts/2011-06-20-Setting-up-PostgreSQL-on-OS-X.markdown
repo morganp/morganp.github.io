@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Database, Ruby, Homebrew
 discuss_url: //109
-url: //109/Setting_up_PostgreSQL_on_OS_X
 id: 109
 ---
 An old guide is written on the [Apple Developer Forum][apple] however if you are using [Homebrew][] it is much simpler.

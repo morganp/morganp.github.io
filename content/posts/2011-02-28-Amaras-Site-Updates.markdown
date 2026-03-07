@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Design, Web, Ruby
 discuss_url: //93
-url: //93/Amaras_Site_Updates
 id: 93
 ---
 I have just finished some minor updates to the site. The largest is the move to Droid Fonts, [Google Fonts][] provides a way for free cross platform fonts to be used. [Font Squirrel] is also meant to be a good alternative.

@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //204
-url: //204/Canon_2012_Winter_Cash_Back
 id: 204
 ---
 The new [Canon Cash back](http://www.canon.co.uk/wintercashback/) offer IS now valid for purchases between Thursday 18th October 2012 and Thursday 24th January 2013.

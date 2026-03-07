@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Active Record, Database, Git, Ruby
 discuss_url: //110
-url: //110/Ruby_script_connect_to_DB_using_database.yml
 id: 110
 ---
 To connect to a rails style DB config outside of the normal workflow, or using a database.yml in a different workflow:

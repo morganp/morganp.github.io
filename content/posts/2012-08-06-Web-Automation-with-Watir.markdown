@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Automation, Gem, OS X, Ruby, Web, Homebrew
 discuss_url: //177
-url: //177/Web_Automation_with_Watir
 id: 177
 ---
 [Watir][] is a web testing framework implemented in ruby, but can be used for testing or automating any web service.

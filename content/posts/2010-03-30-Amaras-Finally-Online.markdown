@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: WebFaction, Sinatra
 discuss_url: //1
-url: //1/Amaras_Finally_Online
 id: 1
 ---
 Just a short first note to announce the fact that the site is finally up.

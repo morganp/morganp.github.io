@@ -8,7 +8,6 @@ footer: true
 Category: Engineering
 tags: Matlab, Plot
 discuss_url: //24
-url: //24/Matlab_Scripting_Axes_Properties
 id: 24
 ---
 Matlab figure properties which can be set through the properties editor can also be set by scripts. My main stumbling block was not realising that gca is a builtin function which returns the current axes. A list of [all properties][mathworks].

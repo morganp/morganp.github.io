@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Vim
 discuss_url: //191
-url: //191/Get_snipMate_working%2C_a_%23vim_plugin
 id: 191
 ---
 [snipMate][] is a useful vim plugin which allows short cuts like for'tab' to be set up which will insert the snippet:

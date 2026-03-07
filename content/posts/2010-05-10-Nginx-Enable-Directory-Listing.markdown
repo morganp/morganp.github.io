@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Web, nginx
 discuss_url: //30
-url: //30/Nginx_Enable_Directory_Listing
 id: 30
 ---
 Directory listing can be enabled (disabled by default) by adding this:

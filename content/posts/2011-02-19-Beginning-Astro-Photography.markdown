@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //90, Lightroom
-url: //90/Beginning_Astro_Photography
 id: 90
 ---
 None of this has been tried yet but from various sources I have created this list:

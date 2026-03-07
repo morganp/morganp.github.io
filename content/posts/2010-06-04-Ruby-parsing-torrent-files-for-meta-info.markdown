@@ -8,7 +8,6 @@ footer: true
 Category: Homelab
 tags: Performance, Ruby, BitTorrent
 discuss_url: //36
-url: //36/Ruby_parsing_torrent_files_for_meta_info
 id: 36
 ---
 There currently does not appear to be any really good torrent file parsers available via the gems system.

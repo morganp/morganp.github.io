@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Git
 discuss_url: //132
-url: //132/Ruby_get_a_users_real_name
 id: 132
 ---
 There does not appear to be a nice way to get a current users real name in ruby. The best way I have found on \*nix systems (Not windows) is:

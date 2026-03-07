@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, Mountain Lion
 discuss_url: //179
-url: //179/Mountain_Lion_default_%24PATH
 id: 179
 ---
     /usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin

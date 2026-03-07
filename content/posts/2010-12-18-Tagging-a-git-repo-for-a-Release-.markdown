@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Git
 discuss_url: //83
-url: //83/Tagging_a_git_repo_for_a_Release_
 id: 83
 ---
 I think it is good practise to create a read only tag when releasing an application. This allows you to create a branch from it at any time or a bug fix with out worrying about accidentally mixing in new features from your latest code base. 

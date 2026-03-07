@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: BitTorrent, Command Line
 discuss_url: //96
-url: //96/%27unregistered_torrent%27_flush_the_DNS
 id: 96
 ---
 If a torrent application has been running and torrents start showing a status of 'unregistered torrent' a likely cause is that the server IP address has changed. To fix this you need to close the application and flush the DNS, before starting the application again.

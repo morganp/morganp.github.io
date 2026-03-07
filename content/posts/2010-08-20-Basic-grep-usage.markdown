@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, OS X, Linux
 discuss_url: //63
-url: //63/Basic_grep_usage
 id: 63
 ---
 Grep is a unix (and mac os x) command line tool to search files for text.  

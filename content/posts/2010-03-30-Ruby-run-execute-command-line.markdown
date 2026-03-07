@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //5
-url: //5/Ruby_run_%28execute%29_command_line
 id: 5
 ---
 Also a [gist][gist] on github. This code snippet is an example of how to execute a command line argument in ruby and display the output

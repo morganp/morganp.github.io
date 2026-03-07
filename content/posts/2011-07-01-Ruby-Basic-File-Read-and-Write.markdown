@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //113
-url: //113/Ruby_Basic_File_Read_and_Write
 id: 113
 ---
 Read text file with one line:

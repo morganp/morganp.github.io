@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, OS X
 discuss_url: //65
-url: //65/Mac_OS_X_Default_Path
 id: 65
 ---
 As this seemed to be a useful post on my old blog I am reposting it.

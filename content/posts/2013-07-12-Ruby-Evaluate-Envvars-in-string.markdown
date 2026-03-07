@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //228
-url: //228/Ruby_Evaluate_Envvars_in_string.
 id: 228
 ---
 In ruby Dir.entries takes a path and returns a list of its contents. However it does not deal with paths (strings) which contain Enviroment Variables (envvars), first they need to be expanded.

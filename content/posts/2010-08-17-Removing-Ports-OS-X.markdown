@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, OS X, Homebrew
 discuss_url: //62
-url: //62/Removing_Ports_OS_X
 id: 62
 ---
 I have previously mentioned I installed [Homebrew][] for installing unix packages, I left Ports in place, but removed from my path, just incase. I have tonight noticed that the Mac ports directory is eating up 1.7GB of space and I want it back.

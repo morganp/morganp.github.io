@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //94
-url: //94/Working_From_Home%2C_Practising_Enfuse_HDR
 id: 94
 ---
 While trying to get my setup to work from home I thought I would give [enfuse][] a go at merging 3 different exposures.

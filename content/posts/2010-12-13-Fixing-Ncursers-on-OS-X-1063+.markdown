@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, OS X, Homebrew
 discuss_url: //82
-url: //82/Fixing_Ncursers_on_OS_X_10.6.3%2B
 id: 82
 ---
 Currently OS X 10.6.3 - 10.6.5 the ncursers library is broken. A hacky fix is to copy the libraries from 10.6.2. I have put my working copies in a public drop box.

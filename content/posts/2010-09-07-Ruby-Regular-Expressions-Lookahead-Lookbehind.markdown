@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Gem, Ruby, Regex
 discuss_url: //68
-url: //68/Ruby_Regular_Expressions_Lookahead_%2F_Lookbehind
 id: 68
 ---
 I recently discovered a feature of regular expressions called lookahead. This means for a match the lookahead must exist but it does not become part of the matched string.

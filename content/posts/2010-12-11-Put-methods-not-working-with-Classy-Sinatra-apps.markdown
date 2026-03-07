@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Sinatra
 discuss_url: //80
-url: //80/Put_methods_not_working_with_Classy_Sinatra_apps
 id: 80
 ---
 Since moving to Classy Sinatra applications I have not been able to get put and delete methods to work correctly. This is because sinatra/base does not include the rack method override 'stuff'.

@@ -8,7 +8,6 @@ footer: true
 Category: Homelab
 tags: Command Line, OS X
 discuss_url: //74
-url: //74/Stop%2FStart_and_Restart_Samba_on_OS_X
 id: 74
 ---
 To Stop Start and Restart Samba on Mac OS X 10.6:

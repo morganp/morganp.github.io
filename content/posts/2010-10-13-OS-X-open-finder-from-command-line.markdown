@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, OS X
 discuss_url: //75
-url: //75/OS_X_open_finder_from_command_line
 id: 75
 ---
 Just discovered this: from [source][].

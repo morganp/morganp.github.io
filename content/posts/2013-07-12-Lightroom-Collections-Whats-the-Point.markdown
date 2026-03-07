@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Lightroom
 discuss_url: //227
-url: //227/Lightroom_Collections_Whats_the_Point%3F
 id: 227
 ---
 After using Lightroom for over 6 years I still do not see the point in Lightroom Collections.

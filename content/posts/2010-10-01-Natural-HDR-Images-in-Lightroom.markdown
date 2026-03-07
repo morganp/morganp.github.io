@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Lightroom
 discuss_url: //73
-url: //73/Natural_HDR_Images_in_Lightroom
 id: 73
 ---
 NB: By default the image is only 500pixels on the long edge. By donating to the project you can remove this restriction.

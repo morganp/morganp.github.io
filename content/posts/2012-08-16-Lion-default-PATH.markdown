@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Command Line, Lion
 discuss_url: //178
-url: //178/Lion_default_%24PATH
 id: 178
 ---
     /usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin

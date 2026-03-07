@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Performance, Ruby, Sinatra, Web
 discuss_url: //155
-url: //155/Minify_your_HTML_from_Sinatra
 id: 155
 ---
 There are gzip compression options available but when I looked at this a long time ago I found that the extra server load to compress (with out caching) and the extra delay in the browser to decompress was not worth the few bytes it saved and lead to longer times before seeing the fully rendered page.

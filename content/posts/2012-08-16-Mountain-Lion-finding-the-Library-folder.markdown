@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Mountain Lion
 discuss_url: //186
-url: //186/Mountain_Lion_finding_the_Library_folder
 id: 186
 ---
 From OS X Lion the Users Library folder has been hidden. To find it make Finder the active application, that is when the menu bar displays 'Finder' in the top left, select the 'Go' menu. Then press the option key (⌥) and select Library.

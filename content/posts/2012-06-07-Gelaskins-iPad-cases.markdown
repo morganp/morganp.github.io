@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, iPad
 discuss_url: //171
-url: //171/Gelaskins_iPad_cases
 id: 171
 ---
 Got the steam punk Gelaskins case yesterday, they can be a fiddle to fit but incredibly thin and adds grippines to the iPad.

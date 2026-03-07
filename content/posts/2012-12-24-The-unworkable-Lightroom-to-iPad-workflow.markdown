@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: Apple, iPad, Lightroom
 discuss_url: //208
-url: //208/The_unworkable_Lightroom_to_iPad_workflow
 id: 208
 ---
 After a bit of research I decided to give [PhotoSmith][photosmith] Version 2.2 a go, it is the most expensive iPad app I have bought to-date. It fills a niche market and nothing else promised what it could deliver it might be worth it. Due to failed promises and many things not work as you would expect it was a massive drain on my time investigating how to get it to work. so the real cost of the app is the hours of you life it wasted!

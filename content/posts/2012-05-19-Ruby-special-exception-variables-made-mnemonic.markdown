@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //164
-url: //164/Ruby_special_exception_variables_made_mnemonic
 id: 164
 ---
 In ruby you can catch StandardErrors using begin rescue end

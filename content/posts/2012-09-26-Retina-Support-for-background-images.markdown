@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: CSS, Web
 discuss_url: //196
-url: //196/Retina_Support_for_background_images
 id: 196
 ---
 This is based on a [guide to adding retina support to websites][guide].

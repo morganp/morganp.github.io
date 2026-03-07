@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Command Line, Git
 discuss_url: //197
-url: //197/Git_Submodules
 id: 197
 ---
 For code reuse within I have found Subversion externals really nice to work with. Instead of copy and pasting code between projects you import part or a whole Subversion repository, at trunk, a pinned revision of trunk or a tag.

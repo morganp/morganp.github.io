@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Matlab, Performance
 discuss_url: //6
-url: //6/Ruby_Performance_Measure
 id: 6
 ---
 Also available as a [gist][gist]. Very simple way of measuring execution time in seconds using Ruby

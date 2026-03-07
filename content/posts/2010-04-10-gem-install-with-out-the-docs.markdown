@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby, Gem
 discuss_url: //13
-url: //13/gem_install_with_out_the_docs
 id: 13
 ---
 When I install gems on my server I do not get any of the documentation which is normally 3-5 times larger than the gem itself. Installing gems with out docs can be done via 

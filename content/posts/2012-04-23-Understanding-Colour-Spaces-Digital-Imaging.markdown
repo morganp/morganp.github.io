@@ -8,7 +8,6 @@ footer: true
 Category: Photography
 tags: 
 discuss_url: //151
-url: //151/Understanding_Colour_Spaces_%28Digital_Imaging%29
 id: 151
 ---
 When working with digital images some effort should be put into understanding the colour space. Which basically means that for each colour the range that you can represent. Knowing the range of colours the file can hold, the range you can see on your screen and the range that you can print will let you get the best results from your images.

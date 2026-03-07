@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //72
-url: //72/Ruby_each_or_delete_if
 id: 72
 ---
 In ruby some times you want to iterate over an array and remove items that meet certain conditions, if using each the results may be unexpected.

@@ -8,7 +8,6 @@ footer: true
 Category: Unix & Tools
 tags: Apple, Mountain Lion
 discuss_url: //184
-url: //184/Mountain_Lion_Setup%2C_Part_4_Apps
 id: 184
 ---
 A better Terminal [iTerm2][].  

@@ -8,7 +8,6 @@ footer: true
 Category: Programming
 tags: Ruby
 discuss_url: //33
-url: //33/Super_simple_Ruby_list_directory_contents
 id: 33
 ---
 A very simple Ruby way for listing files in a directory is the glob function:
