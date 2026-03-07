@@ -4,7 +4,7 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Article 01: From Room to Silicon — The Story of the Computer System</title>
+                        <title>SoC Article 01: From Room to Silicon — The Story of the Computer System</title>
                         <link rel="stylesheet" href="./theme/css/main.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
     <meta name="description" content="How computing evolved from room-filling mainframes to a sliver of silicon in your pocket — and why that history shapes modern SoC design." />
@@ -29,7 +29,7 @@
       <header>
         <h1 class="entry-title">
           <a href="./soc-article-01-from-room-to-silicon.html" rel="bookmark"
-             title="Permalink to Article 01: From Room to Silicon — The Story of the Computer System">Article 01: From Room to Silicon — The Story of the Computer System</a></h1>
+             title="Permalink to SoC Article 01: From Room to Silicon — The Story of the Computer System">SoC Article 01: From Room to Silicon — The Story of the Computer System</a></h1>
       </header>
 
       <div class="entry-content">
@@ -46,7 +46,7 @@
 </footer><!-- /.post-info -->        <p><em>Series: Introduction to SoC Design | Article 1 of 11</em></p>
 <hr>
 <h2>Introduction</h2>
-<p>There is a photograph from 1964 that captures the scale of computing at the time. It shows two engineers installing an IBM System/360 Model 50. They are not sitting at desks. They are standing in a large, air-conditioned room, surrounded by cabinets the size of wardrobe closets, connected by thick bundles of cabling snaking under a raised false floor. The computer weighs approximately two tonnes. It required specialist riggers with cranes and fork trucks to move into the building. It draws 30 kilowatts of power — enough to heat several homes.</p>
+<p>There is a photograph from 1964 that captures the scale of computing at the time. It shows two engineers installing an <a href="https://en.wikipedia.org/wiki/IBM_System/360">IBM System/360</a> Model 50. They are not sitting at desks. They are standing in a large, air-conditioned room, surrounded by cabinets the size of wardrobe closets, connected by thick bundles of cabling snaking under a raised false floor. The computer weighs approximately two tonnes. It required specialist riggers with cranes and fork trucks to move into the building. It draws 30 kilowatts of power — enough to heat several homes.</p>
 <p>That machine cost around $3.5 million in 1964 dollars. It performed roughly 500,000 operations per second.</p>
 <p>The phone in your pocket performs about 15 <em>trillion</em> operations per second - thirty million times more — on a sliver of silicon roughly 100 mm² in area, weighing a fraction of a gram, drawing less than three watts. It fits comfortably in a jacket pocket.</p>
 <p>This article is the story of how we got from there to here. It is not just a history lesson. Understanding the shape of that journey — what drove miniaturisation at each step, and what trade-offs were made along the way — is essential context for understanding why modern SoC design is structured the way it is.</p>
@@ -66,9 +66,9 @@
 <hr>
 <h2>Era 1: The Room-Sized Machine (1950s–1960s)</h2>
 <h3>Valves and Racks</h3>
-<p>The earliest electronic computers used <strong>vacuum tubes</strong> (valves) as their switching elements. A vacuum tube is roughly the size of a light bulb. A computer that needs hundreds of thousands of switching elements built from vacuum tubes fills a building.</p>
-<p><strong>ENIAC</strong> (1945) is the canonical example: 17,468 vacuum tubes, 70,000 resistors, 10,000 capacitors, filling a room 2.4 m × 1.8 m × 30 m. It consumed 150 kilowatts of power and broke down regularly — with so many valves, a failure every few hours was normal. Operators spent more time repairing it than computing with it.</p>
-<p>The <strong>Manchester Baby</strong> (1948), while tiny by comparison, still occupied a substantial rack of equipment and required skilled operators to program it using switches and plugboards.</p>
+<p>The earliest electronic computers used <strong><a href="https://en.wikipedia.org/wiki/Vacuum_tube">vacuum tubes</a></strong> (valves) as their switching elements. A vacuum tube is roughly the size of a light bulb. A computer that needs hundreds of thousands of switching elements built from vacuum tubes fills a building.</p>
+<p><strong><a href="https://en.wikipedia.org/wiki/ENIAC">ENIAC</a></strong> (1945) is the canonical example: 17,468 vacuum tubes, 70,000 resistors, 10,000 capacitors, filling a room 2.4 m × 1.8 m × 30 m. It consumed 150 kilowatts of power and broke down regularly — with so many valves, a failure every few hours was normal. Operators spent more time repairing it than computing with it.</p>
+<p>The <strong><a href="https://en.wikipedia.org/wiki/Manchester_Baby">Manchester Baby</a></strong> (1948), while tiny by comparison, still occupied a substantial rack of equipment and required skilled operators to program it using switches and plugboards.</p>
 <div class="highlight"><pre><span></span><code>Approximate Physical Scale — 1950s Computer Systems
 
   ┌──────────────────────────────────────────────────────────────────┐
@@ -84,7 +84,7 @@
 </code></pre></div>
 
 <h3>The Transistor Changes Everything</h3>
-<p>In 1947, Bell Labs invented the transistor. It did the same job as a vacuum tube — acting as an electronic switch — but was smaller, faster, cooler, more reliable, and consumed far less power. By the late 1950s, computers began to be built from transistors instead.</p>
+<p>In 1947, <a href="https://en.wikipedia.org/wiki/Bell_Labs">Bell Labs</a> invented the <a href="https://en.wikipedia.org/wiki/Transistor">transistor</a>. It did the same job as a vacuum tube — acting as an electronic switch — but was smaller, faster, cooler, more reliable, and consumed far less power. By the late 1950s, computers began to be built from transistors instead.</p>
 <p><strong>IBM System/360</strong> (1964) was a landmark: the first family of computers with a common instruction set, so that programs written for one model would run on any other. But it was still a room-scale machine. The System/360 Model 50 filled multiple cabinets, required dedicated air conditioning, and had to be craned into the computer room through specially widened doorways or lowered through the roof.</p>
 <p>The economics were equally extreme: only universities, large corporations, government agencies, and national laboratories could afford to own one. Everyone else bought time-shares, submitting jobs on punched cards and waiting hours for results.</p>
 <div class="highlight"><pre><span></span><code>IBM System/360 Model 50 Installation (1964):
@@ -110,8 +110,8 @@
 <h2>Era 2: The Minicomputer (1965–1975)</h2>
 <h3>Thinking Small</h3>
 <p>The <strong>minicomputer</strong> was not called "mini" because it was small by today's standards. It was called mini because it was dramatically smaller than the mainframes it accompanied — small enough to fit in a single large cabinet, deliverable in a standard lift, operable without a dedicated air-conditioned room.</p>
-<p><strong>Digital Equipment Corporation (DEC)</strong> pioneered this category. Their <strong>PDP-8</strong> (1965) was a 12-bit machine that cost $18,000 — expensive, but accessible to a laboratory, university department, or medium-sized company without a dedicated data centre.</p>
-<p>The <strong>PDP-11</strong> (1970) is one of the most important computers ever designed. It was a 16-bit machine that fit in a single rack about the size of a tall filing cabinet. It had a clean, elegant instruction set that influenced virtually every processor architecture that followed — including Unix, which was first developed on a PDP-7 and PDP-11.</p>
+<p><strong><a href="https://en.wikipedia.org/wiki/Digital_Equipment_Corporation">Digital Equipment Corporation (DEC)</a></strong> pioneered this category. Their <strong><a href="https://en.wikipedia.org/wiki/PDP-8">PDP-8</a></strong> (1965) was a 12-bit machine that cost $18,000 — expensive, but accessible to a laboratory, university department, or medium-sized company without a dedicated data centre.</p>
+<p>The <strong><a href="https://en.wikipedia.org/wiki/PDP-11">PDP-11</a></strong> (1970) is one of the most important computers ever designed. It was a 16-bit machine that fit in a single rack about the size of a tall filing cabinet. It had a clean, elegant instruction set that influenced virtually every processor architecture that followed — including <a href="https://en.wikipedia.org/wiki/Unix">Unix</a>, which was first developed on a <a href="https://en.wikipedia.org/wiki/PDP-7">PDP-7</a> and PDP-11.</p>
 <div class="highlight"><pre><span></span><code>DEC PDP-11 (1970) — Physical Footprint:
 
   ┌─────────────────────┐
@@ -132,18 +132,18 @@
     Cost: ~$10,000 (1970)
 </code></pre></div>
 
-<p>The PDP-11 introduced several ideas that persist in modern SoC design: memory-mapped I/O (where peripherals appear as addresses in the memory map), a bus standard (UNIBUS), and the concept of a clean separation between the processor and the rest of the system through a well-defined bus interface.</p>
+<p>The PDP-11 introduced several ideas that persist in modern SoC design: <a href="https://en.wikipedia.org/wiki/Memory-mapped_I/O">memory-mapped I/O</a> (where peripherals appear as addresses in the memory map), a bus standard (<a href="https://en.wikipedia.org/wiki/Unibus">UNIBUS</a>), and the concept of a clean separation between the processor and the rest of the system through a well-defined bus interface.</p>
 <h3>The Minicomputer Era's Legacy</h3>
 <p>The minicomputer era produced ideas that underpin every SoC today:</p>
 <ul>
-<li><strong>Bus standards</strong> — the UNIBUS, Multibus, and S-100 buses established the principle that components from different vendors could interoperate on a common bus</li>
-<li><strong>Operating systems</strong> — Unix was born on the PDP-11; its model of processes, file descriptors, and device drivers lives on in Linux running on modern SoCs</li>
+<li><strong>Bus standards</strong> — the UNIBUS, <a href="https://en.wikipedia.org/wiki/Multibus">Multibus</a>, and <a href="https://en.wikipedia.org/wiki/S-100_bus">S-100</a> buses established the principle that components from different vendors could interoperate on a common bus</li>
+<li><strong>Operating systems</strong> — Unix was born on the PDP-11; its model of processes, file descriptors, and device drivers lives on in <a href="https://en.wikipedia.org/wiki/Linux">Linux</a> running on modern SoCs</li>
 <li><strong>Modular architecture</strong> — CPU, memory, and I/O were separate cards in the same backplane, a precursor to the IP block model</li>
 </ul>
 <hr>
 <h2>Era 3: The Microprocessor (1971–1980)</h2>
 <h3>Everything on One Chip</h3>
-<p>In 1971, Intel introduced the <strong>4004</strong> — the first microprocessor. It placed the entire CPU — arithmetic unit, registers, control logic — onto a single chip about 12 mm². It ran at 740 kHz and processed 4-bit numbers.</p>
+<p>In 1971, Intel introduced the <strong><a href="https://en.wikipedia.org/wiki/Intel_4004">4004</a></strong> — the first microprocessor. It placed the entire CPU — arithmetic unit, registers, control logic — onto a single chip about 12 mm². It ran at 740 kHz and processed 4-bit numbers.</p>
 <p>This was a revolutionary idea: previously, a "CPU" was a cabinet full of boards. Now it was a package you could hold between your fingers.</p>
 <div class="highlight"><pre><span></span><code><span class="nv">The</span><span class="w"> </span><span class="nv">Microprocessor</span><span class="w"> </span><span class="nv">Compresses</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">CPU</span>:
 
@@ -160,14 +160,14 @@
 <span class="w">  </span><span class="nv">Multiple</span><span class="w"> </span><span class="nv">boards</span>,<span class="w"> </span><span class="o">~</span><span class="mi">1000</span><span class="w"> </span><span class="nv">chips</span><span class="w">    </span>└──────────────────────┘
 </code></pre></div>
 
-<p>The <strong>8080</strong> (Intel, 1974), <strong>6502</strong> (MOS Technology, 1975), and <strong>Z80</strong> (Zilog, 1976) followed in rapid succession. These 8-bit processors became the engines of the personal computer revolution.</p>
-<p>The <strong>Intel 8086</strong> (1978) and <strong>Motorola 68000</strong> (1979) raised the bar to 16-bit, with the 68000 in particular earning a reputation for elegance and performance that made it the choice for the Apple Macintosh, the Amiga, the Atari ST, and countless workstations.</p>
+<p>The <strong><a href="https://en.wikipedia.org/wiki/Intel_8080">8080</a></strong> (Intel, 1974), <strong><a href="https://en.wikipedia.org/wiki/MOS_Technology_6502">6502</a></strong> (MOS Technology, 1975), and <strong><a href="https://en.wikipedia.org/wiki/Zilog_Z80">Z80</a></strong> (Zilog, 1976) followed in rapid succession. These 8-bit processors became the engines of the personal computer revolution.</p>
+<p>The <strong><a href="https://en.wikipedia.org/wiki/Intel_8086">Intel 8086</a></strong> (1978) and <strong><a href="https://en.wikipedia.org/wiki/Motorola_68000">Motorola 68000</a></strong> (1979) raised the bar to 16-bit, with the 68000 in particular earning a reputation for elegance and performance that made it the choice for the <a href="https://en.wikipedia.org/wiki/Macintosh">Apple Macintosh</a>, the <a href="https://en.wikipedia.org/wiki/Amiga">Amiga</a>, the <a href="https://en.wikipedia.org/wiki/Atari_ST">Atari ST</a>, and countless workstations.</p>
 <p>But the microprocessor alone was just the CPU. Everything else — memory, storage, I/O — was still provided by separate chips on a board. The "system" was still a board, just a smaller one.</p>
 <hr>
 <h2>Era 4: The Personal Computer (1977–1990)</h2>
 <h3>The Desktop System</h3>
-<p>The first personal computers were kits for hobbyists. The <strong>Altair 8800</strong> (1975) was an 8080-based machine with no keyboard, no display, and no software beyond a bootloader — users programmed it by toggling switches on the front panel.</p>
-<p>Within a few years, <strong>Apple</strong>, <strong>Commodore</strong>, and <strong>Tandy</strong> produced complete personal computers: CPU, RAM, ROM, keyboard, display output, and storage on a single motherboard in a desktop enclosure. The <strong>Apple II</strong> (1977) sold as a complete system you could put on a desk.</p>
+<p>The first personal computers were kits for hobbyists. The <strong><a href="https://en.wikipedia.org/wiki/Altair_8800">Altair 8800</a></strong> (1975) was an 8080-based machine with no keyboard, no display, and no software beyond a bootloader — users programmed it by toggling switches on the front panel.</p>
+<p>Within a few years, <strong>Apple</strong>, <strong>Commodore</strong>, and <strong>Tandy</strong> produced complete personal computers: CPU, RAM, ROM, keyboard, display output, and storage on a single motherboard in a desktop enclosure. The <strong><a href="https://en.wikipedia.org/wiki/Apple_II">Apple II</a></strong> (1977) sold as a complete system you could put on a desk.</p>
 <div class="highlight"><pre><span></span><code><span class="n">Apple</span><span class="w"> </span><span class="n">II</span><span class="w"> </span><span class="n">Motherboard</span><span class="w"> </span><span class="p">(</span><span class="mi">1977</span><span class="p">)</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">Complete</span><span class="w"> </span><span class="n">Computer</span><span class="w"> </span><span class="n">System</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">One</span><span class="w"> </span><span class="n">Board</span><span class="o">:</span>
 
 <span class="w">  </span><span class="err">┌────────────────────────────────────────────────────────────────┐</span>
@@ -188,12 +188,12 @@
 <span class="w">  </span><span class="err">└────────────────────────────────────────────────────────────────┘</span>
 </code></pre></div>
 
-<p>The <strong>IBM PC</strong> (1981) standardised the desktop architecture that dominated computing for three decades: a processor, a chipset handling memory and I/O, expansion slots for peripherals, and a shared bus (first ISA, later PCI). By the late 1980s, a PC could sit on a desk, consume 50–200 W, and perform millions of operations per second for a few thousand dollars.</p>
+<p>The <strong><a href="https://en.wikipedia.org/wiki/IBM_Personal_Computer">IBM PC</a></strong> (1981) standardised the desktop architecture that dominated computing for three decades: a processor, a chipset handling memory and I/O, expansion slots for peripherals, and a shared bus (first <a href="https://en.wikipedia.org/wiki/Industry_Standard_Architecture">ISA</a>, later <a href="https://en.wikipedia.org/wiki/Peripheral_Component_Interconnect">PCI</a>). By the late 1980s, a PC could sit on a desk, consume 50–200 W, and perform millions of operations per second for a few thousand dollars.</p>
 <p>The chip count had fallen from thousands (mainframe) to hundreds (minicomputer) to dozens on a single motherboard. But a PC motherboard was still a system assembled from many chips: CPU, north bridge, south bridge, graphics chip, sound chip, network chip, storage controller, and many more.</p>
 <hr>
 <h2>Era 5: The Laptop — Mobile Demands Integration</h2>
 <h3>Batteries Change Everything</h3>
-<p>The first truly portable computers appeared around 1981. The <strong>Grid Compass</strong> (1982) was used by NASA and the US military — it was functional but cost $8,000 and ran for barely four hours on battery. The <strong>Compaq LTE</strong> (1987) was the first laptop to use a 3.5" hard drive and internal battery in a genuinely portable form factor.</p>
+<p>The first truly portable computers appeared around 1981. The <strong><a href="https://en.wikipedia.org/wiki/GRiD_Compass">Grid Compass</a></strong> (1982) was used by NASA and the US military — it was functional but cost $8,000 and ran for barely four hours on battery. The <strong><a href="https://en.wikipedia.org/wiki/Compaq_LTE">Compaq LTE</a></strong> (1987) was the first laptop to use a 3.5" hard drive and internal battery in a genuinely portable form factor.</p>
 <p>Mobile computing imposed a constraint that desktop design had never faced: <strong>batteries</strong>. A desktop computer plugged into the wall can draw as much power as needed. A laptop must run for hours on a battery with finite energy.</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Power</span><span class="w"> </span><span class="nv">Budget</span><span class="w"> </span>—<span class="w"> </span><span class="nv">Desktop</span><span class="w"> </span><span class="nv">vs</span>.<span class="w"> </span><span class="nv">Laptop</span><span class="w"> </span><span class="ss">(</span><span class="nv">late</span><span class="w"> </span><span class="mi">1980</span><span class="nv">s</span><span class="ss">)</span>:
 
@@ -209,14 +209,14 @@
 </code></pre></div>
 
 <p>Power pressure drove two responses:</p>
-<p><strong>Low-voltage CMOS</strong> — designers switched from bipolar logic (powerful but power-hungry) to CMOS (Complementary Metal-Oxide-Semiconductor), which consumes power only when transistors switch, not when they are idle. This dramatically reduced both active and standby power.</p>
+<p><strong>Low-voltage CMOS</strong> — designers switched from bipolar logic (powerful but power-hungry) to <a href="https://en.wikipedia.org/wiki/CMOS">CMOS</a> (Complementary Metal-Oxide-Semiconductor), which consumes power only when transistors switch, not when they are idle. This dramatically reduced both active and standby power.</p>
 <p><strong>Integration</strong> — every chip-to-chip interface wastes energy driving signals off-chip and back. Merging two chips into one removes those interfaces. The laptop era was the first time integration was driven primarily by power rather than just performance.</p>
 <hr>
 <h2>Era 6: The Mobile Phone and the ARM Architecture</h2>
 <h3>An Architecture Built for Efficiency</h3>
-<p>In 1983, Acorn Computers in Cambridge designed their own processor: the <strong>Acorn RISC Machine</strong>, or <strong>ARM</strong>. It was a 32-bit RISC processor designed to be simple, low-power, and fast enough for interactive computing in an inexpensive product. The original ARM1 ran at 6 MHz and consumed a fraction of a watt — remarkable for 1985.</p>
-<p>Acorn spun off <strong>Advanced RISC Machines Ltd</strong> in 1990 as a joint venture with Apple and VLSI Technology. Rather than manufacturing chips itself, ARM licenced its architecture to other companies — a business model that would eventually see ARM cores inside virtually every mobile device on the planet.</p>
-<p>The first mobile phones were large, power-hungry, and limited. As GSM digital mobile telephony spread in the 1990s, phones needed to perform signal processing (decoding the radio channel), handle the telephone UI, and manage a small battery. They could afford perhaps 200 mW of sustained power.</p>
+<p>In 1983, <a href="https://en.wikipedia.org/wiki/Acorn_Computers">Acorn Computers</a> in Cambridge designed their own processor: the <strong><a href="https://en.wikipedia.org/wiki/ARM_architecture_family">Acorn RISC Machine</a></strong>, or <strong>ARM</strong>. It was a 32-bit RISC processor designed to be simple, low-power, and fast enough for interactive computing in an inexpensive product. The original ARM1 ran at 6 MHz and consumed a fraction of a watt — remarkable for 1985.</p>
+<p>Acorn spun off <strong><a href="https://en.wikipedia.org/wiki/Arm_Holdings">Advanced RISC Machines Ltd</a></strong> in 1990 as a joint venture with Apple and VLSI Technology. Rather than manufacturing chips itself, ARM licenced its architecture to other companies — a business model that would eventually see ARM cores inside virtually every mobile device on the planet.</p>
+<p>The first mobile phones were large, power-hungry, and limited. As <a href="https://en.wikipedia.org/wiki/GSM">GSM</a> digital mobile telephony spread in the 1990s, phones needed to perform signal processing (decoding the radio channel), handle the telephone UI, and manage a small battery. They could afford perhaps 200 mW of sustained power.</p>
 <p>A phone of the early 2000s had several separate chips: a <strong>baseband processor</strong> (running the radio protocols), an <strong>application processor</strong> (running the UI and apps), a <strong>power management IC</strong>, a <strong>display controller</strong>, and various analog front-ends for audio and radio. These chips communicated over a shared PCB — the "system" was a small board inside a plastic case.</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Early</span><span class="w"> </span><span class="nv">Smartphone</span><span class="w"> </span><span class="nv">Board</span><span class="w"> </span><span class="nv">Architecture</span><span class="w"> </span><span class="ss">(</span><span class="nv">c</span>.<span class="w"> </span><span class="mi">2003</span><span class="ss">)</span>:
 
@@ -245,8 +245,8 @@
 <h2>Era 7: The System on Chip (1995–present)</h2>
 <h3>Integration Crosses a Threshold</h3>
 <p>As process technology advanced through the 1990s — from 350 nm to 250 nm to 180 nm — the number of transistors that could be fabricated reliably on a single die crossed 100 million. That is enough transistors to implement not just a CPU, but everything around it: memory controllers, DSPs, display engines, USB, audio, and power management.</p>
-<p>The <strong>Texas Instruments OMAP</strong> series (early 2000s) was among the first true smartphone SoCs: ARM application processor, DSP, camera interface, display controller, and power management all on one die. This appeared in early Nokia smartphones and PDAs.</p>
-<p>Apple's acquisition of PA Semi in 2008 and its launch of the <strong>A4</strong> SoC in 2010 (the first iPhone 4 chip) signalled that the world's most valuable consumer electronics company was betting everything on the SoC model. Qualcomm, Samsung, MediaTek, and HiSilicon followed with their own vertical SoC programmes.</p>
+<p>The <strong><a href="https://en.wikipedia.org/wiki/OMAP">Texas Instruments OMAP</a></strong> series (early 2000s) was among the first true smartphone SoCs: ARM application processor, DSP, camera interface, display controller, and power management all on one die. This appeared in early Nokia smartphones and PDAs.</p>
+<p>Apple's acquisition of <a href="https://en.wikipedia.org/wiki/P.A._Semi">PA Semi</a> in 2008 and its launch of the <strong><a href="https://en.wikipedia.org/wiki/Apple_A4">A4</a></strong> SoC in 2010 (the first iPhone 4 chip) signalled that the world's most valuable consumer electronics company was betting everything on the SoC model. Qualcomm, Samsung, MediaTek, and HiSilicon followed with their own vertical SoC programmes.</p>
 <p>The convergence was complete:</p>
 <div class="highlight"><pre><span></span><code><span class="nx">The</span><span class="w"> </span><span class="nx">Integration</span><span class="w"> </span><span class="nx">Journey</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="nx">Same</span><span class="w"> </span><span class="nx">Computational</span><span class="w"> </span><span class="nx">Power</span><span class="p">,</span><span class="w"> </span><span class="nx">Shrinking</span><span class="w"> </span><span class="nx">Footprint</span><span class="p">:</span>
 
@@ -267,7 +267,7 @@
 
 <hr>
 <h2>Moore's Law: The Engine of Miniaturisation</h2>
-<p>No account of this journey is complete without <strong>Moore's Law</strong>. In 1965, Gordon Moore (co-founder of Intel) observed that the number of transistors on a commercially practical integrated circuit doubled approximately every two years. This was an empirical observation about the economics of the semiconductor industry, but it became a self-fulfilling prophecy: the industry organised itself to deliver that doubling, and did so for more than fifty years.</p>
+<p>No account of this journey is complete without <strong><a href="https://en.wikipedia.org/wiki/Moore%27s_law">Moore's Law</a></strong>. In 1965, <a href="https://en.wikipedia.org/wiki/Gordon_Moore">Gordon Moore</a> (co-founder of Intel) observed that the number of transistors on a commercially practical integrated circuit doubled approximately every two years. This was an empirical observation about the economics of the semiconductor industry, but it became a self-fulfilling prophecy: the industry organised itself to deliver that doubling, and did so for more than fifty years.</p>
 <div class="highlight"><pre><span></span><code>Moore&#39;s Law — Transistor Count Over Time:
 
   10^10 ┤                                                     ●  A18 (16B)
@@ -287,7 +287,7 @@
 </code></pre></div>
 
 <p>Each doubling meant that the same design could be shrunk to half the area (reducing cost), or that twice as much logic could fit in the same area (enabling integration). Both drove the SoC story.</p>
-<p>Moore's Law has slowed in recent years — physical limits make further miniaturisation increasingly difficult and expensive below 3 nm. The industry is responding with new techniques: <strong>3D stacking</strong> (chips stacked vertically), <strong>chiplets</strong> (multiple dies in one package), and new materials. But the principle — relentless pressure toward more integration per unit cost — continues.</p>
+<p>Moore's Law has slowed in recent years — physical limits make further miniaturisation increasingly difficult and expensive below 3 nm. The industry is responding with new techniques: <strong><a href="https://en.wikipedia.org/wiki/3D_integrated_circuit">3D stacking</a></strong> (chips stacked vertically), <strong><a href="https://en.wikipedia.org/wiki/Chiplet">chiplets</a></strong> (multiple dies in one package), and new materials. But the principle — relentless pressure toward more integration per unit cost — continues.</p>
 <hr>
 <h2>What "System" Means Now</h2>
 <p>Return to where we started: the IBM System/360, craned into a dedicated machine room, requiring a team of operators and a purpose-built building to run.</p>
