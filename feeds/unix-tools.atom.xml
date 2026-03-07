@@ -1,5 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-02-27T12:00:00+00:00</updated><entry><title>tmux Training Manual: Ghostty, xterm and PVE LXC Terminals</title><link href="http://lizard-spock.co.uk/tmux-training-manual-ghostty-xterm-and-pve-lxc-terminals.html" rel="alternate"/><published>2026-02-27T12:00:00+00:00</published><updated>2026-02-27T12:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-02-27:/tmux-training-manual-ghostty-xterm-and-pve-lxc-terminals.html</id><summary type="html">&lt;p&gt;tmux is a terminal multiplexer: it lets you run multiple terminal sessions inside a single window, split panes side by …&lt;/p&gt;</summary><content type="html">&lt;p&gt;tmux is a terminal multiplexer: it lets you run multiple terminal sessions inside a single window, split panes side by side, and crucially, keep sessions alive after you disconnect. For headless Proxmox VE (PVE) LXC containers accessed over SSH, this is essential. If your SSH connection drops mid-task, tmux keeps the job running and lets you reattach exactly where you left off. This manual walks through tmux in practical exercises, covering Ghostty on macOS, xterm, and terminal sessions inside PVE LXC containers.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-03-07T00:00:00+00:00</updated><entry><title>Managing Dotfiles with Stow and Git</title><link href="http://lizard-spock.co.uk/dotfiles-setup-stow-git.html" rel="alternate"/><published>2026-03-07T00:00:00+00:00</published><updated>2026-03-07T00:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-03-07:/dotfiles-setup-stow-git.html</id><summary type="html">&lt;p&gt;How to centralise and manage Unix dotfiles in a Git repository, using source directives and GNU Stow to link them into place.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Configuration files (dotfiles) for tools like Zsh, Vim, tmux, and Git tend to accumulate across machines over time. Without a strategy, they diverge: one machine has tuned aliases, another has an old vimrc, and a new machine starts from scratch. Keeping dotfiles in a single Git repository solves this. Clone once, link into place, and every machine stays consistent.&lt;/p&gt;
+&lt;p&gt;My dotfiles are on GitHub at &lt;a href="https://github.com/morganp/dotfiles"&gt;morganp/dotfiles&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Why Centralise Dotfiles&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;A single source of truth for all shell and tool configuration.&lt;/li&gt;
+&lt;li&gt;Version history lets you see what changed and roll back if something breaks.&lt;/li&gt;
+&lt;li&gt;Setting up a new machine reduces to cloning the repo and running a handful of commands.&lt;/li&gt;
+&lt;li&gt;Sharing config across macOS and Linux with minimal platform-specific branching.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Cloning the Repo&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;https://github.com/morganp/dotfiles.git&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Linking Config Files&lt;/h2&gt;
+&lt;p&gt;There are two approaches depending on the tool.&lt;/p&gt;
+&lt;h3&gt;Sourcing (Zsh and Vim)&lt;/h3&gt;
+&lt;p&gt;Some tools are simplest to handle by having the home directory config file source the dotfiles version directly.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Zsh&lt;/strong&gt; -- add to &lt;code&gt;~/.zshrc&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles/config/shell/dot-zshrc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Vim&lt;/strong&gt; -- add to &lt;code&gt;~/.vimrc&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;so&lt;/span&gt; &lt;span class="p"&gt;~&lt;/span&gt;&lt;span class="sr"&gt;/dotfiles/&lt;/span&gt;config&lt;span class="sr"&gt;/vim/&lt;/span&gt;dot&lt;span class="p"&gt;-&lt;/span&gt;vimrc_clean
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;GNU Stow (Everything Else)&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.gnu.org/software/stow/"&gt;GNU Stow&lt;/a&gt; manages symlinks. It takes a package directory and creates symlinks in a target directory that mirror the structure. With the &lt;code&gt;--dotfiles&lt;/code&gt; flag, files named &lt;code&gt;dot-foo&lt;/code&gt; are linked as &lt;code&gt;.foo&lt;/code&gt; in the target, keeping the repo free of files that would be hidden by default.&lt;/p&gt;
+&lt;p&gt;Install Stow and other packages via Homebrew:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;brew&lt;span class="w"&gt; &lt;/span&gt;bundle&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;--file&lt;span class="o"&gt;=&lt;/span&gt;~/dotfiles/config/brew
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then link the remaining configs:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles/config
+stow&lt;span class="w"&gt; &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;--dotfiles&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;~/
+stow&lt;span class="w"&gt; &lt;/span&gt;input&lt;span class="w"&gt; &lt;/span&gt;--dotfiles&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;~/
+stow&lt;span class="w"&gt; &lt;/span&gt;screen&lt;span class="w"&gt; &lt;/span&gt;--dotfiles&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;~/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A &lt;code&gt;run_stow&lt;/code&gt; script in the repo automates this.&lt;/p&gt;
+&lt;h2&gt;Tmux&lt;/h2&gt;
+&lt;p&gt;Tmux looks for its config via the &lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt; variable, set in &lt;code&gt;config/shell/dot-profile&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$XDG_CONFIG_HOME/tmux/tmux.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For the tmux plugin manager, clone TPM separately:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;https://github.com/tmux-plugins/tpm&lt;span class="w"&gt; &lt;/span&gt;~/.tmux/plugins/tpm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Shell Features&lt;/h2&gt;
+&lt;p&gt;The dotfiles configure the following shell aliases across Bash and Zsh:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Alias&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;ls&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;File list with colour&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;ll&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Long list with human-readable sizes and colour&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;la&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As &lt;code&gt;ll&lt;/code&gt; but includes hidden files&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lt&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Directory tree view&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;..&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Up one directory&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Other configurations included:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Screen:&lt;/strong&gt; Virtual tabs across the bottom in standard colours.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Inputrc:&lt;/strong&gt; Case-insensitive tab completion, including hidden files.&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Unix &amp; Tools"/><category term="dotfiles"/><category term="shell"/><category term="stow"/><category term="zsh"/><category term="tmux"/><category term="vim"/></entry><entry><title>tmux Training Manual: Ghostty, xterm and PVE LXC Terminals</title><link href="http://lizard-spock.co.uk/tmux-training-manual-ghostty-xterm-and-pve-lxc-terminals.html" rel="alternate"/><published>2026-02-27T12:00:00+00:00</published><updated>2026-02-27T12:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-02-27:/tmux-training-manual-ghostty-xterm-and-pve-lxc-terminals.html</id><summary type="html">&lt;p&gt;tmux is a terminal multiplexer: it lets you run multiple terminal sessions inside a single window, split panes side by …&lt;/p&gt;</summary><content type="html">&lt;p&gt;tmux is a terminal multiplexer: it lets you run multiple terminal sessions inside a single window, split panes side by side, and crucially, keep sessions alive after you disconnect. For headless Proxmox VE (PVE) LXC containers accessed over SSH, this is essential. If your SSH connection drops mid-task, tmux keeps the job running and lets you reattach exactly where you left off. This manual walks through tmux in practical exercises, covering Ghostty on macOS, xterm, and terminal sessions inside PVE LXC containers.&lt;/p&gt;
 &lt;h2&gt;Getting Back to a Known State&lt;/h2&gt;
 &lt;p&gt;This section comes first because it is the most important concept to internalise. Just as pressing &lt;code&gt;Escape&lt;/code&gt; repeatedly in vim returns you to a safe state, tmux has equivalent recovery paths. Learn these before anything else.&lt;/p&gt;
 &lt;h3&gt;The Prefix Key&lt;/h3&gt;
@@ -2509,12 +2593,4 @@ $&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;wge
 &lt;p&gt;If you do not have the developer tools installed there is no need just for this tool the changes can be made manually be editing: Library -&amp;gt; Preferences -&amp;gt; SystemConfiguration -&amp;gt; com.apple.PowerManagement.plist
 under 'Disk Sleep Timer' adjust the minutes of idle time before shutting drives down.&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://hints.macworld.com/article.php?story=20050601044914357"&gt;source1&lt;/a&gt;
-&lt;a href="http://hints.macworld.com/article.php?story=20060922231408751"&gt;source2&lt;/a&gt;&lt;/p&gt;</content><category term="Unix &amp; Tools"/><category term="Apple"/><category term="OS X"/><category term="Performance"/><category term="Power"/></entry><entry><title>"Mac OS X Default Path"</title><link href="//65/Mac_OS_X_Default_Path" rel="alternate"/><published>2010-08-26T09:36:06+01:00</published><updated>2010-08-26T09:36:06+01:00</updated><author><name>morganp</name></author><id>tag:65,2010-08-26:/Mac_OS_X_Default_Path</id><summary type="html">&lt;p&gt;As this seemed to be a useful post on my old blog I am reposting it.
-Just in case the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As this seemed to be a useful post on my old blog I am reposting it.
-Just in case the $PATH terminal variable gets corrupted, for MAC OS X 10.5. 10.6.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sbin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sbin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;X11&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;to add to you path&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=$&lt;/span&gt;&lt;span class="n"&gt;PATH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sbin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"/><category term="Apple"/><category term="Command Line"/><category term="OS X"/></entry></feed>
+&lt;a href="http://hints.macworld.com/article.php?story=20060922231408751"&gt;source2&lt;/a&gt;&lt;/p&gt;</content><category term="Unix &amp; Tools"/><category term="Apple"/><category term="OS X"/><category term="Performance"/><category term="Power"/></entry></feed>

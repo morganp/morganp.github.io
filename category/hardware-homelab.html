@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Lizard-Spock - Hardware & Homelab</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li class="active"><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/homelab.html">Homelab</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../remarkable-local-file-transfer-without-the-cloud.html">reMarkable: Local File Transfer Without the Cloud</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-03-07T00:00:00+00:00">
+                Published: Sat 07 March 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/remarkable.html">reMarkable</a> <a href="../tag/eink.html">eink</a> <a href="../tag/privacy.html">privacy</a> </p>        
+</footer><!-- /.post-info --><p>The reMarkable tablet is excellent for reading and annotating PDFs, but by default it routes
+everything through reMarkable's cloud. If you prefer to keep files local -- for privacy, or
+simply because you do not want a subscription -- you can unpair the device and use the
+built-in USB file server instead.</p>
+<hr>
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#1-unpairing-from-the-cloud">Unpairing from the Cloud</a></li>
+<li><a href="#2-enabling-the-usb-web-interface">Enabling the USB Web Interface</a></li>
+<li><a href="#3-transferring-files">Transferring Files via http://10.11.99.1/</a></li>
+<li><a href="#4-tips-and-limitations">Tips and Limitations</a></li>
+</ol>
+<hr>
+<h2>1. Unpairing from the Cloud</h2>
+<p>Unpairing stops the device from syncing to reMarkable's servers. Your existing documents
+remain on the device; they are simply no longer backed up or accessible from the reMarkable
+apps on other devices.</p>
+<p><strong>On the tablet:</strong></p>
+<ol>
+<li>Open <strong>Settings</strong> (gear icon, bottom-left of the home screen)</li>
+<li>Go to <strong>Storage</strong></li>
+<li>Tap <strong>Unpair device</strong></li>
+<li>Confirm when prompted</li>
+</ol>
+<p>Once unpaired, the tablet no longer requires a reMarkable account or internet connection for
+normal use. The cloud sync icon will disappear from the top bar.</p>
+<blockquote>
+<p><strong>Note:</strong> Unpairing is reversible. You can re-pair the device at any time from the same
+Settings screen by signing back in to your reMarkable account.</p>
+</blockquote>
+<hr>
+<h2>2. Enabling the USB Web Interface</h2>
+<p>The reMarkable has a built-in HTTP file server that becomes accessible over USB. When enabled,
+the tablet presents itself as a USB network adapter and serves files at <code>http://10.11.99.1/</code>.</p>
+<p><strong>On the tablet:</strong></p>
+<ol>
+<li>Open <strong>Settings</strong></li>
+<li>Go to <strong>Storage</strong></li>
+<li>Enable <strong>USB transfer</strong> (the toggle may be labelled "USB web interface" depending on
+   firmware version)</li>
+</ol>
+<p><strong>Connect the tablet to your computer</strong> using the supplied USB-C cable. The tablet will
+appear as a network device (USB Ethernet adapter) rather than a mass storage drive.</p>
+<p>On Linux the interface typically appears as <code>usb0</code> or <code>enp0s20u1</code> and receives an address in
+the <code>10.11.99.0/24</code> subnet automatically via DHCP from the tablet.</p>
+<p>Verify connectivity:</p>
+<div class="highlight"><pre><span></span><code>ping<span class="w"> </span><span class="m">10</span>.11.99.1
+</code></pre></div>
+
+<hr>
+<h2>3. Transferring Files</h2>
+<p>Open a browser and navigate to:</p>
+<div class="highlight"><pre><span></span><code>http://10.11.99.1/
+</code></pre></div>
+
+<p>The web interface shows all documents and notebooks currently on the device, organised in
+folders matching the tablet's home screen layout.</p>
+<h3>Uploading PDFs</h3>
+<ol>
+<li>Click <strong>Import</strong> (or the upload button, top-right)</li>
+<li>Select one or more PDF files from your computer</li>
+<li>The files appear on the tablet home screen immediately -- no restart required</li>
+</ol>
+<p>Supported formats: <strong>PDF</strong> and <strong>EPUB</strong>.</p>
+<h3>Downloading annotated files</h3>
+<ol>
+<li>Click on any document in the web interface</li>
+<li>Select <strong>Download</strong> to save the annotated PDF to your computer</li>
+</ol>
+<p>The downloaded file includes all pencil annotations, highlights, and notes made on the tablet.</p>
+<h3>Command-line upload with curl</h3>
+<p>For scripting or batch uploads:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://10.11.99.1/documents/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;file=@/path/to/document.pdf&quot;</span>
+</code></pre></div>
+
+<p>To upload into a specific folder, first find the folder UUID from the web interface URL, then:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://10.11.99.1/documents/{folder-uuid}&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;file=@/path/to/document.pdf&quot;</span>
+</code></pre></div>
+
+<hr>
+<h2>4. Tips and Limitations</h2>
+<ul>
+<li><strong>No Wi-Fi required.</strong> The USB file server works entirely over the USB cable with no network
+  connection needed.</li>
+<li><strong>Cable must stay connected.</strong> The web interface is only available while the tablet is
+  plugged in. Unplugging immediately drops the <code>10.11.99.1</code> address.</li>
+<li><strong>One client at a time.</strong> The built-in server is minimal; avoid opening multiple browser
+  tabs uploading simultaneously.</li>
+<li><strong>Folder structure is flat internally.</strong> The reMarkable stores documents with UUIDs
+  internally; the folder hierarchy you see in the web interface is a virtual view maintained
+  by the device.</li>
+<li><strong>Firmware updates still work offline.</strong> Updates are downloaded over Wi-Fi separately from
+  the cloud sync; unpairing does not block firmware updates if Wi-Fi is available.</li>
+<li><strong>Annotations on existing PDFs</strong> are exported as a new annotated PDF -- the original on-
+  device file is not modified.</li>
+</ul>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../installing-homebrew-on-a-debian-13-trixie-lxc-container.html" rel="bookmark"
+                               title="Permalink to Installing Homebrew on a Debian 13 (Trixie) LXC Container">Installing Homebrew on a Debian 13 (Trixie) LXC Container</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-02-25T00:00:00+00:00">
+                Published: Wed 25 February 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/debian.html">Debian</a> <a href="../tag/lxc.html">LXC</a> <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/git.html">Git</a> <a href="../tag/bash.html">Bash</a> </p>        
+</footer><!-- /.post-info -->                        <p>A verified step-by-step guide to installing Homebrew (Linuxbrew) on a Debian 13 "trixie" LXC unprivileged container, including group setup, prefix pre-creation, and multi-user configuration.</p>
+                        <a class="readmore" href="../installing-homebrew-on-a-debian-13-trixie-lxc-container.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../node-red-vs-home-assistant.html" rel="bookmark"
+                               title="Permalink to Node Red vs Home Assistant">Node Red vs Home Assistant</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-24T15:58:00+01:00">
+                Published: Thu 24 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/homeassistant.html">HomeAssistant</a> </p>        
+</footer><!-- /.post-info -->                        <p>Node Red vs Home Assistant</p>
+<p>Which is better* ?</p>
+<p>*better: CPU/RAM efficient, easier to learn and or offer better support …</p>
+                        <a class="readmore" href="../node-red-vs-home-assistant.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../proxmox-plex-container.html" rel="bookmark"
+                               title="Permalink to Proxmox Plex Container">Proxmox Plex Container</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-24T13:10:00+01:00">
+                Published: Thu 24 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/plex.html">Plex</a> </p>        
+</footer><!-- /.post-info -->                        <p>With Proxmox installed time to setup Plex in a container, and migrate from Synology NAS.</p>
+<p>I am following these guides …</p>
+                        <a class="readmore" href="../proxmox-plex-container.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../starting-with-proxmox.html" rel="bookmark"
+                               title="Permalink to Starting with ProxMox">Starting with ProxMox</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-24T12:56:00+01:00">
+                Published: Thu 24 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/docker.html">Docker</a> </p>        
+</footer><!-- /.post-info -->                        <p>Having decided that <a href="https://www.proxmox.com/en/">Proxmox</a> is the way forward to manage docker and ivrtualisation outside of the synology NAS. i need …</p>
+                        <a class="readmore" href="../starting-with-proxmox.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../beelink-n200-proxmox-and-plex.html" rel="bookmark"
+                               title="Permalink to Beelink N200 Proxmox and Plex">Beelink N200 Proxmox and Plex</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-24T11:43:00+01:00">
+                Published: Thu 24 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/networking.html">Networking</a> <a href="../tag/plex.html">Plex</a> <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/docker.html">Docker</a> </p>        
+</footer><!-- /.post-info -->                        <p>To improve the Plex transcoding options and off load the computation from the NAS, the plan is purchase a BeeLink …</p>
+                        <a class="readmore" href="../beelink-n200-proxmox-and-plex.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../cat8-t-568.html" rel="bookmark"
+                               title="Permalink to Cat8 T-568">Cat8 T-568</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-21T13:31:00+01:00">
+                Published: Mon 21 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/ethernet.html">Ethernet</a> <a href="../tag/networking.html">Networking</a> </p>        
+</footer><!-- /.post-info -->                        <p>Cat 8 Wiring, comes in 2 variants T-568A and T-568B.  </p>
+<p><img alt="Wiring Diagram" src="../T-568AB.png"></p>
+<p>Cat8 replaces the need for crimping tools with field termination …</p>
+                        <a class="readmore" href="../cat8-t-568.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../synology-connecting-across-vlan-with-active-vpn.html" rel="bookmark"
+                               title="Permalink to Synology Connecting Across VLAN with active VPN">Synology Connecting Across VLAN with active VPN</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-10-16T11:30:00+01:00">
+                Published: Wed 16 October 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/synology.html">Synology</a> <a href="../tag/networking.html">Networking</a> <a href="../tag/vlan.html">VLAN</a> <a href="../tag/vpn.html">VPN</a> </p>        
+</footer><!-- /.post-info -->                        <p>When a Synology NAS creates a VPN connection it overides the default gateway, except for devices listed as contained within …</p>
+                        <a class="readmore" href="../synology-connecting-across-vlan-with-active-vpn.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+                    </ol><!-- /#posts-list -->
+                    </section><!-- /#content -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

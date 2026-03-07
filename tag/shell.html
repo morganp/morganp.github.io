@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Lizard-Spock - shell</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/homelab.html">Homelab</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../dotfiles-setup-stow-git.html">Managing Dotfiles with Stow and Git</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-03-07T00:00:00+00:00">
+                Published: Sat 07 March 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/dotfiles.html">dotfiles</a> <a href="../tag/shell.html">shell</a> <a href="../tag/stow.html">stow</a> <a href="../tag/zsh.html">zsh</a> <a href="../tag/tmux.html">tmux</a> <a href="../tag/vim.html">vim</a> </p>        
+</footer><!-- /.post-info --><p>Configuration files (dotfiles) for tools like Zsh, Vim, tmux, and Git tend to accumulate across machines over time. Without a strategy, they diverge: one machine has tuned aliases, another has an old vimrc, and a new machine starts from scratch. Keeping dotfiles in a single Git repository solves this. Clone once, link into place, and every machine stays consistent.</p>
+<p>My dotfiles are on GitHub at <a href="https://github.com/morganp/dotfiles">morganp/dotfiles</a>.</p>
+<h2>Why Centralise Dotfiles</h2>
+<ul>
+<li>A single source of truth for all shell and tool configuration.</li>
+<li>Version history lets you see what changed and roll back if something breaks.</li>
+<li>Setting up a new machine reduces to cloning the repo and running a handful of commands.</li>
+<li>Sharing config across macOS and Linux with minimal platform-specific branching.</li>
+</ul>
+<h2>Cloning the Repo</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/dotfiles.git<span class="w"> </span>~/dotfiles
+</code></pre></div>
+
+<h2>Linking Config Files</h2>
+<p>There are two approaches depending on the tool.</p>
+<h3>Sourcing (Zsh and Vim)</h3>
+<p>Some tools are simplest to handle by having the home directory config file source the dotfiles version directly.</p>
+<p><strong>Zsh</strong> -- add to <code>~/.zshrc</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>~/dotfiles/config/shell/dot-zshrc
+</code></pre></div>
+
+<p><strong>Vim</strong> -- add to <code>~/.vimrc</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">so</span> <span class="p">~</span><span class="sr">/dotfiles/</span>config<span class="sr">/vim/</span>dot<span class="p">-</span>vimrc_clean
+</code></pre></div>
+
+<h3>GNU Stow (Everything Else)</h3>
+<p><a href="https://www.gnu.org/software/stow/">GNU Stow</a> manages symlinks. It takes a package directory and creates symlinks in a target directory that mirror the structure. With the <code>--dotfiles</code> flag, files named <code>dot-foo</code> are linked as <code>.foo</code> in the target, keeping the repo free of files that would be hidden by default.</p>
+<p>Install Stow and other packages via Homebrew:</p>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>bundle<span class="w"> </span>install<span class="w"> </span>--file<span class="o">=</span>~/dotfiles/config/brew
+</code></pre></div>
+
+<p>Then link the remaining configs:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/dotfiles/config
+stow<span class="w"> </span>git<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
+stow<span class="w"> </span>input<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
+stow<span class="w"> </span>screen<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
+</code></pre></div>
+
+<p>A <code>run_stow</code> script in the repo automates this.</p>
+<h2>Tmux</h2>
+<p>Tmux looks for its config via the <code>$XDG_CONFIG_HOME</code> variable, set in <code>config/shell/dot-profile</code>:</p>
+<div class="highlight"><pre><span></span><code>$XDG_CONFIG_HOME/tmux/tmux.conf
+</code></pre></div>
+
+<p>For the tmux plugin manager, clone TPM separately:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/tmux-plugins/tpm<span class="w"> </span>~/.tmux/plugins/tpm
+</code></pre></div>
+
+<h2>Shell Features</h2>
+<p>The dotfiles configure the following shell aliases across Bash and Zsh:</p>
+<table>
+<thead>
+<tr>
+<th>Alias</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ls</code></td>
+<td>File list with colour</td>
+</tr>
+<tr>
+<td><code>ll</code></td>
+<td>Long list with human-readable sizes and colour</td>
+</tr>
+<tr>
+<td><code>la</code></td>
+<td>As <code>ll</code> but includes hidden files</td>
+</tr>
+<tr>
+<td><code>lt</code></td>
+<td>Directory tree view</td>
+</tr>
+<tr>
+<td><code>..</code></td>
+<td>Up one directory</td>
+</tr>
+</tbody>
+</table>
+<p>Other configurations included:</p>
+<ul>
+<li><strong>Screen:</strong> Virtual tabs across the bottom in standard colours.</li>
+<li><strong>Inputrc:</strong> Case-insensitive tab completion, including hidden files.</li>
+</ul>                    </article>
+                </aside><!-- /#featured -->
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
