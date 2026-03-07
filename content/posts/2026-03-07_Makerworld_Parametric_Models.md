@@ -23,7 +23,7 @@ Think of it as scripting the feature timeline you would normally follow in Fusio
 **Learning resources:**
 
 - YouTube tutorials are the quickest way to get a feel for what OpenSCAD can do.
-- The official OpenSCAD documentation and cheatsheet are available online.
+- The official [OpenSCAD documentation](https://openscad.org/documentation.html) and [cheatsheet](https://openscad.org/cheatsheet/) are available online.
 - LLMs like ChatGPT are surprisingly effective: describe the object you want, ask for an OpenSCAD script, and iterate from there.
 
 **Testing your script:**
@@ -41,9 +41,7 @@ To add a Customize button to your listing, create a new MakerWorld listing and u
 
 ## Controlling the Customizer UI
 
-Any variable declared at the top of your script appears as an editable field in the UI automatically. To control the widget type (slider, dropdown, colour picker, help text), add special comments to your code.
-
-The syntax follows the OpenSCAD Customizer standard. The easiest way to explore the options is to click the "Sample Code" icon in the bottom-left of the Parametric Model Maker. It loads example code demonstrating all available widgets.
+Any variable declared at the top of your script appears as an editable field in the UI automatically. To control the widget type (slider, dropdown, colour picker, help text), use comments following the OpenSCAD Customiser standard. The easiest way to explore the options is to click the "Sample Code" icon in the bottom-left of the Parametric Model Maker. It loads example code demonstrating all available widgets.
 
 **Example: dropdown with named options**
 
@@ -74,8 +72,7 @@ MakerWorld supports a curated set of OpenSCAD libraries:
 | Getriebe | Gear generation |
 | knurledFinishLib_v2 | Knurled surface textures |
 
-## Additional Features
+---
 
-- **User-uploaded images:** Users can upload logos or artwork to be embossed on a model.
-- **Multi-colour / multi-filament:** Supported, allowing models with colour changes.
-- **Multiple build plates:** Supported, along with customising print settings in the exported 3mf file.
+*Largely based on this [Reddit post](https://www.reddit.com/r/BambuLab/comments/1jl6ypa/how_to_create_customizable_models_on_maker_world/) in r/BambuLab.*
+
