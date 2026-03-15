@@ -26,7 +26,236 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="./dotfiles-setup-stow-git.html">Managing Dotfiles with Stow and Git</a></h1>
+                        <h1 class="entry-title"><a href="./soc-article-02-anatomy-and-motivation.html">SoC Article 02: What is a System on Chip? - Anatomy and Motivation</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-03-15T00:00:00+00:00">
+                Published: Sun 15 March 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/computer-architecture.html">Computer Architecture</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/embedded-systems.html">Embedded Systems</a> </p>        
+</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 2 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>In the previous article we traced the seventy-year journey from room-sized mainframes to silicon-level integration, arriving at the <strong>System on Chip</strong> - a complete computer system fabricated on a single piece of silicon. Now it is time to look inside one: what blocks does it contain, how do they relate, and why does integration deliver such dramatic benefits?</p>
+<hr>
+<h2>The Board-to-Silicon Transition</h2>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-901w.png"></p>
+<p>In traditional electronics, a "system" was a <strong>circuit board</strong> populated with many separate chips, each performing one role: a CPU chip, a separate memory controller, a graphics processor, communication peripheral chips, and a power management IC, all connected by copper traces on the PCB.</p>
+<p>A <strong>System on Chip</strong> collapses most or all of those components onto a <strong>single piece of silicon</strong>. The processor, memory interfaces, graphics engine, USB controller, cryptographic accelerator, radio interface, and many other functional blocks are fabricated together in one integrated circuit.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Traditional</span><span class="w"> </span><span class="n">Board</span><span class="o">-</span><span class="n">Level</span><span class="w"> </span><span class="n">System</span><span class="w">          </span><span class="n">System</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">Chip</span>
+<span class="err">┌─────────────────────────────────┐</span><span class="w">     </span><span class="err">┌──────────────────────────────────┐</span>
+<span class="err">│</span><span class="w">  </span><span class="err">┌───────┐</span><span class="w">  </span><span class="err">┌───────┐</span><span class="w">  </span><span class="err">┌─────┐</span><span class="w">  </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">                                  </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">CPU</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">GPU</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="n">DSP</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">  </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌────┐</span><span class="w"> </span><span class="err">┌─────┐</span><span class="w"> </span><span class="err">┌──────┐</span><span class="w">  </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">└───┬───┘</span><span class="w">  </span><span class="err">└───┬───┘</span><span class="w">  </span><span class="err">└──┬──┘</span><span class="w">  </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="n">CPU</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">GPU</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">DSP</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">WiFi</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="err">│</span>
+<span class="err">│</span><span class="w">      </span><span class="err">│</span><span class="w">          </span><span class="err">│</span><span class="w">          </span><span class="err">│</span><span class="w">    </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">  </span><span class="err">└─┬──┘</span><span class="w"> </span><span class="err">└──┬─┘</span><span class="w"> </span><span class="err">└──┬──┘</span><span class="w"> </span><span class="err">└──┬───┘</span><span class="w">  </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">────┴──────────┴──────────┴───</span><span class="w"> </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">    </span><span class="err">│</span><span class="w">       </span><span class="err">│</span><span class="w">      </span><span class="err">│</span><span class="w">       </span><span class="err">│</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">    </span><span class="p">(</span><span class="n">PCB</span><span class="w"> </span><span class="n">Traces</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">slow</span><span class="p">,</span><span class="w"> </span><span class="n">lossy</span><span class="p">)</span><span class="w">   </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">    </span><span class="err">└───────┴──────┴───────┘</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">┌───────┐</span><span class="w">  </span><span class="err">┌───────┐</span><span class="w">  </span><span class="err">┌─────┐</span><span class="w">  </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="n">On</span><span class="o">-</span><span class="n">chip</span><span class="w"> </span><span class="n">Interconnect</span><span class="w">     </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="n">USB</span><span class="w"> </span><span class="n">Ctrl</span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="n">MemCtrl</span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="n">WiFi</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">  </span><span class="err">┌──────┐</span><span class="w"> </span><span class="err">┌──────┐</span><span class="w">  </span><span class="err">┌─────────┐</span><span class="w">  </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">└───────┘</span><span class="w">  </span><span class="err">└───────┘</span><span class="w">  </span><span class="err">└─────┘</span><span class="w">  </span><span class="err">│</span><span class="w">     </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="n">USB</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">DDR</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">Flash</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span>
+<span class="err">└─────────────────────────────────┘</span><span class="w">     </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="n">Ctrl</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">Ctrl</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">Ctrl</span><span class="w">   </span><span class="err">│</span><span class="w">  </span><span class="err">│</span>
+<span class="w">  </span><span class="n">Many</span><span class="w"> </span><span class="n">chips</span><span class="p">,</span><span class="w"> </span><span class="n">large</span><span class="w"> </span><span class="n">PCB</span><span class="p">,</span><span class="w"> </span><span class="n">slow</span><span class="w">           </span><span class="err">│</span><span class="w">  </span><span class="err">└──────┘</span><span class="w"> </span><span class="err">└──────┘</span><span class="w">  </span><span class="err">└─────────┘</span><span class="w">  </span><span class="err">│</span>
+<span class="w">  </span><span class="n">inter</span><span class="o">-</span><span class="n">chip</span><span class="w"> </span><span class="n">signalling</span><span class="w">                 </span><span class="err">└──────────────────────────────────┘</span>
+<span class="w">                                          </span><span class="n">One</span><span class="w"> </span><span class="n">die</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">-</span><span class="n">chip</span><span class="w"> </span><span class="n">wires</span><span class="p">,</span><span class="w"> </span><span class="n">fast</span>
+</code></pre></div>
+
+<p>The term "SoC" emerged formally in the mid-1990s when transistor densities crossed roughly 100 million per chip - the threshold at which integrating a complete system became both technically practical and economically compelling. Today, modern SoCs routinely contain <strong>tens of billions of transistors</strong>.</p>
+<hr>
+<h2>Why Does Integration Matter?</h2>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-2-900w.png"></p>
+<p>Putting everything on one die is not just about convenience. It delivers fundamental advantages across every dimension that matters.</p>
+<h3>Speed</h3>
+<p>On-chip wires are nanometres wide and micrometres long. Signals cross them in fractions of a nanosecond. Signals crossing a PCB encounter far greater inductance and capacitance, longer paths, and the need for high-drive output buffers - all of which introduce significant delay. An on-chip memory access takes 1-5 ns; an off-chip access might take 60-100 ns for the same data.</p>
+<h3>Power Efficiency</h3>
+<p>Driving a signal off-chip requires pumping it up to a voltage level and current that the PCB can handle reliably - this is fundamentally wasteful. On-chip signalling operates at much lower voltages (as little as 0.4 V for the fastest paths) and does not need the drive strength of an off-chip interface. Every chip-to-chip boundary eliminated saves power directly.</p>
+<h3>Area and Cost</h3>
+<p>Fewer chips means a smaller PCB, which means a smaller, lighter product. At the volumes of the smartphone market (billions of units per year), even a 5 mm² reduction in PCB area translates into substantial savings. One complex SoC may cost less to manufacture and assemble than the collection of chips it replaces.</p>
+<h3>Reliability</h3>
+<p>Solder joints and connectors are the most common failure points in electronic assemblies. Fewer chips mean fewer joints, longer mean time between failures, and better suitability for vibration-prone environments (automotive, industrial, aerospace).</p>
+<hr>
+<h2>The Anatomy of a Generic SoC</h2>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-3-900w.png"></p>
+<p>While no two SoCs are identical, most share a recognisable set of functional blocks. The diagram below shows a representative structure:</p>
+<div class="highlight"><pre><span></span><code><span class="err">┌──────────────────────────────────────────────────────────────────────────┐</span>
+<span class="err">│</span><span class="w">                          </span><span class="n">SYSTEM</span><span class="w"> </span><span class="n">ON</span><span class="w"> </span><span class="n">CHIP</span><span class="w">                                  </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                                                                          </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">┌──────────────────────────────────────────────────────────────────┐</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">                    </span><span class="n">Processing</span><span class="w"> </span><span class="n">Subsystem</span><span class="w">                          </span><span class="err">│</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">┌──────────────┐</span><span class="w">  </span><span class="err">┌──────────────┐</span><span class="w">  </span><span class="err">┌────────────────────────┐</span><span class="w">  </span><span class="err">│</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="n">CPU</span><span class="w"> </span><span class="n">Core</span><span class="w">   </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">GPU</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">DSP</span><span class="w">   </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">Hardware</span><span class="w"> </span><span class="n">Accelerator</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="p">(</span><span class="mh">1</span><span class="o">-</span><span class="mh">16</span><span class="w"> </span><span class="n">cores</span><span class="p">)</span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="p">(</span><span class="n">optional</span><span class="p">)</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="p">(</span><span class="n">ML</span><span class="p">,</span><span class="w"> </span><span class="n">Crypto</span><span class="p">,</span><span class="w"> </span><span class="n">Video</span><span class="p">)</span><span class="w">   </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">└──────┬───────┘</span><span class="w">  </span><span class="err">└──────┬───────┘</span><span class="w">  </span><span class="err">└────────────┬───────────┘</span><span class="w">  </span><span class="err">│</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">└─────────┼─────────────────┼───────────────────────┼──────────────┘</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">            </span><span class="err">│</span><span class="w">                 </span><span class="err">│</span><span class="w">                       </span><span class="err">│</span><span class="w">                   </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">┌─────────┴─────────────────┴───────────────────────┴──────────────┐</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">              </span><span class="n">High</span><span class="o">-</span><span class="n">Speed</span><span class="w"> </span><span class="n">System</span><span class="w"> </span><span class="n">Interconnect</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">g</span><span class="p">.</span><span class="w"> </span><span class="n">AXI</span><span class="p">)</span><span class="w">           </span><span class="err">│</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">└────────┬───────────────┬──────────┬────────────┬─────────────────┘</span><span class="w">    </span><span class="err">│</span>
+<span class="err">│</span><span class="w">           </span><span class="err">│</span><span class="w">               </span><span class="err">│</span><span class="w">          </span><span class="err">│</span><span class="w">            </span><span class="err">│</span><span class="w">                      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">┌────────┴──┐</span><span class="w">  </span><span class="err">┌─────────┴──┐</span><span class="w">  </span><span class="err">┌───┴────┐</span><span class="w">  </span><span class="err">┌────┴────────────────┐</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">On</span><span class="o">-</span><span class="n">chip</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">DRAM</span><span class="o">/</span><span class="n">DDR</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">DMA</span><span class="w">   </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">Peripheral</span><span class="w"> </span><span class="n">Bridge</span><span class="w">  </span><span class="err">│</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">SRAM</span><span class="w">     </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="n">Controller</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="n">Engine</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="p">(</span><span class="n">Low</span><span class="o">-</span><span class="n">speed</span><span class="w"> </span><span class="n">bus</span><span class="p">)</span><span class="w">    </span><span class="err">│</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">└───────────┘</span><span class="w">  </span><span class="err">└────────────┘</span><span class="w">  </span><span class="err">└────────┘</span><span class="w">  </span><span class="err">└────┬────────────────┘</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                                                  </span><span class="err">│</span><span class="w">                       </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                                    </span><span class="err">┌─────────────┼─────────────┐</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                                    </span><span class="err">│</span><span class="w">             </span><span class="err">│</span><span class="w">             </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                            </span><span class="err">┌───────┴──┐</span><span class="w">  </span><span class="err">┌───────┴──┐</span><span class="w">  </span><span class="err">┌───────┴──┐</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                            </span><span class="err">│</span><span class="w">   </span><span class="n">UART</span><span class="w">   </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="n">SPI</span><span class="w">    </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="n">I2C</span><span class="w">    </span><span class="err">│</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                            </span><span class="err">│</span><span class="w">   </span><span class="n">GPIO</span><span class="w">   </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="n">USB</span><span class="w">    </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="n">Timers</span><span class="w">  </span><span class="err">│</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                            </span><span class="err">└──────────┘</span><span class="w">  </span><span class="err">└──────────┘</span><span class="w">  </span><span class="err">└──────────┘</span><span class="w">      </span><span class="err">│</span>
+<span class="err">│</span><span class="w">                                                                          </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">┌────────────────┐</span><span class="w">  </span><span class="err">┌────────────────┐</span><span class="w">  </span><span class="err">┌───────────────────────┐</span><span class="w">       </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="n">Clock</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">Reset</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="n">Power</span><span class="w"> </span><span class="n">Manager</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="n">Security</span><span class="w"> </span><span class="n">Engine</span><span class="w">     </span><span class="err">│</span><span class="w">       </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="p">(</span><span class="n">PLLs</span><span class="p">,</span><span class="w"> </span><span class="n">etc</span><span class="p">.)</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w"> </span><span class="p">(</span><span class="n">Voltage</span><span class="w"> </span><span class="n">regs</span><span class="p">)</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="err">│</span><span class="w">  </span><span class="p">(</span><span class="n">TrustZone</span><span class="p">,</span><span class="w"> </span><span class="n">Crypto</span><span class="p">)</span><span class="w">  </span><span class="err">│</span><span class="w">       </span><span class="err">│</span>
+<span class="err">│</span><span class="w">  </span><span class="err">└────────────────┘</span><span class="w">  </span><span class="err">└────────────────┘</span><span class="w">  </span><span class="err">└───────────────────────┘</span><span class="w">       </span><span class="err">│</span>
+<span class="err">└──────────────────────────────────────────────────────────────────────────┘</span>
+<span class="w">         </span><span class="err">↑</span><span class="w">                    </span><span class="err">↑</span><span class="w">                        </span><span class="err">↑</span>
+<span class="w">   </span><span class="p">(</span><span class="n">External</span><span class="w"> </span><span class="n">Pins</span><span class="p">)</span><span class="w">      </span><span class="p">(</span><span class="n">LPDDR5</span><span class="w"> </span><span class="n">pads</span><span class="p">)</span><span class="w">           </span><span class="p">(</span><span class="n">GPIO</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">USB</span><span class="w"> </span><span class="n">pads</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Each block has its own dedicated article later in the series. Here is a brief map of what each does:</p>
+<h3>Processing Subsystem</h3>
+<p>The "brains" of the SoC. One or more <strong>CPU cores</strong> execute general-purpose software. Alongside them are specialised processors - <strong>DSPs</strong> for signal processing, <strong>GPUs</strong> for graphics and parallel computation, and dedicated <strong>hardware accelerators</strong> for AI inference, video coding, and cryptography. (Article 04)</p>
+<h3>Memory Subsystem</h3>
+<p><strong>On-chip SRAM</strong> provides fast, low-latency storage close to the processors. <strong>DRAM controllers</strong> connect to external memory for the large working set. A cache hierarchy sits between the two. (Article 05)</p>
+<h3>System Interconnect</h3>
+<p>The internal "highway" connecting all blocks. High-bandwidth connections use <strong>AXI</strong>; lower-bandwidth peripheral connections use <strong>AHB</strong> or <strong>APB</strong>. (Article 06)</p>
+<h3>DMA Engine</h3>
+<p><strong>Direct Memory Access</strong> allows peripherals to move blocks of data to/from memory without involving the CPU - essential for high-throughput peripherals like USB, Ethernet, and cameras. (Article 08)</p>
+<h3>Peripherals</h3>
+<p>The interfaces that connect the chip to the external world: UART, SPI, I2C, GPIO, USB, Ethernet, and many others. (Article 08)</p>
+<h3>Clock and Reset</h3>
+<p>A <strong>PLL</strong> generates the precise, stable frequencies each subsystem requires. The reset subsystem places all flip-flops in a known initial state after power-up. (Article 07)</p>
+<h3>Power Management</h3>
+<p>The <strong>PMU</strong> selectively powers down idle blocks, runs the CPU at lower voltage when full speed is not needed, and manages battery charging in portable devices. (Article 07)</p>
+<h3>Security Engine</h3>
+<p>Dedicated hardware for encryption, secure boot, key storage, and access control. ARM <strong>TrustZone</strong> partitions the chip into secure and non-secure domains. (Article 11)</p>
+<hr>
+<h2>SoC Examples in the Real World</h2>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-4-900w.png"></p>
+<table>
+<thead>
+<tr>
+<th>SoC</th>
+<th>Application</th>
+<th>Notable Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Apple A18 (iPhone 16)</td>
+<td>Smartphone</td>
+<td>6-core CPU, 6-core GPU, Neural Engine, 16 B transistors</td>
+</tr>
+<tr>
+<td>Qualcomm Snapdragon 8 Gen 3</td>
+<td>Android phone</td>
+<td>big.LITTLE cluster, Hexagon DSP, integrated 5G modem</td>
+</tr>
+<tr>
+<td>NVIDIA Orin</td>
+<td>Autonomous vehicles</td>
+<td>12-core ARM, Ampere GPU, deep learning accelerator</td>
+</tr>
+<tr>
+<td>Raspberry Pi RP2040</td>
+<td>Hobbyist MCU</td>
+<td>Dual Cortex-M0+, PIO state machines, 264 KB SRAM</td>
+</tr>
+<tr>
+<td>Nordic nRF5340</td>
+<td>IoT / BLE</td>
+<td>Dual ARM cores, Bluetooth 5.3 radio integrated on-chip</td>
+</tr>
+<tr>
+<td>Xilinx Zynq UltraScale+</td>
+<td>FPGA SoC</td>
+<td>ARM quad-core + FPGA fabric + GPU + DSP slices</td>
+</tr>
+</tbody>
+</table>
+<p>The range here is important. An SoC is not just a smartphone chip. The same integration principle applies from a $0.50 microcontroller running a light switch to a $200 chip managing an autonomous vehicle.</p>
+<hr>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-5-900w.png"></p>
+<h2>The Complexity Challenge</h2>
+<p>Integration delivers benefits, but it raises design complexity to a different level entirely. A modern SoC is designed by teams of hundreds of engineers over one to three years. The design must:</p>
+<ul>
+<li>Meet timing requirements across all operating conditions (voltage, temperature, process variation)</li>
+<li>Be verified correct before manufacture - a bug in silicon costs millions to fix</li>
+<li>Balance the competing bandwidth demands of many simultaneous data flows</li>
+<li>Boot reliably from cold power-off and recover gracefully from faults</li>
+<li>Meet strict power and thermal budgets across wildly different workloads</li>
+</ul>
+<p>Managing this complexity is the central discipline of SoC design, and it is the reason for the structured methodologies this series explores.</p>
+<hr>
+<h2>HW/SW Duality</h2>
+<p>A crucial insight for SoC design is that <strong>hardware and software are both valid ways to implement any function</strong>. The choice between them is a trade-off, and it shapes the entire architecture:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Hardware</th>
+<th>Software</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Performance</td>
+<td>Very high (parallel, GHz)</td>
+<td>Lower (sequential execution)</td>
+</tr>
+<tr>
+<td>Flexibility</td>
+<td>Fixed after tape-out</td>
+<td>Updateable/patchable</td>
+</tr>
+<tr>
+<td>Energy efficiency</td>
+<td>Excellent for specific tasks</td>
+<td>Lower for the same task</td>
+</tr>
+<tr>
+<td>Development time</td>
+<td>Long, expensive</td>
+<td>Shorter, cheaper</td>
+</tr>
+<tr>
+<td>Debugging difficulty</td>
+<td>Very high post-silicon</td>
+<td>Much easier</td>
+</tr>
+</tbody>
+</table>
+<p>Most SoCs exploit this duality deliberately - placing performance-critical, stable functions in hardware, and flexible or complex control logic in software. Understanding where to draw that line is one of the core skills in SoC architecture and is the subject of Article 11.</p>
+<hr>
+<h2>Summary</h2>
+<p>A System on Chip integrates what was once a board full of discrete chips - processors, memory controllers, communication interfaces, and more - onto a single piece of silicon. Integration delivers speed (proximity), power efficiency (no off-chip driving), smaller area (fewer chips), and higher reliability (fewer solder joints). Every SoC shares a recognisable anatomy: processing subsystem, memory subsystem, system interconnect, DMA engine, peripherals, clock/reset, power management, and security. The following articles examine each of these in turn.</p>
+<hr>
+<h2>Intermediate Articles This Topic Connects To</h2>
+<ul>
+<li><em>AXI4 Protocol Deep Dive</em> - The interconnect in detail</li>
+<li><em>SoC Power Management Techniques</em> - DVFS, power gating, retention</li>
+<li><em>Heterogeneous SoC Partitioning (Advanced)</em> - Formal HW/SW co-exploration</li>
+</ul>
+<hr>
+<p><em>Previous: <a href="./soc-article-01-from-room-to-silicon.html">Article 01 - From Room to Silicon</a></em>
+<em>Next: Article 03 - The SoC Design Stack: From Transistors to Software</em></p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="./dotfiles-setup-stow-git.html" rel="bookmark"
+                               title="Permalink to Managing Dotfiles with Stow and Git">Managing Dotfiles with Stow and Git</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-03-07T00:00:00+00:00">
                 Published: Sat 07 March 2026
@@ -37,96 +266,10 @@
                 </address>
         <p>In <a href="./category/unix-tools.html">Unix & Tools</a>.</p>
 <p>tags: <a href="./tag/dotfiles.html">dotfiles</a> <a href="./tag/shell.html">shell</a> <a href="./tag/stow.html">stow</a> <a href="./tag/zsh.html">zsh</a> <a href="./tag/tmux.html">tmux</a> <a href="./tag/vim.html">vim</a> </p>        
-</footer><!-- /.post-info --><p>Configuration files (dotfiles) for tools like Zsh, Vim, tmux, and Git tend to accumulate across machines over time. Without a strategy, they diverge: one machine has tuned aliases, another has an old vimrc, and a new machine starts from scratch. Keeping dotfiles in a single Git repository solves this. Clone once, link into place, and every machine stays consistent.</p>
-<p>My dotfiles are on GitHub at <a href="https://github.com/morganp/dotfiles">morganp/dotfiles</a>.</p>
-<h2>Why Centralise Dotfiles</h2>
-<ul>
-<li>A single source of truth for all shell and tool configuration.</li>
-<li>Version history lets you see what changed and roll back if something breaks.</li>
-<li>Setting up a new machine reduces to cloning the repo and running a handful of commands.</li>
-<li>Sharing config across macOS and Linux with minimal platform-specific branching.</li>
-</ul>
-<h2>Cloning the Repo</h2>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/dotfiles.git<span class="w"> </span>~/dotfiles
-</code></pre></div>
-
-<h2>Linking Config Files</h2>
-<p>There are two approaches depending on the tool.</p>
-<h3>Sourcing (Zsh and Vim)</h3>
-<p>Some tools are simplest to handle by having the home directory config file source the dotfiles version directly.</p>
-<p><strong>Zsh</strong> -- add to <code>~/.zshrc</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>~/dotfiles/config/shell/dot-zshrc
-</code></pre></div>
-
-<p><strong>Vim</strong> -- add to <code>~/.vimrc</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="k">so</span> <span class="p">~</span><span class="sr">/dotfiles/</span>config<span class="sr">/vim/</span>dot<span class="p">-</span>vimrc_clean
-</code></pre></div>
-
-<h3>GNU Stow (Everything Else)</h3>
-<p><a href="https://www.gnu.org/software/stow/">GNU Stow</a> manages symlinks. It takes a package directory and creates symlinks in a target directory that mirror the structure. With the <code>--dotfiles</code> flag, files named <code>dot-foo</code> are linked as <code>.foo</code> in the target, keeping the repo free of files that would be hidden by default.</p>
-<p>Install Stow and other packages via Homebrew:</p>
-<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>bundle<span class="w"> </span>install<span class="w"> </span>--file<span class="o">=</span>~/dotfiles/config/brew
-</code></pre></div>
-
-<p>Then link the remaining configs:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/dotfiles/config
-stow<span class="w"> </span>git<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
-stow<span class="w"> </span>input<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
-stow<span class="w"> </span>screen<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
-</code></pre></div>
-
-<p>A <code>run_stow</code> script in the repo automates this.</p>
-<h2>Tmux</h2>
-<p>Tmux looks for its config via the <code>$XDG_CONFIG_HOME</code> variable, set in <code>config/shell/dot-profile</code>:</p>
-<div class="highlight"><pre><span></span><code>$XDG_CONFIG_HOME/tmux/tmux.conf
-</code></pre></div>
-
-<p>For the tmux plugin manager, clone TPM separately:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/tmux-plugins/tpm<span class="w"> </span>~/.tmux/plugins/tpm
-</code></pre></div>
-
-<h2>Shell Features</h2>
-<p>The dotfiles configure the following shell aliases across Bash and Zsh:</p>
-<table>
-<thead>
-<tr>
-<th>Alias</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>ls</code></td>
-<td>File list with colour</td>
-</tr>
-<tr>
-<td><code>ll</code></td>
-<td>Long list with human-readable sizes and colour</td>
-</tr>
-<tr>
-<td><code>la</code></td>
-<td>As <code>ll</code> but includes hidden files</td>
-</tr>
-<tr>
-<td><code>lt</code></td>
-<td>Directory tree view</td>
-</tr>
-<tr>
-<td><code>..</code></td>
-<td>Up one directory</td>
-</tr>
-</tbody>
-</table>
-<p>Other configurations included:</p>
-<ul>
-<li><strong>Screen:</strong> Virtual tabs across the bottom in standard colours.</li>
-<li><strong>Inputrc:</strong> Case-insensitive tab completion, including hidden files.</li>
-</ul>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>How to centralise and manage Unix dotfiles in a Git repository, using source directives and GNU Stow to link them into place.</p>
+                        <a class="readmore" href="./dotfiles-setup-stow-git.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -315,28 +458,6 @@ stow<span class="w"> </span>screen<span class="w"> </span>--dotfiles<span class=
 <p>tags: <a href="./tag/tmux.html">tmux</a> <a href="./tag/terminal.html">Terminal</a> <a href="./tag/ghostty.html">Ghostty</a> <a href="./tag/xterm.html">xterm</a> <a href="./tag/proxmox.html">Proxmox</a> <a href="./tag/lxc.html">LXC</a> <a href="./tag/linux.html">Linux</a> <a href="./tag/vim.html">Vim</a> <a href="./tag/bash.html">Bash</a> <a href="./tag/ubuntu.html">Ubuntu</a> </p>        
 </footer><!-- /.post-info -->                        <p>tmux is a terminal multiplexer: it lets you run multiple terminal sessions inside a single window, split panes side by …</p>
                         <a class="readmore" href="./tmux-training-manual-ghostty-xterm-and-pve-lxc-terminals.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="./installing-homebrew-on-a-debian-13-trixie-lxc-container.html" rel="bookmark"
-                               title="Permalink to Installing Homebrew on a Debian 13 (Trixie) LXC Container">Installing Homebrew on a Debian 13 (Trixie) LXC Container</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2026-02-25T00:00:00+00:00">
-                Published: Wed 25 February 2026
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="./category/hardware-homelab.html">Hardware & Homelab</a>.</p>
-<p>tags: <a href="./tag/homebrew.html">Homebrew</a> <a href="./tag/linux.html">Linux</a> <a href="./tag/debian.html">Debian</a> <a href="./tag/lxc.html">LXC</a> <a href="./tag/proxmox.html">Proxmox</a> <a href="./tag/git.html">Git</a> <a href="./tag/bash.html">Bash</a> </p>        
-</footer><!-- /.post-info -->                        <p>A verified step-by-step guide to installing Homebrew (Linuxbrew) on a Debian 13 "trixie" LXC unprivileged container, including group setup, prefix pre-creation, and multi-user configuration.</p>
-                        <a class="readmore" href="./installing-homebrew-on-a-debian-13-trixie-lxc-container.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
                     </ol><!-- /#posts-list -->

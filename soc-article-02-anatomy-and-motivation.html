@@ -4,46 +4,52 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Lizard-Spock - Electronics</title>
-                        <link rel="stylesheet" href="../theme/css/main.css" />
+                        <title>SoC Article 02: What is a System on Chip? - Anatomy and Motivation</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="What blocks make up a System on Chip, how do they relate, and why does integration deliver such dramatic benefits over traditional board-level designs?" />
         </head>
 
         <body id="index" class="home">
                 <header id="banner" class="body">
-                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <h1><a href="./">Lizard-Spock</a></h1>
                         <nav><ul>
-                                                <li><a href="../pages/about.html">About</a></li>
-                                                <li><a href="../category/engineering.html">Engineering</a></li>
-                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
-                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
-                                                <li><a href="../category/music.html">Music</a></li>
-                                                <li><a href="../category/photography.html">Photography</a></li>
-                                                <li><a href="../category/programming.html">Programming</a></li>
-                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li class="active"><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/programming.html">Programming</a></li>
+                                                <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./soc-article-02-anatomy-and-motivation.html" rel="bookmark"
+             title="Permalink to SoC Article 02: What is a System on Chip? - Anatomy and Motivation">SoC Article 02: What is a System on Chip? - Anatomy and Motivation</a></h1>
+      </header>
 
-                <aside id="featured" class="body">
-                    <article>
-                        <h1 class="entry-title"><a href="../soc-article-02-anatomy-and-motivation.html">SoC Article 02: What is a System on Chip? - Anatomy and Motivation</a></h1>
+      <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-03-15T00:00:00+00:00">
                 Published: Sun 15 March 2026
         </abbr>
 
                 <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
                 </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> </p>        
-</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 2 of 11</em></p>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/computer-architecture.html">Computer Architecture</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/embedded-systems.html">Embedded Systems</a> </p>        
+</footer><!-- /.post-info -->        <p><em>Series: Introduction to SoC Design | Article 2 of 11</em></p>
 <hr>
 <h2>Introduction</h2>
 <p>In the previous article we traced the seventy-year journey from room-sized mainframes to silicon-level integration, arriving at the <strong>System on Chip</strong> - a complete computer system fabricated on a single piece of silicon. Now it is time to look inside one: what blocks does it contain, how do they relate, and why does integration deliver such dramatic benefits?</p>
 <hr>
 <h2>The Board-to-Silicon Transition</h2>
-<p><img alt="image" src="../Gemini_Generated_Image_yhyy7hyhyy7hyhyy-901w.png"></p>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-901w.png"></p>
 <p>In traditional electronics, a "system" was a <strong>circuit board</strong> populated with many separate chips, each performing one role: a CPU chip, a separate memory controller, a graphics processor, communication peripheral chips, and a power management IC, all connected by copper traces on the PCB.</p>
 <p>A <strong>System on Chip</strong> collapses most or all of those components onto a <strong>single piece of silicon</strong>. The processor, memory interfaces, graphics engine, USB controller, cryptographic accelerator, radio interface, and many other functional blocks are fabricated together in one integrated circuit.</p>
 <div class="highlight"><pre><span></span><code><span class="n">Traditional</span><span class="w"> </span><span class="n">Board</span><span class="o">-</span><span class="n">Level</span><span class="w"> </span><span class="n">System</span><span class="w">          </span><span class="n">System</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">Chip</span>
@@ -66,7 +72,7 @@
 <p>The term "SoC" emerged formally in the mid-1990s when transistor densities crossed roughly 100 million per chip - the threshold at which integrating a complete system became both technically practical and economically compelling. Today, modern SoCs routinely contain <strong>tens of billions of transistors</strong>.</p>
 <hr>
 <h2>Why Does Integration Matter?</h2>
-<p><img alt="image" src="../Gemini_Generated_Image_yhyy7hyhyy7hyhyy-2-900w.png"></p>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-2-900w.png"></p>
 <p>Putting everything on one die is not just about convenience. It delivers fundamental advantages across every dimension that matters.</p>
 <h3>Speed</h3>
 <p>On-chip wires are nanometres wide and micrometres long. Signals cross them in fractions of a nanosecond. Signals crossing a PCB encounter far greater inductance and capacitance, longer paths, and the need for high-drive output buffers - all of which introduce significant delay. An on-chip memory access takes 1-5 ns; an off-chip access might take 60-100 ns for the same data.</p>
@@ -78,7 +84,7 @@
 <p>Solder joints and connectors are the most common failure points in electronic assemblies. Fewer chips mean fewer joints, longer mean time between failures, and better suitability for vibration-prone environments (automotive, industrial, aerospace).</p>
 <hr>
 <h2>The Anatomy of a Generic SoC</h2>
-<p><img alt="image" src="../Gemini_Generated_Image_yhyy7hyhyy7hyhyy-3-900w.png"></p>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-3-900w.png"></p>
 <p>While no two SoCs are identical, most share a recognisable set of functional blocks. The diagram below shows a representative structure:</p>
 <div class="highlight"><pre><span></span><code><span class="err">┌──────────────────────────────────────────────────────────────────────────┐</span>
 <span class="err">│</span><span class="w">                          </span><span class="n">SYSTEM</span><span class="w"> </span><span class="n">ON</span><span class="w"> </span><span class="n">CHIP</span><span class="w">                                  </span><span class="err">│</span>
@@ -135,7 +141,7 @@
 <p>Dedicated hardware for encryption, secure boot, key storage, and access control. ARM <strong>TrustZone</strong> partitions the chip into secure and non-secure domains. (Article 11)</p>
 <hr>
 <h2>SoC Examples in the Real World</h2>
-<p><img alt="image" src="../Gemini_Generated_Image_yhyy7hyhyy7hyhyy-4-900w.png"></p>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-4-900w.png"></p>
 <table>
 <thead>
 <tr>
@@ -179,7 +185,7 @@
 </table>
 <p>The range here is important. An SoC is not just a smartphone chip. The same integration principle applies from a $0.50 microcontroller running a light switch to a $200 chip managing an autonomous vehicle.</p>
 <hr>
-<p><img alt="image" src="../Gemini_Generated_Image_yhyy7hyhyy7hyhyy-5-900w.png"></p>
+<p><img alt="image" src="./Gemini_Generated_Image_yhyy7hyhyy7hyhyy-5-900w.png"></p>
 <h2>The Complexity Challenge</h2>
 <p>Integration delivers benefits, but it raises design complexity to a different level entirely. A modern SoC is designed by teams of hundreds of engineers over one to three years. The design must:</p>
 <ul>
@@ -241,82 +247,12 @@
 <li><em>Heterogeneous SoC Partitioning (Advanced)</em> - Formal HW/SW co-exploration</li>
 </ul>
 <hr>
-<p><em>Previous: <a href="../soc-article-01-from-room-to-silicon.html">Article 01 - From Room to Silicon</a></em>
-<em>Next: Article 03 - The SoC Design Stack: From Transistors to Software</em></p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+<p><em>Previous: <a href="./soc-article-01-from-room-to-silicon.html">Article 01 - From Room to Silicon</a></em>
+<em>Next: Article 03 - The SoC Design Stack: From Transistors to Software</em></p>
+      </div><!-- /.entry-content -->
 
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../soc-article-01-from-room-to-silicon.html" rel="bookmark"
-                               title="Permalink to SoC Article 01: From Room to Silicon — The Story of the Computer System">SoC Article 01: From Room to Silicon — The Story of the Computer System</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2026-03-07T00:00:00+00:00">
-                Published: Sat 07 March 2026
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/history.html">History</a> <a href="../tag/electronics.html">Electronics</a> </p>        
-</footer><!-- /.post-info -->                        <p>How computing evolved from room-filling mainframes to a sliver of silicon in your pocket — and why that history shapes modern SoC design.</p>
-                        <a class="readmore" href="../soc-article-01-from-room-to-silicon.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html" rel="bookmark"
-                               title="Permalink to WaveDrom Timing Diagrams in Pelican with Claude Code">WaveDrom Timing Diagrams in Pelican with Claude Code</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2026-02-20T12:00:00+00:00">
-                Published: Fri 20 February 2026
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/wavedrom.html">WaveDrom</a> <a href="../tag/timing.html">Timing</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/pelican.html">Pelican</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/python.html">Python</a> <a href="../tag/git.html">Git</a> <a href="../tag/bash.html">Bash</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/rtl.html">RTL</a> </p>        
-</footer><!-- /.post-info -->                        <p><a href="https://wavedrom.com">WaveDrom</a> is a JavaScript library that renders digital timing diagrams from a simple JSON-based format called WaveJSON. It's widely used …</p>
-                        <a class="readmore" href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../flip-flop.html" rel="bookmark"
-                               title="Permalink to "flip-flop"">"flip-flop"</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2014-01-09T19:15:10+00:00">
-                Published: Thu 09 January 2014
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/electronics.html">Electronics</a> <a href="../tag/design.html">Design</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/systemverilog.html">SystemVerilog</a> <a href="../tag/rtl.html">RTL</a> </p>        
-</footer><!-- /.post-info -->                        <p>A flip-flop (D-Type) is essentially 2 latches in series with the enable to one inverted.
-This stops the flip-flop from …</p>
-                        <a class="readmore" href="../flip-flop.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-                    </ol><!-- /#posts-list -->
-                    </section><!-- /#content -->
+    </article>
+  </section>
                 <section id="extras" class="body">
                                 <div class="social">
                                         <h2>social</h2>
