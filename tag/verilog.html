@@ -26,7 +26,394 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../requirements-writing.html">Requirements Writing</a></h1>
+                        <h1 class="entry-title"><a href="../soc-article-03-design-stack.html">SoC Article 03: The SoC Design Stack - From Transistors to Software</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-03-21T00:00:00+00:00">
+                Published: Sat 21 March 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/rtl.html">RTL</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/vhdl.html">VHDL</a> </p>        
+</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 3 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>In the previous article we looked at what a SoC <em>is</em>. Now we need to understand how it is <em>described, designed, and built</em>. The answer is not a single language or a single tool - it is a <strong>stack of abstraction layers</strong>, each hiding complexity from the layer above it.</p>
+<p>This concept of layered abstraction is one of the most powerful ideas in all of engineering, and it is particularly rich in SoC design, where the stack spans from quantum mechanics at the silicon level all the way up to the C programs and operating systems that run on the finished chip.</p>
+<hr>
+<h2>The Abstraction Hierarchy</h2>
+<p>Think of SoC design as a series of nested boxes. Each layer can be understood and reasoned about independently, so long as it respects the contracts defined by the layers around it.</p>
+<div class="highlight"><pre><span></span><code><span class="err">┌──────────────────────────────────────────────────────────┐</span>
+<span class="err">│</span><span class="w">                   </span><span class="n">Application</span><span class="w"> </span><span class="n">Software</span><span class="w">                    </span><span class="err">│</span><span class="w">  </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">&quot;What to do&quot;</span>
+<span class="err">│</span><span class="w">            </span><span class="p">(</span><span class="n">Android</span><span class="p">,</span><span class="w"> </span><span class="n">RTOS</span><span class="p">,</span><span class="w"> </span><span class="n">bare</span><span class="o">-</span><span class="n">metal</span><span class="w"> </span><span class="n">firmware</span><span class="p">)</span><span class="w">           </span><span class="err">│</span>
+<span class="err">├──────────────────────────────────────────────────────────┤</span>
+<span class="err">│</span><span class="w">               </span><span class="n">Operating</span><span class="w"> </span><span class="n">System</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Firmware</span><span class="w">                 </span><span class="err">│</span>
+<span class="err">│</span><span class="w">        </span><span class="p">(</span><span class="n">Linux</span><span class="w"> </span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="n">drivers</span><span class="p">,</span><span class="w"> </span><span class="n">bootloader</span><span class="p">)</span><span class="w">         </span><span class="err">│</span>
+<span class="err">├──────────────────────────────────────────────────────────┤</span>
+<span class="err">│</span><span class="w">         </span><span class="n">Instruction</span><span class="w"> </span><span class="n">Set</span><span class="w"> </span><span class="n">Architecture</span><span class="w"> </span><span class="p">(</span><span class="n">ISA</span><span class="p">)</span><span class="w">                </span><span class="err">│</span><span class="w">  </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">SW</span><span class="o">/</span><span class="n">HW</span><span class="w"> </span><span class="n">boundary</span>
+<span class="err">│</span><span class="w">        </span><span class="p">(</span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="p">,</span><span class="w"> </span><span class="n">ARM</span><span class="p">,</span><span class="w"> </span><span class="n">x86</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">programmer</span><span class="o">-</span><span class="n">visible</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w">      </span><span class="err">│</span>
+<span class="err">├──────────────────────────────────────────────────────────┤</span>
+<span class="err">│</span><span class="w">              </span><span class="n">Microarchitecture</span><span class="w"> </span><span class="p">(</span><span class="n">RTL</span><span class="p">)</span><span class="w">                       </span><span class="err">│</span>
+<span class="err">│</span><span class="w">   </span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span><span class="w"> </span><span class="n">caches</span><span class="p">,</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="n">predictor</span><span class="p">,</span><span class="w"> </span><span class="n">bus</span><span class="w"> </span><span class="n">interfaces</span><span class="p">)</span><span class="w">    </span><span class="err">│</span>
+<span class="err">├──────────────────────────────────────────────────────────┤</span>
+<span class="err">│</span><span class="w">               </span><span class="n">Logic</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Gate</span><span class="w"> </span><span class="n">Level</span><span class="w">                          </span><span class="err">│</span>
+<span class="err">│</span><span class="w">         </span><span class="p">(</span><span class="n">AND</span><span class="p">,</span><span class="w"> </span><span class="n">OR</span><span class="p">,</span><span class="w"> </span><span class="n">flip</span><span class="o">-</span><span class="n">flops</span><span class="p">,</span><span class="w"> </span><span class="n">multiplexers</span><span class="p">)</span><span class="w">               </span><span class="err">│</span>
+<span class="err">├──────────────────────────────────────────────────────────┤</span>
+<span class="err">│</span><span class="w">              </span><span class="n">Transistor</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Circuit</span><span class="w"> </span><span class="n">Level</span><span class="w">                   </span><span class="err">│</span>
+<span class="err">│</span><span class="w">         </span><span class="p">(</span><span class="n">CMOS</span><span class="w"> </span><span class="n">transistors</span><span class="p">,</span><span class="w"> </span><span class="n">analog</span><span class="w"> </span><span class="n">timing</span><span class="w"> </span><span class="n">margins</span><span class="p">)</span><span class="w">         </span><span class="err">│</span>
+<span class="err">├──────────────────────────────────────────────────────────┤</span>
+<span class="err">│</span><span class="w">               </span><span class="n">Layout</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Physical</span><span class="w"> </span><span class="n">Level</span><span class="w">                     </span><span class="err">│</span>
+<span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="n">geometric</span><span class="w"> </span><span class="n">shapes</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">silicon</span><span class="w"> </span><span class="n">layers</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">GDSII</span><span class="w"> </span><span class="n">files</span><span class="p">)</span><span class="w">    </span><span class="err">│</span>
+<span class="err">└──────────────────────────────────────────────────────────┘</span>
+</code></pre></div>
+
+<p><a href="../01-abstraction-stack-HQ.png"><img alt="The SoC abstraction stack from physical layout at the bottom to application software at the top, with ISA highlighted as the hardware/software boundary" src="../01-abstraction-stack-900w.png"></a></p>
+<p>Engineers who work in SoC design typically specialise in one or two adjacent layers. A physical design engineer thinks in terms of polygons and resistance; a firmware engineer thinks in terms of memory-mapped registers and interrupt vectors. The stack is the shared vocabulary that lets them collaborate.</p>
+<hr>
+<h2>The Gajski-Kuhn Y-Chart</h2>
+<p>A classic way to visualise the design space is the <strong>Y-chart</strong>, introduced by Daniel Gajski and Robert Kuhn in 1983. It organises design descriptions along three axes (or "domains"), each of which can be examined at multiple levels of abstraction:</p>
+<div class="highlight"><pre><span></span><code>                    BEHAVIOURAL DOMAIN
+                    (what the circuit does)
+                           |
+                           |  Algorithmic
+                           |  Register-Transfer
+                           |  Logic
+                           |  Circuit
+                           |  Device
+              _____________|_____________
+             /             |              \
+            /              |               \
+           /               |                \
+STRUCTURAL DOMAIN          |          PHYSICAL DOMAIN
+(components &amp; connections)  |        (geometric layout)
+  Processors, ALUs         |         Floorplan, cells
+  Gates, flip-flops        |         Placement, routing
+                           |
+</code></pre></div>
+
+<p><a href="../03-y-chart-HQ.png"><img alt="The Gajski-Kuhn Y-Chart showing three design domains - behavioural, structural, and physical - with abstraction levels along each axis" src="../03-y-chart-900w.png"></a></p>
+<p>The key insight of the Y-chart is that every design activity maps a description from one domain into another at the same level of abstraction. <strong>Synthesis</strong> maps a behavioural RTL description into a structural gate-level netlist. <strong>Place-and-route</strong> maps a structural netlist into a physical layout.</p>
+<hr>
+<h2>Layer 1: Devices and Transistors</h2>
+<p>At the very bottom of the stack sits the <strong>transistor</strong> - the fundamental switch of digital electronics. Modern SoCs are built using <strong>CMOS</strong> (Complementary Metal-Oxide-Semiconductor) technology, which uses two complementary transistor types: <strong>nMOS</strong> (conducts when gate is high) and <strong>pMOS</strong> (conducts when gate is low).</p>
+<div class="highlight"><pre><span></span><code>nMOS Transistor                    pMOS Transistor
+
+   Gate ──┤├── (oxide)                Gate ──┤├──
+          │                                   │
+  Source──┤ ├──Drain             Source──┤ ├──Drain
+  (0V)    │    (Vdd when off)    (Vdd)   │    (0V when off)
+          │                              │
+       Substrate                      Substrate
+</code></pre></div>
+
+<p>A single CMOS inverter (NOT gate) uses one nMOS and one pMOS transistor. This pairing is elegant: it ensures that when the output is stable, no DC path exists from power to ground, so the circuit draws near-zero static power.</p>
+<p><a href="../02-cmos-inverter-HQ.png"><img alt="CMOS inverter schematic showing pMOS and nMOS transistors in complementary configuration, with IN and OUT signals and Vdd/GND rails" src="../02-cmos-inverter-900w.png"></a></p>
+<p>The process of manufacturing transistors is described by the <strong>technology node</strong> - a number like 5 nm, 7 nm, or 28 nm. This roughly corresponds to the minimum feature size achievable. Smaller nodes pack more transistors into the same area but require more expensive processes.</p>
+<hr>
+<h2>Layer 2: Logic Gates</h2>
+<p>Transistors are combined to form <strong>logic gates</strong> - circuits that implement boolean operations. Gates are the building blocks of all digital logic.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">Common</span><span class="w"> </span><span class="nx">Logic</span><span class="w"> </span><span class="nx">Gates</span><span class="w"> </span><span class="p">(</span><span class="nx">CMOS</span><span class="w"> </span><span class="nx">implementation</span><span class="w"> </span><span class="nx">uses</span><span class="w"> </span><span class="nx">complementary</span><span class="w"> </span><span class="nx">transistor</span><span class="w"> </span><span class="nx">pairs</span><span class="p">):</span>
+
+<span class="w">  </span><span class="nx">AND</span><span class="p">:</span><span class="w">  </span><span class="nx">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">A</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="nx">B</span><span class="w">        </span><span class="nx">OR</span><span class="p">:</span><span class="w">  </span><span class="nx">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">B</span><span class="w">       </span><span class="nx">NOT</span><span class="p">:</span><span class="w">  </span><span class="nx">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">A</span><span class="err">&#39;</span>
+<span class="w">  </span><span class="err">┌───┐</span><span class="w">                  </span><span class="err">┌───┐</span><span class="w">                  </span><span class="err">┌───┐</span>
+<span class="nx">A</span><span class="w"> </span><span class="err">┤</span><span class="w">   </span><span class="err">├─</span><span class="w"> </span><span class="nx">Y</span><span class="w">            </span><span class="nx">A</span><span class="w"> </span><span class="err">─┤</span><span class="w">   </span><span class="err">├─</span><span class="w"> </span><span class="nx">Y</span><span class="w">            </span><span class="nx">A</span><span class="w"> </span><span class="err">─┤</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="err">├─</span><span class="w"> </span><span class="nx">Y</span>
+<span class="nx">B</span><span class="w"> </span><span class="err">┤</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="err">│</span><span class="w">              </span><span class="nx">B</span><span class="w"> </span><span class="err">─┤</span><span class="w"> </span><span class="err">≥</span><span class="mi">1</span><span class="err">│</span><span class="w">               </span><span class="err">└───┘</span>
+<span class="w">  </span><span class="err">└───┘</span><span class="w">                  </span><span class="err">└───┘</span>
+
+<span class="nx">XOR</span><span class="p">:</span><span class="w">  </span><span class="nx">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">A</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="nx">B</span><span class="w">       </span><span class="nx">NAND</span><span class="p">:</span><span class="w">  </span><span class="nx">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">B</span><span class="p">)</span><span class="err">&#39;</span><span class="w">     </span><span class="nx">NOR</span><span class="p">:</span><span class="w">  </span><span class="nx">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">(</span><span class="nx">A</span><span class="o">+</span><span class="nx">B</span><span class="p">)</span><span class="err">&#39;</span>
+<span class="w">  </span><span class="err">┌───┐</span><span class="w">                  </span><span class="err">┌────┐</span><span class="w">                 </span><span class="err">┌────┐</span>
+<span class="nx">A</span><span class="w"> </span><span class="err">┤</span><span class="w">   </span><span class="err">├─</span><span class="w"> </span><span class="nx">Y</span><span class="w">            </span><span class="nx">A</span><span class="w"> </span><span class="err">─┤</span><span class="w">    </span><span class="err">├─</span><span class="w"> </span><span class="nx">Y</span><span class="w">           </span><span class="nx">A</span><span class="w"> </span><span class="err">─┤</span><span class="w">    </span><span class="err">├─</span><span class="w"> </span><span class="nx">Y</span>
+<span class="nx">B</span><span class="w"> </span><span class="err">┤</span><span class="w"> </span><span class="p">=</span><span class="mi">1</span><span class="err">│</span><span class="w">              </span><span class="nx">B</span><span class="w"> </span><span class="err">─┤</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nx">o</span><span class="err">│</span><span class="w">             </span><span class="nx">B</span><span class="w"> </span><span class="err">─┤</span><span class="w"> </span><span class="err">≥</span><span class="mi">1</span><span class="nx">o</span><span class="err">│</span>
+<span class="w">  </span><span class="err">└───┘</span><span class="w">                  </span><span class="err">└────┘</span><span class="w">                 </span><span class="err">└────┘</span>
+</code></pre></div>
+
+<p>In practice, <strong>NAND and NOR</strong> gates are the most fundamental - any other gate can be built from them (they are "universal"). Standard cell libraries contain dozens to hundreds of gate variants with different drive strengths, optimised for speed or area.</p>
+<hr>
+<h2>Layer 3: Register Transfer Level (RTL)</h2>
+<p>Above the gate level sits the <strong>Register Transfer Level (RTL)</strong>, the primary working abstraction for SoC designers. RTL describes a circuit in terms of:</p>
+<ul>
+<li><strong>Registers</strong> - collections of flip-flops that hold state</li>
+<li><strong>Combinational logic</strong> - the boolean functions that compute new values from current state and inputs</li>
+<li><strong>Data transfers</strong> - moving values between registers, through functional units (ALUs, multiplexers)</li>
+</ul>
+<p>RTL is described using a <strong>Hardware Description Language (HDL)</strong> - either <strong>Verilog/SystemVerilog</strong> or <strong>VHDL</strong>. Here is a simple 4-bit counter in both:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// SystemVerilog -- 4-bit synchronous counter with enable</span>
+<span class="k">module</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="p">#(</span><span class="k">parameter</span><span class="w"> </span><span class="n">WIDTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">4</span><span class="p">)</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w">             </span><span class="n">clk</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w">             </span><span class="n">rst_n</span><span class="p">,</span><span class="w">   </span><span class="c1">// active-low reset</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w">             </span><span class="n">en</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">WIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">count</span>
+<span class="p">);</span>
+<span class="w">    </span><span class="k">always_ff</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">rst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rst_n</span><span class="p">)</span>
+<span class="w">            </span><span class="n">count</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">en</span><span class="p">)</span>
+<span class="w">            </span><span class="n">count</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">-- VHDL -- equivalent 4-bit synchronous counter</span>
+<span class="k">library</span><span class="w"> </span><span class="nn">ieee</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="nn">ieee.std_logic_1164.</span><span class="k">all</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="nn">ieee.numeric_std.</span><span class="k">all</span><span class="p">;</span>
+
+<span class="k">entity</span><span class="w"> </span><span class="nc">counter</span><span class="w"> </span><span class="k">is</span>
+<span class="w">    </span><span class="k">generic</span><span class="w"> </span><span class="p">(</span><span class="n">WIDTH</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">integer</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="w">    </span><span class="k">port</span><span class="w"> </span><span class="p">(</span>
+<span class="w">        </span><span class="n">clk</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic</span><span class="p">;</span>
+<span class="w">        </span><span class="n">rst_n</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic</span><span class="p">;</span>
+<span class="w">        </span><span class="n">en</span><span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic</span><span class="p">;</span>
+<span class="w">        </span><span class="n">count</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="k">end</span><span class="w"> </span><span class="k">entity</span><span class="p">;</span>
+
+<span class="k">architecture</span><span class="w"> </span><span class="nc">rtl</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nc">counter</span><span class="w"> </span><span class="k">is</span>
+<span class="w">    </span><span class="k">signal</span><span class="w"> </span><span class="n">cnt</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">unsigned</span><span class="p">(</span><span class="n">WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="k">begin</span>
+<span class="w">    </span><span class="k">process</span><span class="p">(</span><span class="n">clk</span><span class="p">,</span><span class="w"> </span><span class="n">rst_n</span><span class="p">)</span>
+<span class="w">    </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">rst_n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="n">cnt</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="p">(</span><span class="k">others</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">elsif</span><span class="w"> </span><span class="n">rising_edge</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;1&#39;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                </span><span class="n">cnt</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">cnt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">            </span><span class="k">end</span><span class="w"> </span><span class="k">if</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span><span class="w"> </span><span class="k">if</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span><span class="w"> </span><span class="k">process</span><span class="p">;</span>
+<span class="w">    </span><span class="n">count</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">cnt</span><span class="p">);</span>
+<span class="k">end</span><span class="w"> </span><span class="k">architecture</span><span class="p">;</span>
+</code></pre></div>
+
+<p>The behaviour of this counter over time is captured in a timing diagram. In this series, timing diagrams are presented in <strong>WaveDrom JSON format</strong>, which can be rendered at <a href="https://wavedrom.com">wavedrom.com</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;clk&quot;</span><span class="p">,</span><span class="w">   </span><span class="nt">&quot;wave&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;P........&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rst_n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;wave&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.1......&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;en&quot;</span><span class="p">,</span><span class="w">    </span><span class="nt">&quot;wave&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0..1.....&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;count&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;wave&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x..22222.&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;0&quot;</span><span class="p">,</span><span class="s2">&quot;1&quot;</span><span class="p">,</span><span class="s2">&quot;2&quot;</span><span class="p">,</span><span class="s2">&quot;3&quot;</span><span class="p">,</span><span class="s2">&quot;4&quot;</span><span class="p">]}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;hscale&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;head&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4-bit Counter Timing Diagram&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><em>Rendering note: paste the JSON above into <a href="https://wavedrom.com/editor.html">wavedrom.com/editor.html</a> to see the waveform.</em></p>
+<hr>
+<h2>Layer 4: The Instruction Set Architecture (ISA)</h2>
+<p>The <strong>ISA</strong> is the contract between hardware and software. It defines:</p>
+<ul>
+<li>The <strong>programmer-visible registers</strong> (e.g., x0-x31 in RISC-V)</li>
+<li>The <strong>instruction set</strong> - the opcodes and their semantics</li>
+<li><strong>Memory addressing modes</strong> - how addresses are formed</li>
+<li><strong>Exception and interrupt behaviour</strong></li>
+<li><strong>Privilege levels</strong> - user, supervisor, machine mode</li>
+</ul>
+<p>The ISA is intentionally a stable interface. A program compiled for RISC-V will run correctly on any RISC-V implementation, regardless of how many pipeline stages it has, how large its caches are, or whether it executes instructions out of order. The microarchitecture can change entirely as long as it correctly implements the ISA.</p>
+<p>There are two broad architectural philosophies:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>CISC</th>
+<th>RISC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Philosophy</td>
+<td>Complex instructions doing more work</td>
+<td>Simple, fast instructions</td>
+</tr>
+<tr>
+<td>Instruction size</td>
+<td>Variable (1-15 bytes on x86)</td>
+<td>Fixed (4 bytes in RISC-V, ARM)</td>
+</tr>
+<tr>
+<td>Register count</td>
+<td>Historically few</td>
+<td>Many (16-32+)</td>
+</tr>
+<tr>
+<td>Examples</td>
+<td>x86 / x86-64</td>
+<td>ARM, RISC-V, MIPS</td>
+</tr>
+<tr>
+<td>Common in SoCs</td>
+<td>Desktop/server</td>
+<td>Mobile, embedded, IoT</td>
+</tr>
+</tbody>
+</table>
+<p>Most modern SoCs use RISC-based ISAs (particularly ARM) because their simpler, more regular instruction encodings are easier to implement efficiently in hardware.</p>
+<hr>
+<h2>Layer 5: Microarchitecture</h2>
+<p>The microarchitecture is the <em>implementation</em> of the ISA - the actual pipeline, caches, branch predictors, and functional units that execute instructions. It is typically described at RTL level.</p>
+<p>A simple five-stage pipeline illustrates the key idea:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Instruction</span><span class="w"> </span><span class="n">lifecycle</span><span class="w"> </span><span class="n">through</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="mh">5</span><span class="o">-</span><span class="n">stage</span><span class="w"> </span><span class="nl">pipeline:</span>
+
+<span class="nl">Cycle:</span><span class="w">      </span><span class="mh">1</span><span class="w">    </span><span class="mh">2</span><span class="w">    </span><span class="mh">3</span><span class="w">    </span><span class="mh">4</span><span class="w">    </span><span class="mh">5</span><span class="w">    </span><span class="mh">6</span><span class="w">    </span><span class="mh">7</span>
+<span class="w">           </span><span class="err">┌────┬────┬────┬────┬────┬────┬────┐</span>
+<span class="n">Instr</span><span class="w"> </span><span class="mh">1</span><span class="o">:</span><span class="w">   </span><span class="err">│</span><span class="w"> </span><span class="n">IF</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">ID</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">EX</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">MA</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">WB</span><span class="w"> </span><span class="err">│</span><span class="w">    </span><span class="err">│</span><span class="w">    </span><span class="err">│</span>
+<span class="w">           </span><span class="err">├────┼────┼────┼────┼────┼────┼────┤</span>
+<span class="n">Instr</span><span class="w"> </span><span class="mh">2</span><span class="o">:</span><span class="w">   </span><span class="err">│</span><span class="w">    </span><span class="err">│</span><span class="w"> </span><span class="n">IF</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">ID</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">EX</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">MA</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">WB</span><span class="w"> </span><span class="err">│</span><span class="w">    </span><span class="err">│</span>
+<span class="w">           </span><span class="err">├────┼────┼────┼────┼────┼────┼────┤</span>
+<span class="n">Instr</span><span class="w"> </span><span class="mh">3</span><span class="o">:</span><span class="w">   </span><span class="err">│</span><span class="w">    </span><span class="err">│</span><span class="w">    </span><span class="err">│</span><span class="w"> </span><span class="n">IF</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">ID</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">EX</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">MA</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">WB</span><span class="w"> </span><span class="err">│</span>
+<span class="w">           </span><span class="err">└────┴────┴────┴────┴────┴────┴────┘</span>
+
+<span class="n">IF</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Instruction</span><span class="w"> </span><span class="n">Fetch</span><span class="w">    </span><span class="n">ID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Instruction</span><span class="w"> </span><span class="n">Decode</span>
+<span class="n">EX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Execute</span><span class="w">              </span><span class="n">MA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Memory</span><span class="w"> </span><span class="n">Access</span>
+<span class="n">WB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Write</span><span class="w"> </span><span class="n">Back</span><span class="w"> </span><span class="p">(</span><span class="n">to</span><span class="w"> </span><span class="n">register</span><span class="w"> </span><span class="n">file</span><span class="p">)</span>
+</code></pre></div>
+
+<p><a href="../04-pipeline-HQ.png"><img alt="5-stage pipeline grid showing three instructions executing in parallel across clock cycles, with Execute stages in teal and Write Back in orange" src="../04-pipeline-900w.png"></a></p>
+<p>Multiple instructions are in-flight simultaneously, improving throughput. The art of microarchitecture is managing the interactions between them - particularly <strong>hazards</strong> where one instruction depends on the result of a previous one that hasn't finished yet.</p>
+<hr>
+<h2>IP Cores: Pre-Built Design Blocks</h2>
+<p>One of the most important concepts in SoC design is the <strong>Intellectual Property (IP) core</strong> - a pre-designed, pre-verified block that can be reused in a new design. IP reuse is what makes SoC development tractable: instead of designing every block from scratch, engineers assemble proven components.</p>
+<p>IP cores come in three forms:</p>
+<div class="highlight"><pre><span></span><code>┌─────────────────────────────────────────────────────────────────┐
+│                     IP Core Classifications                      │
+├────────────┬──────────────┬──────────────────────────────────────┤
+│   Type     │   Form       │   Characteristics                    │
+├────────────┼──────────────┼──────────────────────────────────────┤
+│   Soft IP  │ RTL source   │ Technology-independent. Highly        │
+│            │ (HDL code)   │ portable, configurable. Lowest        │
+│            │              │ optimisation.                         │
+├────────────┼──────────────┼──────────────────────────────────────┤
+│   Firm IP  │ Gate-level   │ Technology-partially-dependent.       │
+│            │ netlist      │ Some timing characterised. Limited    │
+│            │              │ changes possible (placement).         │
+├────────────┼──────────────┼──────────────────────────────────────┤
+│   Hard IP  │ GDSII layout │ Technology-specific, fully            │
+│            │              │ optimised. Cannot be modified.        │
+│            │              │ Highest performance, no portability.  │
+└────────────┴──────────────┴──────────────────────────────────────┘
+</code></pre></div>
+
+<p><a href="../05-ip-core-types-HQ.png"><img alt="IP core classification spectrum from Soft IP (RTL source, portable) through Firm IP (netlist) to Hard IP (GDSII layout, fully optimised), with opposing arrows showing the portability vs optimisation trade-off" src="../05-ip-core-types-900w.png"></a></p>
+<p>ARM's Cortex-M series are delivered as <strong>soft IP</strong> - you receive the RTL description and synthesise it yourself. ARM's Cortex-A series in advanced processes often comes as <strong>hard IP</strong> - the physical layout is fixed for a particular foundry process.</p>
+<p>Common IP blocks found in SoCs:</p>
+<ul>
+<li><strong>CPU cores</strong> - ARM Cortex-A/M/R, RISC-V cores</li>
+<li><strong>GPU IP</strong> - ARM Mali, Imagination PowerVR</li>
+<li><strong>USB PHY and controller</strong> - Synopsys DesignWare</li>
+<li><strong>PCIe controller</strong> - Synopsys, Cadence</li>
+<li><strong>Memory controllers</strong> - DDR PHY from specialised vendors</li>
+<li><strong>Ethernet MAC/PHY</strong> - various vendors</li>
+<li><strong>Cryptography engines</strong> - AES, SHA, PKA implementations</li>
+</ul>
+<hr>
+<h2>The Design Flow Overview</h2>
+<p>Taking an SoC from concept to fabricated silicon follows a structured sequence of steps, each with its own tools and verification checkpoints:</p>
+<div class="highlight"><pre><span></span><code>┌─────────────────────────────────────────────────────────────────┐
+│<span class="w">                     </span><span class="n">SoC</span><span class="w"> </span><span class="n">Design</span><span class="w"> </span><span class="n">Flow</span><span class="w">                              </span>│
+│<span class="w">                                                                   </span>│
+│<span class="w">  </span>┌──────────────┐<span class="w">                                                </span>│
+│<span class="w">  </span>│<span class="w"> </span><span class="n">Specification</span>│<span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Written</span><span class="w"> </span><span class="n">requirements</span><span class="p">,</span><span class="w"> </span><span class="n">power</span><span class="o">/</span><span class="n">area</span><span class="o">/</span><span class="n">speed</span><span class="w"> </span><span class="n">goals</span>│
+│<span class="w">  </span>└──────┬───────┘<span class="w">                                                </span>│
+│<span class="w">         </span>↓<span class="w">                                                        </span>│
+│<span class="w">  </span>┌──────────────┐<span class="w">                                                </span>│
+│<span class="w">  </span>│<span class="w"> </span><span class="n">Architecture</span><span class="w"> </span>│<span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Block</span><span class="w"> </span><span class="n">decomposition</span><span class="p">,</span><span class="w"> </span><span class="n">ISA</span><span class="w"> </span><span class="n">choice</span><span class="p">,</span><span class="w"> </span><span class="n">bus</span><span class="w"> </span><span class="n">choice</span><span class="w"> </span>│
+│<span class="w">  </span>└──────┬───────┘<span class="w">                                                </span>│
+│<span class="w">         </span>↓<span class="w">                                                        </span>│
+│<span class="w">  </span>┌──────────────┐<span class="w">                                                </span>│
+│<span class="w">  </span>│<span class="w">  </span><span class="n">RTL</span><span class="w"> </span><span class="n">Design</span><span class="w">  </span>│<span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">SystemVerilog</span><span class="o">/</span><span class="n">VHDL</span><span class="p">,</span><span class="w"> </span><span class="n">IP</span><span class="w"> </span><span class="n">integration</span><span class="w">          </span>│
+│<span class="w">  </span>└──────┬───────┘<span class="w">                                                </span>│
+│<span class="w">         </span>↓<span class="w">                          </span>┌──────────────────┐<span class="w">         </span>│
+│<span class="w">  </span>┌──────────────┐<span class="w">                  </span>│<span class="w">  </span><span class="n">RTL</span><span class="w"> </span><span class="n">Simulation</span><span class="w">  </span>│<span class="w">         </span>│
+│<span class="w">  </span>│<span class="w">  </span><span class="n">Synthesis</span><span class="w">   </span>│<span class="w"> </span><span class="o">&lt;</span>────────────────│<span class="w">  </span><span class="o">&amp;</span><span class="w"> </span><span class="n">Verification</span><span class="w">  </span>│<span class="w">         </span>│
+│<span class="w">  </span>└──────┬───────┘<span class="w">                  </span>└──────────────────┘<span class="w">         </span>│
+│<span class="w">         </span>↓<span class="w">                                                        </span>│
+│<span class="w">  </span>┌──────────────┐<span class="w">                                                </span>│
+│<span class="w">  </span>│<span class="w">  </span><span class="n">Place</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">Route</span>│<span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Physical</span><span class="w"> </span><span class="n">layout</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="n">process</span><span class="w">          </span>│
+│<span class="w">  </span>└──────┬───────┘<span class="w">                                                </span>│
+│<span class="w">         </span>↓<span class="w">                                                        </span>│
+│<span class="w">  </span>┌──────────────┐<span class="w">                                                </span>│
+│<span class="w">  </span>│<span class="w"> </span><span class="n">Sign</span><span class="o">-</span><span class="n">off</span><span class="w">    </span>│<span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Timing</span><span class="p">,</span><span class="w"> </span><span class="n">power</span><span class="p">,</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="n">drop</span><span class="p">,</span><span class="w"> </span><span class="n">DRC</span><span class="p">,</span><span class="w"> </span><span class="n">LVS</span><span class="w"> </span><span class="n">checks</span><span class="w">      </span>│
+│<span class="w">  </span>└──────┬───────┘<span class="w">                                                </span>│
+│<span class="w">         </span>↓<span class="w">                                                        </span>│
+│<span class="w">  </span>┌──────────────┐<span class="w">                                                </span>│
+│<span class="w">  </span>│<span class="w">  </span><span class="n">Tape</span><span class="o">-</span><span class="n">out</span><span class="w">    </span>│<span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Send</span><span class="w"> </span><span class="n">GDSII</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">foundry</span><span class="w"> </span><span class="n">for</span><span class="w"> </span><span class="n">fabrication</span><span class="w">       </span>│
+│<span class="w">  </span>└──────────────┘<span class="w">                                                </span>│
+└─────────────────────────────────────────────────────────────────┘
+</code></pre></div>
+
+<p>Article 09 in this series covers the design flow in detail. For now, the important point is that design is not a linear process - it is iterative. Problems discovered during synthesis or place-and-route often require revisiting the RTL, and sometimes the architecture.</p>
+<hr>
+<h2>Modelling Languages: Choosing the Right Abstraction</h2>
+<p>Different languages are suited to different levels of the design stack:</p>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Level</th>
+<th>Primary Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SystemC</td>
+<td>Architecture / TLM</td>
+<td>System-level modelling, HW/SW co-design</td>
+</tr>
+<tr>
+<td>SystemVerilog</td>
+<td>RTL / Gate</td>
+<td>Hardware design, simulation, formal</td>
+</tr>
+<tr>
+<td>VHDL</td>
+<td>RTL / Gate</td>
+<td>Hardware design (historically in Europe/defence)</td>
+</tr>
+<tr>
+<td>Verilog</td>
+<td>RTL / Gate</td>
+<td>Older HDL, still widely used</td>
+</tr>
+<tr>
+<td>C/C++</td>
+<td>Algorithm / Firmware</td>
+<td>SW design, hardware test benches</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>Verification / Tools</td>
+<td>Test automation, tooling, cocotb test benches</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Summary</h2>
+<p>SoC design is organised as a stack of abstraction layers, from quantum-mechanical effects in transistors at the bottom to application software at the top. Each layer hides complexity from the layer above it, enabling teams of specialists to collaborate without needing to understand every detail. The key levels are: device/transistor, logic gate, RTL, ISA, microarchitecture, and software. IP reuse is the mechanism that makes modern SoC development tractable. The design flow moves from specification through RTL, synthesis, physical design, and sign-off before tape-out.</p>
+<hr>
+<h2>Intermediate Articles This Topic Connects To</h2>
+<ul>
+<li><em>RTL Synthesis and Timing Closure</em> - How EDA tools map RTL to gates and meet timing</li>
+<li><em>SoC Verification with UVM</em> - Proving the RTL is correct before committing to silicon</li>
+<li><em>Formal Verification Methods</em> - Using mathematics to prove hardware correctness</li>
+</ul>
+<hr>
+<p><em>Previous: <a href="02-what-is-a-system-on-chip.md">Article 02 - What is a System on Chip?</a></em>
+<em>Next: <a href="04-processor-cores.md">Article 04 - Processor Cores: CPU, DSP, GPU and Hardware Accelerators</a></em></p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../requirements-writing.html" rel="bookmark"
+                               title="Permalink to Requirements Writing">Requirements Writing</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-03-06T18:00:00+00:00">
                 Published: Fri 06 March 2026
@@ -37,127 +424,10 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/design.html">Design</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/verification.html">Verification</a> </p>        
-</footer><!-- /.post-info --><p>Good requirements engineering is fundamental to delivering products that meet customer needs within cost and schedule. A well-formed requirement identifies a specific user or stakeholder, defines a positive end result, and states a measurable success criterion -- for example: <em>"The internet user shall be able to access their current account balance in less than 5 seconds."</em> Requirements must be unambiguous, singular (one requirement per statement), and free of escape clauses such as "unless", "except", or "if possible". They should avoid designing the solution, speculating about future needs, or using vague qualitative terms like "user-friendly" or "flexible" that cannot be verified. The normative terms shall, should, and may carry specific and distinct meanings -- using them precisely is critical to a traceable and verifiable requirement set.</p>
-<blockquote>
-<p><strong>Note:</strong> The IBM Requirements Writing Training document uses 'shall' or 'will' interchangeably to signal a mandatory requirement. The IEEE Standards Style Manual (also referenced below) deprecates the use of 'will' for mandatory requirements, reserving it for statements of fact only. The IEEE definition is the preferred usage.</p>
-</blockquote>
-<h2>Normative Terms</h2>
-<p>Normative requirements are normally phrased using one of the three terms below: shall, should, or may. All normative elements that are requirements (shall) are to be followed in all cases in order to be in conformity.</p>
-<table>
-<thead>
-<tr>
-<th>Term</th>
-<th>Priority</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>'Shall'</td>
-<td>High</td>
-<td>'Must-have' for minimum viable product (MVP)</td>
-</tr>
-<tr>
-<td>'Should'</td>
-<td>Medium</td>
-<td>'Desirable' in product and to be considered for phase 1, including any impact</td>
-</tr>
-<tr>
-<td>'May'</td>
-<td>Low</td>
-<td>'Nice-to-have' and could be included if no impact to key metrics. Should log decision.</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Use of Special Terms (from IEEE Standards Style Manual)</strong></p>
-<blockquote>
-<p>The word <strong>shall</strong> is used to indicate mandatory requirements strictly to be followed in order to conform to the Specification and from which no deviation is permitted (shall equals is required to).</p>
-<p>The use of the word <strong>must</strong> is deprecated and shall not be used when stating mandatory requirements; must is used only to describe unavoidable situations.</p>
-<p>The use of the word <strong>will</strong> is deprecated and shall not be used when stating mandatory requirements; will is only used in statements of fact.</p>
-<p>The word <strong>should</strong> is used to indicate that among several possibilities one is recommended as particularly suitable, without mentioning or excluding others; or that a certain course of action is preferred but not necessarily required; or that (in the negative form) a certain course of action is deprecated but not prohibited (should equals is recommended that).</p>
-<p>The word <strong>may</strong> is used to indicate a course of action permissible within the limits of the Specification (may equals is permitted to).</p>
-<p>The word <strong>can</strong> is used for statements of possibility and capability, whether material, physical, or causal (can equals is able to).</p>
-<p>All sections are normative, unless they are explicitly indicated to be informative.</p>
-</blockquote>
-<h2>Requirement Categories</h2>
-<p><em>The following categories reflect a common industry classification used in semiconductor product development.</em></p>
-<table>
-<thead>
-<tr>
-<th>Category</th>
-<th>Definition</th>
-<th>Owner</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CR</td>
-<td><strong>Customer Requirement</strong> -- A customer need that the product needs to meet. Gathered from customer interaction, field channels or market research. May not be possible to meet all CRs on a product due to risk or resources.</td>
-<td>Marketing, Systems</td>
-</tr>
-<tr>
-<td>SR</td>
-<td><strong>System Requirement</strong> -- Describes the required black-box behaviour of the device. Customer visible SRs are the primary basis for the datasheet. Often, an SR translates a CR into the plan-of-record for a product. Captures the negotiated attribute. May not fully meet the ideal CR.</td>
-<td>Systems</td>
-</tr>
-<tr>
-<td>DR</td>
-<td><strong>Design Requirement</strong> -- Result of distillation of SR, driven by implementation choices that do not affect the black-box behaviour but need to be defined for the design or verification team. Capture constraints required to implement the SRs.</td>
-<td>Design</td>
-</tr>
-<tr>
-<td>VR</td>
-<td><strong>Verification Requirement</strong> -- Description of what needs to be done to ensure an SR and/or DR is implemented correctly. Linked to at least one SR and/or DR. Checks and coverage information is recorded in VRs.</td>
-<td>Verification</td>
-</tr>
-<tr>
-<td>VAR</td>
-<td><strong>Validation Requirement</strong> -- A concise description of how an SR or DR of any requirement type will be covered with a test case during the emulation or post-silicon phase of development. Validation requirements check whether we implemented the right thing through means of functional testing or parametric silicon measurements. Test conditions are recorded in a VAR. Linked to at least one SR.</td>
-<td>Validation</td>
-</tr>
-</tbody>
-</table>
-<h2>Requirement Types</h2>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Definition</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Functional</td>
-<td>Normative functional requirements that can be verified and/or validated.</td>
-</tr>
-<tr>
-<td>Parametric</td>
-<td>Normative parametric requirements that can be verified and/or validated.</td>
-</tr>
-<tr>
-<td>Register Field</td>
-<td>Normative register field requirements.</td>
-</tr>
-<tr>
-<td>Informative</td>
-<td>Informative requirement content, not actionable, but provides context for better interpretation of normative requirements. Informative elements are illustrations, examples, or suggestions that explain the meaning and implications of requirements, as well as case studies on their application. May include diagrams and other attachments which are not to be treated as normative.</td>
-</tr>
-<tr>
-<td>Use Case</td>
-<td>System-level use cases. Commonly captured as diagrams and set context (informative) but can require verification and distillation into further requirements (normative).</td>
-</tr>
-</tbody>
-</table>
-<h2>Resources</h2>
-<ul>
-<li><a href="../pdf/IBM_Requirements_Writing_Training.pdf">IBM Requirements Writing Training (PDF)</a></li>
-<li><a href="../pdf/2021-IEEE-Standards-Style-Manual.pdf">2021 IEEE Standards Style Manual (PDF)</a></li>
-</ul>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>Good requirements engineering is fundamental to delivering products that meet customer needs within cost and schedule. A well-formed requirement identifies …</p>
+                        <a class="readmore" href="../requirements-writing.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
