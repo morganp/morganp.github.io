@@ -23,31 +23,6 @@ This concept of layered abstraction is one of the most powerful ideas in all of 
 
 Think of SoC design as a series of nested boxes. Each layer can be understood and reasoned about independently, so long as it respects the contracts defined by the layers around it.
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                   Application Software                    │  <- "What to do"
-│            (Android, RTOS, bare-metal firmware)           │
-├──────────────────────────────────────────────────────────┤
-│               Operating System / Firmware                 │
-│        (Linux kernel, device drivers, bootloader)         │
-├──────────────────────────────────────────────────────────┤
-│         Instruction Set Architecture (ISA)                │  <- SW/HW boundary
-│        (RISC-V, ARM, x86 - programmer-visible state)      │
-├──────────────────────────────────────────────────────────┤
-│              Microarchitecture (RTL)                       │
-│   (pipeline, caches, branch predictor, bus interfaces)    │
-├──────────────────────────────────────────────────────────┤
-│               Logic / Gate Level                          │
-│         (AND, OR, flip-flops, multiplexers)               │
-├──────────────────────────────────────────────────────────┤
-│              Transistor / Circuit Level                   │
-│         (CMOS transistors, analog timing margins)         │
-├──────────────────────────────────────────────────────────┤
-│               Layout / Physical Level                     │
-│     (geometric shapes on silicon layers - GDSII files)    │
-└──────────────────────────────────────────────────────────┘
-```
-
 [![The SoC abstraction stack from physical layout at the bottom to application software at the top, with ISA highlighted as the hardware/software boundary]({attach}/images/SoC/Article03/01-abstraction-stack-900w.png)]({attach}/images/SoC/Article03/01-abstraction-stack-HQ.png)
 
 Engineers who work in SoC design typically specialise in one or two adjacent layers. A physical design engineer thinks in terms of polygons and resistance; a firmware engineer thinks in terms of memory-mapped registers and interrupt vectors. The stack is the shared vocabulary that lets them collaborate.
@@ -58,26 +33,6 @@ Engineers who work in SoC design typically specialise in one or two adjacent lay
 
 A classic way to visualise the design space is the **Y-chart**, introduced by Daniel Gajski and Robert Kuhn in 1983. It organises design descriptions along three axes (or "domains"), each of which can be examined at multiple levels of abstraction:
 
-```
-                    BEHAVIOURAL DOMAIN
-                    (what the circuit does)
-                           |
-                           |  Algorithmic
-                           |  Register-Transfer
-                           |  Logic
-                           |  Circuit
-                           |  Device
-              _____________|_____________
-             /             |              \
-            /              |               \
-           /               |                \
-STRUCTURAL DOMAIN          |          PHYSICAL DOMAIN
-(components & connections)  |        (geometric layout)
-  Processors, ALUs         |         Floorplan, cells
-  Gates, flip-flops        |         Placement, routing
-                           |
-```
-
 [![The Gajski-Kuhn Y-Chart showing three design domains - behavioural, structural, and physical - with abstraction levels along each axis]({attach}/images/SoC/Article03/03-y-chart-900w.png)]({attach}/images/SoC/Article03/03-y-chart-HQ.png)
 
 The key insight of the Y-chart is that every design activity maps a description from one domain into another at the same level of abstraction. **Synthesis** maps a behavioural RTL description into a structural gate-level netlist. **Place-and-route** maps a structural netlist into a physical layout.
@@ -87,17 +42,6 @@ The key insight of the Y-chart is that every design activity maps a description 
 ## Layer 1: Devices and Transistors
 
 At the very bottom of the stack sits the **transistor** - the fundamental switch of digital electronics. Modern SoCs are built using **CMOS** (Complementary Metal-Oxide-Semiconductor) technology, which uses two complementary transistor types: **nMOS** (conducts when gate is high) and **pMOS** (conducts when gate is low).
-
-```
-nMOS Transistor                    pMOS Transistor
-
-   Gate ──┤├── (oxide)                Gate ──┤├──
-          │                                   │
-  Source──┤ ├──Drain             Source──┤ ├──Drain
-  (0V)    │    (Vdd when off)    (Vdd)   │    (0V when off)
-          │                              │
-       Substrate                      Substrate
-```
 
 A single CMOS inverter (NOT gate) uses one nMOS and one pMOS transistor. This pairing is elegant: it ensures that when the output is stable, no DC path exists from power to ground, so the circuit draws near-zero static power.
 
@@ -228,23 +172,6 @@ The microarchitecture is the *implementation* of the ISA - the actual pipeline, 
 
 A simple five-stage pipeline illustrates the key idea:
 
-```
-Instruction lifecycle through a 5-stage pipeline:
-
-Cycle:      1    2    3    4    5    6    7
-           ┌────┬────┬────┬────┬────┬────┬────┐
-Instr 1:   │ IF │ ID │ EX │ MA │ WB │    │    │
-           ├────┼────┼────┼────┼────┼────┼────┤
-Instr 2:   │    │ IF │ ID │ EX │ MA │ WB │    │
-           ├────┼────┼────┼────┼────┼────┼────┤
-Instr 3:   │    │    │ IF │ ID │ EX │ MA │ WB │
-           └────┴────┴────┴────┴────┴────┴────┘
-
-IF = Instruction Fetch    ID = Instruction Decode
-EX = Execute              MA = Memory Access
-WB = Write Back (to register file)
-```
-
 [![5-stage pipeline grid showing three instructions executing in parallel across clock cycles, with Execute stages in teal and Write Back in orange]({attach}/images/SoC/Article03/04-pipeline-900w.png)]({attach}/images/SoC/Article03/04-pipeline-HQ.png)
 
 Multiple instructions are in-flight simultaneously, improving throughput. The art of microarchitecture is managing the interactions between them - particularly **hazards** where one instruction depends on the result of a previous one that hasn't finished yet.
@@ -256,26 +183,6 @@ Multiple instructions are in-flight simultaneously, improving throughput. The ar
 One of the most important concepts in SoC design is the **Intellectual Property (IP) core** - a pre-designed, pre-verified block that can be reused in a new design. IP reuse is what makes SoC development tractable: instead of designing every block from scratch, engineers assemble proven components.
 
 IP cores come in three forms:
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     IP Core Classifications                      │
-├────────────┬──────────────┬──────────────────────────────────────┤
-│   Type     │   Form       │   Characteristics                    │
-├────────────┼──────────────┼──────────────────────────────────────┤
-│   Soft IP  │ RTL source   │ Technology-independent. Highly        │
-│            │ (HDL code)   │ portable, configurable. Lowest        │
-│            │              │ optimisation.                         │
-├────────────┼──────────────┼──────────────────────────────────────┤
-│   Firm IP  │ Gate-level   │ Technology-partially-dependent.       │
-│            │ netlist      │ Some timing characterised. Limited    │
-│            │              │ changes possible (placement).         │
-├────────────┼──────────────┼──────────────────────────────────────┤
-│   Hard IP  │ GDSII layout │ Technology-specific, fully            │
-│            │              │ optimised. Cannot be modified.        │
-│            │              │ Highest performance, no portability.  │
-└────────────┴──────────────┴──────────────────────────────────────┘
-```
 
 [![IP core classification spectrum from Soft IP (RTL source, portable) through Firm IP (netlist) to Hard IP (GDSII layout, fully optimised), with opposing arrows showing the portability vs optimisation trade-off]({attach}/images/SoC/Article03/05-ip-core-types-900w.png)]({attach}/images/SoC/Article03/05-ip-core-types-HQ.png)
 

@@ -31,7 +31,9 @@ READERS = {'html': None}
 # inside the directory content/
 # The contents of img/ will be available at 
 # {{ SITEURL }}/img
-STATIC_PATHS = ['images', 'pdf']
+STATIC_PATHS = ['images', 'pdf', 'extra']
+EXTRA_PATH_METADATA = {'extra/custom.css': {'path': 'static/custom.css'}}
+STYLESHEET_URL = '/static/custom.css'
 
 # If we want to create static pages,
 # we should put them in content/pages
