@@ -22,6 +22,8 @@ The phone in your pocket performs about 15 *trillion* operations per second - th
 
 This article is the story of how we got from there to here. It is not just a history lesson. Understanding the shape of that journey — what drove miniaturisation at each step, and what trade-offs were made along the way — is essential context for understanding why modern SoC design is structured the way it is.
 
+[![The miniaturisation journey: five eras of computing from room-sized mainframe to a fingernail-sized SoC die, showing the same computational capability in a dramatically shrinking footprint]({attach}/images/SoC/Article01/01-era-scale-comparison-900w.png)]({attach}/images/SoC/Article01/01-era-scale-comparison-HQ.png)
+
 ---
 
 ## What is a "System"?
@@ -74,25 +76,7 @@ In 1947, [Bell Labs](https://en.wikipedia.org/wiki/Bell_Labs) invented the [tran
 
 The economics were equally extreme: only universities, large corporations, government agencies, and national laboratories could afford to own one. Everyone else bought time-shares, submitting jobs on punched cards and waiting hours for results.
 
-```
-IBM System/360 Model 50 Installation (1964):
-
-  ┌───────────────────────────────────────────────────────────────┐
-  │                    Computer Room (ground floor)               │
-  │                                                               │
-  │   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-  │   │  CPU     │  │ Memory   │  │ I/O      │  │ Tape     │      │
-  │   │ Cabinet  │  │ Cabinet  │  │ Control  │  │ Drives   │      │
-  │   │ 1.8m × 1m│  │ 1.8m × 1m│  │          │  │          │      │
-  │   └────┬─────┘  └─────┬────┘  └─────┬────┘  └─┬────────┘      │
-  │        │              │             │         │               │
-  │  ──────┴──────────────┴─────────────┴─────────┴(raised floor) │
-  │                    (cables underneath)                        │
-  │                                                               │
-  │  Total weight: ~2 tonnes   Power: 30 kW   Cooling: Required   │
-  │  Speed: ~500,000 ops/sec   Cost: ~$3.5M (1964)                │
-  └───────────────────────────────────────────────────────────────┘
-```
+[![Floor plan of the IBM System/360 computer room showing four cabinets — CPU, Memory, I/O Control, and Tape Drives — connected by cables under a raised floor, with a human figure showing scale]({attach}/images/SoC/Article01/02-ibm360-room-900w.png)]({attach}/images/SoC/Article01/02-ibm360-room-HQ.png)
 
 ---
 
@@ -149,21 +133,7 @@ In 1971, Intel introduced the **[4004](https://en.wikipedia.org/wiki/Intel_4004)
 
 This was a revolutionary idea: previously, a "CPU" was a cabinet full of boards. Now it was a package you could hold between your fingers.
 
-```
-The Microprocessor Compresses the CPU:
-
-  PDP-11/20 CPU (1970):           Intel 4004 (1971):
-  ┌───────────────────────────┐   ┌──────────────────────┐
-  │  ┌─────────────────────┐  │   │     ████████████     │
-  │  │   Board 1: ALU      │  │   │   ██████████████████ │
-  │  │   Board 2: Registers│  │   │  ████ 4004 CPU █████ │
-  │  │   Board 3: Control  │  │   │   ██████████████████ │
-  │  │   Board 4: Bus IF   │  │   │     ████████████     │
-  │  └─────────────────────┘  │   │                      │
-  └───────────────────────────┘   │ 12 mm²    2,300 trans│
-  40 cm × 35 cm   ~10 kg          │ 740 kHz   4-bit data │
-  Multiple boards, ~1000 chips    └──────────────────────┘
-```
+[![Side-by-side comparison: the PDP-11/20 CPU (1970) as a rack of four boards for ALU, registers, control, and bus interface versus the Intel 4004 (1971) as a single tiny chip package — the entire CPU compressed onto 12 mm²]({attach}/images/SoC/Article01/03-pdp11-vs-4004-900w.png)]({attach}/images/SoC/Article01/03-pdp11-vs-4004-HQ.png)
 
 The **[8080](https://en.wikipedia.org/wiki/Intel_8080)** (Intel, 1974), **[6502](https://en.wikipedia.org/wiki/MOS_Technology_6502)** (MOS Technology, 1975), and **[Z80](https://en.wikipedia.org/wiki/Zilog_Z80)** (Zilog, 1976) followed in rapid succession. These 8-bit processors became the engines of the personal computer revolution.
 
@@ -250,28 +220,7 @@ The first mobile phones were large, power-hungry, and limited. As [GSM](https://
 
 A phone of the early 2000s had several separate chips: a **baseband processor** (running the radio protocols), an **application processor** (running the UI and apps), a **power management IC**, a **display controller**, and various analog front-ends for audio and radio. These chips communicated over a shared PCB — the "system" was a small board inside a plastic case.
 
-```
-Early Smartphone Board Architecture (c. 2003):
-
-  ┌─────────────────────────────────────────────────────┐
-  │              Smartphone PCB (~6 cm × 4 cm)          │
-  │                                                     │
-  │  ┌──────────────┐  ┌──────────────┐  ┌───────────┐  │
-  │  │  Application │  │   Baseband   │  │   PMIC    │  │
-  │  │  Processor   │  │  Processor   │  │  (Power   │  │
-  │  │  (ARM9,      │  │  (DSP +      │  │  Mgmt IC) │  │
-  │  │   ~200 MHz)  │  │   protocol)  │  │           │  │
-  │  └──────┬───────┘  └──────┬───────┘  └───────────┘  │
-  │         │                 │                         │
-  │  ┌──────┴───────┐  ┌──────┴───────┐  ┌───────────┐  │
-  │  │  DRAM        │  │  Flash NOR   │  │  LCD      │  │
-  │  │  (SDRAM chip)│  │  (code/data) │  │ Controller│  │
-  │  └──────────────┘  └──────────────┘  └───────────┘  │
-  │                                                     │
-  │  ~6–8 chips + passives + RF front-end               │
-  │  Total system power: ~200 mW (active)               │
-  └─────────────────────────────────────────────────────┘
-```
+[![A pre-SoC smartphone PCB (c. 2003) showing six discrete chips — Application Processor ARM9, Baseband DSP, PMIC, SDRAM, Flash NOR, and LCD Controller — connected by PCB traces, with an annotation showing all of this becomes one SoC]({attach}/images/SoC/Article01/04-smartphone-pcb-900w.png)]({attach}/images/SoC/Article01/04-smartphone-pcb-HQ.png)
 
 This was the moment before SoC. All the pieces existed — they just were not yet on the same die.
 
@@ -313,24 +262,7 @@ The Integration Journey — Same Computational Power, Shrinking Footprint:
 
 No account of this journey is complete without **[Moore's Law](https://en.wikipedia.org/wiki/Moore%27s_law)**. In 1965, [Gordon Moore](https://en.wikipedia.org/wiki/Gordon_Moore) (co-founder of Intel) observed that the number of transistors on a commercially practical integrated circuit doubled approximately every two years. This was an empirical observation about the economics of the semiconductor industry, but it became a self-fulfilling prophecy: the industry organised itself to deliver that doubling, and did so for more than fifty years.
 
-```
-Moore's Law — Transistor Count Over Time:
-
-  10^10 ┤                                                     ●  A18 (16B)
-        │                                                 ●  A14 (11.8B)
-  10^9  ┤                                         ●  A7  (1B, 2013)
-        │                                  ●  Core i7 (774M, 2008)
-  10^8  ┤                        ●  Pentium 4 (42M, 2000)
-        │                ●  Pentium (3.1M, 1993)
-  10^7  ┤        ●  386 (275K, 1985)
-        │    ●  8086 (29K, 1978)
-  10^6  ┤  ●  8080 (6K, 1974)
-        │ ●  4004 (2.3K, 1971)
-  10^3  ┴──────────────────────────────────────────────────────
-        1970   1980   1990   2000   2010   2020
-
-  Doubling every ~2 years (Moore's Law)
-```
+[![Transistor count chart from 1971 to 2024 on a log scale showing the exponential growth from the Intel 4004 at 2,300 transistors to the Apple A18 at 16 billion, with a dotted line showing the idealized Moore's Law doubling every two years]({attach}/images/SoC/Article01/05-moores-law-900w.png)]({attach}/images/SoC/Article01/05-moores-law-HQ.png)
 
 Each doubling meant that the same design could be shrunk to half the area (reducing cost), or that twice as much logic could fit in the same area (enabling integration). Both drove the SoC story.
 
@@ -371,3 +303,7 @@ Computer systems began as room-filling collections of vacuum tubes. The transist
 | 09 | Hardware Description Languages and RTL Design |
 | 10 | The SoC Design Flow: From Specification to Silicon |
 | 11 | HW/SW Co-Design: Bridging Software and Silicon |
+
+---
+
+*Next: [Article 02 - What is a System on Chip? Anatomy and Motivation](|filename|../2026-03-15_SoC_Article_02_Anatomy_and_Motivation/2026-03-15_SoC_Article_02_Anatomy_and_Motivation.md)*
