@@ -43,6 +43,10 @@ Run `make` with no args to see all targets.
 3. **Drafts**: If not ready for publishing, set `Status: draft` in metadata.
 4. **Links**: Use `|filename|` for internal linking to ensure correct paths.
 5. **Images**: Store images in `content/images/` and reference them correctly.
+   - Display images must be no wider than 900px and optimised for fast loading.
+   - For generated images: produce a full-res version (suffix `-HQ.png`) and a 900px display version (suffix `-900w.png`) using `sips -Z 900 HQ.png --out 900w.png`.
+   - When embedding in posts, display the 900px version. If a high-res version exists, link to it so clicking opens the full resolution: `[![alt]({attach}/images/Sub/img-900w.png)]({attach}/images/Sub/img-HQ.png)`
+   - If no HQ version, use a plain image embed: `![alt]({attach}/images/Sub/img-900w.png)`
 6. **Themes**: Do not modify files inside `themes/` unless explicitly told to.
 7. **Configuration**: When updating settings, prefer modifying `pelicanconf.py` over `publishconf.py`.
 
