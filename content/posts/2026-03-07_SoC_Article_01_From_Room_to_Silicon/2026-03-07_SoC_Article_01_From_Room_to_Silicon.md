@@ -293,8 +293,8 @@ Computer systems began as room-filling collections of vacuum tubes. The transist
 | Article | Topic |
 |---------|-------|
 | **01** | **From Room to Silicon — History of the Computer System (this article)** |
-| 02 | What is a System on Chip? — Anatomy and Motivation |
-| 03 | The SoC Design Stack: From Transistors to Software |
+| [02](|filename|../2026-03-15_SoC_Article_02_Anatomy_and_Motivation/2026-03-15_SoC_Article_02_Anatomy_and_Motivation.md) | [What is a System on Chip? — Anatomy and Motivation](|filename|../2026-03-15_SoC_Article_02_Anatomy_and_Motivation/2026-03-15_SoC_Article_02_Anatomy_and_Motivation.md) |
+| [03](|filename|../2026-03-21_SoC_Article_03_Design_Stack/2026-03-21_SoC_Article_03_Design_Stack.md) | [The SoC Design Stack: From Transistors to Software](|filename|../2026-03-21_SoC_Article_03_Design_Stack/2026-03-21_SoC_Article_03_Design_Stack.md) |
 | 04 | Processor Cores: CPU, DSP, GPU and Hardware Accelerators |
 | 05 | Memory Architecture: Caches, DRAM, and On-chip Storage |
 | 06 | Interconnects and Bus Protocols: AXI, AHB, and APB |
