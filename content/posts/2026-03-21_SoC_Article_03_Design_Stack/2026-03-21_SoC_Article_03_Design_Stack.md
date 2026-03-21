@@ -111,21 +111,7 @@ The process of manufacturing transistors is described by the **technology node**
 
 Transistors are combined to form **logic gates** - circuits that implement boolean operations. Gates are the building blocks of all digital logic.
 
-```
-Common Logic Gates (CMOS implementation uses complementary transistor pairs):
-
-  AND:  Y = A . B        OR:  Y = A + B       NOT:  Y = A'
-  ┌───┐                  ┌───┐                  ┌───┐
-A ┤   ├─ Y            A ─┤   ├─ Y            A ─┤ 1 ├─ Y
-B ┤ & │              B ─┤ ≥1│               └───┘
-  └───┘                  └───┘
-
-XOR:  Y = A ^ B       NAND:  Y = (A.B)'     NOR:  Y = (A+B)'
-  ┌───┐                  ┌────┐                 ┌────┐
-A ┤   ├─ Y            A ─┤    ├─ Y           A ─┤    ├─ Y
-B ┤ =1│              B ─┤ & o│             B ─┤ ≥1o│
-  └───┘                  └────┘                 └────┘
-```
+[![Six common logic gates: AND, OR, NOT, NAND, NOR, and XOR, drawn as hand-sketched IEEE symbols with Boolean equations. NAND and NOR highlighted in teal as universal gates.]({attach}/images/SoC/Article03/06-logic-gates-900w.png)]({attach}/images/SoC/Article03/06-logic-gates-HQ.png)
 
 In practice, **NAND and NOR** gates are the most fundamental - any other gate can be built from them (they are "universal"). Standard cell libraries contain dozens to hundreds of gate variants with different drive strengths, optimised for speed or area.
 
@@ -311,39 +297,7 @@ Common IP blocks found in SoCs:
 
 Taking an SoC from concept to fabricated silicon follows a structured sequence of steps, each with its own tools and verification checkpoints:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     SoC Design Flow                              │
-│                                                                   │
-│  ┌──────────────┐                                                │
-│  │ Specification│ <- Written requirements, power/area/speed goals│
-│  └──────┬───────┘                                                │
-│         ↓                                                        │
-│  ┌──────────────┐                                                │
-│  │ Architecture │ <- Block decomposition, ISA choice, bus choice │
-│  └──────┬───────┘                                                │
-│         ↓                                                        │
-│  ┌──────────────┐                                                │
-│  │  RTL Design  │ <- SystemVerilog/VHDL, IP integration          │
-│  └──────┬───────┘                                                │
-│         ↓                          ┌──────────────────┐         │
-│  ┌──────────────┐                  │  RTL Simulation  │         │
-│  │  Synthesis   │ <────────────────│  & Verification  │         │
-│  └──────┬───────┘                  └──────────────────┘         │
-│         ↓                                                        │
-│  ┌──────────────┐                                                │
-│  │  Place & Route│ <- Physical layout on target process          │
-│  └──────┬───────┘                                                │
-│         ↓                                                        │
-│  ┌──────────────┐                                                │
-│  │ Sign-off    │ <- Timing, power, IR drop, DRC, LVS checks      │
-│  └──────┬───────┘                                                │
-│         ↓                                                        │
-│  ┌──────────────┐                                                │
-│  │  Tape-out    │ <- Send GDSII to foundry for fabrication       │
-│  └──────────────┘                                                │
-└─────────────────────────────────────────────────────────────────┘
-```
+[![SoC design flow from Specification through Architecture, RTL Design, Synthesis, Place and Route, Sign-off to Tape-out, with RTL Simulation feeding into Synthesis and a feedback arrow showing iteration back to RTL Design.]({attach}/images/SoC/Article03/07-design-flow-900w.png)]({attach}/images/SoC/Article03/07-design-flow-HQ.png)
 
 Article 09 in this series covers the design flow in detail. For now, the important point is that design is not a linear process - it is iterative. Problems discovered during synthesis or place-and-route often require revisiting the RTL, and sometimes the architecture.
 
