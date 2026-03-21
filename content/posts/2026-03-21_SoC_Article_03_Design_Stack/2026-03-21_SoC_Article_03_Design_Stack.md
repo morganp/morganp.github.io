@@ -121,9 +121,9 @@ begin
 end architecture;
 ```
 
-The behaviour of this counter over time is captured in a timing diagram. In this series, timing diagrams are presented in **WaveDrom JSON format**, which can be rendered at [wavedrom.com](https://wavedrom.com):
+The behaviour of this counter over time is shown in the timing diagram below:
 
-```json
+```wavedrom
 {
   "signal": [
     {"name": "clk",   "wave": "P........"},
@@ -135,8 +135,6 @@ The behaviour of this counter over time is captured in a timing diagram. In this
   "head": {"text": "4-bit Counter Timing Diagram"}
 }
 ```
-
-*Rendering note: paste the JSON above into [wavedrom.com/editor.html](https://wavedrom.com/editor.html) to see the waveform.*
 
 ---
 
