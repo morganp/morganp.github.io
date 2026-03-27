@@ -26,7 +26,184 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../adaptive-filter-theory-notes-1.html">Adaptive Filter Theory Notes 1</a></h1>
+                        <h1 class="entry-title"><a href="../soc-article-04-processor-cores.html">SoC Article 04: Processor Cores - CPU, DSP, GPU and Hardware Accelerators</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-03-27T00:00:00+00:00">
+                Published: Fri 27 March 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/cpu.html">CPU</a> <a href="../tag/dsp.html">DSP</a> <a href="../tag/gpu.html">GPU</a> <a href="../tag/npu.html">NPU</a> <a href="../tag/risc-v.html">RISC-V</a> <a href="../tag/arm.html">ARM</a> </p>        
+</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 4 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>The processor is the heart of any SoC. But "processor" is a broad term that covers a remarkably diverse family of designs, each optimised for a different class of computation. A modern smartphone SoC may contain a dozen or more distinct processing engines - general-purpose CPUs, a graphics processor, a signal processing cluster, a neural network accelerator, and several smaller microcontrollers managing power and connectivity.</p>
+<p>This article surveys the main classes of processor used in SoCs, explains what makes each suited to its domain, and introduces the key architectural concepts every SoC designer needs to understand.</p>
+<hr>
+<h2>The Processing Landscape</h2>
+<p>Different computational tasks have different shapes. Some are sequential and unpredictable (parsing a web page). Others are massively parallel and regular (multiplying a matrix). Still others require precisely timed, low-latency responses (handling a radio frame). These different "shapes" of computation call for different processor architectures.</p>
+<p><a href="../04-task-taxonomy-HQ.png"><img alt="Computational Task Taxonomy showing the spectrum from sequential irregular control-heavy tasks handled by CPUs through DSPs and GPUs to parallel regular data-heavy tasks handled by neural engines" src="../04-task-taxonomy-900w.png"></a></p>
+<hr>
+<h2>General-Purpose CPU Cores</h2>
+<h3>Architecture Fundamentals</h3>
+<p>A CPU core executes a sequential stream of instructions: fetch, decode, execute, access memory, write back. The efficiency of this loop determines performance.</p>
+<p>Modern CPU cores in SoCs are overwhelmingly <strong>RISC</strong> (Reduced Instruction Set Computer) designs. The dominant ISA is <strong>ARM</strong>, with <strong>RISC-V</strong> growing rapidly in open-source and embedded applications.</p>
+<p>The key subsystems inside a CPU core are:</p>
+<p><a href="../04-cpu-core-internals-HQ.png"><img alt="CPU core internal architecture showing the instruction fetch, decode and dispatch, execute units (ALU, FPU, multiplier), register file, load/store unit, and branch predictor" src="../04-cpu-core-internals-900w.png"></a></p>
+<h3>Pipeline Stages</h3>
+<p>A five-stage pipeline is the canonical teaching model:</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_9dbcb49039a3e254bc98df89b49e18d6.svg"></p>
+<h3>The Big-Little Concept</h3>
+<p>For power-sensitive SoCs (smartphones, wearables), ARM developed the <strong>big.LITTLE</strong> architecture, which pairs high-performance "big" cores with energy-efficient "little" cores on the same die:</p>
+<p><a href="../04-big-little-cluster-HQ.png"><img alt="ARM big.LITTLE DynamIQ cluster configuration showing the performance cluster with Cortex-A78 cores and the efficiency cluster with Cortex-A55 cores, sharing an L3 cache and system interconnect" src="../04-big-little-cluster-900w.png"></a></p>
+<p>The OS scheduler assigns heavy tasks (video decoding, gaming) to the big cores, and lightweight tasks (receiving notifications, idle polling) to the little cores. This can reduce energy consumption by 10x or more compared to running everything on the big cores.</p>
+<h3>Key Performance Metrics</h3>
+<ul>
+<li><strong>IPC (Instructions Per Cycle)</strong> - how much useful work a core does per clock cycle</li>
+<li><strong>Clock frequency</strong> - cycles per second (GHz)</li>
+<li><strong>Performance = IPC x Frequency</strong></li>
+<li><strong>CPI (Cycles Per Instruction)</strong> = 1/IPC; lower is better</li>
+</ul>
+<p>Modern high-performance cores achieve IPC values of 4-8 by executing multiple instructions simultaneously (superscalar) and speculatively executing future instructions.</p>
+<hr>
+<h2>Soft vs Hard CPU Cores</h2>
+<p>An important distinction for SoC designers is between <strong>soft</strong> and <strong>hard</strong> processor cores:</p>
+<p><strong>Hard cores</strong> are transistor-level implementations physically embedded in the silicon - you cannot change them. They are highly optimised for performance and area. The ARM Cortex-A cores in a smartphone SoC are hard cores licensed from ARM.</p>
+<p><strong>Soft cores</strong> are RTL descriptions that you synthesise yourself onto the target process or onto FPGA fabric. They are portable and configurable but less efficient. Examples include:
+- <strong>ARM Cortex-M0</strong> (available as soft core for ASIC/FPGA)
+- <strong>RISC-V</strong> cores (PicoRV32, VexRiscv, BOOM, Rocket)
+- <strong>MicroBlaze</strong> (Xilinx/AMD FPGA soft core)
+- <strong>Nios II</strong> (Altera/Intel FPGA soft core)</p>
+<p>SoC designers on FPGAs (see Article 09) almost always use soft cores since they are placing logic into reconfigurable fabric.</p>
+<hr>
+<h2>Digital Signal Processors (DSPs)</h2>
+<p>A <strong>DSP</strong> is a processor specialised for signal processing algorithms. Its architecture is tuned for two operations that appear constantly in such algorithms: <strong>multiply-accumulate (MAC)</strong> and <strong>data movement</strong>.</p>
+<h3>The MAC Operation</h3>
+<p>The core of almost all digital signal processing is the <strong>dot product</strong>: multiply pairs of numbers and sum the results. This appears in:
+- <strong>FIR filters</strong>: y[n] = h[0]x[n] + h[1]x[n-1] + ... + h[N]x[n-N]
+- <strong>FFT</strong> (Fast Fourier Transform)
+- <strong>Convolution</strong> in image processing and neural networks</p>
+<p>A MAC operation computes: <strong>Accumulator += A x B</strong> in a single cycle.</p>
+<p><a href="../04-dsp-mac-unit-HQ.png"><img alt="DSP MAC Unit showing the single-cycle multiply-accumulate pipeline: A and B input registers feeding a multiplier, then an adder, then a 40-bit accumulator with feedback" src="../04-dsp-mac-unit-900w.png"></a></p>
+<h3>DSP Architecture Features</h3>
+<p>DSPs include hardware features that a general-purpose CPU lacks:</p>
+<ul>
+<li><strong>Hardware loopers</strong> - zero-overhead loops without branch penalty</li>
+<li><strong>Dual-MAC units</strong> - two multiply-accumulate operations per cycle</li>
+<li><strong>Circular addressing</strong> - automatic modulo addressing for filter delay lines</li>
+<li><strong>Bit-reverse addressing</strong> - essential for FFT butterfly operations</li>
+<li><strong>SIMD instructions</strong> - Single Instruction Multiple Data, processing several samples simultaneously</li>
+</ul>
+<p>DSPs are commonly found in SoCs handling audio codecs, cellular modem baseband processing, image signal processing (ISPs), and radar systems.</p>
+<hr>
+<h2>Graphics Processing Units (GPUs)</h2>
+<p>A GPU is architected around <strong>massive parallelism</strong>. Instead of a few powerful, complex cores, a GPU contains hundreds or thousands of simple <strong>shader cores</strong> that execute in lockstep on large datasets.</p>
+<p>The programming model is based on the observation that rendering a 3D scene, applying a filter to an image, or training a neural network involves applying the <strong>same operation</strong> to <strong>many different data points</strong> independently.</p>
+<p><a href="../04-gpu-vs-cpu-HQ.png"><img alt="GPU vs CPU core organisation: the CPU has 4 large complex cores with large caches, while the GPU has 2048 simple shader cores - showing how CPUs are optimised for serial branchy tasks while GPUs excel at regular parallel tasks" src="../04-gpu-vs-cpu-900w.png"></a></p>
+<p>In mobile SoCs, GPUs are used for:
+- 3D gaming and UI rendering
+- Video encode/decode
+- Computer vision and augmented reality
+- Machine learning inference (alongside or instead of dedicated NPUs)</p>
+<p>Common mobile GPU families include <strong>ARM Mali</strong>, <strong>Qualcomm Adreno</strong>, and <strong>Apple's own GPU</strong> (unnamed, integrated in A-series chips).</p>
+<hr>
+<h2>Hardware Accelerators</h2>
+<p>As compute-intensive AI workloads have become dominant, SoC vendors have added <strong>dedicated hardware accelerators</strong> - fixed-function silicon blocks that execute one type of computation extremely efficiently.</p>
+<h3>Neural Processing Unit (NPU / Neural Engine)</h3>
+<p>An NPU accelerates neural network inference - the process of running a trained model on new input data. The core operation is matrix-vector multiplication (essentially a large MAC array).</p>
+<p><a href="../04-systolic-array-HQ.png"><img alt="Systolic array architecture used in NPU designs: a grid of Processing Elements (PEs) where weights flow downward and activations flow rightward, each PE computing one MAC per clock cycle, with partial sums accumulating downward" src="../04-systolic-array-900w.png"></a></p>
+<p>In a systolic array, data flows through the processing elements rhythmically (like blood through a heart - hence "systolic"). Weights are pre-loaded; activations and partial sums flow through, with each PE performing one MAC per cycle. This achieves very high utilisation of the multiplication hardware.</p>
+<h3>Video Codec Engine</h3>
+<p>Encoding and decoding H.264/H.265/AV1 video in software is extremely CPU-intensive. A dedicated hardware codec can process 4K video at 30+ frames per second while drawing milliwatts, compared to watts for a software implementation. Modern SoCs include fixed-function codec blocks that implement the specific algorithms of each video standard.</p>
+<h3>Cryptographic Accelerator</h3>
+<p>AES encryption, SHA hashing, RSA/ECC public-key operations, and True Random Number Generation (TRNG) are all candidates for hardware acceleration. Performing AES-128 in hardware can be 50-100x more energy-efficient than software.</p>
+<h3>Image Signal Processor (ISP)</h3>
+<p>The camera pipeline - demosaicing, noise reduction, white balance, tone mapping, HDR merging - runs in a dedicated ISP. This is a DSP-like block hardwired to the specific algorithms of computational photography.</p>
+<hr>
+<h2>The Processor Cluster: Putting It Together</h2>
+<p>A high-end mobile SoC might contain the following processing elements:</p>
+<p><a href="../04-soc-processor-subsystem-HQ.png"><img alt="Modern mobile SoC processor subsystem showing the CPU cluster (prime, big and little cores), GPU, DSP, NPU, ISP and modem as distinct blocks on the die" src="../04-soc-processor-subsystem-900w.png"></a></p>
+<hr>
+<h2>Processor State Machine: A Simplified View</h2>
+<p>Every processor can be modelled as a state machine. Here is a simplified view of a CPU's states in a typical embedded SoC context:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_d3b3a56743e4c3f1c5d4b7c3e7a5609b.svg"></p>
+<hr>
+<h2>Choosing the Right Processor for Your SoC</h2>
+<p>The processor choice depends critically on the application:</p>
+<table>
+<thead>
+<tr>
+<th>Application</th>
+<th>Primary Processor</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IoT sensor node</td>
+<td>Cortex-M0+ (soft/hard)</td>
+<td>Ultra-low power, simple code</td>
+</tr>
+<tr>
+<td>RTOS control system</td>
+<td>Cortex-M4 / M7</td>
+<td>Real-time response, DSP extensions</td>
+</tr>
+<tr>
+<td>Automotive ADAS</td>
+<td>Cortex-A + DSP cluster</td>
+<td>Linux needed + CV workloads</td>
+</tr>
+<tr>
+<td>Smartphone</td>
+<td>big.LITTLE Cortex-A</td>
+<td>Variable load, battery priority</td>
+</tr>
+<tr>
+<td>Edge AI inference</td>
+<td>ARM + NPU</td>
+<td>Dominates workload</td>
+</tr>
+<tr>
+<td>5G baseband</td>
+<td>Multi-DSP cluster</td>
+<td>Fixed-point signal processing</td>
+</tr>
+<tr>
+<td>FPGA prototyping</td>
+<td>RISC-V soft core</td>
+<td>Open, configurable, no licence fee</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Summary</h2>
+<p>SoC processing subsystems are not monolithic: they combine CPUs for general-purpose code, DSPs for signal processing, GPUs for parallel/graphics workloads, and hardware accelerators for specific high-demand functions like AI inference, video coding, and cryptography. Each architecture is optimised for its domain. The RISC philosophy underpins most modern SoC CPUs, while the systolic array and SIMD principles dominate accelerators. Understanding the trade-offs between these options is one of the core competencies of SoC architecture.</p>
+<hr>
+<h2>Intermediate Articles This Topic Connects To</h2>
+<ul>
+<li><em>Pipeline Design and Hazards</em> - Data, structural, and control hazards; forwarding networks</li>
+<li><em>Cache Coherency Protocols</em> - How multiple CPU cores agree on the state of shared memory</li>
+<li><em>AI Accelerator Architecture (Advanced)</em> - Dataflow, weight stationarity, memory bandwidth</li>
+</ul>
+<hr>
+<p><em>Previous: <a href="../soc-article-03-design-stack.html">Article 03 - The SoC Design Stack</a></em></p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../adaptive-filter-theory-notes-1.html" rel="bookmark"
+                               title="Permalink to Adaptive Filter Theory Notes 1">Adaptive Filter Theory Notes 1</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2024-12-19T11:04:00+00:00">
                 Published: Thu 19 December 2024
@@ -37,22 +214,13 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/dsp.html">DSP</a> </p>        
-</footer><!-- /.post-info --><p>Notes From Reading Adaptive Signal Theory (5th Ed) by Simon Haykin</p>
+</footer><!-- /.post-info -->                        <p>Notes From Reading Adaptive Signal Theory (5th Ed) by Simon Haykin</p>
 <h2>Three Basic Kinds Of Estimation</h2>
 <ul>
-<li>Filtering  - Extraction of Current and previous information. RealTime operation.</li>
-<li>Smoothing  - Data after the time of interest is used. Posteriori operation.</li>
-<li>Prediction - forcasting for some time in the future. RealTime operation.</li>
-</ul>
-<p>Filter optimization is useful to think of minimising the mean-square-error. </p>
-<p>For stationary inputs the <strong>Wiener</strong> filter is considered optimal in mean-square-error sense.</p>
-<p>Plots of the mean-square value of the error signal versus the adjustable parameters of the linear filter is known as the <strong>error-performance-surface</strong>. The min point on this is the Wiener solution.</p>
-<p>Wiener Filter is no good with moving signals, or precense of noise. Kalman Filters are useful in this sitation.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+<li>Filtering  - Extraction of Current …</li></ul>
+                        <a class="readmore" href="../adaptive-filter-theory-notes-1.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
