@@ -1,5 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-04T00:00:00+01:00</updated><entry><title>SoC Article 05: Memory Architecture - Caches, DRAM, and On-chip Storage</title><link href="http://lizard-spock.co.uk/soc-article-05-memory-architecture.html" rel="alternate"></link><published>2026-04-04T00:00:00+01:00</published><updated>2026-04-04T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-04:/soc-article-05-memory-architecture.html</id><summary type="html">&lt;p&gt;How modern SoCs bridge the speed gap between fast CPU cores and slow external DRAM through cache hierarchies, SRAM, and DRAM controllers. Covers cache organisation, MESI coherency, the MMU, and on-chip storage.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 5 of 11&lt;/em&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-09T00:00:00+01:00</updated><entry><title>SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</title><link href="http://lizard-spock.co.uk/soc-article-06-interconnects-and-bus-protocols.html" rel="alternate"></link><published>2026-04-09T00:00:00+01:00</published><updated>2026-04-09T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-09:/soc-article-06-interconnects-and-bus-protocols.html</id><summary type="html">&lt;p&gt;How SoC blocks communicate: the AMBA bus family from simple APB peripherals through pipelined AHB to the high-performance AXI4 with its five independent channels, valid/ready handshake, and crossbar interconnects.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 6 of 11&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Every block on a SoC -- CPUs, DMA engines, memory controllers, peripherals -- must communicate with every other block. The internal communication fabric that makes this possible is called the &lt;strong&gt;interconnect&lt;/strong&gt; or &lt;strong&gt;bus&lt;/strong&gt;. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.&lt;/p&gt;
+&lt;p&gt;This article introduces the major bus standards used in modern SoCs, with emphasis on &lt;strong&gt;ARM's AMBA (Advanced Microcontroller Bus Architecture)&lt;/strong&gt; family, which is the dominant standard in the industry.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Why a Standard Bus Matters&lt;/h2&gt;
+&lt;p&gt;Without a standard interface, every IP block would need a custom interface to every other block -- an impractical explosion of design effort. A standard bus protocol defines:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Signal names and widths&lt;/strong&gt; -- both sides know how to connect&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Handshake mechanism&lt;/strong&gt; -- how a master requests and a slave responds&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Transaction semantics&lt;/strong&gt; -- what "read", "write", and "burst" mean&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Timing requirements&lt;/strong&gt; -- setup times, hold times, latency bounds&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;IP vendors design their blocks to be &lt;strong&gt;plug-compatible&lt;/strong&gt; with the standard, so a UART controller from one vendor and a DMA engine from another can both connect to the same ARM CoreLink interconnect without any custom glue logic.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The AMBA Family&lt;/h2&gt;
+&lt;p&gt;ARM's &lt;strong&gt;AMBA&lt;/strong&gt; specification, first published in 1996 and evolving through multiple generations, defines a family of bus protocols at different performance tiers:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/06-amba-family-HQ.png"&gt;&lt;img alt="AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple" src="http://lizard-spock.co.uk/06-amba-family-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The family spans from simple, low-power APB peripherals on the right through pipelined AHB, high-performance AXI4, all the way to cache-coherent ACE/CHI protocols used in multi-core processor clusters on the left.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;APB -- Advanced Peripheral Bus&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;APB&lt;/strong&gt; is the simplest AMBA protocol, designed for low-bandwidth, low-power peripheral registers. It is a &lt;strong&gt;synchronous, non-pipelined&lt;/strong&gt; bus with no burst mode -- every transfer takes a minimum of two clock cycles.&lt;/p&gt;
+&lt;h3&gt;APB Signals&lt;/h3&gt;
+&lt;p&gt;Key APB signals:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;PCLK&lt;/code&gt; -- Clock&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PRESETn&lt;/code&gt; -- Active-low reset&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PADDR&lt;/code&gt; -- Address (12-32 bit)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PSEL&lt;/code&gt; -- Select: asserted to indicate target peripheral&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PENABLE&lt;/code&gt; -- Enable: on second cycle of every transfer&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PWRITE&lt;/code&gt; -- Direction: high = write, low = read&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PWDATA&lt;/code&gt; -- Write data&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PRDATA&lt;/code&gt; -- Read data (from slave)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PREADY&lt;/code&gt; -- Slave extends transfer if not ready&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PSLVERR&lt;/code&gt; -- Slave error response&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;APB Write Timing&lt;/h3&gt;
+&lt;p&gt;An APB write transaction takes place over two phases: &lt;strong&gt;Setup&lt;/strong&gt; and &lt;strong&gt;Access&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_09ef87f95dc8f74f62f977bf68033a1e.svg"&gt;&lt;/p&gt;
+&lt;p&gt;In the &lt;strong&gt;Setup&lt;/strong&gt; phase, PSEL is asserted and the address and write data are presented. In the &lt;strong&gt;Access&lt;/strong&gt; phase, PENABLE goes high confirming the transfer. PREADY allows a slow peripheral to extend the access phase by holding it low.&lt;/p&gt;
+&lt;p&gt;APB is ideal for: UART, SPI, I2C, GPIO, timer, and watchdog registers -- anything that does not require high data throughput.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;AHB -- Advanced High-performance Bus&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;AHB&lt;/strong&gt; sits in the middle tier. It is a &lt;strong&gt;pipelined&lt;/strong&gt;, higher-bandwidth protocol supporting burst transfers. AHB separates the &lt;strong&gt;address phase&lt;/strong&gt; and &lt;strong&gt;data phase&lt;/strong&gt;, allowing the next address to be issued while the current data transfer is in progress.&lt;/p&gt;
+&lt;h3&gt;Key AHB Signals&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;HCLK&lt;/code&gt;, &lt;code&gt;HRESETn&lt;/code&gt; -- Clock and reset&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HADDR&lt;/code&gt; -- Address (32-bit)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HTRANS&lt;/code&gt; -- Transfer type: IDLE / BUSY / NONSEQ / SEQ&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HWRITE&lt;/code&gt; -- Direction&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HSIZE&lt;/code&gt; -- Transfer size (8, 16, 32, 64... bit)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HBURST&lt;/code&gt; -- Burst type (SINGLE, INCR, WRAP4, INCR4...)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HWDATA&lt;/code&gt; / &lt;code&gt;HRDATA&lt;/code&gt; -- Write and read data&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HREADY&lt;/code&gt; -- Transfer complete / extend&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HRESP&lt;/code&gt; -- Response (OKAY / ERROR)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;AHB Pipelined Burst Read&lt;/h3&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_b51c9049a22ed7556c47b205afac8c07.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The key insight: while the data for A0 is being returned, the address A1 is already being presented. This pipeline overlap hides address-to-data latency and improves throughput.&lt;/p&gt;
+&lt;h3&gt;AHB Arbitration&lt;/h3&gt;
+&lt;p&gt;When multiple masters (CPU, DMA) contend for the AHB, an &lt;strong&gt;arbiter&lt;/strong&gt; decides who gets access using a bus grant / bus request protocol. Masters assert &lt;code&gt;HBUSREQx&lt;/code&gt; when they want the bus; the arbiter asserts &lt;code&gt;HGRANTx&lt;/code&gt; to indicate the winner. This round-robin or priority-based arbitration introduces a form of time-division multiplexing onto the shared bus.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;AXI -- Advanced eXtensible Interface&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;AXI4&lt;/strong&gt; is the highest-performance AMBA protocol, used to connect CPUs, memory controllers, DMA engines, GPUs, and other high-bandwidth masters and slaves. It is the backbone of most modern SoCs.&lt;/p&gt;
+&lt;p&gt;AXI4's key innovation is &lt;strong&gt;independent channels&lt;/strong&gt;: read and write transactions are completely separate, and multiple transactions can be in flight simultaneously.&lt;/p&gt;
+&lt;h3&gt;The Five AXI Channels&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/06-axi-channels-HQ.png"&gt;&lt;img alt="AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names" src="http://lizard-spock.co.uk/06-axi-channels-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The five channels are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AW (Write Address)&lt;/strong&gt; -- master sends the address and burst parameters for a write&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;W (Write Data)&lt;/strong&gt; -- master sends the data beats with byte strobes and WLAST flag&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;B (Write Response)&lt;/strong&gt; -- slave confirms the write completed (or reports an error)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AR (Read Address)&lt;/strong&gt; -- master sends the address and burst parameters for a read&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;R (Read Data)&lt;/strong&gt; -- slave returns data beats with RLAST flag&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Valid/Ready Handshake&lt;/h3&gt;
+&lt;p&gt;Every AXI channel uses the same &lt;strong&gt;valid/ready handshake&lt;/strong&gt; protocol. The sender asserts &lt;code&gt;VALID&lt;/code&gt; when it has data to transfer. The receiver asserts &lt;code&gt;READY&lt;/code&gt; when it can accept data. The transfer completes on the rising clock edge when &lt;strong&gt;both&lt;/strong&gt; are high:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_bdf5614eafeb6fb4c582b3cf98b83a3e.svg"&gt;&lt;/p&gt;
+&lt;p&gt;This decoupled handshake is powerful: the master can issue addresses continuously; the slave can stall when its internal buffers are full, without requiring the master to back off.&lt;/p&gt;
+&lt;h3&gt;AXI Burst Transfers&lt;/h3&gt;
+&lt;p&gt;Rather than issuing many single transactions, AXI supports &lt;strong&gt;burst transfers&lt;/strong&gt; -- a single address phase followed by multiple data beats. This dramatically improves efficiency for sequential memory access.&lt;/p&gt;
+&lt;p&gt;Key burst parameters:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AWLEN / ARLEN&lt;/strong&gt; -- number of data beats (0=1 beat, 255=256 beats for AXI4)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AWSIZE / ARSIZE&lt;/strong&gt; -- bytes per beat (1, 2, 4, 8, 16, 32, 64, 128)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AWBURST / ARBURST&lt;/strong&gt; -- burst type:&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;FIXED&lt;/code&gt; -- same address repeated (useful for FIFOs)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;INCR&lt;/code&gt; -- address increments each beat (normal memory access)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;WRAP&lt;/code&gt; -- like INCR but wraps at a boundary (useful for cache lines)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;AXI IDs and Out-of-Order Transactions&lt;/h3&gt;
+&lt;p&gt;AXI assigns each transaction an &lt;strong&gt;ID&lt;/strong&gt; (&lt;code&gt;AWID&lt;/code&gt; / &lt;code&gt;ARID&lt;/code&gt;). A slave may respond to transactions &lt;strong&gt;out of order&lt;/strong&gt; as long as responses within the same ID are in order. This allows a memory controller to optimise DRAM access patterns rather than being forced to respond in the exact order of requests.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The Interconnect: From Bus to Crossbar&lt;/h2&gt;
+&lt;p&gt;A simple shared bus forces all masters to share a single data path -- only one master can use it at a time. This creates a bottleneck in systems with multiple high-bandwidth masters.&lt;/p&gt;
+&lt;p&gt;The solution is an &lt;strong&gt;AXI crossbar&lt;/strong&gt; (also called a &lt;strong&gt;switch matrix&lt;/strong&gt;): it provides dedicated paths between every master-slave pair, allowing multiple simultaneous transfers as long as they target different slaves.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/06-bus-vs-crossbar-HQ.png"&gt;&lt;img alt="Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right" src="http://lizard-spock.co.uk/06-bus-vs-crossbar-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;ARM's CoreLink NIC-400 and CoreLink CCI-550 are examples of AXI interconnect IP used in real SoCs. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;QoS: Quality of Service in Interconnects&lt;/h2&gt;
+&lt;p&gt;Not all traffic is equal. A display engine reading pixel data must deliver frames at a guaranteed rate, or the screen will tear. A background DMA transfer moving log data is not time-critical. AXI4 supports &lt;strong&gt;QoS signalling&lt;/strong&gt; (&lt;code&gt;ARQOS&lt;/code&gt; / &lt;code&gt;AWQOS&lt;/code&gt;) -- a 4-bit priority tag attached to every transaction.&lt;/p&gt;
+&lt;p&gt;The interconnect uses these tags to arbitrate between competing masters, ensuring that time-sensitive traffic is served first without starvation of low-priority traffic.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;AXI4-Lite: The Simplified Register Interface&lt;/h2&gt;
+&lt;p&gt;Full AXI4 has substantial complexity -- burst management, ID tracking, out-of-order responses. For accessing peripheral register banks (where individual 32-bit reads and writes are all that is needed), &lt;strong&gt;AXI4-Lite&lt;/strong&gt; offers a simplified subset:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;No burst support (single transfers only)&lt;/li&gt;
+&lt;li&gt;No transaction IDs&lt;/li&gt;
+&lt;li&gt;No out-of-order support&lt;/li&gt;
+&lt;li&gt;Simple 32-bit or 64-bit data width&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;AXI4-Lite is extremely common for connecting peripheral IP blocks to the system bus, where its simplicity makes it easy to implement correctly.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;APB Bridge: Connecting the Bus Tiers&lt;/h2&gt;
+&lt;p&gt;Because APB is simpler and lower power, slow peripherals are typically attached to an &lt;strong&gt;APB bus&lt;/strong&gt; rather than directly to the AXI/AHB backbone. An &lt;strong&gt;AXI-to-APB bridge&lt;/strong&gt; converts between the protocols:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/06-soc-bus-hierarchy-HQ.png"&gt;&lt;img alt="SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus" src="http://lizard-spock.co.uk/06-soc-bus-hierarchy-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The bridge runs the APB at a lower, slower clock (e.g., 100 MHz) while the AXI backbone runs at 500 MHz or more, reducing dynamic power in the peripherals.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Network-on-Chip (NoC)&lt;/h2&gt;
+&lt;p&gt;In the largest, most complex SoCs -- server processors, AI accelerators -- even an AXI crossbar becomes a bottleneck. The solution is a &lt;strong&gt;Network-on-Chip (NoC)&lt;/strong&gt;: a switched packet network embedded on the die, with routers at each node and links between them.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/06-noc-mesh-HQ.png"&gt;&lt;img alt="Network-on-Chip 4x4 mesh topology showing router nodes connected by bidirectional links with CPU, GPU, DRAM, and NPU blocks at the edges" src="http://lizard-spock.co.uk/06-noc-mesh-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;NoCs provide:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Scalability&lt;/strong&gt; -- adding more processing tiles does not require redesigning the interconnect&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Bandwidth&lt;/strong&gt; -- multiple simultaneous transfers across different links&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Modularity&lt;/strong&gt; -- standard router IP can be assembled in different topologies&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This is an advanced topic covered in the advanced article series.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;SoC interconnects form the communication backbone that links every functional block. The AMBA protocol family provides a hierarchy of protocols: APB for simple peripherals, AHB for mid-range transfers, and AXI for high-performance connections. AXI's independent channel architecture and valid/ready handshake enable high-throughput, pipelined, out-of-order transfers. Crossbar interconnects replace shared buses to allow simultaneous transfers between different master-slave pairs. Understanding these protocols is essential for designing IP blocks that plug into an SoC and for debugging system-level performance issues.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Further Reading&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;AXI4 Protocol Deep Dive&lt;/em&gt; -- Burst types, transaction IDs, out-of-order response ordering&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;DMA Controller Architecture&lt;/em&gt; -- How a DMA engine uses AXI to move data autonomously&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Network-on-Chip Design (Advanced)&lt;/em&gt; -- Topology, routing algorithms, virtual channels&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/soc-article-05-memory-architecture.html"&gt;Article 05 -- Memory Architecture&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Computer Architecture"></category><category term="Electronics"></category><category term="Embedded Systems"></category><category term="ARM"></category><category term="AMBA"></category><category term="AXI"></category><category term="AHB"></category><category term="APB"></category><category term="Bus Protocols"></category></entry><entry><title>SoC Article 05: Memory Architecture - Caches, DRAM, and On-chip Storage</title><link href="http://lizard-spock.co.uk/soc-article-05-memory-architecture.html" rel="alternate"></link><published>2026-04-04T00:00:00+01:00</published><updated>2026-04-04T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-04:/soc-article-05-memory-architecture.html</id><summary type="html">&lt;p&gt;How modern SoCs bridge the speed gap between fast CPU cores and slow external DRAM through cache hierarchies, SRAM, and DRAM controllers. Covers cache organisation, MESI coherency, the MMU, and on-chip storage.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 5 of 11&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Of all the factors that determine a SoC's real-world performance, &lt;strong&gt;memory&lt;/strong&gt; is often the most important and the most overlooked by beginners. A modern CPU core can theoretically execute billions of operations per second, but most of that potential is wasted if data cannot be delivered fast enough.&lt;/p&gt;
@@ -4526,50 +4666,4 @@ To append to an array you could use &lt;code&gt;data(end+1) = append_value&lt;/c
 
 &lt;span class="nv"&gt;even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
 &lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Lee Standard Hood"</title><link href="http://lizard-spock.co.uk/lee-standard-hood.html" rel="alternate"></link><published>2014-05-05T20:36:43+01:00</published><updated>2014-05-05T20:36:43+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-05:/lee-standard-hood.html</id><summary type="html">&lt;p&gt;Available to buy from &lt;a href="http://www.wexphotographic.com/buy-lee-standard-lens-hood/p1010398"&gt;WEX&lt;/a&gt;. Also see &lt;a href="/blog/photography/lee-wide-angle-hood/"&gt;Lee Wide Angle Hood&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Hoods or lens shades help improve contrast by stopping …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Available to buy from &lt;a href="http://www.wexphotographic.com/buy-lee-standard-lens-hood/p1010398"&gt;WEX&lt;/a&gt;. Also see &lt;a href="/blog/photography/lee-wide-angle-hood/"&gt;Lee Wide Angle Hood&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Hoods or lens shades help improve contrast by stopping out of frame light source entering the lens. LEE filters are square filters that can be used for effects or managing dynamic range, however as they mount in front of the lens with a holder you can no longer use your lenses standard hood. LEE have a standard, universal and wide angle hoods available.&lt;/p&gt;
-&lt;p&gt;LEE do not provide many specs for the hood on their website. To help others decide
-if this is right for them I have included measurements and pictures.&lt;/p&gt;
-&lt;p&gt;The Standard is the smallest of the three hoods. 
-It actually has a very clever rail system which allows it to be mounted in a slot. 
-When mounted on to a lee adapter ring this sits further back out of the way.
-All Lee products should have this and there would be no need for a tandem connector. &lt;/p&gt;
-&lt;p&gt;&lt;img alt="LEE standard hood" src="/images/Photography/LEE/morganp-20140405-Lee-_MG_7257.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;Filter weigh 150g&lt;/p&gt;
-&lt;h2&gt;Dimensions&lt;/h2&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Width Height:
-External: 13.1cm x 13.1cm
-Internal: 11.1cm x 11.1cm
-
-Depth:
-Complete compressed: 3.5cm.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Min expansion&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;complete&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;4.6&lt;/span&gt;&lt;span class="n"&gt;cm&lt;/span&gt;
-&lt;span class="n"&gt;hood&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mount&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;3.6&lt;/span&gt;&lt;span class="n"&gt;cm&lt;/span&gt;
-&lt;span class="n"&gt;hood&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;only&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;3.1&lt;/span&gt;&lt;span class="n"&gt;cm&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img alt="LEE standard hood minimum expansion" src="/images/Photography/LEE/morganp-20140405-Lee-_MG_7249.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;Max Expansion&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;complete&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;15.0&lt;/span&gt;&lt;span class="n"&gt;cm&lt;/span&gt;
-&lt;span class="n"&gt;hood&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mount&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;14.0&lt;/span&gt;&lt;span class="n"&gt;cm&lt;/span&gt;
-&lt;span class="n"&gt;hood&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;only&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;13.3&lt;/span&gt;&lt;span class="n"&gt;cm&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img alt="LEE standard hood maximum expansion" src="/images/Photography/LEE/morganp-20140405-Lee-_MG_7251.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;This hood is too small for use under 28mm on a full-frame camera.&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;On a crop sensor it is still good at 16mm&lt;/p&gt;
-&lt;p&gt;Vignetting examples:
-&lt;img alt="LEE standard hood vignetting test setup" src="/images/Photography/LEE/morganp-20140405-Lee-IMG_0116.jpg"&gt;
-Setup for following examples, Canon 6D, wide angle adapter, Lee holder 3 slots (2 for filters, 1 for hood) then universal hood at minimal expansion.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="16mm full-frame vignetting with filter holder" src="/images/Photography/LEE/morganp-20140409--_MG_7416.jpg" title="16mm full-frame"&gt;
-above 16mm full-frame with filter holder&lt;/p&gt;
-&lt;p&gt;&lt;img alt="20mm full-frame vignetting with filter holder" src="/images/Photography/LEE/morganp-20140409--_MG_7417.jpg" title="20mm full-frame"&gt;
-above 20mm full-frame with filter holder&lt;/p&gt;
-&lt;p&gt;&lt;img alt="24mm full-frame vignetting with filter holder" src="/images/Photography/LEE/morganp-20140409--_MG_7418.jpg" title="24mm full-frame"&gt;
-above 24mm full-frame with filter holder&lt;/p&gt;
-&lt;p&gt;&lt;img alt="28mm full-frame vignetting with filter holder" src="/images/Photography/LEE/morganp-20140409--_MG_7419.jpg" title="28mm full-frame"&gt;
-above 28mm full-frame with filter holder&lt;/p&gt;</content><category term="Photography"></category><category term="Filters"></category></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry></feed>

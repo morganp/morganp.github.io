@@ -26,7 +26,171 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../soc-article-05-memory-architecture.html">SoC Article 05: Memory Architecture - Caches, DRAM, and On-chip Storage</a></h1>
+                        <h1 class="entry-title"><a href="../soc-article-06-interconnects-and-bus-protocols.html">SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-09T00:00:00+01:00">
+                Published: Thu 09 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/arm.html">ARM</a> <a href="../tag/amba.html">AMBA</a> <a href="../tag/axi.html">AXI</a> <a href="../tag/ahb.html">AHB</a> <a href="../tag/apb.html">APB</a> <a href="../tag/bus-protocols.html">Bus Protocols</a> </p>        
+</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 6 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>Every block on a SoC -- CPUs, DMA engines, memory controllers, peripherals -- must communicate with every other block. The internal communication fabric that makes this possible is called the <strong>interconnect</strong> or <strong>bus</strong>. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.</p>
+<p>This article introduces the major bus standards used in modern SoCs, with emphasis on <strong>ARM's AMBA (Advanced Microcontroller Bus Architecture)</strong> family, which is the dominant standard in the industry.</p>
+<hr>
+<h2>Why a Standard Bus Matters</h2>
+<p>Without a standard interface, every IP block would need a custom interface to every other block -- an impractical explosion of design effort. A standard bus protocol defines:</p>
+<ul>
+<li><strong>Signal names and widths</strong> -- both sides know how to connect</li>
+<li><strong>Handshake mechanism</strong> -- how a master requests and a slave responds</li>
+<li><strong>Transaction semantics</strong> -- what "read", "write", and "burst" mean</li>
+<li><strong>Timing requirements</strong> -- setup times, hold times, latency bounds</li>
+</ul>
+<p>IP vendors design their blocks to be <strong>plug-compatible</strong> with the standard, so a UART controller from one vendor and a DMA engine from another can both connect to the same ARM CoreLink interconnect without any custom glue logic.</p>
+<hr>
+<h2>The AMBA Family</h2>
+<p>ARM's <strong>AMBA</strong> specification, first published in 1996 and evolving through multiple generations, defines a family of bus protocols at different performance tiers:</p>
+<p><a href="../06-amba-family-HQ.png"><img alt="AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple" src="../06-amba-family-900w.png"></a></p>
+<p>The family spans from simple, low-power APB peripherals on the right through pipelined AHB, high-performance AXI4, all the way to cache-coherent ACE/CHI protocols used in multi-core processor clusters on the left.</p>
+<hr>
+<h2>APB -- Advanced Peripheral Bus</h2>
+<p><strong>APB</strong> is the simplest AMBA protocol, designed for low-bandwidth, low-power peripheral registers. It is a <strong>synchronous, non-pipelined</strong> bus with no burst mode -- every transfer takes a minimum of two clock cycles.</p>
+<h3>APB Signals</h3>
+<p>Key APB signals:</p>
+<ul>
+<li><code>PCLK</code> -- Clock</li>
+<li><code>PRESETn</code> -- Active-low reset</li>
+<li><code>PADDR</code> -- Address (12-32 bit)</li>
+<li><code>PSEL</code> -- Select: asserted to indicate target peripheral</li>
+<li><code>PENABLE</code> -- Enable: on second cycle of every transfer</li>
+<li><code>PWRITE</code> -- Direction: high = write, low = read</li>
+<li><code>PWDATA</code> -- Write data</li>
+<li><code>PRDATA</code> -- Read data (from slave)</li>
+<li><code>PREADY</code> -- Slave extends transfer if not ready</li>
+<li><code>PSLVERR</code> -- Slave error response</li>
+</ul>
+<h3>APB Write Timing</h3>
+<p>An APB write transaction takes place over two phases: <strong>Setup</strong> and <strong>Access</strong>:</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_09ef87f95dc8f74f62f977bf68033a1e.svg"></p>
+<p>In the <strong>Setup</strong> phase, PSEL is asserted and the address and write data are presented. In the <strong>Access</strong> phase, PENABLE goes high confirming the transfer. PREADY allows a slow peripheral to extend the access phase by holding it low.</p>
+<p>APB is ideal for: UART, SPI, I2C, GPIO, timer, and watchdog registers -- anything that does not require high data throughput.</p>
+<hr>
+<h2>AHB -- Advanced High-performance Bus</h2>
+<p><strong>AHB</strong> sits in the middle tier. It is a <strong>pipelined</strong>, higher-bandwidth protocol supporting burst transfers. AHB separates the <strong>address phase</strong> and <strong>data phase</strong>, allowing the next address to be issued while the current data transfer is in progress.</p>
+<h3>Key AHB Signals</h3>
+<ul>
+<li><code>HCLK</code>, <code>HRESETn</code> -- Clock and reset</li>
+<li><code>HADDR</code> -- Address (32-bit)</li>
+<li><code>HTRANS</code> -- Transfer type: IDLE / BUSY / NONSEQ / SEQ</li>
+<li><code>HWRITE</code> -- Direction</li>
+<li><code>HSIZE</code> -- Transfer size (8, 16, 32, 64... bit)</li>
+<li><code>HBURST</code> -- Burst type (SINGLE, INCR, WRAP4, INCR4...)</li>
+<li><code>HWDATA</code> / <code>HRDATA</code> -- Write and read data</li>
+<li><code>HREADY</code> -- Transfer complete / extend</li>
+<li><code>HRESP</code> -- Response (OKAY / ERROR)</li>
+</ul>
+<h3>AHB Pipelined Burst Read</h3>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_b51c9049a22ed7556c47b205afac8c07.svg"></p>
+<p>The key insight: while the data for A0 is being returned, the address A1 is already being presented. This pipeline overlap hides address-to-data latency and improves throughput.</p>
+<h3>AHB Arbitration</h3>
+<p>When multiple masters (CPU, DMA) contend for the AHB, an <strong>arbiter</strong> decides who gets access using a bus grant / bus request protocol. Masters assert <code>HBUSREQx</code> when they want the bus; the arbiter asserts <code>HGRANTx</code> to indicate the winner. This round-robin or priority-based arbitration introduces a form of time-division multiplexing onto the shared bus.</p>
+<hr>
+<h2>AXI -- Advanced eXtensible Interface</h2>
+<p><strong>AXI4</strong> is the highest-performance AMBA protocol, used to connect CPUs, memory controllers, DMA engines, GPUs, and other high-bandwidth masters and slaves. It is the backbone of most modern SoCs.</p>
+<p>AXI4's key innovation is <strong>independent channels</strong>: read and write transactions are completely separate, and multiple transactions can be in flight simultaneously.</p>
+<h3>The Five AXI Channels</h3>
+<p><a href="../06-axi-channels-HQ.png"><img alt="AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names" src="../06-axi-channels-900w.png"></a></p>
+<p>The five channels are:</p>
+<ul>
+<li><strong>AW (Write Address)</strong> -- master sends the address and burst parameters for a write</li>
+<li><strong>W (Write Data)</strong> -- master sends the data beats with byte strobes and WLAST flag</li>
+<li><strong>B (Write Response)</strong> -- slave confirms the write completed (or reports an error)</li>
+<li><strong>AR (Read Address)</strong> -- master sends the address and burst parameters for a read</li>
+<li><strong>R (Read Data)</strong> -- slave returns data beats with RLAST flag</li>
+</ul>
+<h3>Valid/Ready Handshake</h3>
+<p>Every AXI channel uses the same <strong>valid/ready handshake</strong> protocol. The sender asserts <code>VALID</code> when it has data to transfer. The receiver asserts <code>READY</code> when it can accept data. The transfer completes on the rising clock edge when <strong>both</strong> are high:</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_bdf5614eafeb6fb4c582b3cf98b83a3e.svg"></p>
+<p>This decoupled handshake is powerful: the master can issue addresses continuously; the slave can stall when its internal buffers are full, without requiring the master to back off.</p>
+<h3>AXI Burst Transfers</h3>
+<p>Rather than issuing many single transactions, AXI supports <strong>burst transfers</strong> -- a single address phase followed by multiple data beats. This dramatically improves efficiency for sequential memory access.</p>
+<p>Key burst parameters:</p>
+<ul>
+<li><strong>AWLEN / ARLEN</strong> -- number of data beats (0=1 beat, 255=256 beats for AXI4)</li>
+<li><strong>AWSIZE / ARSIZE</strong> -- bytes per beat (1, 2, 4, 8, 16, 32, 64, 128)</li>
+<li><strong>AWBURST / ARBURST</strong> -- burst type:</li>
+<li><code>FIXED</code> -- same address repeated (useful for FIFOs)</li>
+<li><code>INCR</code> -- address increments each beat (normal memory access)</li>
+<li><code>WRAP</code> -- like INCR but wraps at a boundary (useful for cache lines)</li>
+</ul>
+<h3>AXI IDs and Out-of-Order Transactions</h3>
+<p>AXI assigns each transaction an <strong>ID</strong> (<code>AWID</code> / <code>ARID</code>). A slave may respond to transactions <strong>out of order</strong> as long as responses within the same ID are in order. This allows a memory controller to optimise DRAM access patterns rather than being forced to respond in the exact order of requests.</p>
+<hr>
+<h2>The Interconnect: From Bus to Crossbar</h2>
+<p>A simple shared bus forces all masters to share a single data path -- only one master can use it at a time. This creates a bottleneck in systems with multiple high-bandwidth masters.</p>
+<p>The solution is an <strong>AXI crossbar</strong> (also called a <strong>switch matrix</strong>): it provides dedicated paths between every master-slave pair, allowing multiple simultaneous transfers as long as they target different slaves.</p>
+<p><a href="../06-bus-vs-crossbar-HQ.png"><img alt="Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right" src="../06-bus-vs-crossbar-900w.png"></a></p>
+<p>ARM's CoreLink NIC-400 and CoreLink CCI-550 are examples of AXI interconnect IP used in real SoCs. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.</p>
+<hr>
+<h2>QoS: Quality of Service in Interconnects</h2>
+<p>Not all traffic is equal. A display engine reading pixel data must deliver frames at a guaranteed rate, or the screen will tear. A background DMA transfer moving log data is not time-critical. AXI4 supports <strong>QoS signalling</strong> (<code>ARQOS</code> / <code>AWQOS</code>) -- a 4-bit priority tag attached to every transaction.</p>
+<p>The interconnect uses these tags to arbitrate between competing masters, ensuring that time-sensitive traffic is served first without starvation of low-priority traffic.</p>
+<hr>
+<h2>AXI4-Lite: The Simplified Register Interface</h2>
+<p>Full AXI4 has substantial complexity -- burst management, ID tracking, out-of-order responses. For accessing peripheral register banks (where individual 32-bit reads and writes are all that is needed), <strong>AXI4-Lite</strong> offers a simplified subset:</p>
+<ul>
+<li>No burst support (single transfers only)</li>
+<li>No transaction IDs</li>
+<li>No out-of-order support</li>
+<li>Simple 32-bit or 64-bit data width</li>
+</ul>
+<p>AXI4-Lite is extremely common for connecting peripheral IP blocks to the system bus, where its simplicity makes it easy to implement correctly.</p>
+<hr>
+<h2>APB Bridge: Connecting the Bus Tiers</h2>
+<p>Because APB is simpler and lower power, slow peripherals are typically attached to an <strong>APB bus</strong> rather than directly to the AXI/AHB backbone. An <strong>AXI-to-APB bridge</strong> converts between the protocols:</p>
+<p><a href="../06-soc-bus-hierarchy-HQ.png"><img alt="SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus" src="../06-soc-bus-hierarchy-900w.png"></a></p>
+<p>The bridge runs the APB at a lower, slower clock (e.g., 100 MHz) while the AXI backbone runs at 500 MHz or more, reducing dynamic power in the peripherals.</p>
+<hr>
+<h2>Network-on-Chip (NoC)</h2>
+<p>In the largest, most complex SoCs -- server processors, AI accelerators -- even an AXI crossbar becomes a bottleneck. The solution is a <strong>Network-on-Chip (NoC)</strong>: a switched packet network embedded on the die, with routers at each node and links between them.</p>
+<p><a href="../06-noc-mesh-HQ.png"><img alt="Network-on-Chip 4x4 mesh topology showing router nodes connected by bidirectional links with CPU, GPU, DRAM, and NPU blocks at the edges" src="../06-noc-mesh-900w.png"></a></p>
+<p>NoCs provide:</p>
+<ul>
+<li><strong>Scalability</strong> -- adding more processing tiles does not require redesigning the interconnect</li>
+<li><strong>Bandwidth</strong> -- multiple simultaneous transfers across different links</li>
+<li><strong>Modularity</strong> -- standard router IP can be assembled in different topologies</li>
+</ul>
+<p>This is an advanced topic covered in the advanced article series.</p>
+<hr>
+<h2>Summary</h2>
+<p>SoC interconnects form the communication backbone that links every functional block. The AMBA protocol family provides a hierarchy of protocols: APB for simple peripherals, AHB for mid-range transfers, and AXI for high-performance connections. AXI's independent channel architecture and valid/ready handshake enable high-throughput, pipelined, out-of-order transfers. Crossbar interconnects replace shared buses to allow simultaneous transfers between different master-slave pairs. Understanding these protocols is essential for designing IP blocks that plug into an SoC and for debugging system-level performance issues.</p>
+<hr>
+<h2>Further Reading</h2>
+<ul>
+<li><em>AXI4 Protocol Deep Dive</em> -- Burst types, transaction IDs, out-of-order response ordering</li>
+<li><em>DMA Controller Architecture</em> -- How a DMA engine uses AXI to move data autonomously</li>
+<li><em>Network-on-Chip Design (Advanced)</em> -- Topology, routing algorithms, virtual channels</li>
+</ul>
+<hr>
+<p><em>Previous: <a href="../soc-article-05-memory-architecture.html">Article 05 -- Memory Architecture</a></em></p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../soc-article-05-memory-architecture.html" rel="bookmark"
+                               title="Permalink to SoC Article 05: Memory Architecture - Caches, DRAM, and On-chip Storage">SoC Article 05: Memory Architecture - Caches, DRAM, and On-chip Storage</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-04-04T00:00:00+01:00">
                 Published: Sat 04 April 2026
@@ -37,132 +201,10 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/memory.html">Memory</a> <a href="../tag/dram.html">DRAM</a> <a href="../tag/sram.html">SRAM</a> <a href="../tag/cache.html">Cache</a> <a href="../tag/arm.html">ARM</a> </p>        
-</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 5 of 11</em></p>
-<hr>
-<h2>Introduction</h2>
-<p>Of all the factors that determine a SoC's real-world performance, <strong>memory</strong> is often the most important and the most overlooked by beginners. A modern CPU core can theoretically execute billions of operations per second, but most of that potential is wasted if data cannot be delivered fast enough.</p>
-<p>The art of SoC memory architecture is bridging the massive speed gap between the processor (which wants data in nanoseconds) and the external DRAM (which takes tens of nanoseconds to respond) in the most energy-efficient way possible.</p>
-<hr>
-<h2>The Memory Speed Gap</h2>
-<p>The problem starts with a fundamental mismatch in technology:</p>
-<p><a href="../05-memory-technology-comparison-HQ.png"><img alt="Memory technology comparison table showing capacity, latency, bandwidth and power from CPU registers through DRAM to flash storage" src="../05-memory-technology-comparison-900w.png"></a></p>
-<p>Notice the gap: a CPU register delivers data in under a nanosecond, while external DRAM takes 50-70 ns - roughly 100x slower. Without a caching strategy, the CPU would spend most of its time waiting for memory.</p>
-<hr>
-<h2>The Memory Hierarchy</h2>
-<p>The solution is a <strong>hierarchy</strong> of storage technologies, organised by speed, cost, and distance from the processor:</p>
-<p><a href="../05-memory-hierarchy-HQ.png"><img alt="Memory hierarchy pyramid showing registers, L1 cache, L2 cache, L3 cache, DRAM and flash storage with latency and capacity annotations" src="../05-memory-hierarchy-900w.png"></a></p>
-<p>The hierarchy works because of <strong>locality</strong> - the observation that most programs access the same data repeatedly over a short period (<em>temporal locality</em>) and access data at adjacent addresses in sequence (<em>spatial locality</em>). Caches exploit both properties.</p>
-<hr>
-<h2>How Caches Work</h2>
-<p>A cache is a small, fast SRAM that stores copies of recently-used data from slower memory. When the CPU reads an address, it first checks the cache:</p>
-<ul>
-<li><strong>Cache hit</strong> - the data is in the cache; it is returned immediately (low latency)</li>
-<li><strong>Cache miss</strong> - the data is not in the cache; it must be fetched from a slower level</li>
-</ul>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_b8d5e322e8edb747d88c0ef3d9f3d343.svg"></p>
-<h3>Cache Organisation</h3>
-<p>A cache is organised into <strong>lines</strong> (also called blocks) - the minimum unit of transfer between memory levels. A typical cache line is <strong>64 bytes</strong>.</p>
-<p>Three important cache parameters:</p>
-<p><strong>Capacity</strong> - total amount of data the cache can hold.</p>
-<p><strong>Associativity</strong> - how many possible cache locations a given memory address can map to. A <em>direct-mapped</em> cache is simplest: each address maps to exactly one line. A <em>fully-associative</em> cache can hold any address in any line. A <em>4-way set-associative</em> cache is a compromise: each address maps to a set of 4 lines.</p>
-<p><a href="../05-cache-organisation-HQ.png"><img alt="Cache associativity comparison showing direct-mapped cache versus 4-way set-associative cache organisation" src="../05-cache-organisation-900w.png"></a></p>
-<p><strong>Write policy</strong> - what happens when the CPU writes to a cached address:</p>
-<ul>
-<li><em>Write-through</em>: simultaneously update both cache and memory (simple, but uses memory bandwidth)</li>
-<li><em>Write-back</em>: update only the cache, mark the line "dirty", and write to memory only when the line is evicted (more efficient)</li>
-</ul>
-<hr>
-<h2>Static RAM (SRAM): The Cache Technology</h2>
-<p>Caches are built from <strong>SRAM</strong> (Static RAM). Each bit is stored in a <strong>six-transistor cell</strong> (6T SRAM) - two cross-coupled inverters and two access transistors.</p>
-<p>SRAM retains data as long as power is applied (it is <em>volatile</em>). It is fast (sub-nanosecond access) but uses significant area - roughly 100-150 F per bit (where F is the minimum feature size). This is why caches are small relative to DRAM.</p>
-<hr>
-<h2>DRAM: The Main Memory Technology</h2>
-<p>External DRAM uses a <strong>one-transistor, one-capacitor</strong> (1T1C) cell. The charge on a capacitor represents the bit value.</p>
-<p><a href="../05-sram-dram-cells-HQ.png"><img alt="SRAM 6T cell versus DRAM 1T1C cell comparison showing transistor and capacitor layout with wordline and bitline connections" src="../05-sram-dram-cells-900w.png"></a></p>
-<p>The 1T1C cell is much smaller than a 6T SRAM cell, enabling much higher density - today's DRAM stores tens of gigabits per die. However, the capacitor leaks charge over time, so each cell must be <strong>refreshed</strong> (read and rewritten) thousands of times per second. This refresh activity consumes power and introduces brief periods where the memory cannot be accessed.</p>
-<h3>DRAM Organisation</h3>
-<p>DRAM is organised into <strong>banks</strong>, <strong>rows</strong>, and <strong>columns</strong>. Accessing data requires:</p>
-<ol>
-<li><strong>Activate</strong> (open) a row - copies the row into a row buffer (sense amplifiers)</li>
-<li><strong>Read/Write</strong> column - access the desired column from the row buffer</li>
-<li><strong>Precharge</strong> - close the row (prepare for the next row activation)</li>
-</ol>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_0301a316868482bdbb1947198a5e921c.svg"></p>
-<p>Key timing parameters:</p>
-<ul>
-<li><strong>tRCD</strong> - Row-to-Column Delay (time after ACT before a column can be accessed)</li>
-<li><strong>CL</strong> - CAS Latency (time after READ command before data appears)</li>
-<li><strong>tRP</strong> - Row Precharge time (time to precharge before next ACT)</li>
-<li><strong>tRAS</strong> - Row Active time (minimum time row must be open)</li>
-</ul>
-<hr>
-<h2>On-chip SRAM (Tightly Coupled Memory)</h2>
-<p>In addition to caches, many SoCs include blocks of <strong>Tightly Coupled Memory (TCM)</strong> - SRAM directly connected to the processor core, accessed through a dedicated bus rather than through the cache hierarchy. TCM provides:</p>
-<ul>
-<li><strong>Guaranteed latency</strong> - always one cycle, no possibility of a cache miss</li>
-<li><strong>Deterministic behaviour</strong> - essential for real-time systems</li>
-<li><strong>DMA-accessible storage</strong> - used for buffers shared with peripherals</li>
-</ul>
-<p>This is particularly common in ARM Cortex-M microcontrollers, where code critical for interrupt service routines may be placed in ITCM (Instruction TCM) to ensure it always executes at maximum speed.</p>
-<hr>
-<h2>The DRAM Controller</h2>
-<p>Between the SoC's system bus and the DRAM package sits the <strong>DRAM controller</strong> - a complex piece of hardware that:</p>
-<ul>
-<li>Translates read/write requests from the bus into DRAM-specific command sequences (ACT, RD, WR, PRE, REF)</li>
-<li>Schedules requests to maximise row-buffer hit rate and memory bandwidth</li>
-<li>Issues periodic <strong>refresh</strong> commands to prevent data loss</li>
-<li>Manages multiple banks and ranks for parallel access</li>
-<li>Implements <strong>QoS (Quality of Service)</strong> to ensure latency-sensitive initiators (e.g., display engines) get priority</li>
-</ul>
-<p><a href="../05-dram-controller-HQ.png"><img alt="DRAM controller architecture block diagram showing AXI slave interface, command scheduler, refresh engine, and PHY interface connecting to LPDDR5 DRAM" src="../05-dram-controller-900w.png"></a></p>
-<hr>
-<h2>Non-Volatile Storage</h2>
-<p>Beyond volatile DRAM, SoCs interface with non-volatile storage where data must persist after power-off:</p>
-<p><strong>eMMC (embedded MultiMediaCard)</strong> - flash memory in a BGA package, soldered to the board. Used in mid-range phones and single-board computers.</p>
-<p><strong>UFS (Universal Flash Storage)</strong> - faster, lower-latency serial protocol with command queuing. Used in high-end smartphones.</p>
-<p><strong>NOR Flash</strong> - byte-addressable, execute-in-place (XIP) capable. Often used for bootloaders on embedded systems.</p>
-<p><strong>NAND Flash</strong> - high density, page/block-based access. Requires a flash translation layer (FTL) to manage wear levelling.</p>
-<p>The SoC connects to these through dedicated controller IP blocks: eMMC controller on AHB/APB, UFS controller on AXI, QSPI controller on APB for NOR flash, and NAND controller on AHB.</p>
-<hr>
-<h2>Memory Mapping: The Software View</h2>
-<p>From software's perspective, all memory - SRAM, DRAM, memory-mapped registers, flash - appears as a flat <strong>address space</strong>. The processor simply reads and writes to 32-bit or 64-bit addresses; the hardware decides which memory or peripheral handles each range.</p>
-<p><a href="../05-address-map-HQ.png"><img alt="32-bit SoC address space layout showing peripheral registers, private CPU peripherals, external DRAM, on-chip SRAM, and flash ROM regions" src="../05-address-map-900w.png"></a></p>
-<p>The <strong>memory map</strong> is one of the first things a firmware developer consults when writing code for a new SoC. It is typically documented in the SoC's <strong>Technical Reference Manual (TRM)</strong>.</p>
-<hr>
-<h2>Cache Coherency: The Multi-Core Problem</h2>
-<p>When multiple CPU cores share a memory system, a challenge arises: <strong>what happens if two cores have different cached copies of the same address?</strong></p>
-<p>This is the <strong>cache coherency problem</strong>. If Core 0 writes to address A and Core 1 has a stale cached copy of A, Core 1 will read incorrect data.</p>
-<p>Hardware cache coherency protocols solve this. The most common is <strong>MESI</strong> (Modified, Exclusive, Shared, Invalid):</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_a25d2b06f62d26e489ba5d1cdc5ad725.svg"></p>
-<p>Each cache line has a state tag (M, E, S, or I) that determines how it may be used. A bus snooping mechanism or directory protocol ensures all cores agree on the current state.</p>
-<hr>
-<h2>Memory Management Unit (MMU)</h2>
-<p>The <strong>MMU</strong> translates <strong>virtual addresses</strong> (used by software) into <strong>physical addresses</strong> (used by hardware). This translation enables:</p>
-<ul>
-<li><strong>Process isolation</strong> - each process has its own virtual address space</li>
-<li><strong>Memory protection</strong> - preventing processes from accessing each other's memory</li>
-<li><strong>Virtual memory</strong> - presenting more memory than is physically available</li>
-</ul>
-<p>Translation is performed via a <strong>page table</strong> hierarchy stored in DRAM. To avoid the latency of a full table walk for every access, the CPU caches recent translations in the <strong>TLB (Translation Lookaside Buffer)</strong>:</p>
-<p><a href="../05-mmu-translation-HQ.png"><img alt="MMU virtual to physical address translation diagram showing VPN fields, TLB lookup path, page table walk on miss, and physical frame number output" src="../05-mmu-translation-900w.png"></a></p>
-<p>The ARM SMMU (System Memory Management Unit) extends this concept to non-CPU masters (DMA engines, GPU), ensuring that peripheral DMA transfers are also constrained to authorised memory regions.</p>
-<hr>
-<h2>Summary</h2>
-<p>The SoC memory architecture is a carefully designed hierarchy that bridges the speed gap between fast-but-small on-chip SRAM and slow-but-large external DRAM. Caches exploit locality to keep frequently-used data close to the processor. DRAM controllers manage the complex command sequencing needed to drive modern LPDDR memory. The MMU virtualises the address space to enable protection and isolation. Together, these components are often the primary determinant of real-world SoC performance.</p>
-<hr>
-<h2>Intermediate Articles This Topic Connects To</h2>
-<ul>
-<li><em>Cache Coherency Protocols</em> - MESI, MOESI, directory-based coherency in detail</li>
-<li><em>DRAM Subsystem Timing (Advanced)</em> - tRCD, tCL, CWL, refresh, power states, LPDDR5</li>
-<li><em>Memory-Mapped I/O and Linux Device Drivers</em> - How software talks to hardware registers</li>
-</ul>
-<hr>
-<p><em>Previous: <a href="../soc-article-04-processor-cores.html">SoC Article 04 - Processor Cores</a></em></p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>How modern SoCs bridge the speed gap between fast CPU cores and slow external DRAM through cache hierarchies, SRAM, and DRAM controllers. Covers cache organisation, MESI coherency, the MMU, and on-chip storage.</p>
+                        <a class="readmore" href="../soc-article-05-memory-architecture.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
