@@ -7,24 +7,25 @@
 &lt;p&gt;&lt;a href="http://lizard-spock.co.uk/assembled_side-HQ.png"&gt;&lt;img alt="Side profile showing both guides and the two overlapping rods" src="http://lizard-spock.co.uk/assembled_side-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Lost Art Press have documented pinch rods across several articles spanning 2013 to 2025, from a home-centre build using steel tube sleeves and heart pine, through to the machined brass Crucible Tool hardware and a new all-metal prototype using 1/4" keystock. The design has been remarkably stable across all those years -- two rods, two guides, one thumbscrew.&lt;/p&gt;
 &lt;h2&gt;The OpenSCAD Design&lt;/h2&gt;
-&lt;p&gt;The model is parametric with the key dimensions at the top of the file:&lt;/p&gt;
+&lt;p&gt;A parametrised OpenSCAD model. The guides with or without the rods can be 3D printed. The full source is on GitHub at &lt;a href="https://github.com/morganp/OpenSCAD_PinchRods"&gt;morganp/OpenSCAD_PinchRods&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The model parameters:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;STOCK_THICKNESS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;19&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;// height of ONE rod -- two stack to fill the opening&lt;/span&gt;
 &lt;span class="n"&gt;STOCK_WIDTH&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;19&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// width of each rod&lt;/span&gt;
 &lt;span class="n"&gt;WALL_THICKNESS&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="c1"&gt;// guide wall thickness&lt;/span&gt;
 &lt;span class="n"&gt;GUIDE_LENGTH&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;40&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// depth of each guide block&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total. The BOSL2 library handles the threaded M5 screw hole and the parametric knob.&lt;/p&gt;
+&lt;p&gt;The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total.&lt;/p&gt;
 &lt;h3&gt;Display Mode&lt;/h3&gt;
 &lt;p&gt;A &lt;code&gt;MODE&lt;/code&gt; variable at the top switches between a full assembly preview and single-part export for printing:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;MODE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;assembled&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="c1"&gt;// or &amp;quot;print&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;PRINT_PART&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;guide2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;fastner&amp;quot; | &amp;quot;guide1&amp;quot; | &amp;quot;guide2&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;PRINT_PART&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;guide2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;fastener&amp;quot; | &amp;quot;guide1&amp;quot; | &amp;quot;guide2&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h2&gt;The Two Guides&lt;/h2&gt;
 &lt;p&gt;The guides are intentionally different. Each one locks a different rod, so you can set one end, then adjust the other independently.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Guide 1&lt;/strong&gt; is mounted inverted in the assembly. Flipping it 180 degrees around the X axis keeps the rod opening in exactly the same position (the opening is symmetric around the centreline at Z = 14.5mm), but moves the countersunk screw hole from the bottom to the top. A screw through that top hole locks onto the top rod.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Guide 2&lt;/strong&gt; has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Guide 2&lt;/strong&gt; has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened. BOSL2's &lt;code&gt;screw_hole()&lt;/code&gt; cuts the threaded recess into the standoff, and &lt;code&gt;screw()&lt;/code&gt; with &lt;code&gt;anchor=BOTTOM&lt;/code&gt; generates the matching fastener.&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -39,7 +40,6 @@
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;The BOSL2 &lt;code&gt;screw_hole()&lt;/code&gt; call takes care of cutting the threaded recess into the standoff, and &lt;code&gt;screw()&lt;/code&gt; with &lt;code&gt;anchor=BOTTOM&lt;/code&gt; generates the matching fastener with the thread pointing downward into the hole.&lt;/p&gt;
 &lt;h2&gt;Tapered Tips&lt;/h2&gt;
 &lt;p&gt;Each rod has a 45-degree chisel taper at one end. Both tapers point toward the shared centreline between the two stacked rods, so from the side the two tips form a symmetric arrowhead shape pointing at the Z midpoint.&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tips_detail-HQ.png"&gt;&lt;img alt="Tapered rod tips exiting guide 1" src="http://lizard-spock.co.uk/tips_detail-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
@@ -58,7 +58,7 @@
 &lt;tr&gt;
 &lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_guide1-HQ.png"&gt;&lt;img alt="Guide 1 part" src="http://lizard-spock.co.uk/part_guide1-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
 &lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_guide2-HQ.png"&gt;&lt;img alt="Guide 2 part" src="http://lizard-spock.co.uk/part_guide2-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
-&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_fastner-HQ.png"&gt;&lt;img alt="Fastener part" src="http://lizard-spock.co.uk/part_fastner-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_fastener-HQ.png"&gt;&lt;img alt="Fastener part" src="http://lizard-spock.co.uk/part_fastener-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -67,13 +67,6 @@
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://github.com/BelfrySCAD/BOSL2"&gt;BOSL2&lt;/a&gt; -- parametric screws, threads, and screw holes&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/TemptorSent/parametric-knob-maker"&gt;parametric-knob-maker&lt;/a&gt; -- the thumbscrew knob profile&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2&gt;Still To Do&lt;/h2&gt;
-&lt;p&gt;A few things remain on the TODO list inside the SCAD file:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Add thread to the knob so it actually mates with the M5 screw&lt;/li&gt;
-&lt;li&gt;Add a chamfered mounting screw hole to both guides for securing to the rod stock&lt;/li&gt;
-&lt;li&gt;Proper pointed/bevelled rod ends on the printable rod parts (the current taper is assembly-preview only -- the rods themselves are not yet modelled as printable parts)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;The source is on GitHub at &lt;a href="https://github.com/morganp/OpenSCAD_PinchRods"&gt;morganp/OpenSCAD_PinchRods&lt;/a&gt;.&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="OpenSCAD"></category><category term="3D Printing"></category><category term="BOSL2"></category><category term="Woodworking"></category><category term="CAD"></category><category term="Parametric Design"></category></entry><entry><title>SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</title><link href="http://lizard-spock.co.uk/soc-article-06-interconnects-and-bus-protocols.html" rel="alternate"></link><published>2026-04-09T00:00:00+01:00</published><updated>2026-04-09T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-09:/soc-article-06-interconnects-and-bus-protocols.html</id><summary type="html">&lt;p&gt;How SoC blocks communicate: the AMBA bus family from simple APB peripherals through pipelined AHB to the high-performance AXI4 with its five independent channels, valid/ready handshake, and crossbar interconnects.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 6 of 11&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;

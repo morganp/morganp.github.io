@@ -51,24 +51,25 @@
 <p><a href="./assembled_side-HQ.png"><img alt="Side profile showing both guides and the two overlapping rods" src="./assembled_side-900w.png"></a></p>
 <p>Lost Art Press have documented pinch rods across several articles spanning 2013 to 2025, from a home-centre build using steel tube sleeves and heart pine, through to the machined brass Crucible Tool hardware and a new all-metal prototype using 1/4" keystock. The design has been remarkably stable across all those years -- two rods, two guides, one thumbscrew.</p>
 <h2>The OpenSCAD Design</h2>
-<p>The model is parametric with the key dimensions at the top of the file:</p>
+<p>A parametrised OpenSCAD model. The guides with or without the rods can be 3D printed. The full source is on GitHub at <a href="https://github.com/morganp/OpenSCAD_PinchRods">morganp/OpenSCAD_PinchRods</a>.</p>
+<p>The model parameters:</p>
 <div class="highlight"><pre><span></span><code><span class="n">STOCK_THICKNESS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">19</span><span class="o">/</span><span class="m">2</span><span class="p">;</span><span class="w">  </span><span class="c1">// height of ONE rod -- two stack to fill the opening</span>
 <span class="n">STOCK_WIDTH</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="m">19</span><span class="p">;</span><span class="w">    </span><span class="c1">// width of each rod</span>
 <span class="n">WALL_THICKNESS</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w">     </span><span class="c1">// guide wall thickness</span>
 <span class="n">GUIDE_LENGTH</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">40</span><span class="p">;</span><span class="w">    </span><span class="c1">// depth of each guide block</span>
 </code></pre></div>
 
-<p>The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total. The BOSL2 library handles the threaded M5 screw hole and the parametric knob.</p>
+<p>The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total.</p>
 <h3>Display Mode</h3>
 <p>A <code>MODE</code> variable at the top switches between a full assembly preview and single-part export for printing:</p>
 <div class="highlight"><pre><span></span><code><span class="n">MODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;assembled&quot;</span><span class="p">;</span><span class="w">   </span><span class="c1">// or &quot;print&quot;</span>
-<span class="n">PRINT_PART</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;guide2&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;fastner&quot; | &quot;guide1&quot; | &quot;guide2&quot;</span>
+<span class="n">PRINT_PART</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;guide2&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;fastener&quot; | &quot;guide1&quot; | &quot;guide2&quot;</span>
 </code></pre></div>
 
 <h2>The Two Guides</h2>
 <p>The guides are intentionally different. Each one locks a different rod, so you can set one end, then adjust the other independently.</p>
 <p><strong>Guide 1</strong> is mounted inverted in the assembly. Flipping it 180 degrees around the X axis keeps the rod opening in exactly the same position (the opening is symmetric around the centreline at Z = 14.5mm), but moves the countersunk screw hole from the bottom to the top. A screw through that top hole locks onto the top rod.</p>
-<p><strong>Guide 2</strong> has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened.</p>
+<p><strong>Guide 2</strong> has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened. BOSL2's <code>screw_hole()</code> cuts the threaded recess into the standoff, and <code>screw()</code> with <code>anchor=BOTTOM</code> generates the matching fastener.</p>
 <table>
 <thead>
 <tr>
@@ -83,7 +84,6 @@
 </tr>
 </tbody>
 </table>
-<p>The BOSL2 <code>screw_hole()</code> call takes care of cutting the threaded recess into the standoff, and <code>screw()</code> with <code>anchor=BOTTOM</code> generates the matching fastener with the thread pointing downward into the hole.</p>
 <h2>Tapered Tips</h2>
 <p>Each rod has a 45-degree chisel taper at one end. Both tapers point toward the shared centreline between the two stacked rods, so from the side the two tips form a symmetric arrowhead shape pointing at the Z midpoint.</p>
 <p><a href="./tips_detail-HQ.png"><img alt="Tapered rod tips exiting guide 1" src="./tips_detail-900w.png"></a></p>
@@ -102,7 +102,7 @@
 <tr>
 <td><a href="./part_guide1-HQ.png"><img alt="Guide 1 part" src="./part_guide1-900w.png"></a></td>
 <td><a href="./part_guide2-HQ.png"><img alt="Guide 2 part" src="./part_guide2-900w.png"></a></td>
-<td><a href="./part_fastner-HQ.png"><img alt="Fastener part" src="./part_fastner-900w.png"></a></td>
+<td><a href="./part_fastener-HQ.png"><img alt="Fastener part" src="./part_fastener-900w.png"></a></td>
 </tr>
 </tbody>
 </table>
@@ -111,13 +111,6 @@
 <ul>
 <li><a href="https://github.com/BelfrySCAD/BOSL2">BOSL2</a> -- parametric screws, threads, and screw holes</li>
 <li><a href="https://github.com/TemptorSent/parametric-knob-maker">parametric-knob-maker</a> -- the thumbscrew knob profile</li>
-</ul>
-<h2>Still To Do</h2>
-<p>A few things remain on the TODO list inside the SCAD file:</p>
-<ul>
-<li>Add thread to the knob so it actually mates with the M5 screw</li>
-<li>Add a chamfered mounting screw hole to both guides for securing to the rod stock</li>
-<li>Proper pointed/bevelled rod ends on the printable rod parts (the current taper is assembly-preview only -- the rods themselves are not yet modelled as printable parts)</li>
 </ul>
 <p>The source is on GitHub at <a href="https://github.com/morganp/OpenSCAD_PinchRods">morganp/OpenSCAD_PinchRods</a>.</p>
       </div><!-- /.entry-content -->
