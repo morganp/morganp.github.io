@@ -80,12 +80,4 @@ The SCAD file requires two OpenSCAD libraries in your libraries folder:
 - [BOSL2](https://github.com/BelfrySCAD/BOSL2) -- parametric screws, threads, and screw holes
 - [parametric-knob-maker](https://github.com/TemptorSent/parametric-knob-maker) -- the thumbscrew knob profile
 
-## Still To Do
-
-The following are still on the to-do list:
-
-- Add thread to the knob so it actually mates with the M5 screw
-- Add a chamfered mounting screw hole to both guides for securing to the rod stock
-- Proper pointed/bevelled rod ends on the printable rod parts (the current taper is assembly-preview only -- the rods themselves are not yet modelled as printable parts)
-
 The source is on GitHub at [morganp/OpenSCAD_PinchRods](https://github.com/morganp/OpenSCAD_PinchRods).
