@@ -23,7 +23,9 @@ Lost Art Press have documented pinch rods across several articles spanning 2013 
 
 ## The OpenSCAD Design
 
-The model is parametric with the key dimensions at the top of the file:
+A parametrised OpenSCAD model. The guides with or without the rods can be 3D printed. The full source is on GitHub at [morganp/OpenSCAD_PinchRods](https://github.com/morganp/OpenSCAD_PinchRods).
+
+The model parameters:
 
 ```openscad
 STOCK_THICKNESS = 19/2;  // height of ONE rod -- two stack to fill the opening
@@ -32,7 +34,7 @@ WALL_THICKNESS  = 5;     // guide wall thickness
 GUIDE_LENGTH    = 40;    // depth of each guide block
 ```
 
-The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total. The BOSL2 library handles the threaded M5 screw hole and the parametric knob.
+The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total.
 
 ### Display Mode
 
@@ -40,7 +42,7 @@ A `MODE` variable at the top switches between a full assembly preview and single
 
 ```openscad
 MODE = "assembled";   // or "print"
-PRINT_PART = "guide2"; // "fastner" | "guide1" | "guide2"
+PRINT_PART = "guide2"; // "fastener" | "guide1" | "guide2"
 ```
 
 ## The Two Guides
@@ -49,13 +51,11 @@ The guides are intentionally different. Each one locks a different rod, so you c
 
 **Guide 1** is mounted inverted in the assembly. Flipping it 180 degrees around the X axis keeps the rod opening in exactly the same position (the opening is symmetric around the centreline at Z = 14.5mm), but moves the countersunk screw hole from the bottom to the top. A screw through that top hole locks onto the top rod.
 
-**Guide 2** has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened.
+**Guide 2** has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened. BOSL2's `screw_hole()` cuts the threaded recess into the standoff, and `screw()` with `anchor=BOTTOM` generates the matching fastener.
 
 | Guide 1 -- inverted, screw hole on top | Guide 2 -- M5 thumbscrew knob |
 |---|---|
 | [![Guide 1]({attach}/images/OpenSCAD/PinchRods/guide1_detail-900w.png)]({attach}/images/OpenSCAD/PinchRods/guide1_detail-HQ.png) | [![Guide 2]({attach}/images/OpenSCAD/PinchRods/guide2_detail-900w.png)]({attach}/images/OpenSCAD/PinchRods/guide2_detail-HQ.png) |
-
-The BOSL2 `screw_hole()` call takes care of cutting the threaded recess into the standoff, and `screw()` with `anchor=BOTTOM` generates the matching fastener with the thread pointing downward into the hole.
 
 ## Tapered Tips
 
@@ -71,7 +71,7 @@ Three parts are printed separately. For 3mf export, set `MODE = "print"` and sel
 
 | Guide 1 | Guide 2 | Thumbscrew |
 |---|---|---|
-| [![Guide 1 part]({attach}/images/OpenSCAD/PinchRods/part_guide1-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide1-HQ.png) | [![Guide 2 part]({attach}/images/OpenSCAD/PinchRods/part_guide2-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide2-HQ.png) | [![Fastener part]({attach}/images/OpenSCAD/PinchRods/part_fastner-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_fastner-HQ.png) |
+| [![Guide 1 part]({attach}/images/OpenSCAD/PinchRods/part_guide1-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide1-HQ.png) | [![Guide 2 part]({attach}/images/OpenSCAD/PinchRods/part_guide2-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide2-HQ.png) | [![Fastener part]({attach}/images/OpenSCAD/PinchRods/part_fastener-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_fastener-HQ.png) |
 
 ## Dependencies
 
@@ -82,7 +82,7 @@ The SCAD file requires two OpenSCAD libraries in your libraries folder:
 
 ## Still To Do
 
-A few things remain on the TODO list inside the SCAD file:
+The following are still on the to-do list:
 
 - Add thread to the knob so it actually mates with the M5 screw
 - Add a chamfered mounting screw hole to both guides for securing to the rod stock
