@@ -38,9 +38,10 @@ Run `make` with no args to see all targets.
 
 
 ## Rules for Claude
-1. **Content Creation**: When creating new posts, always use Markdown (`.md`) format.
+1. **Commits**: Do not add a `Co-Authored-By` trailer or any Claude signature to commit messages.
+2. **Content Creation**: When creating new posts, always use Markdown (`.md`) format.
 2. **Metadata**: Ensure all content files contain the necessary Pelican metadata header (Title, Date, Category, Tags, Slug).
-3. **Drafts**: If not ready for publishing, set `Status: draft` in metadata.
+3. **Drafts**: Always create new posts with `Status: draft` in metadata. Never publish on creation unless explicitly asked.
 4. **Links**: Use `|filename|` for internal linking to ensure correct paths.
 5. **Images**: Store images in `content/images/` and reference them correctly.
    - Display images must be no wider than 900px and optimised for fast loading.

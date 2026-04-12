@@ -1,11 +1,11 @@
 Title: 3D Printed Pinch Rods in OpenSCAD
 Date: 2026-04-12
-Category: Engineering
+Category: Home & Garden
 Tags: OpenSCAD, 3D Printing, BOSL2, Woodworking, CAD, Parametric Design
 Slug: openscad-pinch-rods
 Author: morganp
 Summary: Designing a parametric set of pinch rods in OpenSCAD using the BOSL2 library. Pinch rods are a traditional woodworking tool for checking carcases for square and transferring interior dimensions without measuring.
-Status: draft
+Status: published
 
 [![Assembled pinch rods]({attach}/images/OpenSCAD/PinchRods/assembled-900w.png)]({attach}/images/OpenSCAD/PinchRods/assembled-HQ.png)
 
