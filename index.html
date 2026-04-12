@@ -26,7 +26,107 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="./soc-article-06-interconnects-and-bus-protocols.html">SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</a></h1>
+                        <h1 class="entry-title"><a href="./openscad-pinch-rods.html">3D Printed Pinch Rods in OpenSCAD</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-12T00:00:00+01:00">
+                Published: Sun 12 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/home-garden.html">Home & Garden</a>.</p>
+<p>tags: <a href="./tag/openscad.html">OpenSCAD</a> <a href="./tag/3d-printing.html">3D Printing</a> <a href="./tag/bosl2.html">BOSL2</a> <a href="./tag/woodworking.html">Woodworking</a> <a href="./tag/cad.html">CAD</a> <a href="./tag/parametric-design.html">Parametric Design</a> </p>        
+</footer><!-- /.post-info --><p><a href="./assembled-HQ.png"><img alt="Assembled pinch rods" src="./assembled-900w.png"></a></p>
+<h2>What are Pinch Rods?</h2>
+<p>Pinch rods are a traditional woodworking measuring tool that predate the tape measure as the reliable way to check whether a box, cabinet, or carcase is square. The concept is simple: two flat rods with pointed ends overlap and slide through a pair of guide blocks. You nestle the tips into opposite diagonal corners of an assembly, lock the rods in place, then check the other diagonal. If both diagonals match, the assembly is square.</p>
+<p>The beauty of pinch rods over a tape measure is that you never read a number. The rods physically span the diagonal, and you use that same span directly on the other diagonal. Any discrepancy is immediately obvious as a gap or an overrun at one tip.</p>
+<p>They have a second use too: transferring interior dimensions. Set the rods to fit snugly inside a space, lock them, carry the tool to your workpiece, and mark directly. No arithmetic, no misread ruler.</p>
+<p><a href="./assembled_side-HQ.png"><img alt="Side profile showing both guides and the two overlapping rods" src="./assembled_side-900w.png"></a></p>
+<p>Lost Art Press have documented pinch rods across several articles spanning 2013 to 2025, from a home-centre build using steel tube sleeves and heart pine, through to the machined brass Crucible Tool hardware and a new all-metal prototype using 1/4" keystock. The design has been remarkably stable across all those years -- two rods, two guides, one thumbscrew.</p>
+<h2>The OpenSCAD Design</h2>
+<p>The model is parametric with the key dimensions at the top of the file:</p>
+<div class="highlight"><pre><span></span><code><span class="n">STOCK_THICKNESS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">19</span><span class="o">/</span><span class="m">2</span><span class="p">;</span><span class="w">  </span><span class="c1">// height of ONE rod -- two stack to fill the opening</span>
+<span class="n">STOCK_WIDTH</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="m">19</span><span class="p">;</span><span class="w">    </span><span class="c1">// width of each rod</span>
+<span class="n">WALL_THICKNESS</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w">     </span><span class="c1">// guide wall thickness</span>
+<span class="n">GUIDE_LENGTH</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">40</span><span class="p">;</span><span class="w">    </span><span class="c1">// depth of each guide block</span>
+</code></pre></div>
+
+<p>The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total. The BOSL2 library handles the threaded M5 screw hole and the parametric knob.</p>
+<h3>Display Mode</h3>
+<p>A <code>MODE</code> variable at the top switches between a full assembly preview and single-part export for printing:</p>
+<div class="highlight"><pre><span></span><code><span class="n">MODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;assembled&quot;</span><span class="p">;</span><span class="w">   </span><span class="c1">// or &quot;print&quot;</span>
+<span class="n">PRINT_PART</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;guide2&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;fastner&quot; | &quot;guide1&quot; | &quot;guide2&quot;</span>
+</code></pre></div>
+
+<h2>The Two Guides</h2>
+<p>The guides are intentionally different. Each one locks a different rod, so you can set one end, then adjust the other independently.</p>
+<p><strong>Guide 1</strong> is mounted inverted in the assembly. Flipping it 180 degrees around the X axis keeps the rod opening in exactly the same position (the opening is symmetric around the centreline at Z = 14.5mm), but moves the countersunk screw hole from the bottom to the top. A screw through that top hole locks onto the top rod.</p>
+<p><strong>Guide 2</strong> has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened.</p>
+<table>
+<thead>
+<tr>
+<th>Guide 1 -- inverted, screw hole on top</th>
+<th>Guide 2 -- M5 thumbscrew knob</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./guide1_detail-HQ.png"><img alt="Guide 1" src="./guide1_detail-900w.png"></a></td>
+<td><a href="./guide2_detail-HQ.png"><img alt="Guide 2" src="./guide2_detail-900w.png"></a></td>
+</tr>
+</tbody>
+</table>
+<p>The BOSL2 <code>screw_hole()</code> call takes care of cutting the threaded recess into the standoff, and <code>screw()</code> with <code>anchor=BOTTOM</code> generates the matching fastener with the thread pointing downward into the hole.</p>
+<h2>Tapered Tips</h2>
+<p>Each rod has a 45-degree chisel taper at one end. Both tapers point toward the shared centreline between the two stacked rods, so from the side the two tips form a symmetric arrowhead shape pointing at the Z midpoint.</p>
+<p><a href="./tips_detail-HQ.png"><img alt="Tapered rod tips exiting guide 1" src="./tips_detail-900w.png"></a></p>
+<p>The taper is generated using <code>hull()</code> between a knife-edge line at the tip and a full rectangular cross-section a little further along. At 45 degrees the horizontal run equals the vertical rise, so the taper length is exactly <code>STOCK_THICKNESS</code> (9.5mm). The two rods have their tapers on opposite ends of the assembly so each tip engages a different corner of the workpiece.</p>
+<h2>Printable Parts</h2>
+<p>Three parts are printed separately. For 3mf export, set <code>MODE = "print"</code> and select the part with <code>PRINT_PART</code>. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled.</p>
+<table>
+<thead>
+<tr>
+<th>Guide 1</th>
+<th>Guide 2</th>
+<th>Thumbscrew</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./part_guide1-HQ.png"><img alt="Guide 1 part" src="./part_guide1-900w.png"></a></td>
+<td><a href="./part_guide2-HQ.png"><img alt="Guide 2 part" src="./part_guide2-900w.png"></a></td>
+<td><a href="./part_fastner-HQ.png"><img alt="Fastener part" src="./part_fastner-900w.png"></a></td>
+</tr>
+</tbody>
+</table>
+<h2>Dependencies</h2>
+<p>The SCAD file requires two OpenSCAD libraries in your libraries folder:</p>
+<ul>
+<li><a href="https://github.com/BelfrySCAD/BOSL2">BOSL2</a> -- parametric screws, threads, and screw holes</li>
+<li><a href="https://github.com/TemptorSent/parametric-knob-maker">parametric-knob-maker</a> -- the thumbscrew knob profile</li>
+</ul>
+<h2>Still To Do</h2>
+<p>A few things remain on the TODO list inside the SCAD file:</p>
+<ul>
+<li>Add thread to the knob so it actually mates with the M5 screw</li>
+<li>Add a chamfered mounting screw hole to both guides for securing to the rod stock</li>
+<li>Proper pointed/bevelled rod ends on the printable rod parts (the current taper is assembly-preview only -- the rods themselves are not yet modelled as printable parts)</li>
+</ul>
+<p>The source is on GitHub at <a href="https://github.com/morganp/OpenSCAD_PinchRods">morganp/OpenSCAD_PinchRods</a>.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="./soc-article-06-interconnects-and-bus-protocols.html" rel="bookmark"
+                               title="Permalink to SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB">SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-04-09T00:00:00+01:00">
                 Published: Thu 09 April 2026
@@ -37,152 +137,10 @@
                 </address>
         <p>In <a href="./category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/computer-architecture.html">Computer Architecture</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/embedded-systems.html">Embedded Systems</a> <a href="./tag/arm.html">ARM</a> <a href="./tag/amba.html">AMBA</a> <a href="./tag/axi.html">AXI</a> <a href="./tag/ahb.html">AHB</a> <a href="./tag/apb.html">APB</a> <a href="./tag/bus-protocols.html">Bus Protocols</a> </p>        
-</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 6 of 11</em></p>
-<hr>
-<h2>Introduction</h2>
-<p>Every block on a SoC -- CPUs, DMA engines, memory controllers, peripherals -- must communicate with every other block. The internal communication fabric that makes this possible is called the <strong>interconnect</strong> or <strong>bus</strong>. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.</p>
-<p>This article introduces the major bus standards used in modern SoCs, with emphasis on <strong>ARM's AMBA (Advanced Microcontroller Bus Architecture)</strong> family, which is the dominant standard in the industry.</p>
-<hr>
-<h2>Why a Standard Bus Matters</h2>
-<p>Without a standard interface, every IP block would need a custom interface to every other block -- an impractical explosion of design effort. A standard bus protocol defines:</p>
-<ul>
-<li><strong>Signal names and widths</strong> -- both sides know how to connect</li>
-<li><strong>Handshake mechanism</strong> -- how a master requests and a slave responds</li>
-<li><strong>Transaction semantics</strong> -- what "read", "write", and "burst" mean</li>
-<li><strong>Timing requirements</strong> -- setup times, hold times, latency bounds</li>
-</ul>
-<p>IP vendors design their blocks to be <strong>plug-compatible</strong> with the standard, so a UART controller from one vendor and a DMA engine from another can both connect to the same ARM CoreLink interconnect without any custom glue logic.</p>
-<hr>
-<h2>The AMBA Family</h2>
-<p>ARM's <strong>AMBA</strong> specification, first published in 1996 and evolving through multiple generations, defines a family of bus protocols at different performance tiers:</p>
-<p><a href="./06-amba-family-HQ.png"><img alt="AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple" src="./06-amba-family-900w.png"></a></p>
-<p>The family spans from simple, low-power APB peripherals on the right through pipelined AHB, high-performance AXI4, all the way to cache-coherent ACE/CHI protocols used in multi-core processor clusters on the left.</p>
-<hr>
-<h2>APB -- Advanced Peripheral Bus</h2>
-<p><strong>APB</strong> is the simplest AMBA protocol, designed for low-bandwidth, low-power peripheral registers. It is a <strong>synchronous, non-pipelined</strong> bus with no burst mode -- every transfer takes a minimum of two clock cycles.</p>
-<h3>APB Signals</h3>
-<p>Key APB signals:</p>
-<ul>
-<li><code>PCLK</code> -- Clock</li>
-<li><code>PRESETn</code> -- Active-low reset</li>
-<li><code>PADDR</code> -- Address (12-32 bit)</li>
-<li><code>PSEL</code> -- Select: asserted to indicate target peripheral</li>
-<li><code>PENABLE</code> -- Enable: on second cycle of every transfer</li>
-<li><code>PWRITE</code> -- Direction: high = write, low = read</li>
-<li><code>PWDATA</code> -- Write data</li>
-<li><code>PRDATA</code> -- Read data (from slave)</li>
-<li><code>PREADY</code> -- Slave extends transfer if not ready</li>
-<li><code>PSLVERR</code> -- Slave error response</li>
-</ul>
-<h3>APB Write Timing</h3>
-<p>An APB write transaction takes place over two phases: <strong>Setup</strong> and <strong>Access</strong>:</p>
-<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_09ef87f95dc8f74f62f977bf68033a1e.svg"></p>
-<p>In the <strong>Setup</strong> phase, PSEL is asserted and the address and write data are presented. In the <strong>Access</strong> phase, PENABLE goes high confirming the transfer. PREADY allows a slow peripheral to extend the access phase by holding it low.</p>
-<p>APB is ideal for: UART, SPI, I2C, GPIO, timer, and watchdog registers -- anything that does not require high data throughput.</p>
-<hr>
-<h2>AHB -- Advanced High-performance Bus</h2>
-<p><strong>AHB</strong> sits in the middle tier. It is a <strong>pipelined</strong>, higher-bandwidth protocol supporting burst transfers. AHB separates the <strong>address phase</strong> and <strong>data phase</strong>, allowing the next address to be issued while the current data transfer is in progress.</p>
-<h3>Key AHB Signals</h3>
-<ul>
-<li><code>HCLK</code>, <code>HRESETn</code> -- Clock and reset</li>
-<li><code>HADDR</code> -- Address (32-bit)</li>
-<li><code>HTRANS</code> -- Transfer type: IDLE / BUSY / NONSEQ / SEQ</li>
-<li><code>HWRITE</code> -- Direction</li>
-<li><code>HSIZE</code> -- Transfer size (8, 16, 32, 64... bit)</li>
-<li><code>HBURST</code> -- Burst type (SINGLE, INCR, WRAP4, INCR4...)</li>
-<li><code>HWDATA</code> / <code>HRDATA</code> -- Write and read data</li>
-<li><code>HREADY</code> -- Transfer complete / extend</li>
-<li><code>HRESP</code> -- Response (OKAY / ERROR)</li>
-</ul>
-<h3>AHB Pipelined Burst Read</h3>
-<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_b51c9049a22ed7556c47b205afac8c07.svg"></p>
-<p>The key insight: while the data for A0 is being returned, the address A1 is already being presented. This pipeline overlap hides address-to-data latency and improves throughput.</p>
-<h3>AHB Arbitration</h3>
-<p>When multiple masters (CPU, DMA) contend for the AHB, an <strong>arbiter</strong> decides who gets access using a bus grant / bus request protocol. Masters assert <code>HBUSREQx</code> when they want the bus; the arbiter asserts <code>HGRANTx</code> to indicate the winner. This round-robin or priority-based arbitration introduces a form of time-division multiplexing onto the shared bus.</p>
-<hr>
-<h2>AXI -- Advanced eXtensible Interface</h2>
-<p><strong>AXI4</strong> is the highest-performance AMBA protocol, used to connect CPUs, memory controllers, DMA engines, GPUs, and other high-bandwidth masters and slaves. It is the backbone of most modern SoCs.</p>
-<p>AXI4's key innovation is <strong>independent channels</strong>: read and write transactions are completely separate, and multiple transactions can be in flight simultaneously.</p>
-<h3>The Five AXI Channels</h3>
-<p><a href="./06-axi-channels-HQ.png"><img alt="AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names" src="./06-axi-channels-900w.png"></a></p>
-<p>The five channels are:</p>
-<ul>
-<li><strong>AW (Write Address)</strong> -- master sends the address and burst parameters for a write</li>
-<li><strong>W (Write Data)</strong> -- master sends the data beats with byte strobes and WLAST flag</li>
-<li><strong>B (Write Response)</strong> -- slave confirms the write completed (or reports an error)</li>
-<li><strong>AR (Read Address)</strong> -- master sends the address and burst parameters for a read</li>
-<li><strong>R (Read Data)</strong> -- slave returns data beats with RLAST flag</li>
-</ul>
-<h3>Valid/Ready Handshake</h3>
-<p>Every AXI channel uses the same <strong>valid/ready handshake</strong> protocol. The sender asserts <code>VALID</code> when it has data to transfer. The receiver asserts <code>READY</code> when it can accept data. The transfer completes on the rising clock edge when <strong>both</strong> are high:</p>
-<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_bdf5614eafeb6fb4c582b3cf98b83a3e.svg"></p>
-<p>This decoupled handshake is powerful: the master can issue addresses continuously; the slave can stall when its internal buffers are full, without requiring the master to back off.</p>
-<h3>AXI Burst Transfers</h3>
-<p>Rather than issuing many single transactions, AXI supports <strong>burst transfers</strong> -- a single address phase followed by multiple data beats. This dramatically improves efficiency for sequential memory access.</p>
-<p>Key burst parameters:</p>
-<ul>
-<li><strong>AWLEN / ARLEN</strong> -- number of data beats (0=1 beat, 255=256 beats for AXI4)</li>
-<li><strong>AWSIZE / ARSIZE</strong> -- bytes per beat (1, 2, 4, 8, 16, 32, 64, 128)</li>
-<li><strong>AWBURST / ARBURST</strong> -- burst type:</li>
-<li><code>FIXED</code> -- same address repeated (useful for FIFOs)</li>
-<li><code>INCR</code> -- address increments each beat (normal memory access)</li>
-<li><code>WRAP</code> -- like INCR but wraps at a boundary (useful for cache lines)</li>
-</ul>
-<h3>AXI IDs and Out-of-Order Transactions</h3>
-<p>AXI assigns each transaction an <strong>ID</strong> (<code>AWID</code> / <code>ARID</code>). A slave may respond to transactions <strong>out of order</strong> as long as responses within the same ID are in order. This allows a memory controller to optimise DRAM access patterns rather than being forced to respond in the exact order of requests.</p>
-<hr>
-<h2>The Interconnect: From Bus to Crossbar</h2>
-<p>A simple shared bus forces all masters to share a single data path -- only one master can use it at a time. This creates a bottleneck in systems with multiple high-bandwidth masters.</p>
-<p>The solution is an <strong>AXI crossbar</strong> (also called a <strong>switch matrix</strong>): it provides dedicated paths between every master-slave pair, allowing multiple simultaneous transfers as long as they target different slaves.</p>
-<p><a href="./06-bus-vs-crossbar-HQ.png"><img alt="Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right" src="./06-bus-vs-crossbar-900w.png"></a></p>
-<p>ARM's CoreLink NIC-400 and CoreLink CCI-550 are examples of AXI interconnect IP used in real SoCs. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.</p>
-<hr>
-<h2>QoS: Quality of Service in Interconnects</h2>
-<p>Not all traffic is equal. A display engine reading pixel data must deliver frames at a guaranteed rate, or the screen will tear. A background DMA transfer moving log data is not time-critical. AXI4 supports <strong>QoS signalling</strong> (<code>ARQOS</code> / <code>AWQOS</code>) -- a 4-bit priority tag attached to every transaction.</p>
-<p>The interconnect uses these tags to arbitrate between competing masters, ensuring that time-sensitive traffic is served first without starvation of low-priority traffic.</p>
-<hr>
-<h2>AXI4-Lite: The Simplified Register Interface</h2>
-<p>Full AXI4 has substantial complexity -- burst management, ID tracking, out-of-order responses. For accessing peripheral register banks (where individual 32-bit reads and writes are all that is needed), <strong>AXI4-Lite</strong> offers a simplified subset:</p>
-<ul>
-<li>No burst support (single transfers only)</li>
-<li>No transaction IDs</li>
-<li>No out-of-order support</li>
-<li>Simple 32-bit or 64-bit data width</li>
-</ul>
-<p>AXI4-Lite is extremely common for connecting peripheral IP blocks to the system bus, where its simplicity makes it easy to implement correctly.</p>
-<hr>
-<h2>APB Bridge: Connecting the Bus Tiers</h2>
-<p>Because APB is simpler and lower power, slow peripherals are typically attached to an <strong>APB bus</strong> rather than directly to the AXI/AHB backbone. An <strong>AXI-to-APB bridge</strong> converts between the protocols:</p>
-<p><a href="./06-soc-bus-hierarchy-HQ.png"><img alt="SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus" src="./06-soc-bus-hierarchy-900w.png"></a></p>
-<p>The bridge runs the APB at a lower, slower clock (e.g., 100 MHz) while the AXI backbone runs at 500 MHz or more, reducing dynamic power in the peripherals.</p>
-<hr>
-<h2>Network-on-Chip (NoC)</h2>
-<p>In the largest, most complex SoCs -- server processors, AI accelerators -- even an AXI crossbar becomes a bottleneck. The solution is a <strong>Network-on-Chip (NoC)</strong>: a switched packet network embedded on the die, with routers at each node and links between them.</p>
-<p><a href="./06-noc-mesh-HQ.png"><img alt="Network-on-Chip 4x4 mesh topology showing router nodes connected by bidirectional links with CPU, GPU, DRAM, and NPU blocks at the edges" src="./06-noc-mesh-900w.png"></a></p>
-<p>NoCs provide:</p>
-<ul>
-<li><strong>Scalability</strong> -- adding more processing tiles does not require redesigning the interconnect</li>
-<li><strong>Bandwidth</strong> -- multiple simultaneous transfers across different links</li>
-<li><strong>Modularity</strong> -- standard router IP can be assembled in different topologies</li>
-</ul>
-<p>This is an advanced topic covered in the advanced article series.</p>
-<hr>
-<h2>Summary</h2>
-<p>SoC interconnects form the communication backbone that links every functional block. The AMBA protocol family provides a hierarchy of protocols: APB for simple peripherals, AHB for mid-range transfers, and AXI for high-performance connections. AXI's independent channel architecture and valid/ready handshake enable high-throughput, pipelined, out-of-order transfers. Crossbar interconnects replace shared buses to allow simultaneous transfers between different master-slave pairs. Understanding these protocols is essential for designing IP blocks that plug into an SoC and for debugging system-level performance issues.</p>
-<hr>
-<h2>Further Reading</h2>
-<ul>
-<li><em>AXI4 Protocol Deep Dive</em> -- Burst types, transaction IDs, out-of-order response ordering</li>
-<li><em>DMA Controller Architecture</em> -- How a DMA engine uses AXI to move data autonomously</li>
-<li><em>Network-on-Chip Design (Advanced)</em> -- Topology, routing algorithms, virtual channels</li>
-</ul>
-<hr>
-<p><em>Previous: <a href="./soc-article-05-memory-architecture.html">Article 05 -- Memory Architecture</a></em></p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>How SoC blocks communicate: the AMBA bus family from simple APB peripherals through pipelined AHB to the high-performance AXI4 with its five independent channels, valid/ready handshake, and crossbar interconnects.</p>
+                        <a class="readmore" href="./soc-article-06-interconnects-and-bus-protocols.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -357,28 +315,6 @@
 <p>tags: <a href="./tag/openscad.html">OpenSCAD</a> <a href="./tag/3d-print.html">3D Print</a> <a href="./tag/macos.html">macOS</a> <a href="./tag/homebrew.html">Homebrew</a> </p>        
 </footer><!-- /.post-info -->                        <p>Installing OpenSCAD on Apple Silicon Macs using Homebrew.</p>
                         <a class="readmore" href="./openscad-apple-silicon.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="./remarkable-local-file-transfer-without-the-cloud.html" rel="bookmark"
-                               title="Permalink to reMarkable: Local File Transfer Without the Cloud">reMarkable: Local File Transfer Without the Cloud</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2026-03-07T00:00:00+00:00">
-                Published: Sat 07 March 2026
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="./category/hardware-homelab.html">Hardware & Homelab</a>.</p>
-<p>tags: <a href="./tag/remarkable.html">reMarkable</a> <a href="./tag/eink.html">eink</a> <a href="./tag/privacy.html">privacy</a> </p>        
-</footer><!-- /.post-info -->                        <p>How to use the reMarkable tablet without cloud sync by unpairing the device and enabling the built-in USB file server at http://10.11.99.1/.</p>
-                        <a class="readmore" href="./remarkable-local-file-transfer-without-the-cloud.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
                     </ol><!-- /#posts-list -->

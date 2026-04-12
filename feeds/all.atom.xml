@@ -1,5 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-09T00:00:00+01:00</updated><entry><title>SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</title><link href="http://lizard-spock.co.uk/soc-article-06-interconnects-and-bus-protocols.html" rel="alternate"></link><published>2026-04-09T00:00:00+01:00</published><updated>2026-04-09T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-09:/soc-article-06-interconnects-and-bus-protocols.html</id><summary type="html">&lt;p&gt;How SoC blocks communicate: the AMBA bus family from simple APB peripherals through pipelined AHB to the high-performance AXI4 with its five independent channels, valid/ready handshake, and crossbar interconnects.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 6 of 11&lt;/em&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-12T00:00:00+01:00</updated><entry><title>3D Printed Pinch Rods in OpenSCAD</title><link href="http://lizard-spock.co.uk/openscad-pinch-rods.html" rel="alternate"></link><published>2026-04-12T00:00:00+01:00</published><updated>2026-04-12T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-12:/openscad-pinch-rods.html</id><summary type="html">&lt;p&gt;Designing a parametric set of pinch rods in OpenSCAD using the BOSL2 library. Pinch rods are a traditional woodworking tool for checking carcases for square and transferring interior dimensions without measuring.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/assembled-HQ.png"&gt;&lt;img alt="Assembled pinch rods" src="http://lizard-spock.co.uk/assembled-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;What are Pinch Rods?&lt;/h2&gt;
+&lt;p&gt;Pinch rods are a traditional woodworking measuring tool that predate the tape measure as the reliable way to check whether a box, cabinet, or carcase is square. The concept is simple: two flat rods with pointed ends overlap and slide through a pair of guide blocks. You nestle the tips into opposite diagonal corners of an assembly, lock the rods in place, then check the other diagonal. If both diagonals match, the assembly is square.&lt;/p&gt;
+&lt;p&gt;The beauty of pinch rods over a tape measure is that you never read a number. The rods physically span the diagonal, and you use that same span directly on the other diagonal. Any discrepancy is immediately obvious as a gap or an overrun at one tip.&lt;/p&gt;
+&lt;p&gt;They have a second use too: transferring interior dimensions. Set the rods to fit snugly inside a space, lock them, carry the tool to your workpiece, and mark directly. No arithmetic, no misread ruler.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/assembled_side-HQ.png"&gt;&lt;img alt="Side profile showing both guides and the two overlapping rods" src="http://lizard-spock.co.uk/assembled_side-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Lost Art Press have documented pinch rods across several articles spanning 2013 to 2025, from a home-centre build using steel tube sleeves and heart pine, through to the machined brass Crucible Tool hardware and a new all-metal prototype using 1/4" keystock. The design has been remarkably stable across all those years -- two rods, two guides, one thumbscrew.&lt;/p&gt;
+&lt;h2&gt;The OpenSCAD Design&lt;/h2&gt;
+&lt;p&gt;The model is parametric with the key dimensions at the top of the file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;STOCK_THICKNESS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;19&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;// height of ONE rod -- two stack to fill the opening&lt;/span&gt;
+&lt;span class="n"&gt;STOCK_WIDTH&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;19&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// width of each rod&lt;/span&gt;
+&lt;span class="n"&gt;WALL_THICKNESS&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="c1"&gt;// guide wall thickness&lt;/span&gt;
+&lt;span class="n"&gt;GUIDE_LENGTH&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;40&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// depth of each guide block&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total. The BOSL2 library handles the threaded M5 screw hole and the parametric knob.&lt;/p&gt;
+&lt;h3&gt;Display Mode&lt;/h3&gt;
+&lt;p&gt;A &lt;code&gt;MODE&lt;/code&gt; variable at the top switches between a full assembly preview and single-part export for printing:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;MODE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;assembled&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="c1"&gt;// or &amp;quot;print&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;PRINT_PART&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;guide2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;fastner&amp;quot; | &amp;quot;guide1&amp;quot; | &amp;quot;guide2&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;The Two Guides&lt;/h2&gt;
+&lt;p&gt;The guides are intentionally different. Each one locks a different rod, so you can set one end, then adjust the other independently.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Guide 1&lt;/strong&gt; is mounted inverted in the assembly. Flipping it 180 degrees around the X axis keeps the rod opening in exactly the same position (the opening is symmetric around the centreline at Z = 14.5mm), but moves the countersunk screw hole from the bottom to the top. A screw through that top hole locks onto the top rod.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Guide 2&lt;/strong&gt; has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Guide 1 -- inverted, screw hole on top&lt;/th&gt;
+&lt;th&gt;Guide 2 -- M5 thumbscrew knob&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/guide1_detail-HQ.png"&gt;&lt;img alt="Guide 1" src="http://lizard-spock.co.uk/guide1_detail-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/guide2_detail-HQ.png"&gt;&lt;img alt="Guide 2" src="http://lizard-spock.co.uk/guide2_detail-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The BOSL2 &lt;code&gt;screw_hole()&lt;/code&gt; call takes care of cutting the threaded recess into the standoff, and &lt;code&gt;screw()&lt;/code&gt; with &lt;code&gt;anchor=BOTTOM&lt;/code&gt; generates the matching fastener with the thread pointing downward into the hole.&lt;/p&gt;
+&lt;h2&gt;Tapered Tips&lt;/h2&gt;
+&lt;p&gt;Each rod has a 45-degree chisel taper at one end. Both tapers point toward the shared centreline between the two stacked rods, so from the side the two tips form a symmetric arrowhead shape pointing at the Z midpoint.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tips_detail-HQ.png"&gt;&lt;img alt="Tapered rod tips exiting guide 1" src="http://lizard-spock.co.uk/tips_detail-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The taper is generated using &lt;code&gt;hull()&lt;/code&gt; between a knife-edge line at the tip and a full rectangular cross-section a little further along. At 45 degrees the horizontal run equals the vertical rise, so the taper length is exactly &lt;code&gt;STOCK_THICKNESS&lt;/code&gt; (9.5mm). The two rods have their tapers on opposite ends of the assembly so each tip engages a different corner of the workpiece.&lt;/p&gt;
+&lt;h2&gt;Printable Parts&lt;/h2&gt;
+&lt;p&gt;Three parts are printed separately. For 3mf export, set &lt;code&gt;MODE = "print"&lt;/code&gt; and select the part with &lt;code&gt;PRINT_PART&lt;/code&gt;. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Guide 1&lt;/th&gt;
+&lt;th&gt;Guide 2&lt;/th&gt;
+&lt;th&gt;Thumbscrew&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_guide1-HQ.png"&gt;&lt;img alt="Guide 1 part" src="http://lizard-spock.co.uk/part_guide1-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_guide2-HQ.png"&gt;&lt;img alt="Guide 2 part" src="http://lizard-spock.co.uk/part_guide2-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_fastner-HQ.png"&gt;&lt;img alt="Fastener part" src="http://lizard-spock.co.uk/part_fastner-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;Dependencies&lt;/h2&gt;
+&lt;p&gt;The SCAD file requires two OpenSCAD libraries in your libraries folder:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/BelfrySCAD/BOSL2"&gt;BOSL2&lt;/a&gt; -- parametric screws, threads, and screw holes&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/TemptorSent/parametric-knob-maker"&gt;parametric-knob-maker&lt;/a&gt; -- the thumbscrew knob profile&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Still To Do&lt;/h2&gt;
+&lt;p&gt;A few things remain on the TODO list inside the SCAD file:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Add thread to the knob so it actually mates with the M5 screw&lt;/li&gt;
+&lt;li&gt;Add a chamfered mounting screw hole to both guides for securing to the rod stock&lt;/li&gt;
+&lt;li&gt;Proper pointed/bevelled rod ends on the printable rod parts (the current taper is assembly-preview only -- the rods themselves are not yet modelled as printable parts)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The source is on GitHub at &lt;a href="https://github.com/morganp/OpenSCAD_PinchRods"&gt;morganp/OpenSCAD_PinchRods&lt;/a&gt;.&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="OpenSCAD"></category><category term="3D Printing"></category><category term="BOSL2"></category><category term="Woodworking"></category><category term="CAD"></category><category term="Parametric Design"></category></entry><entry><title>SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</title><link href="http://lizard-spock.co.uk/soc-article-06-interconnects-and-bus-protocols.html" rel="alternate"></link><published>2026-04-09T00:00:00+01:00</published><updated>2026-04-09T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-09:/soc-article-06-interconnects-and-bus-protocols.html</id><summary type="html">&lt;p&gt;How SoC blocks communicate: the AMBA bus family from simple APB peripherals through pipelined AHB to the high-performance AXI4 with its five independent channels, valid/ready handshake, and crossbar interconnects.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 6 of 11&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Every block on a SoC -- CPUs, DMA engines, memory controllers, peripherals -- must communicate with every other block. The internal communication fabric that makes this possible is called the &lt;strong&gt;interconnect&lt;/strong&gt; or &lt;strong&gt;bus&lt;/strong&gt;. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.&lt;/p&gt;
@@ -4628,42 +4704,4 @@ any(input==4)
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;input = 32;
 check = [32,64,128];
 any( check==input )
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Matlab: Split Odd &amp; Even Array Elements"</title><link href="http://lizard-spock.co.uk/matlab-split-odd-even-array-elements.html" rel="alternate"></link><published>2014-05-07T17:58:33+01:00</published><updated>2014-05-07T17:58:33+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-07:/matlab-split-odd-even-array-elements.html</id><summary type="html">&lt;p&gt;Using Matlab to splitting data into odd and even samples.&lt;/p&gt;
-&lt;p&gt;A for loop approach:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;data_odd&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[];&lt;/span&gt;
-&lt;span class="n"&gt;data_even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[];&lt;/span&gt;
-&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nb"&gt;length …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Using Matlab to splitting data into odd and even samples.&lt;/p&gt;
-&lt;p&gt;A for loop approach:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;data_odd&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[];&lt;/span&gt;
-&lt;span class="n"&gt;data_even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[];&lt;/span&gt;
-&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nb"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;mod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c"&gt;%% disp(&amp;#39;odd&amp;#39;)&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;data_odd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;data_odd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c"&gt;%% disp(&amp;#39;even&amp;#39;)&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;data_even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;data_even&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Matlab approach using ranges to remap values:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;data_odd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;end&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
-&lt;span class="nt"&gt;data_even&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nd"&gt;end&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Ranges are composed of &lt;code&gt;start_index:step_size:end_index&lt;/code&gt;. If step_size is omitted, 1 is assumed.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;end&lt;/code&gt; has a special meaning when used inside an array, it is the position of the last element.
-To append to an array you could use &lt;code&gt;data(end+1) = append_value&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;No error or warning is triggered if the &lt;code&gt;end_index&lt;/code&gt; can not be reached with the given step size, which is why this works with &lt;code&gt;end&lt;/code&gt; as the stop point of both sides.&lt;/p&gt;
-&lt;h2&gt;Example&lt;/h2&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;[&lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;]&lt;span class="c1"&gt;;&lt;/span&gt;
-&lt;span class="nv"&gt;odd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;:&lt;span class="mi"&gt;2&lt;/span&gt;:&lt;span class="k"&gt;end&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
-&lt;span class="nv"&gt;even&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;:&lt;span class="mi"&gt;2&lt;/span&gt;:&lt;span class="k"&gt;end&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
-
-&lt;span class="nv"&gt;odd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
-&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;
-
-&lt;span class="nv"&gt;even&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
-&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry></feed>
