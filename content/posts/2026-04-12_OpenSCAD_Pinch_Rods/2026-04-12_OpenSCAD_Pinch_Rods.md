@@ -78,6 +78,6 @@ Four parts are printed separately. For 3mf export, set `MODE = "print"` and sele
 The SCAD file requires two OpenSCAD libraries in your libraries folder:
 
 - [BOSL2](https://github.com/BelfrySCAD/BOSL2) -- parametric screws, threads, and screw holes
-- [parametric-knob-maker](https://github.com/TemptorSent/parametric-knob-maker) -- the thumbscrew knob profile
+- [parametric-knob-maker](https://github.com/morganp/parametric-knob-maker) -- the thumbscrew knob profile (fork with generalised round knob module)
 
 The source is on GitHub at [morganp/OpenSCAD_PinchRods](https://github.com/morganp/OpenSCAD_PinchRods).
