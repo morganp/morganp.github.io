@@ -260,4 +260,6 @@ SoC interconnects form the communication backbone that links every functional bl
 
 ---
 
-*Previous: [Article 05 -- Memory Architecture]({filename}../2026-04-04_SoC_Article_05_Memory_Architecture/2026-04-04_SoC_Article_05_Memory_Architecture.md)*
+*Previous: [Article 05 -- Memory Architecture]({filename}/posts/2026-04-04_SoC_Article_05_Memory_Architecture/2026-04-04_SoC_Article_05_Memory_Architecture.md)*
+
+*Next: [Article 07 - Clocking, Reset, and Power Domains]({filename}/posts/2026-04-11_SoC_Article_07_Clocking_Reset_and_Power_Domains/2026-04-11_SoC_Article_07_Clocking_Reset_and_Power_Domains.md)*

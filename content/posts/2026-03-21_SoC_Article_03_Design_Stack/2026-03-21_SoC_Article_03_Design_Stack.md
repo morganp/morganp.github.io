@@ -238,4 +238,4 @@ SoC design is organised as a stack of abstraction layers, from quantum-mechanica
 ---
 
 *Previous: [Article 02 - What is a System on Chip?](|filename|../2026-03-15_SoC_Article_02_Anatomy_and_Motivation/2026-03-15_SoC_Article_02_Anatomy_and_Motivation.md)*
-*Next: Article 04 - Processor Cores: CPU, DSP, GPU and Hardware Accelerators*
+*Next: [Article 04 - Processor Cores: CPU, DSP, GPU and Hardware Accelerators]({filename}/posts/2026-03-27_SoC_Article_04_Processor_Cores/2026-03-27_SoC_Article_04_Processor_Cores.md)*

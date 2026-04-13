@@ -295,10 +295,10 @@ Computer systems began as room-filling collections of vacuum tubes. The transist
 | **01** | **From Room to Silicon — History of the Computer System (this article)** |
 | [02](soc-article-02-anatomy-and-motivation.html) | [What is a System on Chip? — Anatomy and Motivation](soc-article-02-anatomy-and-motivation.html) |
 | [03](soc-article-03-design-stack.html) | [The SoC Design Stack: From Transistors to Software](soc-article-03-design-stack.html) |
-| 04 | Processor Cores: CPU, DSP, GPU and Hardware Accelerators |
-| 05 | Memory Architecture: Caches, DRAM, and On-chip Storage |
-| 06 | Interconnects and Bus Protocols: AXI, AHB, and APB |
-| 07 | Clocking, Reset, and Power Domains |
+| [04](soc-article-04-processor-cores.html) | [Processor Cores: CPU, DSP, GPU and Hardware Accelerators](soc-article-04-processor-cores.html) |
+| [05](soc-article-05-memory-architecture.html) | [Memory Architecture: Caches, DRAM, and On-chip Storage](soc-article-05-memory-architecture.html) |
+| [06](soc-article-06-interconnects-and-bus-protocols.html) | [Interconnects and Bus Protocols: AXI, AHB, and APB](soc-article-06-interconnects-and-bus-protocols.html) |
+| [07](soc-article-07-clocking-reset-and-power-domains.html) | [Clocking, Reset, and Power Domains](soc-article-07-clocking-reset-and-power-domains.html) |
 | 08 | Peripherals and I/O: Connecting the SoC to the World |
 | 09 | Hardware Description Languages and RTL Design |
 | 10 | The SoC Design Flow: From Specification to Silicon |
