@@ -42,7 +42,7 @@ A `MODE` variable at the top switches between a full assembly preview and single
 
 ```openscad
 MODE = "assembled";   // or "print"
-PRINT_PART = "guide2"; // "fastener" | "guide1" | "guide2"
+PRINT_PART = "guide2"; // "fastener" | "guide1" | "guide2" | "rod"
 ```
 
 ## The Two Guides
@@ -67,11 +67,11 @@ The taper is generated using `hull()` between a knife-edge line at the tip and a
 
 ## Printable Parts
 
-Three parts are printed separately. For 3mf export, set `MODE = "print"` and select the part with `PRINT_PART`. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled.
+Four parts are printed separately. For 3mf export, set `MODE = "print"` and select the part with `PRINT_PART`. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled. Print two rods and flip one on assembly -- both are the same shape.
 
-| Guide 1 | Guide 2 | Thumbscrew |
-|---|---|---|
-| [![Guide 1 part]({attach}/images/OpenSCAD/PinchRods/part_guide1-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide1-HQ.png) | [![Guide 2 part]({attach}/images/OpenSCAD/PinchRods/part_guide2-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide2-HQ.png) | [![Fastener part]({attach}/images/OpenSCAD/PinchRods/part_fastener-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_fastener-HQ.png) |
+| Guide 1 | Guide 2 | Thumbscrew | Rod (print x2) |
+|---|---|---|---|
+| [![Guide 1 part]({attach}/images/OpenSCAD/PinchRods/part_guide1-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide1-HQ.png) | [![Guide 2 part]({attach}/images/OpenSCAD/PinchRods/part_guide2-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide2-HQ.png) | [![Fastener part]({attach}/images/OpenSCAD/PinchRods/part_fastener-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_fastener-HQ.png) | [![Rod part]({attach}/images/OpenSCAD/PinchRods/part_rod-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_rod-HQ.png) |
 
 ## Dependencies
 
