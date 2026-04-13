@@ -26,7 +26,147 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../openscad-pinch-rods.html">3D Printed Pinch Rods in OpenSCAD</a></h1>
+                        <h1 class="entry-title"><a href="../parametric-knob-maker-openscad.html">Parametric Knob Maker for OpenSCAD</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-13T00:00:00+01:00">
+                Published: Mon 13 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/openscad.html">OpenSCAD</a> <a href="../tag/3d-printing.html">3D Printing</a> <a href="../tag/bosl2.html">BOSL2</a> <a href="../tag/cad.html">CAD</a> <a href="../tag/parametric-design.html">Parametric Design</a> </p>        
+</footer><!-- /.post-info --><p>Parametric thumbscrew knobs come up often enough in 3D printing projects that it is worth having a reusable library for them. This post covers a fork of <a href="https://github.com/aminGhafoory/parametric-knob-maker">aminGhafoory/parametric-knob-maker</a> that adds a generalised round knob module. The fork is at <a href="https://github.com/morganp/parametric-knob-maker">morganp/parametric-knob-maker</a>.</p>
+<p>The library was used to generate the thumbscrew knob in the <a href="../openscad-pinch-rods.html">pinch rods</a> post.</p>
+<h2>Installation</h2>
+<p>Clone or download the repository into your OpenSCAD libraries folder:</p>
+<div class="highlight"><pre><span></span><code>~/.local/share/OpenSCAD/libraries/     (Linux)
+~/Documents/OpenSCAD/libraries/        (macOS)
+My Documents\OpenSCAD\libraries\       (Windows)
+</code></pre></div>
+
+<h2>The <code>knob()</code> Module</h2>
+<p><strong>File:</strong> <code>parametric_knob.scad</code></p>
+<p>The round knob has a narrower offset base for mounting clearance, chamfered top and bottom edges, and equally-spaced cylindrical grip cutouts around the perimeter. Z=0 is at the base, making it straightforward to position on top of a screw shaft.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
+
+<span class="n">knob</span><span class="p">(</span>
+<span class="w">    </span><span class="n">knob_height</span><span class="p">,</span><span class="w">       </span><span class="c1">// height of the main knob body         (default: 15)</span>
+<span class="w">    </span><span class="n">knob_diam</span><span class="p">,</span><span class="w">         </span><span class="c1">// diameter of the main knob body       (default: 30)</span>
+<span class="w">    </span><span class="n">offset_height</span><span class="p">,</span><span class="w">     </span><span class="c1">// height of the narrower base section  (default: 5)</span>
+<span class="w">    </span><span class="n">offset_diam</span><span class="p">,</span><span class="w">       </span><span class="c1">// diameter of the base section         (default: knob_diam/2)</span>
+<span class="w">    </span><span class="n">knob_chamfer</span><span class="p">,</span><span class="w">      </span><span class="c1">// top edge chamfer depth at 45 deg     (default: 2)</span>
+<span class="w">    </span><span class="n">base_chamfer</span><span class="p">,</span><span class="w">      </span><span class="c1">// base edge chamfer depth at 45 deg    (default: 1)</span>
+<span class="w">    </span><span class="n">num_grip_cutouts</span><span class="p">,</span><span class="w">  </span><span class="c1">// number of finger grip cutouts        (default: 15)</span>
+<span class="w">    </span><span class="n">grip_cutout_diam</span><span class="p">,</span><span class="w">  </span><span class="c1">// diameter of each grip cutout         (default: 4)</span>
+<span class="w">    </span><span class="n">cutout_radius_adj</span><span class="p">,</span><span class="w"> </span><span class="c1">// outward offset of cutout centres     (default: 1)</span>
+<span class="w">    </span><span class="n">knob_color</span><span class="w">         </span><span class="c1">// preview colour                       (default: &quot;red&quot;)</span>
+<span class="p">);</span>
+</code></pre></div>
+
+<h3>Default knob</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
+<span class="n">knob</span><span class="p">();</span>
+</code></pre></div>
+
+<p><img alt="Default knob -- 30mm diameter, 15mm tall, 15 grip cutouts" src="../knob_default.png"></p>
+<h3>Small thumbscrew knob</h3>
+<p>Compact knob for M3/M4 screws where finger space is limited.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
+<span class="n">knob</span><span class="p">(</span><span class="n">knob_height</span><span class="o">=</span><span class="m">8</span><span class="p">,</span><span class="w"> </span><span class="n">knob_diam</span><span class="o">=</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="n">offset_height</span><span class="o">=</span><span class="m">2</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="Small knob -- 20mm diameter, 8mm tall" src="../knob_small.png"></p>
+<h3>Large adjustment knob</h3>
+<p>Wider knob with more cutouts for applications needing higher torque or finer control.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
+<span class="n">knob</span><span class="p">(</span>
+<span class="w">    </span><span class="n">knob_height</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="p">,</span>
+<span class="w">    </span><span class="n">knob_diam</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="m">50</span><span class="p">,</span>
+<span class="w">    </span><span class="n">num_grip_cutouts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="p">,</span>
+<span class="w">    </span><span class="n">grip_cutout_diam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span><span class="p">,</span>
+<span class="w">    </span><span class="n">knob_color</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;SteelBlue&quot;</span>
+<span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="Large knob -- 50mm diameter, 20mm tall, 20 grip cutouts" src="../knob_large.png"></p>
+<h3>Slim base</h3>
+<p>A narrow offset base minimises the footprint on the mounting surface -- useful when the knob sits close to a panel or bracket.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
+<span class="n">knob</span><span class="p">(</span>
+<span class="w">    </span><span class="n">knob_height</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="m">15</span><span class="p">,</span>
+<span class="w">    </span><span class="n">knob_diam</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="m">35</span><span class="p">,</span>
+<span class="w">    </span><span class="n">offset_height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">offset_diam</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
+<span class="w">    </span><span class="n">knob_color</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;DarkOrange&quot;</span>
+<span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="Slim base knob -- 35mm diameter with narrow 10mm base" src="../knob_slim_base.png"></p>
+<h3>Combining with a BOSL2 screw</h3>
+<p>The <code>knob()</code> module pairs neatly with BOSL2's <code>screw()</code> to produce a complete thumbscrew assembly. Place the screw with <code>anchor=BOTTOM</code> so the thread points downward, then translate the knob up to sit on top of the shaft.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
+<span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">BOSL2/std.scad</span><span class="p">&gt;</span>
+<span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">BOSL2/screws.scad</span><span class="p">&gt;</span>
+
+<span class="n">THREAD_LEN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">12</span><span class="p">;</span>
+
+<span class="nb">union</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">screw</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="s2">&quot;M5&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="n">THREAD_LEN</span><span class="o">+</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="o">=</span><span class="l">true</span><span class="p">,</span><span class="w"> </span><span class="n">anchor</span><span class="o">=</span><span class="n">BOTTOM</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">translate</span><span class="p">([</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">THREAD_LEN</span><span class="p">])</span>
+<span class="w">        </span><span class="n">knob</span><span class="p">(</span><span class="n">knob_height</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">offset_height</span><span class="o">=</span><span class="m">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>The <code>hex_knob()</code> Module</h2>
+<p><strong>File:</strong> <code>parametric_hex_knob.scad</code></p>
+<p>The hex knob is intended to capture a hex-head bolt in its base recess and provide a through-hole for the shaft, removing the need for any additional fastener. The hex screw recess is currently under development and commented out -- the module renders the knob body and grip cutouts only.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_hex_knob.scad</span><span class="p">&gt;</span>
+
+<span class="n">hex_knob</span><span class="p">(</span>
+<span class="w">    </span><span class="n">knob_height</span><span class="p">,</span><span class="w">          </span><span class="c1">// height of the knob body           (default: 15)</span>
+<span class="w">    </span><span class="n">knob_diam</span><span class="p">,</span><span class="w">            </span><span class="c1">// diameter of the knob              (default: 30)</span>
+<span class="w">    </span><span class="n">screwhead_facetoface</span><span class="p">,</span><span class="w"> </span><span class="c1">// hex head face-to-face size (mm)   (default: 8)</span>
+<span class="w">    </span><span class="n">screwhead_depth</span><span class="p">,</span><span class="w">      </span><span class="c1">// depth of hex recess               (default: 12)</span>
+<span class="w">    </span><span class="n">thru_hole_diam</span><span class="p">,</span><span class="w">       </span><span class="c1">// through-hole diameter             (default: 4)</span>
+<span class="w">    </span><span class="n">num_grip_cutouts</span><span class="p">,</span><span class="w">     </span><span class="c1">// number of finger grip cutouts     (default: 20)</span>
+<span class="w">    </span><span class="n">grip_cutout_diam</span><span class="p">,</span><span class="w">     </span><span class="c1">// diameter of each grip cutout      (default: 4)</span>
+<span class="w">    </span><span class="n">cutout_radius_adj</span><span class="w">     </span><span class="c1">// outward offset of cutout centres  (default: 1)</span>
+<span class="p">);</span>
+</code></pre></div>
+
+<p>The <code>screwhead_facetoface</code> parameter corresponds to the face-to-face dimension <code>s</code> in DIN 933.</p>
+<table>
+<thead>
+<tr>
+<th>Default hex knob</th>
+<th>Large hex knob</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Default hex knob -- 30mm diameter, 15mm tall" src="../hex_knob_default.png"></td>
+<td><img alt="Large hex knob -- 45mm diameter, 20mm tall" src="../hex_knob_large.png"></td>
+</tr>
+</tbody>
+</table>
+<h2>Implementation Notes</h2>
+<p>The <code>knob()</code> geometry is built from 2D profiles rotated with <code>rotate_extrude()</code>. Chamfers are cut using <code>difference()</code> against polygon shapes. Grip cutouts are placed by a helper module <code>rotate_on_circle()</code> that distributes cylinders at equal angular intervals around the perimeter using <code>sin()</code>/<code>cos()</code> positioning.</p>
+<p>The source is on GitHub at <a href="https://github.com/morganp/parametric-knob-maker">morganp/parametric-knob-maker</a>.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../openscad-pinch-rods.html" rel="bookmark"
+                               title="Permalink to 3D Printed Pinch Rods in OpenSCAD">3D Printed Pinch Rods in OpenSCAD</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-04-12T00:00:00+01:00">
                 Published: Sun 12 April 2026
@@ -37,81 +177,10 @@
                 </address>
         <p>In <a href="../category/home-garden.html">Home & Garden</a>.</p>
 <p>tags: <a href="../tag/openscad.html">OpenSCAD</a> <a href="../tag/3d-printing.html">3D Printing</a> <a href="../tag/bosl2.html">BOSL2</a> <a href="../tag/woodworking.html">Woodworking</a> <a href="../tag/cad.html">CAD</a> <a href="../tag/parametric-design.html">Parametric Design</a> </p>        
-</footer><!-- /.post-info --><p><a href="../assembled-HQ.png"><img alt="Assembled pinch rods" src="../assembled-900w.png"></a></p>
-<h2>What are Pinch Rods?</h2>
-<p>Pinch rods are a traditional woodworking measuring tool that predate the tape measure as the reliable way to check whether a box, cabinet, or carcase is square. The concept is simple: two flat rods with pointed ends overlap and slide through a pair of guide blocks. You nestle the tips into opposite diagonal corners of an assembly, lock the rods in place, then check the other diagonal. If both diagonals match, the assembly is square.</p>
-<p>The beauty of pinch rods over a tape measure is that you never read a number. The rods physically span the diagonal, and you use that same span directly on the other diagonal. Any discrepancy is immediately obvious as a gap or an overrun at one tip.</p>
-<p>They have a second use too: transferring interior dimensions. Set the rods to fit snugly inside a space, lock them, carry the tool to your workpiece, and mark directly. No arithmetic, no misread ruler.</p>
-<p><a href="../assembled_side-HQ.png"><img alt="Side profile showing both guides and the two overlapping rods" src="../assembled_side-900w.png"></a></p>
-<p>Lost Art Press have documented pinch rods across several articles spanning 2013 to 2025, from a home-centre build using steel tube sleeves and heart pine, through to the machined brass Crucible Tool hardware and a new all-metal prototype using 1/4" keystock. The design has been remarkably stable across all those years -- two rods, two guides, one thumbscrew.</p>
-<h2>The OpenSCAD Design</h2>
-<p>A parametrised OpenSCAD model. The guides with or without the rods can be 3D printed. The full source is on GitHub at <a href="https://github.com/morganp/OpenSCAD_PinchRods">morganp/OpenSCAD_PinchRods</a>.</p>
-<p>The model parameters:</p>
-<div class="highlight"><pre><span></span><code><span class="n">STOCK_THICKNESS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">19</span><span class="o">/</span><span class="m">2</span><span class="p">;</span><span class="w">  </span><span class="c1">// height of ONE rod -- two stack to fill the opening</span>
-<span class="n">STOCK_WIDTH</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="m">19</span><span class="p">;</span><span class="w">    </span><span class="c1">// width of each rod</span>
-<span class="n">WALL_THICKNESS</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w">     </span><span class="c1">// guide wall thickness</span>
-<span class="n">GUIDE_LENGTH</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">40</span><span class="p">;</span><span class="w">    </span><span class="c1">// depth of each guide block</span>
-</code></pre></div>
-
-<p>The two rods are 19mm wide and 9.5mm tall each. They sit one on top of the other inside both guide blocks, so the guide opening is 19mm x 19mm total.</p>
-<h3>Display Mode</h3>
-<p>A <code>MODE</code> variable at the top switches between a full assembly preview and single-part export for printing:</p>
-<div class="highlight"><pre><span></span><code><span class="n">MODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;assembled&quot;</span><span class="p">;</span><span class="w">   </span><span class="c1">// or &quot;print&quot;</span>
-<span class="n">PRINT_PART</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;guide2&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;fastener&quot; | &quot;guide1&quot; | &quot;guide2&quot;</span>
-</code></pre></div>
-
-<h2>The Two Guides</h2>
-<p>The guides are intentionally different. Each one locks a different rod, so you can set one end, then adjust the other independently.</p>
-<p><strong>Guide 1</strong> is mounted inverted in the assembly. Flipping it 180 degrees around the X axis keeps the rod opening in exactly the same position (the opening is symmetric around the centreline at Z = 14.5mm), but moves the countersunk screw hole from the bottom to the top. A screw through that top hole locks onto the top rod.</p>
-<p><strong>Guide 2</strong> has a cylindrical standoff boss on top with an M5 threaded hole. A clamping membrane -- a thin slab just inside the opening -- transmits force from the thumbscrew down onto the bottom rod when the knob is tightened. BOSL2's <code>screw_hole()</code> cuts the threaded recess into the standoff, and <code>screw()</code> with <code>anchor=BOTTOM</code> generates the matching fastener.</p>
-<table>
-<thead>
-<tr>
-<th>Guide 1 -- inverted, screw hole on top</th>
-<th>Guide 2 -- M5 thumbscrew knob</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../guide1_detail-HQ.png"><img alt="Guide 1" src="../guide1_detail-900w.png"></a></td>
-<td><a href="../guide2_detail-HQ.png"><img alt="Guide 2" src="../guide2_detail-900w.png"></a></td>
-</tr>
-</tbody>
-</table>
-<h2>Tapered Tips</h2>
-<p>Each rod has a 45-degree chisel taper at one end. Both tapers point toward the shared centreline between the two stacked rods, so from the side the two tips form a symmetric arrowhead shape pointing at the Z midpoint.</p>
-<p><a href="../tips_detail-HQ.png"><img alt="Tapered rod tips exiting guide 1" src="../tips_detail-900w.png"></a></p>
-<p>The taper is generated using <code>hull()</code> between a knife-edge line at the tip and a full rectangular cross-section a little further along. At 45 degrees the horizontal run equals the vertical rise, so the taper length is exactly <code>STOCK_THICKNESS</code> (9.5mm). The two rods have their tapers on opposite ends of the assembly so each tip engages a different corner of the workpiece.</p>
-<h2>Printable Parts</h2>
-<p>Three parts are printed separately. For 3mf export, set <code>MODE = "print"</code> and select the part with <code>PRINT_PART</code>. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled.</p>
-<table>
-<thead>
-<tr>
-<th>Guide 1</th>
-<th>Guide 2</th>
-<th>Thumbscrew</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../part_guide1-HQ.png"><img alt="Guide 1 part" src="../part_guide1-900w.png"></a></td>
-<td><a href="../part_guide2-HQ.png"><img alt="Guide 2 part" src="../part_guide2-900w.png"></a></td>
-<td><a href="../part_fastener-HQ.png"><img alt="Fastener part" src="../part_fastener-900w.png"></a></td>
-</tr>
-</tbody>
-</table>
-<h2>Dependencies</h2>
-<p>The SCAD file requires two OpenSCAD libraries in your libraries folder:</p>
-<ul>
-<li><a href="https://github.com/BelfrySCAD/BOSL2">BOSL2</a> -- parametric screws, threads, and screw holes</li>
-<li><a href="https://github.com/TemptorSent/parametric-knob-maker">parametric-knob-maker</a> -- the thumbscrew knob profile</li>
-</ul>
-<p>The source is on GitHub at <a href="https://github.com/morganp/OpenSCAD_PinchRods">morganp/OpenSCAD_PinchRods</a>.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>Designing a parametric set of pinch rods in OpenSCAD using the BOSL2 library. Pinch rods are a traditional woodworking tool for checking carcases for square and transferring interior dimensions without measuring.</p>
+                        <a class="readmore" href="../openscad-pinch-rods.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>

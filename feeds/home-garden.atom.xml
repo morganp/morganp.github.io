@@ -19,7 +19,7 @@
 &lt;h3&gt;Display Mode&lt;/h3&gt;
 &lt;p&gt;A &lt;code&gt;MODE&lt;/code&gt; variable at the top switches between a full assembly preview and single-part export for printing:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;MODE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;assembled&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="c1"&gt;// or &amp;quot;print&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;PRINT_PART&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;guide2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;fastener&amp;quot; | &amp;quot;guide1&amp;quot; | &amp;quot;guide2&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;PRINT_PART&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;guide2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;fastener&amp;quot; | &amp;quot;guide1&amp;quot; | &amp;quot;guide2&amp;quot; | &amp;quot;rod&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h2&gt;The Two Guides&lt;/h2&gt;
@@ -45,13 +45,14 @@
 &lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tips_detail-HQ.png"&gt;&lt;img alt="Tapered rod tips exiting guide 1" src="http://lizard-spock.co.uk/tips_detail-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;The taper is generated using &lt;code&gt;hull()&lt;/code&gt; between a knife-edge line at the tip and a full rectangular cross-section a little further along. At 45 degrees the horizontal run equals the vertical rise, so the taper length is exactly &lt;code&gt;STOCK_THICKNESS&lt;/code&gt; (9.5mm). The two rods have their tapers on opposite ends of the assembly so each tip engages a different corner of the workpiece.&lt;/p&gt;
 &lt;h2&gt;Printable Parts&lt;/h2&gt;
-&lt;p&gt;Three parts are printed separately. For 3mf export, set &lt;code&gt;MODE = "print"&lt;/code&gt; and select the part with &lt;code&gt;PRINT_PART&lt;/code&gt;. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled.&lt;/p&gt;
+&lt;p&gt;Four parts are printed separately. For 3mf export, set &lt;code&gt;MODE = "print"&lt;/code&gt; and select the part with &lt;code&gt;PRINT_PART&lt;/code&gt;. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled. Print two rods and flip one on assembly -- both are the same shape.&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
 &lt;th&gt;Guide 1&lt;/th&gt;
 &lt;th&gt;Guide 2&lt;/th&gt;
 &lt;th&gt;Thumbscrew&lt;/th&gt;
+&lt;th&gt;Rod (print x2)&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
@@ -59,6 +60,7 @@
 &lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_guide1-HQ.png"&gt;&lt;img alt="Guide 1 part" src="http://lizard-spock.co.uk/part_guide1-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
 &lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_guide2-HQ.png"&gt;&lt;img alt="Guide 2 part" src="http://lizard-spock.co.uk/part_guide2-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
 &lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_fastener-HQ.png"&gt;&lt;img alt="Fastener part" src="http://lizard-spock.co.uk/part_fastener-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_rod-HQ.png"&gt;&lt;img alt="Rod part" src="http://lizard-spock.co.uk/part_rod-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -66,7 +68,7 @@
 &lt;p&gt;The SCAD file requires two OpenSCAD libraries in your libraries folder:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://github.com/BelfrySCAD/BOSL2"&gt;BOSL2&lt;/a&gt; -- parametric screws, threads, and screw holes&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://github.com/TemptorSent/parametric-knob-maker"&gt;parametric-knob-maker&lt;/a&gt; -- the thumbscrew knob profile&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/morganp/parametric-knob-maker"&gt;parametric-knob-maker&lt;/a&gt; -- the thumbscrew knob profile (fork with generalised round knob module)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;The source is on GitHub at &lt;a href="https://github.com/morganp/OpenSCAD_PinchRods"&gt;morganp/OpenSCAD_PinchRods&lt;/a&gt;.&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="OpenSCAD"></category><category term="3D Printing"></category><category term="BOSL2"></category><category term="Woodworking"></category><category term="CAD"></category><category term="Parametric Design"></category></entry><entry><title>Scotland Outdoor Routes</title><link href="http://lizard-spock.co.uk/scotland-outdoor-routes.html" rel="alternate"></link><published>2026-03-06T12:00:00+00:00</published><updated>2026-03-06T12:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-03-06:/scotland-outdoor-routes.html</id><summary type="html">&lt;h2&gt;Misc&lt;/h2&gt;
 &lt;p&gt;Historic Scotland (Family £106/year includes entry to Edinburgh Castle):

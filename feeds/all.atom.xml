@@ -1,5 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-12T00:00:00+01:00</updated><entry><title>3D Printed Pinch Rods in OpenSCAD</title><link href="http://lizard-spock.co.uk/openscad-pinch-rods.html" rel="alternate"></link><published>2026-04-12T00:00:00+01:00</published><updated>2026-04-12T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-12:/openscad-pinch-rods.html</id><summary type="html">&lt;p&gt;Designing a parametric set of pinch rods in OpenSCAD using the BOSL2 library. Pinch rods are a traditional woodworking tool for checking carcases for square and transferring interior dimensions without measuring.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/assembled-HQ.png"&gt;&lt;img alt="Assembled pinch rods" src="http://lizard-spock.co.uk/assembled-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-13T00:00:00+01:00</updated><entry><title>Parametric Knob Maker for OpenSCAD</title><link href="http://lizard-spock.co.uk/parametric-knob-maker-openscad.html" rel="alternate"></link><published>2026-04-13T00:00:00+01:00</published><updated>2026-04-13T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-13:/parametric-knob-maker-openscad.html</id><summary type="html">&lt;p&gt;A fork of aminGhafoory's parametric-knob-maker that adds a generalised round knob module with configurable offset base, chamfers, and grip cutouts. Covers the knob() and hex_knob() modules, the key parameters, and how to combine the result with a BOSL2 screw for a complete thumbscrew assembly.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Parametric thumbscrew knobs come up often enough in 3D printing projects that it is worth having a reusable library for them. This post covers a fork of &lt;a href="https://github.com/aminGhafoory/parametric-knob-maker"&gt;aminGhafoory/parametric-knob-maker&lt;/a&gt; that adds a generalised round knob module. The fork is at &lt;a href="https://github.com/morganp/parametric-knob-maker"&gt;morganp/parametric-knob-maker&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The library was used to generate the thumbscrew knob in the &lt;a href="http://lizard-spock.co.uk/openscad-pinch-rods.html"&gt;pinch rods&lt;/a&gt; post.&lt;/p&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;Clone or download the repository into your OpenSCAD libraries folder:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;~/.local/share/OpenSCAD/libraries/     (Linux)
+~/Documents/OpenSCAD/libraries/        (macOS)
+My Documents\OpenSCAD\libraries\       (Windows)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;The &lt;code&gt;knob()&lt;/code&gt; Module&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;File:&lt;/strong&gt; &lt;code&gt;parametric_knob.scad&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The round knob has a narrower offset base for mounting clearance, chamfered top and bottom edges, and equally-spaced cylindrical grip cutouts around the perimeter. Z=0 is at the base, making it straightforward to position on top of a screw shaft.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;parametric-knob-maker/parametric_knob.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class="n"&gt;knob&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_height&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="c1"&gt;// height of the main knob body         (default: 15)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_diam&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;// diameter of the main knob body       (default: 30)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;offset_height&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="c1"&gt;// height of the narrower base section  (default: 5)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;offset_diam&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="c1"&gt;// diameter of the base section         (default: knob_diam/2)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_chamfer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="c1"&gt;// top edge chamfer depth at 45 deg     (default: 2)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;base_chamfer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="c1"&gt;// base edge chamfer depth at 45 deg    (default: 1)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;num_grip_cutouts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;// number of finger grip cutouts        (default: 15)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;grip_cutout_diam&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;// diameter of each grip cutout         (default: 4)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;cutout_radius_adj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// outward offset of cutout centres     (default: 1)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_color&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;// preview colour                       (default: &amp;quot;red&amp;quot;)&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Default knob&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;parametric-knob-maker/parametric_knob.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="n"&gt;knob&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="Default knob -- 30mm diameter, 15mm tall, 15 grip cutouts" src="http://lizard-spock.co.uk/knob_default.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Small thumbscrew knob&lt;/h3&gt;
+&lt;p&gt;Compact knob for M3/M4 screws where finger space is limited.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;parametric-knob-maker/parametric_knob.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="n"&gt;knob&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;knob_height&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;knob_diam&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;offset_height&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="Small knob -- 20mm diameter, 8mm tall" src="http://lizard-spock.co.uk/knob_small.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Large adjustment knob&lt;/h3&gt;
+&lt;p&gt;Wider knob with more cutouts for applications needing higher torque or finer control.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;parametric-knob-maker/parametric_knob.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="n"&gt;knob&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_height&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_diam&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;num_grip_cutouts&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;grip_cutout_diam&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_color&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SteelBlue&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="Large knob -- 50mm diameter, 20mm tall, 20 grip cutouts" src="http://lizard-spock.co.uk/knob_large.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Slim base&lt;/h3&gt;
+&lt;p&gt;A narrow offset base minimises the footprint on the mounting surface -- useful when the knob sits close to a panel or bracket.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;parametric-knob-maker/parametric_knob.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="n"&gt;knob&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_height&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;15&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_diam&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;35&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;offset_height&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;offset_diam&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_color&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;DarkOrange&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="Slim base knob -- 35mm diameter with narrow 10mm base" src="http://lizard-spock.co.uk/knob_slim_base.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Combining with a BOSL2 screw&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;knob()&lt;/code&gt; module pairs neatly with BOSL2's &lt;code&gt;screw()&lt;/code&gt; to produce a complete thumbscrew assembly. Place the screw with &lt;code&gt;anchor=BOTTOM&lt;/code&gt; so the thread points downward, then translate the knob up to sit on top of the shaft.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;parametric-knob-maker/parametric_knob.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;BOSL2/std.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;BOSL2/screws.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class="n"&gt;THREAD_LEN&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;12&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="nb"&gt;union&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;screw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;spec&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;M5&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;THREAD_LEN&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="l"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;anchor&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;BOTTOM&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;translate&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;THREAD_LEN&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;knob&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;knob_height&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;offset_height&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;The &lt;code&gt;hex_knob()&lt;/code&gt; Module&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;File:&lt;/strong&gt; &lt;code&gt;parametric_hex_knob.scad&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The hex knob is intended to capture a hex-head bolt in its base recess and provide a through-hole for the shaft, removing the need for any additional fastener. The hex screw recess is currently under development and commented out -- the module renders the knob body and grip cutouts only.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;include&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="cpf"&gt;parametric-knob-maker/parametric_hex_knob.scad&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class="n"&gt;hex_knob&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_height&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="c1"&gt;// height of the knob body           (default: 15)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;knob_diam&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="c1"&gt;// diameter of the knob              (default: 30)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;screwhead_facetoface&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// hex head face-to-face size (mm)   (default: 8)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;screwhead_depth&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="c1"&gt;// depth of hex recess               (default: 12)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;thru_hole_diam&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="c1"&gt;// through-hole diameter             (default: 4)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;num_grip_cutouts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="c1"&gt;// number of finger grip cutouts     (default: 20)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;grip_cutout_diam&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="c1"&gt;// diameter of each grip cutout      (default: 4)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;cutout_radius_adj&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="c1"&gt;// outward offset of cutout centres  (default: 1)&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;screwhead_facetoface&lt;/code&gt; parameter corresponds to the face-to-face dimension &lt;code&gt;s&lt;/code&gt; in DIN 933.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Default hex knob&lt;/th&gt;
+&lt;th&gt;Large hex knob&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;img alt="Default hex knob -- 30mm diameter, 15mm tall" src="http://lizard-spock.co.uk/hex_knob_default.png"&gt;&lt;/td&gt;
+&lt;td&gt;&lt;img alt="Large hex knob -- 45mm diameter, 20mm tall" src="http://lizard-spock.co.uk/hex_knob_large.png"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;Implementation Notes&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;knob()&lt;/code&gt; geometry is built from 2D profiles rotated with &lt;code&gt;rotate_extrude()&lt;/code&gt;. Chamfers are cut using &lt;code&gt;difference()&lt;/code&gt; against polygon shapes. Grip cutouts are placed by a helper module &lt;code&gt;rotate_on_circle()&lt;/code&gt; that distributes cylinders at equal angular intervals around the perimeter using &lt;code&gt;sin()&lt;/code&gt;/&lt;code&gt;cos()&lt;/code&gt; positioning.&lt;/p&gt;
+&lt;p&gt;The source is on GitHub at &lt;a href="https://github.com/morganp/parametric-knob-maker"&gt;morganp/parametric-knob-maker&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="OpenSCAD"></category><category term="3D Printing"></category><category term="BOSL2"></category><category term="CAD"></category><category term="Parametric Design"></category></entry><entry><title>3D Printed Pinch Rods in OpenSCAD</title><link href="http://lizard-spock.co.uk/openscad-pinch-rods.html" rel="alternate"></link><published>2026-04-12T00:00:00+01:00</published><updated>2026-04-12T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-12:/openscad-pinch-rods.html</id><summary type="html">&lt;p&gt;Designing a parametric set of pinch rods in OpenSCAD using the BOSL2 library. Pinch rods are a traditional woodworking tool for checking carcases for square and transferring interior dimensions without measuring.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/assembled-HQ.png"&gt;&lt;img alt="Assembled pinch rods" src="http://lizard-spock.co.uk/assembled-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;What are Pinch Rods?&lt;/h2&gt;
 &lt;p&gt;Pinch rods are a traditional woodworking measuring tool that predate the tape measure as the reliable way to check whether a box, cabinet, or carcase is square. The concept is simple: two flat rods with pointed ends overlap and slide through a pair of guide blocks. You nestle the tips into opposite diagonal corners of an assembly, lock the rods in place, then check the other diagonal. If both diagonals match, the assembly is square.&lt;/p&gt;
 &lt;p&gt;The beauty of pinch rods over a tape measure is that you never read a number. The rods physically span the diagonal, and you use that same span directly on the other diagonal. Any discrepancy is immediately obvious as a gap or an overrun at one tip.&lt;/p&gt;
@@ -19,7 +135,7 @@
 &lt;h3&gt;Display Mode&lt;/h3&gt;
 &lt;p&gt;A &lt;code&gt;MODE&lt;/code&gt; variable at the top switches between a full assembly preview and single-part export for printing:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;MODE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;assembled&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="c1"&gt;// or &amp;quot;print&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;PRINT_PART&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;guide2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;fastener&amp;quot; | &amp;quot;guide1&amp;quot; | &amp;quot;guide2&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;PRINT_PART&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;guide2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;fastener&amp;quot; | &amp;quot;guide1&amp;quot; | &amp;quot;guide2&amp;quot; | &amp;quot;rod&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h2&gt;The Two Guides&lt;/h2&gt;
@@ -45,13 +161,14 @@
 &lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tips_detail-HQ.png"&gt;&lt;img alt="Tapered rod tips exiting guide 1" src="http://lizard-spock.co.uk/tips_detail-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;The taper is generated using &lt;code&gt;hull()&lt;/code&gt; between a knife-edge line at the tip and a full rectangular cross-section a little further along. At 45 degrees the horizontal run equals the vertical rise, so the taper length is exactly &lt;code&gt;STOCK_THICKNESS&lt;/code&gt; (9.5mm). The two rods have their tapers on opposite ends of the assembly so each tip engages a different corner of the workpiece.&lt;/p&gt;
 &lt;h2&gt;Printable Parts&lt;/h2&gt;
-&lt;p&gt;Three parts are printed separately. For 3mf export, set &lt;code&gt;MODE = "print"&lt;/code&gt; and select the part with &lt;code&gt;PRINT_PART&lt;/code&gt;. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled.&lt;/p&gt;
+&lt;p&gt;Four parts are printed separately. For 3mf export, set &lt;code&gt;MODE = "print"&lt;/code&gt; and select the part with &lt;code&gt;PRINT_PART&lt;/code&gt;. Note that Guide 1 is printed in its natural orientation (flat bottom on the bed) and then flipped over when assembled. Print two rods and flip one on assembly -- both are the same shape.&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
 &lt;th&gt;Guide 1&lt;/th&gt;
 &lt;th&gt;Guide 2&lt;/th&gt;
 &lt;th&gt;Thumbscrew&lt;/th&gt;
+&lt;th&gt;Rod (print x2)&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
@@ -59,6 +176,7 @@
 &lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_guide1-HQ.png"&gt;&lt;img alt="Guide 1 part" src="http://lizard-spock.co.uk/part_guide1-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
 &lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_guide2-HQ.png"&gt;&lt;img alt="Guide 2 part" src="http://lizard-spock.co.uk/part_guide2-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
 &lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_fastener-HQ.png"&gt;&lt;img alt="Fastener part" src="http://lizard-spock.co.uk/part_fastener-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="http://lizard-spock.co.uk/part_rod-HQ.png"&gt;&lt;img alt="Rod part" src="http://lizard-spock.co.uk/part_rod-900w.png"&gt;&lt;/a&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -66,7 +184,7 @@
 &lt;p&gt;The SCAD file requires two OpenSCAD libraries in your libraries folder:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://github.com/BelfrySCAD/BOSL2"&gt;BOSL2&lt;/a&gt; -- parametric screws, threads, and screw holes&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://github.com/TemptorSent/parametric-knob-maker"&gt;parametric-knob-maker&lt;/a&gt; -- the thumbscrew knob profile&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/morganp/parametric-knob-maker"&gt;parametric-knob-maker&lt;/a&gt; -- the thumbscrew knob profile (fork with generalised round knob module)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;The source is on GitHub at &lt;a href="https://github.com/morganp/OpenSCAD_PinchRods"&gt;morganp/OpenSCAD_PinchRods&lt;/a&gt;.&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="OpenSCAD"></category><category term="3D Printing"></category><category term="BOSL2"></category><category term="Woodworking"></category><category term="CAD"></category><category term="Parametric Design"></category></entry><entry><title>SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</title><link href="http://lizard-spock.co.uk/soc-article-06-interconnects-and-bus-protocols.html" rel="alternate"></link><published>2026-04-09T00:00:00+01:00</published><updated>2026-04-09T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-09:/soc-article-06-interconnects-and-bus-protocols.html</id><summary type="html">&lt;p&gt;How SoC blocks communicate: the AMBA bus family from simple APB peripherals through pipelined AHB to the high-performance AXI4 with its five independent channels, valid/ready handshake, and crossbar interconnects.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 6 of 11&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
@@ -4681,20 +4799,4 @@ Underside of rack.&lt;/p&gt;</content><category term="Home &amp; Garden"></categ
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Now  The path will contain &lt;code&gt;C:/ ... /libs/example_toolbox/function&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;As shown in the example this is useful for toolboxes etc which could be distributed with a top level script which adds the toolbox functions on to the path.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"Matlab: Array content check"</title><link href="http://lizard-spock.co.uk/matlab-array-content-check.html" rel="alternate"></link><published>2014-05-07T18:13:24+01:00</published><updated>2014-05-07T18:13:24+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-07:/matlab-array-content-check.html</id><summary type="html">&lt;p&gt;Checking if an Array contains a number:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;input = [1,2,3,4];
-check = 4;
-any(input==4)
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Check if a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Checking if an Array contains a number:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;input = [1,2,3,4];
-check = 4;
-any(input==4)
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Check if a number is contained in an array:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;input = 32;
-check = [32,64,128];
-any( check==input )
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry></feed>
+&lt;p&gt;As shown in the example this is useful for toolboxes etc which could be distributed with a top level script which adds the toolbox functions on to the path.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry></feed>
