@@ -11,7 +11,7 @@ A previous post on [Requirements Writing]({filename}/posts/2026-03-06_Requiremen
 
 ## The RFC 2119 Keywords
 
-RFC 2119 defines six levels of requirement, expressed through the following keywords and their synonyms:
+RFC 2119 defines five levels of requirement, expressed through the following keywords and their synonyms:
 
 | Keyword | Synonyms | Meaning |
 |---|---|---|
