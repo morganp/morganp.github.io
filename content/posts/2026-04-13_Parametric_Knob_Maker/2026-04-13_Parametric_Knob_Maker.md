@@ -116,6 +116,8 @@ union() {
 }
 ```
 
+![Thumbscrew assembly -- knob with M5 threaded shaft below]({attach}/images/OpenSCAD/ParametricKnob/knob_thumbscrew.png)
+
 ## The `hex_knob()` Module
 
 **File:** `parametric_hex_knob.scad`
@@ -137,7 +139,9 @@ hex_knob(
 );
 ```
 
-The `screwhead_facetoface` parameter corresponds to the face-to-face dimension `s` in DIN 933.
+The `screwhead_facetoface` parameter corresponds to the face-to-face dimension `s` in DIN 933. The knob is designed to capture the bolt head in the base recess with the shaft passing through -- the hex recess feature is still under development.
+
+![Hex knob underside with M8 hex bolt ready to insert]({attach}/images/OpenSCAD/ParametricKnob/hex_knob_with_bolt.png)
 
 | Default hex knob | Large hex knob |
 |---|---|
