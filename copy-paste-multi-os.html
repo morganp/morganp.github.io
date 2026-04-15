@@ -313,6 +313,15 @@
 </tbody>
 </table>
 <p>Both shortcut conventions work in both contexts. Switching between a macOS application and a remote RHEL session in Exceed requires no change in keyboard habit.</p>
+<h2>Managing Karabiner Configuration with Stow</h2>
+<p>Karabiner-Elements stores its configuration as JSON at <code>~/.config/karabiner/karabiner.json</code>. This makes it straightforward to track in a dotfiles repository and deploy with <a href="https://www.gnu.org/software/stow/">GNU Stow</a>.</p>
+<p>In the dotfiles repo, place the config at <code>config/karabiner/karabiner.json</code> to mirror the target path. Then create the directory and stow it:</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="nv">$HOME</span>/.config/karabiner
+stow<span class="w"> </span>karabiner<span class="w"> </span>-t<span class="w"> </span><span class="nv">$HOME</span>/.config/karabiner
+</code></pre></div>
+
+<p>This creates a symlink from <code>~/.config/karabiner/karabiner.json</code> into the dotfiles repo, so any edits made via the Karabiner-Elements UI are immediately reflected in the tracked file.</p>
+<p>The Karabiner config for this setup is included in <a href="https://github.com/morganp/dotfiles">morganp/dotfiles</a>.</p>
       </div><!-- /.entry-content -->
 
     </article>
