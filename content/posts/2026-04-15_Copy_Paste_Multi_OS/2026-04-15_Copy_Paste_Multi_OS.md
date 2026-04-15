@@ -19,16 +19,16 @@ Working across macOS locally and a remote RHEL system through [OpenText Exceed T
 
 The goal is to be able to use either convention and have it work correctly -- mapping macOS shortcuts into Linux ones when Exceed is active, and mapping Linux shortcuts into macOS ones everywhere else.
 
-## Terminal Emulator
+## eXceed Usage
 
-A terminal emulator running on macOS (such as [iTerm2](https://iterm2.com/) or the built-in Terminal) already supports the Linux convention natively:
+### Terminal Emulator
+
+A terminal emulator running inside Exceed already supports the Linux convention natively -- no configuration is required:
 
 - `Ctrl-Shift-C` -- copy to system clipboard
 - `Ctrl-Shift-V` -- paste from system clipboard
 
-No configuration is required here.
-
-## gVim: Adding Ctrl-Shift-C / Ctrl-Shift-V
+### gVim: Adding Ctrl-Shift-C / Ctrl-Shift-V
 
 Vim does not use the system clipboard by default. Add the following to `.vimrc` to map the Linux terminal shortcuts to yank and paste from the system clipboard (`+` register):
 
