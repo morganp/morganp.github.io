@@ -14,7 +14,8 @@ Working across macOS locally and a remote RHEL system through [OpenText Exceed T
 | Context | Copy | Paste |
 |---|---|---|
 | macOS native apps | `Cmd-C` | `Cmd-V` |
-| Linux terminal / gVim via Exceed | `Ctrl-Shift-C` | `Ctrl-Shift-V` |
+| Linux terminal via Exceed | `Ctrl-Shift-C` | `Ctrl-Shift-V` |
+| gVim via Exceed | `"+y` | `"+gP` |
 
 The goal is to be able to use either convention and have it work correctly -- mapping macOS shortcuts into Linux ones when Exceed is active, and mapping Linux shortcuts into macOS ones everywhere else.
 
