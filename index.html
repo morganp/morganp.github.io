@@ -26,7 +26,295 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="./parametric-knob-maker-openscad.html">Parametric Knob Maker for OpenSCAD</a></h1>
+                        <h1 class="entry-title"><a href="./copy-paste-multi-os.html">Copy and Paste in a Multi-OS System</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-15T00:00:00+01:00">
+                Published: Wed 15 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="./tag/macos.html">macOS</a> <a href="./tag/linux.html">Linux</a> <a href="./tag/rhel.html">RHEL</a> <a href="./tag/karabiner-elements.html">Karabiner-Elements</a> <a href="./tag/gvim.html">gVim</a> <a href="./tag/productivity.html">Productivity</a> <a href="./tag/keyboard.html">Keyboard</a> </p>        
+</footer><!-- /.post-info --><p>Working across macOS locally and a remote RHEL system through <a href="https://www.opentext.com/products/exceed-turbo-x">OpenText Exceed TurboX</a> creates a clipboard shortcut mismatch. Linux applications expect <code>Ctrl-Shift-C</code> / <code>Ctrl-Shift-V</code> for copy and paste; macOS expects <code>Cmd-C</code> / <code>Cmd-V</code>. Switching mental models every time the active window changes is error-prone and slow. This post covers a setup that makes both shortcut conventions work regardless of which application is in focus.</p>
+<h2>The Problem</h2>
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Copy</th>
+<th>Paste</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS native apps</td>
+<td><code>Cmd-C</code></td>
+<td><code>Cmd-V</code></td>
+</tr>
+<tr>
+<td>Linux terminal / gVim via Exceed</td>
+<td><code>Ctrl-Shift-C</code></td>
+<td><code>Ctrl-Shift-V</code></td>
+</tr>
+</tbody>
+</table>
+<p>The goal is to be able to use either convention and have it work correctly -- mapping macOS shortcuts into Linux ones when Exceed is active, and mapping Linux shortcuts into macOS ones everywhere else.</p>
+<h2>Terminal Emulator</h2>
+<p>A terminal emulator running on macOS (such as <a href="https://iterm2.com/">iTerm2</a> or the built-in Terminal) already supports the Linux convention natively:</p>
+<ul>
+<li><code>Ctrl-Shift-C</code> -- copy to system clipboard</li>
+<li><code>Ctrl-Shift-V</code> -- paste from system clipboard</li>
+</ul>
+<p>No configuration is required here.</p>
+<h2>gVim: Adding Ctrl-Shift-C / Ctrl-Shift-V</h2>
+<p>Vim does not use the system clipboard by default. Add the following to <code>.vimrc</code> to map the Linux terminal shortcuts to yank and paste from the system clipboard (<code>+</code> register):</p>
+<div class="highlight"><pre><span></span><code><span class="c">&quot; Map Ctrl-Shift-C / Ctrl-Shift-V to system clipboard copy / paste</span>
+<span class="p">:</span>map <span class="p">&lt;</span>C<span class="p">-</span>S<span class="p">-</span><span class="k">c</span><span class="p">&gt;</span> <span class="c">&quot;+y</span>
+<span class="p">:</span>map <span class="p">&lt;</span>C<span class="p">-</span>S<span class="p">-</span><span class="k">v</span><span class="p">&gt;</span> <span class="c">&quot;+gP</span>
+</code></pre></div>
+
+<h2>Karabiner-Elements: Unifying the Shortcuts on macOS</h2>
+<p><a href="https://karabiner-elements.pqrs.org/">Karabiner-Elements</a> is a keyboard remapper for macOS. Two sets of rules are needed -- one for all applications except Exceed, and one for Exceed specifically.</p>
+<h3>Rule Set 1: Ctrl-Shift shortcuts outside Exceed</h3>
+<p>For every application except Exceed, map the Linux-style shortcuts to their macOS equivalents. This means pressing <code>Ctrl-Shift-C</code> in any native macOS app triggers <code>Cmd-C</code>, so the Linux muscle memory works everywhere.</p>
+<p><a href="./karabiner-non-exceed-HQ.png"><img alt="Karabiner-Elements: Ctrl-Shift rules applied to all apps except Exceed" src="./karabiner-non-exceed-900w.png"></a></p>
+<p>The four rules (copy, paste, cut, undo):</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Ctrl+Shift+C to Copy (Cmd+C)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_unless&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Ctrl+Shift+V to Paste (Cmd+V)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_unless&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Ctrl+Shift+X to Cut (Cmd+X)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_unless&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Ctrl+Shift+Z to Undo (Cmd+Z)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_unless&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3>Rule Set 2: Cmd shortcuts inside Exceed</h3>
+<p>When Exceed is the active application, the reverse mapping applies: <code>Cmd-C/V/X/Z</code> are translated into <code>Ctrl-Shift-C/V/X/Z</code> so they reach gVim and other Linux applications with the shortcuts they expect.</p>
+<p><a href="./karabiner-exceed-HQ.png"><img alt="Karabiner-Elements: Cmd rules applied when Exceed is active" src="./karabiner-exceed-900w.png"></a></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Copy Cmd+C to Ctrl+Shift+C on Exceed&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_if&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Paste Cmd+V to Ctrl+Shift+V on Exceed&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_if&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Cut Cmd+X to Ctrl+Shift+X on Exceed&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_if&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Undo Cmd+Z to Ctrl+Shift+Z on Exceed&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_if&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>Result</h2>
+<p>With both rule sets in place:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Outside Exceed</th>
+<th>Inside Exceed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Copy</td>
+<td><code>Ctrl-Shift-C</code> or <code>Cmd-C</code></td>
+<td><code>Ctrl-Shift-C</code> or <code>Cmd-C</code></td>
+</tr>
+<tr>
+<td>Paste</td>
+<td><code>Ctrl-Shift-V</code> or <code>Cmd-V</code></td>
+<td><code>Ctrl-Shift-V</code> or <code>Cmd-V</code></td>
+</tr>
+<tr>
+<td>Cut</td>
+<td><code>Ctrl-Shift-X</code> or <code>Cmd-X</code></td>
+<td><code>Ctrl-Shift-X</code> or <code>Cmd-X</code></td>
+</tr>
+<tr>
+<td>Undo</td>
+<td><code>Ctrl-Shift-Z</code> or <code>Cmd-Z</code></td>
+<td><code>Ctrl-Shift-Z</code> or <code>Cmd-Z</code></td>
+</tr>
+</tbody>
+</table>
+<p>Both shortcut conventions work in both contexts. Switching between a macOS application and a remote RHEL session in Exceed requires no change in keyboard habit.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="./parametric-knob-maker-openscad.html" rel="bookmark"
+                               title="Permalink to Parametric Knob Maker for OpenSCAD">Parametric Knob Maker for OpenSCAD</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-04-13T00:00:00+01:00">
                 Published: Mon 13 April 2026
@@ -37,130 +325,10 @@
                 </address>
         <p>In <a href="./category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="./tag/openscad.html">OpenSCAD</a> <a href="./tag/3d-printing.html">3D Printing</a> <a href="./tag/bosl2.html">BOSL2</a> <a href="./tag/cad.html">CAD</a> <a href="./tag/parametric-design.html">Parametric Design</a> </p>        
-</footer><!-- /.post-info --><p>Parametric thumbscrew knobs come up often enough in 3D printing projects that it is worth having a reusable library for them. This post covers a fork of <a href="https://github.com/aminGhafoory/parametric-knob-maker">aminGhafoory/parametric-knob-maker</a> that adds a generalised round knob module. The fork is at <a href="https://github.com/morganp/parametric-knob-maker">morganp/parametric-knob-maker</a>.</p>
-<p>The library was used to generate the thumbscrew knob in the <a href="./openscad-pinch-rods.html">pinch rods</a> post.</p>
-<h2>Installation</h2>
-<p>Clone or download the repository into your OpenSCAD libraries folder:</p>
-<div class="highlight"><pre><span></span><code>~/.local/share/OpenSCAD/libraries/     (Linux)
-~/Documents/OpenSCAD/libraries/        (macOS)
-My Documents\OpenSCAD\libraries\       (Windows)
-</code></pre></div>
-
-<h2>The <code>knob()</code> Module</h2>
-<p><strong>File:</strong> <code>parametric_knob.scad</code></p>
-<p>The round knob has a narrower offset base for mounting clearance, chamfered top and bottom edges, and equally-spaced cylindrical grip cutouts around the perimeter. Z=0 is at the base, making it straightforward to position on top of a screw shaft.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
-
-<span class="n">knob</span><span class="p">(</span>
-<span class="w">    </span><span class="n">knob_height</span><span class="p">,</span><span class="w">       </span><span class="c1">// height of the main knob body         (default: 15)</span>
-<span class="w">    </span><span class="n">knob_diam</span><span class="p">,</span><span class="w">         </span><span class="c1">// diameter of the main knob body       (default: 30)</span>
-<span class="w">    </span><span class="n">offset_height</span><span class="p">,</span><span class="w">     </span><span class="c1">// height of the narrower base section  (default: 5)</span>
-<span class="w">    </span><span class="n">offset_diam</span><span class="p">,</span><span class="w">       </span><span class="c1">// diameter of the base section         (default: knob_diam/2)</span>
-<span class="w">    </span><span class="n">knob_chamfer</span><span class="p">,</span><span class="w">      </span><span class="c1">// top edge chamfer depth at 45 deg     (default: 2)</span>
-<span class="w">    </span><span class="n">base_chamfer</span><span class="p">,</span><span class="w">      </span><span class="c1">// base edge chamfer depth at 45 deg    (default: 1)</span>
-<span class="w">    </span><span class="n">num_grip_cutouts</span><span class="p">,</span><span class="w">  </span><span class="c1">// number of finger grip cutouts        (default: 15)</span>
-<span class="w">    </span><span class="n">grip_cutout_diam</span><span class="p">,</span><span class="w">  </span><span class="c1">// diameter of each grip cutout         (default: 4)</span>
-<span class="w">    </span><span class="n">cutout_radius_adj</span><span class="p">,</span><span class="w"> </span><span class="c1">// outward offset of cutout centres     (default: 1)</span>
-<span class="w">    </span><span class="n">knob_color</span><span class="w">         </span><span class="c1">// preview colour                       (default: &quot;red&quot;)</span>
-<span class="p">);</span>
-</code></pre></div>
-
-<h3>Default knob</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
-<span class="n">knob</span><span class="p">();</span>
-</code></pre></div>
-
-<p><img alt="Default knob -- 30mm diameter, 15mm tall, 15 grip cutouts" src="./knob_default.png"></p>
-<h3>Small thumbscrew knob</h3>
-<p>Compact knob for M3/M4 screws where finger space is limited.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
-<span class="n">knob</span><span class="p">(</span><span class="n">knob_height</span><span class="o">=</span><span class="m">8</span><span class="p">,</span><span class="w"> </span><span class="n">knob_diam</span><span class="o">=</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="n">offset_height</span><span class="o">=</span><span class="m">2</span><span class="p">);</span>
-</code></pre></div>
-
-<p><img alt="Small knob -- 20mm diameter, 8mm tall" src="./knob_small.png"></p>
-<h3>Large adjustment knob</h3>
-<p>Wider knob with more cutouts for applications needing higher torque or finer control.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
-<span class="n">knob</span><span class="p">(</span>
-<span class="w">    </span><span class="n">knob_height</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="p">,</span>
-<span class="w">    </span><span class="n">knob_diam</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="m">50</span><span class="p">,</span>
-<span class="w">    </span><span class="n">num_grip_cutouts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="p">,</span>
-<span class="w">    </span><span class="n">grip_cutout_diam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span><span class="p">,</span>
-<span class="w">    </span><span class="n">knob_color</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;SteelBlue&quot;</span>
-<span class="p">);</span>
-</code></pre></div>
-
-<p><img alt="Large knob -- 50mm diameter, 20mm tall, 20 grip cutouts" src="./knob_large.png"></p>
-<h3>Slim base</h3>
-<p>A narrow offset base minimises the footprint on the mounting surface -- useful when the knob sits close to a panel or bracket.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
-<span class="n">knob</span><span class="p">(</span>
-<span class="w">    </span><span class="n">knob_height</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="m">15</span><span class="p">,</span>
-<span class="w">    </span><span class="n">knob_diam</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="m">35</span><span class="p">,</span>
-<span class="w">    </span><span class="n">offset_height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span>
-<span class="w">    </span><span class="n">offset_diam</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
-<span class="w">    </span><span class="n">knob_color</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;DarkOrange&quot;</span>
-<span class="p">);</span>
-</code></pre></div>
-
-<p><img alt="Slim base knob -- 35mm diameter with narrow 10mm base" src="./knob_slim_base.png"></p>
-<h3>Combining with a BOSL2 screw</h3>
-<p>The <code>knob()</code> module pairs neatly with BOSL2's <code>screw()</code> to produce a complete thumbscrew assembly. Place the screw with <code>anchor=BOTTOM</code> so the thread points downward, then translate the knob up to sit on top of the shaft.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_knob.scad</span><span class="p">&gt;</span>
-<span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">BOSL2/std.scad</span><span class="p">&gt;</span>
-<span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">BOSL2/screws.scad</span><span class="p">&gt;</span>
-
-<span class="n">THREAD_LEN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">12</span><span class="p">;</span>
-
-<span class="nb">union</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">screw</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="s2">&quot;M5&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="n">THREAD_LEN</span><span class="o">+</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="o">=</span><span class="l">true</span><span class="p">,</span><span class="w"> </span><span class="n">anchor</span><span class="o">=</span><span class="n">BOTTOM</span><span class="p">);</span>
-<span class="w">    </span><span class="nb">translate</span><span class="p">([</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">THREAD_LEN</span><span class="p">])</span>
-<span class="w">        </span><span class="n">knob</span><span class="p">(</span><span class="n">knob_height</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">offset_height</span><span class="o">=</span><span class="m">1</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p><img alt="Thumbscrew assembly -- knob with M5 threaded shaft below" src="./knob_thumbscrew.png"></p>
-<h2>The <code>hex_knob()</code> Module</h2>
-<p><strong>File:</strong> <code>parametric_hex_knob.scad</code></p>
-<p>The hex knob is intended to capture a hex-head bolt in its base recess and provide a through-hole for the shaft, removing the need for any additional fastener. The hex screw recess is currently under development and commented out -- the module renders the knob body and grip cutouts only.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">include</span> <span class="p">&lt;</span><span class="cpf">parametric-knob-maker/parametric_hex_knob.scad</span><span class="p">&gt;</span>
-
-<span class="n">hex_knob</span><span class="p">(</span>
-<span class="w">    </span><span class="n">knob_height</span><span class="p">,</span><span class="w">          </span><span class="c1">// height of the knob body           (default: 15)</span>
-<span class="w">    </span><span class="n">knob_diam</span><span class="p">,</span><span class="w">            </span><span class="c1">// diameter of the knob              (default: 30)</span>
-<span class="w">    </span><span class="n">screwhead_facetoface</span><span class="p">,</span><span class="w"> </span><span class="c1">// hex head face-to-face size (mm)   (default: 8)</span>
-<span class="w">    </span><span class="n">screwhead_depth</span><span class="p">,</span><span class="w">      </span><span class="c1">// depth of hex recess               (default: 12)</span>
-<span class="w">    </span><span class="n">thru_hole_diam</span><span class="p">,</span><span class="w">       </span><span class="c1">// through-hole diameter             (default: 4)</span>
-<span class="w">    </span><span class="n">num_grip_cutouts</span><span class="p">,</span><span class="w">     </span><span class="c1">// number of finger grip cutouts     (default: 20)</span>
-<span class="w">    </span><span class="n">grip_cutout_diam</span><span class="p">,</span><span class="w">     </span><span class="c1">// diameter of each grip cutout      (default: 4)</span>
-<span class="w">    </span><span class="n">cutout_radius_adj</span><span class="w">     </span><span class="c1">// outward offset of cutout centres  (default: 1)</span>
-<span class="p">);</span>
-</code></pre></div>
-
-<p>The <code>screwhead_facetoface</code> parameter corresponds to the face-to-face dimension <code>s</code> in DIN 933. The knob is designed to capture the bolt head in the base recess with the shaft passing through -- the hex recess feature is still under development.</p>
-<p><img alt="Hex knob underside with M8 hex bolt ready to insert" src="./hex_knob_with_bolt.png"></p>
-<table>
-<thead>
-<tr>
-<th>Default hex knob</th>
-<th>Large hex knob</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><img alt="Default hex knob -- 30mm diameter, 15mm tall" src="./hex_knob_default.png"></td>
-<td><img alt="Large hex knob -- 45mm diameter, 20mm tall" src="./hex_knob_large.png"></td>
-</tr>
-</tbody>
-</table>
-<h2>Implementation Notes</h2>
-<p>The <code>knob()</code> geometry is built from 2D profiles rotated with <code>rotate_extrude()</code>. Chamfers are cut using <code>difference()</code> against polygon shapes. Grip cutouts are placed by a helper module <code>rotate_on_circle()</code> that distributes cylinders at equal angular intervals around the perimeter using <code>sin()</code>/<code>cos()</code> positioning.</p>
-<p>The source is on GitHub at <a href="https://github.com/morganp/parametric-knob-maker">morganp/parametric-knob-maker</a>.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>A fork of aminGhafoory's parametric-knob-maker that adds a generalised round knob module with configurable offset base, chamfers, and grip cutouts. Covers the knob() and hex_knob() modules, the key parameters, and how to combine the result with a BOSL2 screw for a complete thumbscrew assembly.</p>
+                        <a class="readmore" href="./parametric-knob-maker-openscad.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -335,28 +503,6 @@ My Documents\OpenSCAD\libraries\       (Windows)
 <p>tags: <a href="./tag/dotfiles.html">dotfiles</a> <a href="./tag/shell.html">shell</a> <a href="./tag/stow.html">stow</a> <a href="./tag/zsh.html">zsh</a> <a href="./tag/tmux.html">tmux</a> <a href="./tag/vim.html">vim</a> </p>        
 </footer><!-- /.post-info -->                        <p>How to centralise and manage Unix dotfiles in a Git repository, using source directives and GNU Stow to link them into place.</p>
                         <a class="readmore" href="./dotfiles-setup-stow-git.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="./emotional-intelligence-in-the-workplace.html" rel="bookmark"
-                               title="Permalink to Emotional Intelligence in the Workplace">Emotional Intelligence in the Workplace</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2026-03-07T00:00:00+00:00">
-                Published: Sat 07 March 2026
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="./tag/leadership.html">Leadership</a> <a href="./tag/management.html">Management</a> <a href="./tag/soft-skills.html">Soft Skills</a> <a href="./tag/teams.html">Teams</a> </p>        
-</footer><!-- /.post-info -->                        <p>A summary of high and low emotional intelligence (EQ) traits in leaders and employees, and how EQ shapes team dynamics and decision making.</p>
-                        <a class="readmore" href="./emotional-intelligence-in-the-workplace.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
                     </ol><!-- /#posts-list -->
