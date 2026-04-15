@@ -260,3 +260,18 @@ With both rule sets in place:
 | Undo | `Ctrl-Shift-Z` or `Cmd-Z` | `Ctrl-Shift-Z` or `Cmd-Z` |
 
 Both shortcut conventions work in both contexts. Switching between a macOS application and a remote RHEL session in Exceed requires no change in keyboard habit.
+
+## Managing Karabiner Configuration with Stow
+
+Karabiner-Elements stores its configuration as JSON at `~/.config/karabiner/karabiner.json`. This makes it straightforward to track in a dotfiles repository and deploy with [GNU Stow](https://www.gnu.org/software/stow/).
+
+In the dotfiles repo, place the config at `config/karabiner/karabiner.json` to mirror the target path. Then create the directory and stow it:
+
+```bash
+mkdir -p $HOME/.config/karabiner
+stow karabiner -t $HOME/.config/karabiner
+```
+
+This creates a symlink from `~/.config/karabiner/karabiner.json` into the dotfiles repo, so any edits made via the Karabiner-Elements UI are immediately reflected in the tracked file.
+
+The Karabiner config for this setup is included in [morganp/dotfiles](https://github.com/morganp/dotfiles).
