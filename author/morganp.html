@@ -26,7 +26,197 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../copy-paste-multi-os.html">Copy and Paste in a Multi-OS System</a></h1>
+                        <h1 class="entry-title"><a href="../proxmox-disable-root-login-sudo-user.html">Proxmox: Disable root@pam Login and Create a Sudo User</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-17T00:00:00+01:00">
+                Published: Fri 17 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/security.html">Security</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/homelab.html">Homelab</a> <a href="../tag/virtualisation.html">Virtualisation</a> </p>        
+</footer><!-- /.post-info --><p>Out of the box, Proxmox VE only has the <code>root@pam</code> account. Logging in directly as root is convenient during initial setup, but it is a bad habit to keep. This post walks through creating a named PAM user, granting it sudo access, and then disabling root login via both SSH and the web UI.</p>
+<h2>Why Bother</h2>
+<ul>
+<li>Audit logs become meaningful. <code>root</code> in auth logs could be anyone; <code>dave</code> is traceable.</li>
+<li>SSH brute-force tools target <code>root</code> first. Disabling it removes the most-attacked entry point.</li>
+<li>Sudo with <code>NOPASSWD</code> for specific commands is still safer than a permanent root shell.</li>
+</ul>
+<h2>1. Create the System User</h2>
+<p>Log in as root on the Proxmox host (via console or SSH) and add the new UNIX account:</p>
+<div class="highlight"><pre><span></span><code>useradd<span class="w"> </span>-m<span class="w"> </span>-s<span class="w"> </span>/bin/bash<span class="w"> </span>dave
+passwd<span class="w"> </span>dave
+</code></pre></div>
+
+<p><code>-m</code> creates a home directory. Set a strong password when prompted.</p>
+<h2>2. Install sudo</h2>
+<p>Proxmox minimal installs may not include sudo:</p>
+<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>sudo
+</code></pre></div>
+
+<h2>3. Grant sudo Access</h2>
+<p>Add <code>dave</code> to the <code>sudo</code> group, which is already configured in <code>/etc/sudoers</code> to allow full sudo:</p>
+<div class="highlight"><pre><span></span><code>usermod<span class="w"> </span>-aG<span class="w"> </span>sudo<span class="w"> </span>dave
+</code></pre></div>
+
+<p>To verify the group membership took effect:</p>
+<div class="highlight"><pre><span></span><code>id<span class="w"> </span>dave
+</code></pre></div>
+
+<p>You should see <code>sudo</code> in the groups list.</p>
+<h2>4. Register the User in Proxmox</h2>
+<p>Proxmox has its own user database separate from the Linux PAM database. The <code>@pam</code> realm bridges them, but you still need to add the user in the Proxmox layer.</p>
+<p><strong>Via the web UI:</strong> Datacenter &gt; Permissions &gt; Users &gt; Add</p>
+<ul>
+<li>User: <code>dave</code></li>
+<li>Realm: <code>pam</code></li>
+<li>Enable: checked</li>
+</ul>
+<p><strong>Via the CLI:</strong></p>
+<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>user<span class="w"> </span>add<span class="w"> </span>dave@pam
+</code></pre></div>
+
+<h2>5. Assign a Proxmox Role</h2>
+<p>The user needs at least one permission to do anything useful. For a full admin, assign the built-in <code>Administrator</code> role at the root path <code>/</code>:</p>
+<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>acl<span class="w"> </span>modify<span class="w"> </span>/<span class="w"> </span>-user<span class="w"> </span>dave@pam<span class="w"> </span>-role<span class="w"> </span>Administrator
+</code></pre></div>
+
+<p>For a more restricted setup, use <code>PVEAdmin</code> (everything except node-level config) or define a custom role.</p>
+<h2>6. Test the New Account</h2>
+<p>Before locking out root, confirm the new account works end to end:</p>
+<ol>
+<li>Open a new terminal (do not close the existing root session).</li>
+<li>
+<p>SSH in as <code>dave</code>:</p>
+<p><code>bash
+ssh dave@&lt;proxmox-ip&gt;</code></p>
+</li>
+<li>
+<p>Confirm sudo works:</p>
+<p><code>bash
+sudo -i</code></p>
+</li>
+<li>
+<p>Log in to the Proxmox web UI at <code>https://&lt;proxmox-ip&gt;:8006</code> as <code>dave@pam</code>.</p>
+</li>
+</ol>
+<p>Do not proceed to the next step until all three work.</p>
+<h2>7. Disable root SSH Login</h2>
+<p>Edit <code>/etc/ssh/sshd_config</code>:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/ssh/sshd_config
+</code></pre></div>
+
+<p>Find or add the following line:</p>
+<div class="highlight"><pre><span></span><code>PermitRootLogin no
+</code></pre></div>
+
+<p>Reload SSH without dropping existing connections:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>sshd
+</code></pre></div>
+
+<p>Verify by attempting <code>ssh root@&lt;proxmox-ip&gt;</code> -- it should now be refused.</p>
+<h2>8. Disable root@pam in the Proxmox Web UI</h2>
+<p>Even with SSH root login disabled, <code>root@pam</code> can still authenticate through the Proxmox web UI. To disable it:</p>
+<p><strong>Via the web UI:</strong> Datacenter &gt; Permissions &gt; Users &gt; select <code>root</code> &gt; Edit &gt; uncheck Enable</p>
+<p><strong>Via the CLI:</strong></p>
+<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>user<span class="w"> </span>modify<span class="w"> </span>root@pam<span class="w"> </span>--enable<span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+
+<p>This does not delete root or change anything at the Linux level. It only prevents login through the Proxmox authentication stack.</p>
+<blockquote>
+<p><strong>Note:</strong> The Linux <code>root</code> account remains intact. You can always recover it from the physical console or by re-enabling <code>root@pam</code> through the CLI as your admin user with sudo.</p>
+</blockquote>
+<h2>Verification Checklist</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Command</th>
+<th>Expected Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dave SSH login</td>
+<td><code>ssh dave@&lt;ip&gt;</code></td>
+<td>Login prompt</td>
+</tr>
+<tr>
+<td>dave sudo</td>
+<td><code>sudo -i</code></td>
+<td>Root shell</td>
+</tr>
+<tr>
+<td>dave web UI</td>
+<td>Browser <code>https://&lt;ip&gt;:8006</code></td>
+<td>Logged in as dave@pam</td>
+</tr>
+<tr>
+<td>root SSH blocked</td>
+<td><code>ssh root@&lt;ip&gt;</code></td>
+<td>Permission denied</td>
+</tr>
+<tr>
+<td>root web UI blocked</td>
+<td>Browser login as root@pam</td>
+<td>Login rejected</td>
+</tr>
+</tbody>
+</table>
+<h2>Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>useradd</code></td>
+<td>Creates the Linux PAM account</td>
+</tr>
+<tr>
+<td><code>apt install sudo</code></td>
+<td>Ensures sudo is present</td>
+</tr>
+<tr>
+<td><code>usermod -aG sudo</code></td>
+<td>Grants full sudo via the sudo group</td>
+</tr>
+<tr>
+<td><code>pveum user add</code></td>
+<td>Registers the account in Proxmox</td>
+</tr>
+<tr>
+<td><code>pveum acl modify</code></td>
+<td>Assigns a Proxmox role</td>
+</tr>
+<tr>
+<td><code>PermitRootLogin no</code></td>
+<td>Blocks root SSH</td>
+</tr>
+<tr>
+<td><code>pveum user modify root@pam --enable 0</code></td>
+<td>Blocks root Proxmox web UI login</td>
+</tr>
+</tbody>
+</table>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../copy-paste-multi-os.html" rel="bookmark"
+                               title="Permalink to Copy and Paste in a Multi-OS System">Copy and Paste in a Multi-OS System</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-04-15T00:00:00+01:00">
                 Published: Wed 15 April 2026
@@ -37,290 +227,10 @@
                 </address>
         <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
 <p>tags: <a href="../tag/macos.html">macOS</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/rhel.html">RHEL</a> <a href="../tag/karabiner-elements.html">Karabiner-Elements</a> <a href="../tag/gvim.html">gVim</a> <a href="../tag/productivity.html">Productivity</a> <a href="../tag/keyboard.html">Keyboard</a> </p>        
-</footer><!-- /.post-info --><p>Working across macOS locally and a remote RHEL system through <a href="https://www.opentext.com/products/exceed-turbo-x">OpenText Exceed TurboX</a> creates a clipboard shortcut mismatch. Linux applications expect <code>Ctrl-Shift-C</code> / <code>Ctrl-Shift-V</code> for copy and paste; macOS expects <code>Cmd-C</code> / <code>Cmd-V</code>. Switching mental models every time the active window changes is error-prone and slow. This post covers a setup that makes both shortcut conventions work regardless of which application is in focus.</p>
-<h2>The Problem</h2>
-<table>
-<thead>
-<tr>
-<th>Context</th>
-<th>Copy</th>
-<th>Paste</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>macOS native apps</td>
-<td><code>Cmd-C</code></td>
-<td><code>Cmd-V</code></td>
-</tr>
-<tr>
-<td>Linux terminal via Exceed</td>
-<td><code>Ctrl-Shift-C</code></td>
-<td><code>Ctrl-Shift-V</code></td>
-</tr>
-<tr>
-<td>gVim via Exceed</td>
-<td><code>"+y</code></td>
-<td><code>"+gP</code></td>
-</tr>
-</tbody>
-</table>
-<p>The goal is to be able to use either convention and have it work correctly -- mapping macOS shortcuts into Linux ones when Exceed is active, and mapping Linux shortcuts into macOS ones everywhere else.</p>
-<h2>eXceed Usage</h2>
-<h3>Terminal Emulator</h3>
-<p>A terminal emulator running inside Exceed already supports the Linux convention natively -- no configuration is required:</p>
-<ul>
-<li><code>Ctrl-Shift-C</code> -- copy to system clipboard</li>
-<li><code>Ctrl-Shift-V</code> -- paste from system clipboard</li>
-</ul>
-<h3>gVim: Adding Ctrl-Shift-C / Ctrl-Shift-V</h3>
-<p>Vim does not use the system clipboard by default. Add the following to <code>.vimrc</code> to map the Linux terminal shortcuts to yank and paste from the system clipboard (<code>+</code> register):</p>
-<div class="highlight"><pre><span></span><code><span class="c">&quot; Map Ctrl-Shift-C / Ctrl-Shift-V to system clipboard copy / paste</span>
-<span class="p">:</span>map <span class="p">&lt;</span>C<span class="p">-</span>S<span class="p">-</span><span class="k">c</span><span class="p">&gt;</span> <span class="c">&quot;+y</span>
-<span class="p">:</span>map <span class="p">&lt;</span>C<span class="p">-</span>S<span class="p">-</span><span class="k">v</span><span class="p">&gt;</span> <span class="c">&quot;+gP</span>
-</code></pre></div>
-
-<h2>Karabiner-Elements: Unifying the Shortcuts on macOS</h2>
-<p><a href="https://karabiner-elements.pqrs.org/">Karabiner-Elements</a> is a keyboard remapper for macOS. Two sets of rules are needed -- one for all applications except Exceed, and one for Exceed specifically.</p>
-<h3>Rule Set 1: Ctrl-Shift shortcuts outside Exceed</h3>
-<p>For every application except Exceed, map the Linux-style shortcuts to their macOS equivalents. This means pressing <code>Ctrl-Shift-C</code> in any native macOS app triggers <code>Cmd-C</code>, so the Linux muscle memory works everywhere.</p>
-<p><a href="../karabiner-non-exceed-HQ.png"><img alt="Karabiner-Elements: Ctrl-Shift rules applied to all apps except Exceed" src="../karabiner-non-exceed-900w.png"></a></p>
-<p>The four rules (copy, paste, cut, undo):</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Ctrl+Shift+C to Copy (Cmd+C)&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
-<span class="w">                    </span><span class="p">],</span>
-<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_unless&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Ctrl+Shift+V to Paste (Cmd+V)&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
-<span class="w">                    </span><span class="p">],</span>
-<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_unless&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Ctrl+Shift+X to Cut (Cmd+X)&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
-<span class="w">                    </span><span class="p">],</span>
-<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_unless&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Ctrl+Shift+Z to Undo (Cmd+Z)&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
-<span class="w">                    </span><span class="p">],</span>
-<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_unless&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<h3>Rule Set 2: Cmd shortcuts inside Exceed</h3>
-<p>When Exceed is the active application, the reverse mapping applies: <code>Cmd-C/V/X/Z</code> are translated into <code>Ctrl-Shift-C/V/X/Z</code> so they reach gVim and other Linux applications with the shortcuts they expect.</p>
-<p><a href="../karabiner-exceed-HQ.png"><img alt="Karabiner-Elements: Cmd rules applied when Exceed is active" src="../karabiner-exceed-900w.png"></a></p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Copy Cmd+C to Ctrl+Shift+C on Exceed&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
-<span class="w">                    </span><span class="p">],</span>
-<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_if&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Paste Cmd+V to Ctrl+Shift+V on Exceed&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
-<span class="w">                    </span><span class="p">],</span>
-<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_if&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Cut Cmd+X to Ctrl+Shift+X on Exceed&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
-<span class="w">                    </span><span class="p">],</span>
-<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_if&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Map Undo Cmd+Z to Ctrl+Shift+Z on Exceed&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;manipulators&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;conditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;bundle_identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                        </span><span class="s2">&quot;^com\\.OpenText\\.Exceed-TurboX-Client$&quot;</span>
-<span class="w">                    </span><span class="p">],</span>
-<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;frontmost_application_if&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;mandatory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;left_command&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;key_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;modifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;shift&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;basic&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<h2>Result</h2>
-<p>With both rule sets in place:</p>
-<table>
-<thead>
-<tr>
-<th>Action</th>
-<th>Outside Exceed</th>
-<th>Inside Exceed</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Copy</td>
-<td><code>Ctrl-Shift-C</code> or <code>Cmd-C</code></td>
-<td><code>Ctrl-Shift-C</code> or <code>Cmd-C</code></td>
-</tr>
-<tr>
-<td>Paste</td>
-<td><code>Ctrl-Shift-V</code> or <code>Cmd-V</code></td>
-<td><code>Ctrl-Shift-V</code> or <code>Cmd-V</code></td>
-</tr>
-<tr>
-<td>Cut</td>
-<td><code>Ctrl-Shift-X</code> or <code>Cmd-X</code></td>
-<td><code>Ctrl-Shift-X</code> or <code>Cmd-X</code></td>
-</tr>
-<tr>
-<td>Undo</td>
-<td><code>Ctrl-Shift-Z</code> or <code>Cmd-Z</code></td>
-<td><code>Ctrl-Shift-Z</code> or <code>Cmd-Z</code></td>
-</tr>
-</tbody>
-</table>
-<p>Both shortcut conventions work in both contexts. Switching between a macOS application and a remote RHEL session in Exceed requires no change in keyboard habit.</p>
-<h2>Managing Karabiner Configuration with Stow</h2>
-<p>Karabiner-Elements stores its configuration as JSON at <code>~/.config/karabiner/karabiner.json</code>. This makes it straightforward to track in a dotfiles repository and deploy with <a href="https://www.gnu.org/software/stow/">GNU Stow</a>.</p>
-<p>In the dotfiles repo, place the config at <code>config/karabiner/karabiner.json</code> to mirror the target path. Then create the directory and stow it:</p>
-<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="nv">$HOME</span>/.config/karabiner
-stow<span class="w"> </span>karabiner<span class="w"> </span>-t<span class="w"> </span><span class="nv">$HOME</span>/.config/karabiner
-</code></pre></div>
-
-<p>This creates a symlink from <code>~/.config/karabiner/karabiner.json</code> into the dotfiles repo, so any edits made via the Karabiner-Elements UI are immediately reflected in the tracked file.</p>
-<p>The Karabiner config for this setup is included in <a href="https://github.com/morganp/dotfiles">morganp/dotfiles</a>.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>Unifying copy and paste shortcuts when working across macOS locally and RHEL remotely via OpenText Exceed. Covers terminal emulator behaviour, gVim clipboard mapping, and Karabiner-Elements rules to make Ctrl-Shift-C/V and Cmd-C/V work consistently in both directions.</p>
+                        <a class="readmore" href="../copy-paste-multi-os.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>

@@ -26,7 +26,197 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../remarkable-local-file-transfer-without-the-cloud.html">reMarkable: Local File Transfer Without the Cloud</a></h1>
+                        <h1 class="entry-title"><a href="../proxmox-disable-root-login-sudo-user.html">Proxmox: Disable root@pam Login and Create a Sudo User</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-17T00:00:00+01:00">
+                Published: Fri 17 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/security.html">Security</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/homelab.html">Homelab</a> <a href="../tag/virtualisation.html">Virtualisation</a> </p>        
+</footer><!-- /.post-info --><p>Out of the box, Proxmox VE only has the <code>root@pam</code> account. Logging in directly as root is convenient during initial setup, but it is a bad habit to keep. This post walks through creating a named PAM user, granting it sudo access, and then disabling root login via both SSH and the web UI.</p>
+<h2>Why Bother</h2>
+<ul>
+<li>Audit logs become meaningful. <code>root</code> in auth logs could be anyone; <code>dave</code> is traceable.</li>
+<li>SSH brute-force tools target <code>root</code> first. Disabling it removes the most-attacked entry point.</li>
+<li>Sudo with <code>NOPASSWD</code> for specific commands is still safer than a permanent root shell.</li>
+</ul>
+<h2>1. Create the System User</h2>
+<p>Log in as root on the Proxmox host (via console or SSH) and add the new UNIX account:</p>
+<div class="highlight"><pre><span></span><code>useradd<span class="w"> </span>-m<span class="w"> </span>-s<span class="w"> </span>/bin/bash<span class="w"> </span>dave
+passwd<span class="w"> </span>dave
+</code></pre></div>
+
+<p><code>-m</code> creates a home directory. Set a strong password when prompted.</p>
+<h2>2. Install sudo</h2>
+<p>Proxmox minimal installs may not include sudo:</p>
+<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>sudo
+</code></pre></div>
+
+<h2>3. Grant sudo Access</h2>
+<p>Add <code>dave</code> to the <code>sudo</code> group, which is already configured in <code>/etc/sudoers</code> to allow full sudo:</p>
+<div class="highlight"><pre><span></span><code>usermod<span class="w"> </span>-aG<span class="w"> </span>sudo<span class="w"> </span>dave
+</code></pre></div>
+
+<p>To verify the group membership took effect:</p>
+<div class="highlight"><pre><span></span><code>id<span class="w"> </span>dave
+</code></pre></div>
+
+<p>You should see <code>sudo</code> in the groups list.</p>
+<h2>4. Register the User in Proxmox</h2>
+<p>Proxmox has its own user database separate from the Linux PAM database. The <code>@pam</code> realm bridges them, but you still need to add the user in the Proxmox layer.</p>
+<p><strong>Via the web UI:</strong> Datacenter &gt; Permissions &gt; Users &gt; Add</p>
+<ul>
+<li>User: <code>dave</code></li>
+<li>Realm: <code>pam</code></li>
+<li>Enable: checked</li>
+</ul>
+<p><strong>Via the CLI:</strong></p>
+<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>user<span class="w"> </span>add<span class="w"> </span>dave@pam
+</code></pre></div>
+
+<h2>5. Assign a Proxmox Role</h2>
+<p>The user needs at least one permission to do anything useful. For a full admin, assign the built-in <code>Administrator</code> role at the root path <code>/</code>:</p>
+<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>acl<span class="w"> </span>modify<span class="w"> </span>/<span class="w"> </span>-user<span class="w"> </span>dave@pam<span class="w"> </span>-role<span class="w"> </span>Administrator
+</code></pre></div>
+
+<p>For a more restricted setup, use <code>PVEAdmin</code> (everything except node-level config) or define a custom role.</p>
+<h2>6. Test the New Account</h2>
+<p>Before locking out root, confirm the new account works end to end:</p>
+<ol>
+<li>Open a new terminal (do not close the existing root session).</li>
+<li>
+<p>SSH in as <code>dave</code>:</p>
+<p><code>bash
+ssh dave@&lt;proxmox-ip&gt;</code></p>
+</li>
+<li>
+<p>Confirm sudo works:</p>
+<p><code>bash
+sudo -i</code></p>
+</li>
+<li>
+<p>Log in to the Proxmox web UI at <code>https://&lt;proxmox-ip&gt;:8006</code> as <code>dave@pam</code>.</p>
+</li>
+</ol>
+<p>Do not proceed to the next step until all three work.</p>
+<h2>7. Disable root SSH Login</h2>
+<p>Edit <code>/etc/ssh/sshd_config</code>:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/ssh/sshd_config
+</code></pre></div>
+
+<p>Find or add the following line:</p>
+<div class="highlight"><pre><span></span><code>PermitRootLogin no
+</code></pre></div>
+
+<p>Reload SSH without dropping existing connections:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>sshd
+</code></pre></div>
+
+<p>Verify by attempting <code>ssh root@&lt;proxmox-ip&gt;</code> -- it should now be refused.</p>
+<h2>8. Disable root@pam in the Proxmox Web UI</h2>
+<p>Even with SSH root login disabled, <code>root@pam</code> can still authenticate through the Proxmox web UI. To disable it:</p>
+<p><strong>Via the web UI:</strong> Datacenter &gt; Permissions &gt; Users &gt; select <code>root</code> &gt; Edit &gt; uncheck Enable</p>
+<p><strong>Via the CLI:</strong></p>
+<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>user<span class="w"> </span>modify<span class="w"> </span>root@pam<span class="w"> </span>--enable<span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+
+<p>This does not delete root or change anything at the Linux level. It only prevents login through the Proxmox authentication stack.</p>
+<blockquote>
+<p><strong>Note:</strong> The Linux <code>root</code> account remains intact. You can always recover it from the physical console or by re-enabling <code>root@pam</code> through the CLI as your admin user with sudo.</p>
+</blockquote>
+<h2>Verification Checklist</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Command</th>
+<th>Expected Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dave SSH login</td>
+<td><code>ssh dave@&lt;ip&gt;</code></td>
+<td>Login prompt</td>
+</tr>
+<tr>
+<td>dave sudo</td>
+<td><code>sudo -i</code></td>
+<td>Root shell</td>
+</tr>
+<tr>
+<td>dave web UI</td>
+<td>Browser <code>https://&lt;ip&gt;:8006</code></td>
+<td>Logged in as dave@pam</td>
+</tr>
+<tr>
+<td>root SSH blocked</td>
+<td><code>ssh root@&lt;ip&gt;</code></td>
+<td>Permission denied</td>
+</tr>
+<tr>
+<td>root web UI blocked</td>
+<td>Browser login as root@pam</td>
+<td>Login rejected</td>
+</tr>
+</tbody>
+</table>
+<h2>Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>useradd</code></td>
+<td>Creates the Linux PAM account</td>
+</tr>
+<tr>
+<td><code>apt install sudo</code></td>
+<td>Ensures sudo is present</td>
+</tr>
+<tr>
+<td><code>usermod -aG sudo</code></td>
+<td>Grants full sudo via the sudo group</td>
+</tr>
+<tr>
+<td><code>pveum user add</code></td>
+<td>Registers the account in Proxmox</td>
+</tr>
+<tr>
+<td><code>pveum acl modify</code></td>
+<td>Assigns a Proxmox role</td>
+</tr>
+<tr>
+<td><code>PermitRootLogin no</code></td>
+<td>Blocks root SSH</td>
+</tr>
+<tr>
+<td><code>pveum user modify root@pam --enable 0</code></td>
+<td>Blocks root Proxmox web UI login</td>
+</tr>
+</tbody>
+</table>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../remarkable-local-file-transfer-without-the-cloud.html" rel="bookmark"
+                               title="Permalink to reMarkable: Local File Transfer Without the Cloud">reMarkable: Local File Transfer Without the Cloud</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-03-07T00:00:00+00:00">
                 Published: Sat 07 March 2026
@@ -37,109 +227,10 @@
                 </address>
         <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
 <p>tags: <a href="../tag/remarkable.html">reMarkable</a> <a href="../tag/eink.html">eink</a> <a href="../tag/privacy.html">privacy</a> </p>        
-</footer><!-- /.post-info --><p>The reMarkable tablet is excellent for reading and annotating PDFs, but by default it routes
-everything through reMarkable's cloud. If you prefer to keep files local -- for privacy, or
-simply because you do not want a subscription -- you can unpair the device and use the
-built-in USB file server instead.</p>
-<hr>
-<h2>Table of Contents</h2>
-<ol>
-<li><a href="#1-unpairing-from-the-cloud">Unpairing from the Cloud</a></li>
-<li><a href="#2-enabling-the-usb-web-interface">Enabling the USB Web Interface</a></li>
-<li><a href="#3-transferring-files">Transferring Files via http://10.11.99.1/</a></li>
-<li><a href="#4-tips-and-limitations">Tips and Limitations</a></li>
-</ol>
-<hr>
-<h2>1. Unpairing from the Cloud</h2>
-<p>Unpairing stops the device from syncing to reMarkable's servers. Your existing documents
-remain on the device; they are simply no longer backed up or accessible from the reMarkable
-apps on other devices.</p>
-<p><strong>On the tablet:</strong></p>
-<ol>
-<li>Open <strong>Settings</strong> (gear icon, bottom-left of the home screen)</li>
-<li>Go to <strong>Storage</strong></li>
-<li>Tap <strong>Unpair device</strong></li>
-<li>Confirm when prompted</li>
-</ol>
-<p>Once unpaired, the tablet no longer requires a reMarkable account or internet connection for
-normal use. The cloud sync icon will disappear from the top bar.</p>
-<blockquote>
-<p><strong>Note:</strong> Unpairing is reversible. You can re-pair the device at any time from the same
-Settings screen by signing back in to your reMarkable account.</p>
-</blockquote>
-<hr>
-<h2>2. Enabling the USB Web Interface</h2>
-<p>The reMarkable has a built-in HTTP file server that becomes accessible over USB. When enabled,
-the tablet presents itself as a USB network adapter and serves files at <code>http://10.11.99.1/</code>.</p>
-<p><strong>On the tablet:</strong></p>
-<ol>
-<li>Open <strong>Settings</strong></li>
-<li>Go to <strong>Storage</strong></li>
-<li>Enable <strong>USB transfer</strong> (the toggle may be labelled "USB web interface" depending on
-   firmware version)</li>
-</ol>
-<p><strong>Connect the tablet to your computer</strong> using the supplied USB-C cable. The tablet will
-appear as a network device (USB Ethernet adapter) rather than a mass storage drive.</p>
-<p>On Linux the interface typically appears as <code>usb0</code> or <code>enp0s20u1</code> and receives an address in
-the <code>10.11.99.0/24</code> subnet automatically via DHCP from the tablet.</p>
-<p>Verify connectivity:</p>
-<div class="highlight"><pre><span></span><code>ping<span class="w"> </span><span class="m">10</span>.11.99.1
-</code></pre></div>
-
-<hr>
-<h2>3. Transferring Files</h2>
-<p>Open a browser and navigate to:</p>
-<div class="highlight"><pre><span></span><code>http://10.11.99.1/
-</code></pre></div>
-
-<p>The web interface shows all documents and notebooks currently on the device, organised in
-folders matching the tablet's home screen layout.</p>
-<h3>Uploading PDFs</h3>
-<ol>
-<li>Click <strong>Import</strong> (or the upload button, top-right)</li>
-<li>Select one or more PDF files from your computer</li>
-<li>The files appear on the tablet home screen immediately -- no restart required</li>
-</ol>
-<p>Supported formats: <strong>PDF</strong> and <strong>EPUB</strong>.</p>
-<h3>Downloading annotated files</h3>
-<ol>
-<li>Click on any document in the web interface</li>
-<li>Select <strong>Download</strong> to save the annotated PDF to your computer</li>
-</ol>
-<p>The downloaded file includes all pencil annotations, highlights, and notes made on the tablet.</p>
-<h3>Command-line upload with curl</h3>
-<p>For scripting or batch uploads:</p>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://10.11.99.1/documents/<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;file=@/path/to/document.pdf&quot;</span>
-</code></pre></div>
-
-<p>To upload into a specific folder, first find the folder UUID from the web interface URL, then:</p>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://10.11.99.1/documents/{folder-uuid}&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;file=@/path/to/document.pdf&quot;</span>
-</code></pre></div>
-
-<hr>
-<h2>4. Tips and Limitations</h2>
-<ul>
-<li><strong>No Wi-Fi required.</strong> The USB file server works entirely over the USB cable with no network
-  connection needed.</li>
-<li><strong>Cable must stay connected.</strong> The web interface is only available while the tablet is
-  plugged in. Unplugging immediately drops the <code>10.11.99.1</code> address.</li>
-<li><strong>One client at a time.</strong> The built-in server is minimal; avoid opening multiple browser
-  tabs uploading simultaneously.</li>
-<li><strong>Folder structure is flat internally.</strong> The reMarkable stores documents with UUIDs
-  internally; the folder hierarchy you see in the web interface is a virtual view maintained
-  by the device.</li>
-<li><strong>Firmware updates still work offline.</strong> Updates are downloaded over Wi-Fi separately from
-  the cloud sync; unpairing does not block firmware updates if Wi-Fi is available.</li>
-<li><strong>Annotations on existing PDFs</strong> are exported as a new annotated PDF -- the original on-
-  device file is not modified.</li>
-</ul>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>How to use the reMarkable tablet without cloud sync by unpairing the device and enabling the built-in USB file server at http://10.11.99.1/.</p>
+                        <a class="readmore" href="../remarkable-local-file-transfer-without-the-cloud.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>

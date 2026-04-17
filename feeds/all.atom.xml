@@ -1,5 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-15T00:00:00+01:00</updated><entry><title>Copy and Paste in a Multi-OS System</title><link href="http://lizard-spock.co.uk/copy-paste-multi-os.html" rel="alternate"></link><published>2026-04-15T00:00:00+01:00</published><updated>2026-04-15T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-15:/copy-paste-multi-os.html</id><summary type="html">&lt;p&gt;Unifying copy and paste shortcuts when working across macOS locally and RHEL remotely via OpenText Exceed. Covers terminal emulator behaviour, gVim clipboard mapping, and Karabiner-Elements rules to make Ctrl-Shift-C/V and Cmd-C/V work consistently in both directions.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Working across macOS locally and a remote RHEL system through &lt;a href="https://www.opentext.com/products/exceed-turbo-x"&gt;OpenText Exceed TurboX&lt;/a&gt; creates a clipboard shortcut mismatch. Linux applications expect &lt;code&gt;Ctrl-Shift-C&lt;/code&gt; / &lt;code&gt;Ctrl-Shift-V&lt;/code&gt; for copy and paste; macOS expects &lt;code&gt;Cmd-C&lt;/code&gt; / &lt;code&gt;Cmd-V&lt;/code&gt;. Switching mental models every time the active window changes is error-prone and slow. This post covers a setup that makes both shortcut conventions work regardless of which application is in focus.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-17T00:00:00+01:00</updated><entry><title>Proxmox: Disable root@pam Login and Create a Sudo User</title><link href="http://lizard-spock.co.uk/proxmox-disable-root-login-sudo-user.html" rel="alternate"></link><published>2026-04-17T00:00:00+01:00</published><updated>2026-04-17T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-17:/proxmox-disable-root-login-sudo-user.html</id><summary type="html">&lt;p&gt;How to harden a Proxmox VE host by disabling direct root@pam login, creating a named admin user dave@pam, and granting it passwordless sudo access.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Out of the box, Proxmox VE only has the &lt;code&gt;root@pam&lt;/code&gt; account. Logging in directly as root is convenient during initial setup, but it is a bad habit to keep. This post walks through creating a named PAM user, granting it sudo access, and then disabling root login via both SSH and the web UI.&lt;/p&gt;
+&lt;h2&gt;Why Bother&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Audit logs become meaningful. &lt;code&gt;root&lt;/code&gt; in auth logs could be anyone; &lt;code&gt;dave&lt;/code&gt; is traceable.&lt;/li&gt;
+&lt;li&gt;SSH brute-force tools target &lt;code&gt;root&lt;/code&gt; first. Disabling it removes the most-attacked entry point.&lt;/li&gt;
+&lt;li&gt;Sudo with &lt;code&gt;NOPASSWD&lt;/code&gt; for specific commands is still safer than a permanent root shell.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;1. Create the System User&lt;/h2&gt;
+&lt;p&gt;Log in as root on the Proxmox host (via console or SSH) and add the new UNIX account:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;useradd&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;/bin/bash&lt;span class="w"&gt; &lt;/span&gt;dave
+passwd&lt;span class="w"&gt; &lt;/span&gt;dave
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;-m&lt;/code&gt; creates a home directory. Set a strong password when prompted.&lt;/p&gt;
+&lt;h2&gt;2. Install sudo&lt;/h2&gt;
+&lt;p&gt;Proxmox minimal installs may not include sudo:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;apt&lt;span class="w"&gt; &lt;/span&gt;update&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-y&lt;span class="w"&gt; &lt;/span&gt;sudo
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;3. Grant sudo Access&lt;/h2&gt;
+&lt;p&gt;Add &lt;code&gt;dave&lt;/code&gt; to the &lt;code&gt;sudo&lt;/code&gt; group, which is already configured in &lt;code&gt;/etc/sudoers&lt;/code&gt; to allow full sudo:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;usermod&lt;span class="w"&gt; &lt;/span&gt;-aG&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;dave
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To verify the group membership took effect:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;id&lt;span class="w"&gt; &lt;/span&gt;dave
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;You should see &lt;code&gt;sudo&lt;/code&gt; in the groups list.&lt;/p&gt;
+&lt;h2&gt;4. Register the User in Proxmox&lt;/h2&gt;
+&lt;p&gt;Proxmox has its own user database separate from the Linux PAM database. The &lt;code&gt;@pam&lt;/code&gt; realm bridges them, but you still need to add the user in the Proxmox layer.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Via the web UI:&lt;/strong&gt; Datacenter &amp;gt; Permissions &amp;gt; Users &amp;gt; Add&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;User: &lt;code&gt;dave&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Realm: &lt;code&gt;pam&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Enable: checked&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Via the CLI:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pveum&lt;span class="w"&gt; &lt;/span&gt;user&lt;span class="w"&gt; &lt;/span&gt;add&lt;span class="w"&gt; &lt;/span&gt;dave@pam
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;5. Assign a Proxmox Role&lt;/h2&gt;
+&lt;p&gt;The user needs at least one permission to do anything useful. For a full admin, assign the built-in &lt;code&gt;Administrator&lt;/code&gt; role at the root path &lt;code&gt;/&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pveum&lt;span class="w"&gt; &lt;/span&gt;acl&lt;span class="w"&gt; &lt;/span&gt;modify&lt;span class="w"&gt; &lt;/span&gt;/&lt;span class="w"&gt; &lt;/span&gt;-user&lt;span class="w"&gt; &lt;/span&gt;dave@pam&lt;span class="w"&gt; &lt;/span&gt;-role&lt;span class="w"&gt; &lt;/span&gt;Administrator
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For a more restricted setup, use &lt;code&gt;PVEAdmin&lt;/code&gt; (everything except node-level config) or define a custom role.&lt;/p&gt;
+&lt;h2&gt;6. Test the New Account&lt;/h2&gt;
+&lt;p&gt;Before locking out root, confirm the new account works end to end:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Open a new terminal (do not close the existing root session).&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;SSH in as &lt;code&gt;dave&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;bash
+ssh dave@&amp;lt;proxmox-ip&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Confirm sudo works:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;bash
+sudo -i&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Log in to the Proxmox web UI at &lt;code&gt;https://&amp;lt;proxmox-ip&amp;gt;:8006&lt;/code&gt; as &lt;code&gt;dave@pam&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Do not proceed to the next step until all three work.&lt;/p&gt;
+&lt;h2&gt;7. Disable root SSH Login&lt;/h2&gt;
+&lt;p&gt;Edit &lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;nano&lt;span class="w"&gt; &lt;/span&gt;/etc/ssh/sshd_config
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Find or add the following line:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;PermitRootLogin no
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Reload SSH without dropping existing connections:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;systemctl&lt;span class="w"&gt; &lt;/span&gt;reload&lt;span class="w"&gt; &lt;/span&gt;sshd
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Verify by attempting &lt;code&gt;ssh root@&amp;lt;proxmox-ip&amp;gt;&lt;/code&gt; -- it should now be refused.&lt;/p&gt;
+&lt;h2&gt;8. Disable root@pam in the Proxmox Web UI&lt;/h2&gt;
+&lt;p&gt;Even with SSH root login disabled, &lt;code&gt;root@pam&lt;/code&gt; can still authenticate through the Proxmox web UI. To disable it:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Via the web UI:&lt;/strong&gt; Datacenter &amp;gt; Permissions &amp;gt; Users &amp;gt; select &lt;code&gt;root&lt;/code&gt; &amp;gt; Edit &amp;gt; uncheck Enable&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Via the CLI:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pveum&lt;span class="w"&gt; &lt;/span&gt;user&lt;span class="w"&gt; &lt;/span&gt;modify&lt;span class="w"&gt; &lt;/span&gt;root@pam&lt;span class="w"&gt; &lt;/span&gt;--enable&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This does not delete root or change anything at the Linux level. It only prevents login through the Proxmox authentication stack.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; The Linux &lt;code&gt;root&lt;/code&gt; account remains intact. You can always recover it from the physical console or by re-enabling &lt;code&gt;root@pam&lt;/code&gt; through the CLI as your admin user with sudo.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;Verification Checklist&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Check&lt;/th&gt;
+&lt;th&gt;Command&lt;/th&gt;
+&lt;th&gt;Expected Result&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;dave SSH login&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;ssh dave@&amp;lt;ip&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Login prompt&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;dave sudo&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;sudo -i&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Root shell&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;dave web UI&lt;/td&gt;
+&lt;td&gt;Browser &lt;code&gt;https://&amp;lt;ip&amp;gt;:8006&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Logged in as dave@pam&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;root SSH blocked&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;ssh root@&amp;lt;ip&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Permission denied&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;root web UI blocked&lt;/td&gt;
+&lt;td&gt;Browser login as root@pam&lt;/td&gt;
+&lt;td&gt;Login rejected&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Step&lt;/th&gt;
+&lt;th&gt;What It Does&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;useradd&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Creates the Linux PAM account&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;apt install sudo&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Ensures sudo is present&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;usermod -aG sudo&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Grants full sudo via the sudo group&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;pveum user add&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Registers the account in Proxmox&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;pveum acl modify&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Assigns a Proxmox role&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;PermitRootLogin no&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Blocks root SSH&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;pveum user modify root@pam --enable 0&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Blocks root Proxmox web UI login&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</content><category term="Hardware &amp; Homelab"></category><category term="Proxmox"></category><category term="Security"></category><category term="Linux"></category><category term="Homelab"></category><category term="Virtualisation"></category></entry><entry><title>Copy and Paste in a Multi-OS System</title><link href="http://lizard-spock.co.uk/copy-paste-multi-os.html" rel="alternate"></link><published>2026-04-15T00:00:00+01:00</published><updated>2026-04-15T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-15:/copy-paste-multi-os.html</id><summary type="html">&lt;p&gt;Unifying copy and paste shortcuts when working across macOS locally and RHEL remotely via OpenText Exceed. Covers terminal emulator behaviour, gVim clipboard mapping, and Karabiner-Elements rules to make Ctrl-Shift-C/V and Cmd-C/V work consistently in both directions.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Working across macOS locally and a remote RHEL system through &lt;a href="https://www.opentext.com/products/exceed-turbo-x"&gt;OpenText Exceed TurboX&lt;/a&gt; creates a clipboard shortcut mismatch. Linux applications expect &lt;code&gt;Ctrl-Shift-C&lt;/code&gt; / &lt;code&gt;Ctrl-Shift-V&lt;/code&gt; for copy and paste; macOS expects &lt;code&gt;Cmd-C&lt;/code&gt; / &lt;code&gt;Cmd-V&lt;/code&gt;. Switching mental models every time the active window changes is error-prone and slow. This post covers a setup that makes both shortcut conventions work regardless of which application is in focus.&lt;/p&gt;
 &lt;h2&gt;The Problem&lt;/h2&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -5157,8 +5323,4 @@ ans =
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;11    22&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;a href="http://blogs.mathworks.com/loren/2007/04/19/vectorizing-access-to-an-array-of-structures/"&gt;Solution found on a Loren Post&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry><entry><title>"F-Stop ICU Strobies"</title><link href="http://lizard-spock.co.uk/f-stop-icu-strobies.html" rel="alternate"></link><published>2014-05-28T18:44:55+01:00</published><updated>2014-05-28T18:44:55+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-05-28:/f-stop-icu-strobies.html</id><summary type="html">&lt;p&gt;My large ICU loaded with my &lt;a href="http://www.wexphotographic.com/buy-interfit-strobies-portrait-kit/p1031888"&gt;Strobies portrait kit&lt;/a&gt; and Canon 580EX MKII.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="F Stop" src="/images/Photography/fstop_icu_large_lighting/morganp-20140517-FStop-_MG_8927.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;The collapsed soft box is folded into …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My large ICU loaded with my &lt;a href="http://www.wexphotographic.com/buy-interfit-strobies-portrait-kit/p1031888"&gt;Strobies portrait kit&lt;/a&gt; and Canon 580EX MKII.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="F Stop" src="/images/Photography/fstop_icu_large_lighting/morganp-20140517-FStop-_MG_8927.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;The collapsed soft box is folded into the right hand side. Additional accessories are a &lt;a href="https://www.amazon.co.uk/dp/B0007DDK7A?tag=morgue-21&amp;amp;camp=2902&amp;amp;creative=19466&amp;amp;linkCode=as4&amp;amp;creativeASIN=B0007DDK7A&amp;amp;adid=1VSQ11QZRMHHASH7FHN9&amp;amp;"&gt;3M Lastolite off camera cord&lt;/a&gt;, &lt;a href="https://www.amazon.co.uk/dp/B002D4AHT0?tag=morgue-21&amp;amp;camp=2902&amp;amp;creative=19466&amp;amp;linkCode=as4&amp;amp;creativeASIN=B002D4AHT0&amp;amp;adid=0PB41F04SGBY01WKVJYB&amp;amp;"&gt;Colorvision SpyderCube&lt;/a&gt; and a &lt;a href="https://www.amazon.co.uk/dp/B0007DDK7A?tag=morgue-21&amp;amp;camp=2902&amp;amp;creative=19466&amp;amp;linkCode=as4&amp;amp;creativeASIN=B0007DDK7A&amp;amp;adid=1VSQ11QZRMHHASH7FHN9&amp;amp;"&gt;Stofen&lt;/a&gt;.&lt;/p&gt;</content><category term="Photography"></category><category term="fstop"></category><category term="Canon"></category></entry></feed>
+&lt;p&gt;&lt;a href="http://blogs.mathworks.com/loren/2007/04/19/vectorizing-access-to-an-array-of-structures/"&gt;Solution found on a Loren Post&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"></category><category term="Matlab"></category></entry></feed>
