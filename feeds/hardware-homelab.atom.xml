@@ -195,7 +195,189 @@ sudo -i&lt;/code&gt;&lt;/p&gt;
 &lt;td&gt;Blocks root Proxmox web UI login&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
-&lt;/table&gt;</content><category term="Hardware &amp; Homelab"></category><category term="Proxmox"></category><category term="Security"></category><category term="Linux"></category><category term="Homelab"></category><category term="Virtualisation"></category></entry><entry><title>reMarkable: Local File Transfer Without the Cloud</title><link href="http://lizard-spock.co.uk/remarkable-local-file-transfer-without-the-cloud.html" rel="alternate"></link><published>2026-03-07T00:00:00+00:00</published><updated>2026-03-07T00:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-03-07:/remarkable-local-file-transfer-without-the-cloud.html</id><summary type="html">&lt;p&gt;How to use the reMarkable tablet without cloud sync by unpairing the device and enabling the built-in USB file server at http://10.11.99.1/.&lt;/p&gt;</summary><content type="html">&lt;p&gt;The reMarkable tablet is excellent for reading and annotating PDFs, but by default it routes
+&lt;/table&gt;</content><category term="Hardware &amp; Homelab"></category><category term="Proxmox"></category><category term="Security"></category><category term="Linux"></category><category term="Homelab"></category><category term="Virtualisation"></category></entry><entry><title>Proxmox: Setting Up a New User Account with Dotfiles</title><link href="http://lizard-spock.co.uk/proxmox-user-dotfiles-setup.html" rel="alternate"></link><published>2026-04-17T00:00:00+01:00</published><updated>2026-04-17T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-17:/proxmox-user-dotfiles-setup.html</id><summary type="html">&lt;p&gt;After creating a non-root Proxmox user, install essential tools (git, stow, gh) and pull in your dotfiles from GitHub to get a familiar shell environment on a fresh host.&lt;/p&gt;</summary><content type="html">&lt;p&gt;This post follows on from &lt;a href="http://lizard-spock.co.uk/proxmox-disable-root-login-sudo-user.html"&gt;Proxmox: Disable root@pam Login and Create a Sudo User&lt;/a&gt;. At that point you have a working &lt;code&gt;dave&lt;/code&gt; account with sudo. The next step is making it feel like home: a few essential tools and your dotfiles pulled from GitHub.&lt;/p&gt;
+&lt;p&gt;The dotfiles repo used in this guide is &lt;a href="https://github.com/morganp/dotfiles"&gt;morganp/dotfiles&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Two Strategies&lt;/h2&gt;
+&lt;p&gt;Before diving in, it helps to understand the two ways config files are deployed. Most tools use &lt;strong&gt;GNU Stow&lt;/strong&gt;, which creates symlinks from &lt;code&gt;$HOME&lt;/code&gt; (or an XDG config dir) into the repo. A change to the repo file is immediately live everywhere that file is symlinked.&lt;/p&gt;
+&lt;p&gt;A small number of files -- shell configs and Vim -- use a &lt;strong&gt;source wrapper&lt;/strong&gt; instead. &lt;code&gt;~/.zshrc&lt;/code&gt; is a real file that exists only on the local machine and contains a single &lt;code&gt;source&lt;/code&gt; line pointing into the repo. This allows host-specific additions (work proxy settings, machine-specific aliases) to live below the source line without touching the shared repo file. It also prevents tools that append to &lt;code&gt;.bashrc&lt;/code&gt; from dirtying the repo.&lt;/p&gt;
+&lt;p&gt;The split is:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;File&lt;/th&gt;
+&lt;th&gt;Strategy&lt;/th&gt;
+&lt;th&gt;Reason&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Most config (git, screen, ctags, ...)&lt;/td&gt;
+&lt;td&gt;Stow symlink&lt;/td&gt;
+&lt;td&gt;Identical across all hosts&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;~/.zshrc&lt;/code&gt;, &lt;code&gt;~/.bashrc&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Source wrapper&lt;/td&gt;
+&lt;td&gt;Host-specific additions needed&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;~/.vimrc&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Source wrapper&lt;/td&gt;
+&lt;td&gt;Different plugin sets per host&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;Install Basic Tools&lt;/h2&gt;
+&lt;p&gt;SSH in as your new user and install the essentials in one pass:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;update&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-y&lt;span class="w"&gt; &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;stow
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;gh&lt;/code&gt; (the GitHub CLI) is not in the standard Debian/Ubuntu repos, so it needs the official GitHub apt source:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;mkdir&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;/etc/apt/keyrings
+curl&lt;span class="w"&gt; &lt;/span&gt;-fsSL&lt;span class="w"&gt; &lt;/span&gt;https://cli.github.com/packages/githubcli-archive-keyring.gpg&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;tee&lt;span class="w"&gt; &lt;/span&gt;/etc/apt/keyrings/githubcli-archive-keyring.gpg&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/null
+
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;deb [arch=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;dpkg&lt;span class="w"&gt; &lt;/span&gt;--print-architecture&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt; signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] \&lt;/span&gt;
+&lt;span class="s2"&gt;    https://cli.github.com/packages stable main&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;tee&lt;span class="w"&gt; &lt;/span&gt;/etc/apt/sources.list.d/github-cli.list&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/null
+
+sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;update&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-y&lt;span class="w"&gt; &lt;/span&gt;gh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Verify all three are present:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;--version
+stow&lt;span class="w"&gt; &lt;/span&gt;--version
+gh&lt;span class="w"&gt; &lt;/span&gt;--version
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Authenticate with GitHub&lt;/h2&gt;
+&lt;p&gt;Before cloning private repos, authenticate &lt;code&gt;gh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gh&lt;span class="w"&gt; &lt;/span&gt;auth&lt;span class="w"&gt; &lt;/span&gt;login
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Select &lt;strong&gt;GitHub.com&lt;/strong&gt;, then &lt;strong&gt;HTTPS&lt;/strong&gt;, then &lt;strong&gt;Login with a web browser&lt;/strong&gt; (or a personal access token if the host has no browser). The token is stored in &lt;code&gt;~/.config/gh/hosts.yml&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Confirm it worked:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gh&lt;span class="w"&gt; &lt;/span&gt;auth&lt;span class="w"&gt; &lt;/span&gt;status
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Clone the Dotfiles Repository&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gh&lt;span class="w"&gt; &lt;/span&gt;repo&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;morganp/dotfiles&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Or with plain git over HTTPS if you skipped &lt;code&gt;gh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;https://github.com/morganp/dotfiles.git&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Strategy 1: Apply with run_stow&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;--dotfiles&lt;/code&gt; flag used throughout the script tells Stow to treat a file named &lt;code&gt;dot-foo&lt;/code&gt; in the package as &lt;code&gt;.foo&lt;/code&gt; in the target directory. This lets the repo store dotfiles without leading dots, making them visible in directory listings and avoiding accidental git ignores.&lt;/p&gt;
+&lt;p&gt;The repo ships a &lt;a href="https://github.com/morganp/dotfiles/blob/main/config/run_stow"&gt;&lt;code&gt;run_stow&lt;/code&gt;&lt;/a&gt; script that applies each package explicitly and creates any XDG config directories that may not exist yet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles/config
+bash&lt;span class="w"&gt; &lt;/span&gt;run_stow
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Under the hood it does things like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;stow&lt;span class="w"&gt; &lt;/span&gt;input&lt;span class="w"&gt; &lt;/span&gt;--dotfiles&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;~/
+stow&lt;span class="w"&gt; &lt;/span&gt;screen&lt;span class="w"&gt; &lt;/span&gt;--dotfiles&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;~/
+stow&lt;span class="w"&gt; &lt;/span&gt;ctags&lt;span class="w"&gt; &lt;/span&gt;--dotfiles&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;~/
+
+mkdir&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.config/git
+stow&lt;span class="w"&gt; &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.config/git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If Stow finds a file already at the target (e.g. the default &lt;code&gt;.inputrc&lt;/code&gt; written by the system), it will refuse to proceed and print a conflict warning. Remove or back up the conflicting file first:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mv&lt;span class="w"&gt; &lt;/span&gt;~/.inputrc&lt;span class="w"&gt; &lt;/span&gt;~/.inputrc.bak
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then re-run the script. Reload the shell once done:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;exec&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;bash
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Strategy 2: Shell and Vim via Source Wrapper&lt;/h2&gt;
+&lt;p&gt;The shared repo file holds config common to all hosts. Each machine's &lt;code&gt;~/.zshrc&lt;/code&gt; is a thin wrapper that sources the shared file first, then adds anything host-specific below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# ~/.zshrc -- this file is NOT in the repo, it lives only on this host&lt;/span&gt;
+&lt;span class="nb"&gt;source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles/config/shell/dot-zshrc
+
+&lt;span class="c1"&gt;# host-specific additions below&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;http_proxy&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;http://proxy.work.example.com:3128
+&lt;span class="nb"&gt;alias&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;backup&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;rsync -av /data /mnt/nas/backup&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For a work vs. home split, source a second context file or use a hostname conditional:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles/config/shell/dot-zshrc
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;hostname&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;*&lt;span class="s2"&gt;&amp;quot;work&amp;quot;&lt;/span&gt;*&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles/config/shell/dot-zshrc_work
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Create &lt;code&gt;~/.bashrc&lt;/code&gt; the same way:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# ~/.bashrc&lt;/span&gt;
+&lt;span class="nb"&gt;source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/dotfiles/config/shell/dot-bashrc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For Vim, &lt;code&gt;dot-vimrc_clean&lt;/code&gt; is a minimal, plugin-free config well suited to servers. Create &lt;code&gt;~/.vimrc&lt;/code&gt; sourcing it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;&amp;quot; ~/.vimrc&lt;/span&gt;
+&lt;span class="k"&gt;so&lt;/span&gt; &lt;span class="p"&gt;~&lt;/span&gt;&lt;span class="sr"&gt;/dotfiles/&lt;/span&gt;config&lt;span class="sr"&gt;/vim/&lt;/span&gt;dot&lt;span class="p"&gt;-&lt;/span&gt;vimrc_clean
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The repo also contains &lt;code&gt;dot-vimrc&lt;/code&gt; (full config with plugins) and &lt;code&gt;dot-vimrc_spelling&lt;/code&gt; -- point &lt;code&gt;~/.vimrc&lt;/code&gt; at whichever suits the host. Because these wrapper files are not managed by Stow, they are not tracked by the dotfiles repo on this machine.&lt;/p&gt;
+&lt;h2&gt;Verify&lt;/h2&gt;
+&lt;p&gt;Check that the Stow symlinks landed:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ls&lt;span class="w"&gt; &lt;/span&gt;-la&lt;span class="w"&gt; &lt;/span&gt;~/&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;grep&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;\-&amp;gt;&amp;#39;&lt;/span&gt;
+ls&lt;span class="w"&gt; &lt;/span&gt;-la&lt;span class="w"&gt; &lt;/span&gt;~/.config/git/&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;grep&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;\-&amp;gt;&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Check that the source wrappers are in place:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;head&lt;span class="w"&gt; &lt;/span&gt;-1&lt;span class="w"&gt; &lt;/span&gt;~/.zshrc
+head&lt;span class="w"&gt; &lt;/span&gt;-1&lt;span class="w"&gt; &lt;/span&gt;~/.vimrc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Both should show the &lt;code&gt;source&lt;/code&gt; / &lt;code&gt;so&lt;/code&gt; line pointing into &lt;code&gt;~/dotfiles/&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Any future change to a file in &lt;code&gt;~/dotfiles/&lt;/code&gt; is immediately live. Commit and push from &lt;code&gt;~/dotfiles/&lt;/code&gt; as normal to keep the repo in sync across hosts.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Strategy&lt;/th&gt;
+&lt;th&gt;Files&lt;/th&gt;
+&lt;th&gt;How&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Stow symlink&lt;/td&gt;
+&lt;td&gt;Most config (git, screen, ctags, ...)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;bash run_stow&lt;/code&gt; from &lt;code&gt;~/dotfiles/config&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Source wrapper&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;~/.zshrc&lt;/code&gt;, &lt;code&gt;~/.bashrc&lt;/code&gt;, &lt;code&gt;~/.vimrc&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Real local file with a single &lt;code&gt;source&lt;/code&gt; line&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Tool&lt;/th&gt;
+&lt;th&gt;Purpose&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;git&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Version control, cloning the dotfiles repo&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;stow&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Symlink manager for most config packages&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;gh&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;GitHub CLI for authentication and repo operations&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</content><category term="Hardware &amp; Homelab"></category><category term="Proxmox"></category><category term="Linux"></category><category term="Dotfiles"></category><category term="Git"></category><category term="Stow"></category><category term="Homelab"></category><category term="Productivity"></category></entry><entry><title>reMarkable: Local File Transfer Without the Cloud</title><link href="http://lizard-spock.co.uk/remarkable-local-file-transfer-without-the-cloud.html" rel="alternate"></link><published>2026-03-07T00:00:00+00:00</published><updated>2026-03-07T00:00:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-03-07:/remarkable-local-file-transfer-without-the-cloud.html</id><summary type="html">&lt;p&gt;How to use the reMarkable tablet without cloud sync by unpairing the device and enabling the built-in USB file server at http://10.11.99.1/.&lt;/p&gt;</summary><content type="html">&lt;p&gt;The reMarkable tablet is excellent for reading and annotating PDFs, but by default it routes
 everything through reMarkable's cloud. If you prefer to keep files local -- for privacy, or
 simply because you do not want a subscription -- you can unpair the device and use the
 built-in USB file server instead.&lt;/p&gt;
