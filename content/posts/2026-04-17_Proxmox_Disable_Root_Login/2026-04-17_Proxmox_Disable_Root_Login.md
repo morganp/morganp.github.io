@@ -9,13 +9,38 @@ Status: published
 
 Out of the box, Proxmox VE only has the `root@pam` account. Logging in directly as root is convenient during initial setup, but it is a bad habit to keep. This post walks through creating a named PAM user, granting it sudo access, and then disabling root login via both SSH and the web UI.
 
+## Authentication Realms: @pam vs @pve
+
+The `@` suffix in Proxmox usernames is not cosmetic -- it identifies which authentication realm validates the password.
+
+**`@pam`** -- Linux Pluggable Authentication Modules. Proxmox delegates the password check to the host operating system. The user must exist as a real UNIX account in `/etc/passwd`. Password changes happen with `passwd` on the shell. SSH login uses the same credentials. This is the realm for admin accounts that also need shell access.
+
+**`@pve`** -- Proxmox Virtual Environment internal realm. Passwords are stored in Proxmox's own database (`/etc/pve/priv/shadow.cfg`), completely separate from the OS. The user has no UNIX account and cannot SSH in. This is the right realm for giving colleagues or tenants web UI access without touching the OS user database.
+
+**`@ldap` / `@ad`** -- Optional realms for binding to an LDAP directory or Active Directory. Not covered here.
+
+| Realm | Password stored | SSH access | UNIX account required |
+|---|---|---|---|
+| `@pam` | Linux PAM (`/etc/shadow`) | Yes | Yes |
+| `@pve` | Proxmox internal DB | No | No |
+
+For the admin account in this guide we use `@pam` because we also want sudo and SSH access.
+
 ## Why Bother
 
 - Audit logs become meaningful. `root` in auth logs could be anyone; `dave` is traceable.
 - SSH brute-force tools target `root` first. Disabling it removes the most-attacked entry point.
 - Sudo with `NOPASSWD` for specific commands is still safer than a permanent root shell.
 
-## 1. Create the System User
+## 1. Install sudo
+
+Proxmox minimal installs may not include sudo:
+
+```bash
+apt update && apt install -y sudo
+```
+
+## 2. Create the System User
 
 Log in as root on the Proxmox host (via console or SSH) and add the new UNIX account:
 
@@ -25,14 +50,6 @@ passwd dave
 ```
 
 `-m` creates a home directory. Set a strong password when prompted.
-
-## 2. Install sudo
-
-Proxmox minimal installs may not include sudo:
-
-```bash
-apt update && apt install -y sudo
-```
 
 ## 3. Grant sudo Access
 
