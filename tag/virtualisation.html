@@ -38,24 +38,54 @@
         <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
 <p>tags: <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/security.html">Security</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/homelab.html">Homelab</a> <a href="../tag/virtualisation.html">Virtualisation</a> </p>        
 </footer><!-- /.post-info --><p>Out of the box, Proxmox VE only has the <code>root@pam</code> account. Logging in directly as root is convenient during initial setup, but it is a bad habit to keep. This post walks through creating a named PAM user, granting it sudo access, and then disabling root login via both SSH and the web UI.</p>
+<h2>Authentication Realms: @pam vs @pve</h2>
+<p>The <code>@</code> suffix in Proxmox usernames is not cosmetic -- it identifies which authentication realm validates the password.</p>
+<p><strong><code>@pam</code></strong> -- Linux Pluggable Authentication Modules. Proxmox delegates the password check to the host operating system. The user must exist as a real UNIX account in <code>/etc/passwd</code>. Password changes happen with <code>passwd</code> on the shell. SSH login uses the same credentials. This is the realm for admin accounts that also need shell access.</p>
+<p><strong><code>@pve</code></strong> -- Proxmox Virtual Environment internal realm. Passwords are stored in Proxmox's own database (<code>/etc/pve/priv/shadow.cfg</code>), completely separate from the OS. The user has no UNIX account and cannot SSH in. This is the right realm for giving colleagues or tenants web UI access without touching the OS user database.</p>
+<p><strong><code>@ldap</code> / <code>@ad</code></strong> -- Optional realms for binding to an LDAP directory or Active Directory. Not covered here.</p>
+<table>
+<thead>
+<tr>
+<th>Realm</th>
+<th>Password stored</th>
+<th>SSH access</th>
+<th>UNIX account required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@pam</code></td>
+<td>Linux PAM (<code>/etc/shadow</code>)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>@pve</code></td>
+<td>Proxmox internal DB</td>
+<td>No</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>For the admin account in this guide we use <code>@pam</code> because we also want sudo and SSH access.</p>
 <h2>Why Bother</h2>
 <ul>
 <li>Audit logs become meaningful. <code>root</code> in auth logs could be anyone; <code>dave</code> is traceable.</li>
 <li>SSH brute-force tools target <code>root</code> first. Disabling it removes the most-attacked entry point.</li>
 <li>Sudo with <code>NOPASSWD</code> for specific commands is still safer than a permanent root shell.</li>
 </ul>
-<h2>1. Create the System User</h2>
+<h2>1. Install sudo</h2>
+<p>Proxmox minimal installs may not include sudo:</p>
+<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>sudo
+</code></pre></div>
+
+<h2>2. Create the System User</h2>
 <p>Log in as root on the Proxmox host (via console or SSH) and add the new UNIX account:</p>
 <div class="highlight"><pre><span></span><code>useradd<span class="w"> </span>-m<span class="w"> </span>-s<span class="w"> </span>/bin/bash<span class="w"> </span>dave
 passwd<span class="w"> </span>dave
 </code></pre></div>
 
 <p><code>-m</code> creates a home directory. Set a strong password when prompted.</p>
-<h2>2. Install sudo</h2>
-<p>Proxmox minimal installs may not include sudo:</p>
-<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>sudo
-</code></pre></div>
-
 <h2>3. Grant sudo Access</h2>
 <p>Add <code>dave</code> to the <code>sudo</code> group, which is already configured in <code>/etc/sudoers</code> to allow full sudo:</p>
 <div class="highlight"><pre><span></span><code>usermod<span class="w"> </span>-aG<span class="w"> </span>sudo<span class="w"> </span>dave

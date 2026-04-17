@@ -1,23 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Hardware &amp; Homelab</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/hardware-homelab.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-17T00:00:00+01:00</updated><entry><title>Proxmox: Disable root@pam Login and Create a Sudo User</title><link href="http://lizard-spock.co.uk/proxmox-disable-root-login-sudo-user.html" rel="alternate"></link><published>2026-04-17T00:00:00+01:00</published><updated>2026-04-17T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-17:/proxmox-disable-root-login-sudo-user.html</id><summary type="html">&lt;p&gt;How to harden a Proxmox VE host by disabling direct root@pam login, creating a named admin user dave@pam, and granting it passwordless sudo access.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Out of the box, Proxmox VE only has the &lt;code&gt;root@pam&lt;/code&gt; account. Logging in directly as root is convenient during initial setup, but it is a bad habit to keep. This post walks through creating a named PAM user, granting it sudo access, and then disabling root login via both SSH and the web UI.&lt;/p&gt;
+&lt;h2&gt;Authentication Realms: @pam vs @pve&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;@&lt;/code&gt; suffix in Proxmox usernames is not cosmetic -- it identifies which authentication realm validates the password.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;@pam&lt;/code&gt;&lt;/strong&gt; -- Linux Pluggable Authentication Modules. Proxmox delegates the password check to the host operating system. The user must exist as a real UNIX account in &lt;code&gt;/etc/passwd&lt;/code&gt;. Password changes happen with &lt;code&gt;passwd&lt;/code&gt; on the shell. SSH login uses the same credentials. This is the realm for admin accounts that also need shell access.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;@pve&lt;/code&gt;&lt;/strong&gt; -- Proxmox Virtual Environment internal realm. Passwords are stored in Proxmox's own database (&lt;code&gt;/etc/pve/priv/shadow.cfg&lt;/code&gt;), completely separate from the OS. The user has no UNIX account and cannot SSH in. This is the right realm for giving colleagues or tenants web UI access without touching the OS user database.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;@ldap&lt;/code&gt; / &lt;code&gt;@ad&lt;/code&gt;&lt;/strong&gt; -- Optional realms for binding to an LDAP directory or Active Directory. Not covered here.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Realm&lt;/th&gt;
+&lt;th&gt;Password stored&lt;/th&gt;
+&lt;th&gt;SSH access&lt;/th&gt;
+&lt;th&gt;UNIX account required&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;@pam&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Linux PAM (&lt;code&gt;/etc/shadow&lt;/code&gt;)&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;@pve&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Proxmox internal DB&lt;/td&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;For the admin account in this guide we use &lt;code&gt;@pam&lt;/code&gt; because we also want sudo and SSH access.&lt;/p&gt;
 &lt;h2&gt;Why Bother&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;Audit logs become meaningful. &lt;code&gt;root&lt;/code&gt; in auth logs could be anyone; &lt;code&gt;dave&lt;/code&gt; is traceable.&lt;/li&gt;
 &lt;li&gt;SSH brute-force tools target &lt;code&gt;root&lt;/code&gt; first. Disabling it removes the most-attacked entry point.&lt;/li&gt;
 &lt;li&gt;Sudo with &lt;code&gt;NOPASSWD&lt;/code&gt; for specific commands is still safer than a permanent root shell.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2&gt;1. Create the System User&lt;/h2&gt;
+&lt;h2&gt;1. Install sudo&lt;/h2&gt;
+&lt;p&gt;Proxmox minimal installs may not include sudo:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;apt&lt;span class="w"&gt; &lt;/span&gt;update&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-y&lt;span class="w"&gt; &lt;/span&gt;sudo
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;2. Create the System User&lt;/h2&gt;
 &lt;p&gt;Log in as root on the Proxmox host (via console or SSH) and add the new UNIX account:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;useradd&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;/bin/bash&lt;span class="w"&gt; &lt;/span&gt;dave
 passwd&lt;span class="w"&gt; &lt;/span&gt;dave
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;code&gt;-m&lt;/code&gt; creates a home directory. Set a strong password when prompted.&lt;/p&gt;
-&lt;h2&gt;2. Install sudo&lt;/h2&gt;
-&lt;p&gt;Proxmox minimal installs may not include sudo:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;apt&lt;span class="w"&gt; &lt;/span&gt;update&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-y&lt;span class="w"&gt; &lt;/span&gt;sudo
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 &lt;h2&gt;3. Grant sudo Access&lt;/h2&gt;
 &lt;p&gt;Add &lt;code&gt;dave&lt;/code&gt; to the &lt;code&gt;sudo&lt;/code&gt; group, which is already configured in &lt;code&gt;/etc/sudoers&lt;/code&gt; to allow full sudo:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;usermod&lt;span class="w"&gt; &lt;/span&gt;-aG&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;dave
