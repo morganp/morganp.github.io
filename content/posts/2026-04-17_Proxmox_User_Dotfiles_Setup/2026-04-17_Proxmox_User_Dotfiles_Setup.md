@@ -5,7 +5,7 @@ Tags: Proxmox, Linux, Dotfiles, Git, Stow, Homelab, Productivity
 Slug: proxmox-user-dotfiles-setup
 Author: morganp
 Summary: After creating a non-root Proxmox user, install essential tools (git, stow, gh) and pull in your dotfiles from GitHub to get a familiar shell environment on a fresh host.
-Status: draft
+Status: published
 
 This post follows on from [Proxmox: Disable root@pam Login and Create a Sudo User]({filename}/posts/2026-04-17_Proxmox_Disable_Root_Login/2026-04-17_Proxmox_Disable_Root_Login.md). At that point you have a working `dave` account with sudo. The next step is making it feel like home: a few essential tools and your dotfiles pulled from GitHub.
 
