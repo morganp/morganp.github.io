@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Proxmox: Setting Up a New User Account with Dotfiles</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="After creating a non-root Proxmox user, install essential tools (git, stow, gh) and pull in your dotfiles from GitHub to get a familiar shell..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li class="active"><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/proxmox-user-dotfiles-setup.html" rel="bookmark"
+             title="Permalink to Proxmox: Setting Up a New User Account with Dotfiles">Proxmox: Setting Up a New User Account with Dotfiles</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-04-17T00:00:00+01:00">
+                Published: Fri 17 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/dotfiles.html">Dotfiles</a> <a href="../tag/git.html">Git</a> <a href="../tag/stow.html">Stow</a> <a href="../tag/homelab.html">Homelab</a> <a href="../tag/productivity.html">Productivity</a> </p>        
+</footer><!-- /.post-info -->        <p>This post follows on from <a href="../proxmox-disable-root-login-sudo-user.html">Proxmox: Disable root@pam Login and Create a Sudo User</a>. At that point you have a working <code>dave</code> account with sudo. The next step is making it feel like home: a few essential tools and your dotfiles pulled from GitHub.</p>
+<p>The dotfiles repo used in this guide is <a href="https://github.com/morganp/dotfiles">morganp/dotfiles</a>.</p>
+<h2>Two Strategies</h2>
+<p>Before diving in, it helps to understand the two ways config files are deployed. Most tools use <strong>GNU Stow</strong>, which creates symlinks from <code>$HOME</code> (or an XDG config dir) into the repo. A change to the repo file is immediately live everywhere that file is symlinked.</p>
+<p>A small number of files -- shell configs and Vim -- use a <strong>source wrapper</strong> instead. <code>~/.zshrc</code> is a real file that exists only on the local machine and contains a single <code>source</code> line pointing into the repo. This allows host-specific additions (work proxy settings, machine-specific aliases) to live below the source line without touching the shared repo file. It also prevents tools that append to <code>.bashrc</code> from dirtying the repo.</p>
+<p>The split is:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Strategy</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Most config (git, screen, ctags, ...)</td>
+<td>Stow symlink</td>
+<td>Identical across all hosts</td>
+</tr>
+<tr>
+<td><code>~/.zshrc</code>, <code>~/.bashrc</code></td>
+<td>Source wrapper</td>
+<td>Host-specific additions needed</td>
+</tr>
+<tr>
+<td><code>~/.vimrc</code></td>
+<td>Source wrapper</td>
+<td>Different plugin sets per host</td>
+</tr>
+</tbody>
+</table>
+<h2>Install Basic Tools</h2>
+<p>SSH in as your new user and install the essentials in one pass:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>git<span class="w"> </span>stow
+</code></pre></div>
+
+<p><code>gh</code> (the GitHub CLI) is not in the standard Debian/Ubuntu repos, so it needs the official GitHub apt source:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/etc/apt/keyrings
+curl<span class="w"> </span>-fsSL<span class="w"> </span>https://cli.github.com/packages/githubcli-archive-keyring.gpg<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/keyrings/githubcli-archive-keyring.gpg<span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;deb [arch=</span><span class="k">$(</span>dpkg<span class="w"> </span>--print-architecture<span class="k">)</span><span class="s2"> signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] \</span>
+<span class="s2">    https://cli.github.com/packages stable main&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/sources.list.d/github-cli.list<span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+
+sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>gh
+</code></pre></div>
+
+<p>Verify all three are present:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>--version
+stow<span class="w"> </span>--version
+gh<span class="w"> </span>--version
+</code></pre></div>
+
+<h2>Authenticate with GitHub</h2>
+<p>Before cloning private repos, authenticate <code>gh</code>:</p>
+<div class="highlight"><pre><span></span><code>gh<span class="w"> </span>auth<span class="w"> </span>login
+</code></pre></div>
+
+<p>Select <strong>GitHub.com</strong>, then <strong>HTTPS</strong>, then <strong>Login with a web browser</strong> (or a personal access token if the host has no browser). The token is stored in <code>~/.config/gh/hosts.yml</code>.</p>
+<p>Confirm it worked:</p>
+<div class="highlight"><pre><span></span><code>gh<span class="w"> </span>auth<span class="w"> </span>status
+</code></pre></div>
+
+<h2>Clone the Dotfiles Repository</h2>
+<div class="highlight"><pre><span></span><code>gh<span class="w"> </span>repo<span class="w"> </span>clone<span class="w"> </span>morganp/dotfiles<span class="w"> </span>~/dotfiles
+</code></pre></div>
+
+<p>Or with plain git over HTTPS if you skipped <code>gh</code>:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/dotfiles.git<span class="w"> </span>~/dotfiles
+</code></pre></div>
+
+<h2>Strategy 1: Apply with run_stow</h2>
+<p>The <code>--dotfiles</code> flag used throughout the script tells Stow to treat a file named <code>dot-foo</code> in the package as <code>.foo</code> in the target directory. This lets the repo store dotfiles without leading dots, making them visible in directory listings and avoiding accidental git ignores.</p>
+<p>The repo ships a <a href="https://github.com/morganp/dotfiles/blob/main/config/run_stow"><code>run_stow</code></a> script that applies each package explicitly and creates any XDG config directories that may not exist yet:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/dotfiles/config
+bash<span class="w"> </span>run_stow
+</code></pre></div>
+
+<p>Under the hood it does things like:</p>
+<div class="highlight"><pre><span></span><code>stow<span class="w"> </span>input<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
+stow<span class="w"> </span>screen<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
+stow<span class="w"> </span>ctags<span class="w"> </span>--dotfiles<span class="w"> </span>-t<span class="w"> </span>~/
+
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="nv">$HOME</span>/.config/git
+stow<span class="w"> </span>git<span class="w"> </span>-t<span class="w"> </span><span class="nv">$HOME</span>/.config/git
+</code></pre></div>
+
+<p>If Stow finds a file already at the target (e.g. the default <code>.inputrc</code> written by the system), it will refuse to proceed and print a conflict warning. Remove or back up the conflicting file first:</p>
+<div class="highlight"><pre><span></span><code>mv<span class="w"> </span>~/.inputrc<span class="w"> </span>~/.inputrc.bak
+</code></pre></div>
+
+<p>Then re-run the script. Reload the shell once done:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">exec</span><span class="w"> </span>bash
+</code></pre></div>
+
+<h2>Strategy 2: Shell and Vim via Source Wrapper</h2>
+<p>The shared repo file holds config common to all hosts. Each machine's <code>~/.zshrc</code> is a thin wrapper that sources the shared file first, then adds anything host-specific below:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ~/.zshrc -- this file is NOT in the repo, it lives only on this host</span>
+<span class="nb">source</span><span class="w"> </span>~/dotfiles/config/shell/dot-zshrc
+
+<span class="c1"># host-specific additions below</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">http_proxy</span><span class="o">=</span>http://proxy.work.example.com:3128
+<span class="nb">alias</span><span class="w"> </span><span class="nv">backup</span><span class="o">=</span><span class="s2">&quot;rsync -av /data /mnt/nas/backup&quot;</span>
+</code></pre></div>
+
+<p>For a work vs. home split, source a second context file or use a hostname conditional:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>~/dotfiles/config/shell/dot-zshrc
+
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="k">$(</span>hostname<span class="k">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*<span class="s2">&quot;work&quot;</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">source</span><span class="w"> </span>~/dotfiles/config/shell/dot-zshrc_work
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>Create <code>~/.bashrc</code> the same way:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ~/.bashrc</span>
+<span class="nb">source</span><span class="w"> </span>~/dotfiles/config/shell/dot-bashrc
+</code></pre></div>
+
+<p>For Vim, <code>dot-vimrc_clean</code> is a minimal, plugin-free config well suited to servers. Create <code>~/.vimrc</code> sourcing it:</p>
+<div class="highlight"><pre><span></span><code><span class="c">&quot; ~/.vimrc</span>
+<span class="k">so</span> <span class="p">~</span><span class="sr">/dotfiles/</span>config<span class="sr">/vim/</span>dot<span class="p">-</span>vimrc_clean
+</code></pre></div>
+
+<p>The repo also contains <code>dot-vimrc</code> (full config with plugins) and <code>dot-vimrc_spelling</code> -- point <code>~/.vimrc</code> at whichever suits the host. Because these wrapper files are not managed by Stow, they are not tracked by the dotfiles repo on this machine.</p>
+<h2>Verify</h2>
+<p>Check that the Stow symlinks landed:</p>
+<div class="highlight"><pre><span></span><code>ls<span class="w"> </span>-la<span class="w"> </span>~/<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;\-&gt;&#39;</span>
+ls<span class="w"> </span>-la<span class="w"> </span>~/.config/git/<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;\-&gt;&#39;</span>
+</code></pre></div>
+
+<p>Check that the source wrappers are in place:</p>
+<div class="highlight"><pre><span></span><code>head<span class="w"> </span>-1<span class="w"> </span>~/.zshrc
+head<span class="w"> </span>-1<span class="w"> </span>~/.vimrc
+</code></pre></div>
+
+<p>Both should show the <code>source</code> / <code>so</code> line pointing into <code>~/dotfiles/</code>.</p>
+<p>Any future change to a file in <code>~/dotfiles/</code> is immediately live. Commit and push from <code>~/dotfiles/</code> as normal to keep the repo in sync across hosts.</p>
+<h2>Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Files</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stow symlink</td>
+<td>Most config (git, screen, ctags, ...)</td>
+<td><code>bash run_stow</code> from <code>~/dotfiles/config</code></td>
+</tr>
+<tr>
+<td>Source wrapper</td>
+<td><code>~/.zshrc</code>, <code>~/.bashrc</code>, <code>~/.vimrc</code></td>
+<td>Real local file with a single <code>source</code> line</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>git</code></td>
+<td>Version control, cloning the dotfiles repo</td>
+</tr>
+<tr>
+<td><code>stow</code></td>
+<td>Symlink manager for most config packages</td>
+</tr>
+<tr>
+<td><code>gh</code></td>
+<td>GitHub CLI for authentication and repo operations</td>
+</tr>
+</tbody>
+</table>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
