@@ -198,7 +198,7 @@ The solution is an **AXI crossbar** (also called a **switch matrix**): it provid
 
 [![Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right]({attach}/images/SoC/Article06/06-bus-vs-crossbar-900w.png)]({attach}/images/SoC/Article06/06-bus-vs-crossbar-HQ.png)
 
-ARM's CoreLink NIC-400 and CoreLink CCI-550 are examples of AXI interconnect IP used in real SoCs. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.
+ARM's CoreLink NIC-400 and NIC-450 are examples of AXI mux-style interconnects, where a fixed matrix routes each master to a set of slaves. The CoreLink NI-700 takes a different approach: it is a Network-on-Chip (NoC) switched network that routes transactions independently through the fabric, allowing better scalability for large numbers of endpoints. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.
 
 ---
 
