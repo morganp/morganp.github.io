@@ -95,7 +95,7 @@
 <li><code>HRESP</code> -- Response (OKAY / ERROR)</li>
 </ul>
 <h3>AHB Pipelined Burst Read</h3>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_b51c9049a22ed7556c47b205afac8c07.svg"></p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_b0bc3916a3a9fe56242afe61c3f4ef2c.svg"></p>
 <p>The key insight: while the data for A0 is being returned, the address A1 is already being presented. This pipeline overlap hides address-to-data latency and improves throughput.</p>
 <h3>AHB Arbitration</h3>
 <p>When multiple masters (CPU, DMA) contend for the AHB, an <strong>arbiter</strong> decides who gets access using a bus grant / bus request protocol. Masters assert <code>HBUSREQx</code> when they want the bus; the arbiter asserts <code>HGRANTx</code> to indicate the winner. This round-robin or priority-based arbitration introduces a form of time-division multiplexing onto the shared bus.</p>
@@ -115,7 +115,7 @@
 </ul>
 <h3>Valid/Ready Handshake</h3>
 <p>Every AXI channel uses the same <strong>valid/ready handshake</strong> protocol. The sender asserts <code>VALID</code> when it has data to transfer. The receiver asserts <code>READY</code> when it can accept data. The transfer completes on the rising clock edge when <strong>both</strong> are high:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_bdf5614eafeb6fb4c582b3cf98b83a3e.svg"></p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_6921d6179fd61809d2c1545f92cf2bfe.svg"></p>
 <p>This decoupled handshake is powerful: the master can issue addresses continuously; the slave can stall when its internal buffers are full, without requiring the master to back off.</p>
 <h3>AXI Burst Transfers</h3>
 <p>Rather than issuing many single transactions, AXI supports <strong>burst transfers</strong> -- a single address phase followed by multiple data beats. This dramatically improves efficiency for sequential memory access.</p>

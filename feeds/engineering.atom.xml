@@ -366,7 +366,7 @@ My Documents\OpenSCAD\libraries\       (Windows)
 &lt;li&gt;&lt;code&gt;HRESP&lt;/code&gt; -- Response (OKAY / ERROR)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;AHB Pipelined Burst Read&lt;/h3&gt;
-&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_b51c9049a22ed7556c47b205afac8c07.svg"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_b0bc3916a3a9fe56242afe61c3f4ef2c.svg"&gt;&lt;/p&gt;
 &lt;p&gt;The key insight: while the data for A0 is being returned, the address A1 is already being presented. This pipeline overlap hides address-to-data latency and improves throughput.&lt;/p&gt;
 &lt;h3&gt;AHB Arbitration&lt;/h3&gt;
 &lt;p&gt;When multiple masters (CPU, DMA) contend for the AHB, an &lt;strong&gt;arbiter&lt;/strong&gt; decides who gets access using a bus grant / bus request protocol. Masters assert &lt;code&gt;HBUSREQx&lt;/code&gt; when they want the bus; the arbiter asserts &lt;code&gt;HGRANTx&lt;/code&gt; to indicate the winner. This round-robin or priority-based arbitration introduces a form of time-division multiplexing onto the shared bus.&lt;/p&gt;
@@ -386,7 +386,7 @@ My Documents\OpenSCAD\libraries\       (Windows)
 &lt;/ul&gt;
 &lt;h3&gt;Valid/Ready Handshake&lt;/h3&gt;
 &lt;p&gt;Every AXI channel uses the same &lt;strong&gt;valid/ready handshake&lt;/strong&gt; protocol. The sender asserts &lt;code&gt;VALID&lt;/code&gt; when it has data to transfer. The receiver asserts &lt;code&gt;READY&lt;/code&gt; when it can accept data. The transfer completes on the rising clock edge when &lt;strong&gt;both&lt;/strong&gt; are high:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_bdf5614eafeb6fb4c582b3cf98b83a3e.svg"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_6921d6179fd61809d2c1545f92cf2bfe.svg"&gt;&lt;/p&gt;
 &lt;p&gt;This decoupled handshake is powerful: the master can issue addresses continuously; the slave can stall when its internal buffers are full, without requiring the master to back off.&lt;/p&gt;
 &lt;h3&gt;AXI Burst Transfers&lt;/h3&gt;
 &lt;p&gt;Rather than issuing many single transactions, AXI supports &lt;strong&gt;burst transfers&lt;/strong&gt; -- a single address phase followed by multiple data beats. This dramatically improves efficiency for sequential memory access.&lt;/p&gt;
