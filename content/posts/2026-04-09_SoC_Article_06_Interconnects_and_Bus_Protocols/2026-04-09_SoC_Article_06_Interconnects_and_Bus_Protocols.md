@@ -68,15 +68,15 @@ An APB write transaction takes place over two phases: **Setup** and **Access**:
 ```wavedrom
 {
   "signal": [
-    {"name": "PCLK",    "wave": "P......."},
-    {"name": "PADDR",   "wave": "x.2.2x..", "data": ["Addr", "Addr"]},
-    {"name": "PSEL",    "wave": "0.1...0."},
-    {"name": "PENABLE", "wave": "0...1.0."},
-    {"name": "PWRITE",  "wave": "0.1...0."},
-    {"name": "PWDATA",  "wave": "x.2...x.", "data": ["Data"]},
-    {"name": "PREADY",  "wave": "0...1.0."},
+    {"name": "PCLK",    "wave": "P....."},
+    {"name": "PADDR",   "wave": "x.2.x.", "data": ["Addr"]},
+    {"name": "PSEL",    "wave": "0.1.0."},
+    {"name": "PENABLE", "wave": "0..10."},
+    {"name": "PWRITE",  "wave": "0.1.0."},
+    {"name": "PWDATA",  "wave": "x.2.x.", "data": ["Data"]},
+    {"name": "PREADY",  "wave": "0..10."},
     {},
-    {"name": "Phase",   "wave": "x.2.3.x.", "data": ["Setup","Access"]}
+    {"name": "Phase",   "wave": "x.23x.", "data": ["Setup","Access"]}
   ],
   "head": {"text": "APB Write Transaction (no wait states)"}
 }
