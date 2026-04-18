@@ -26,7 +26,129 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../soc-article-06-interconnects-and-bus-protocols.html">SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</a></h1>
+                        <h1 class="entry-title"><a href="../soc-article-07-clocking-reset-and-power-domains.html">SoC Article 07: Clocking, Reset, and Power Domains</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-11T00:00:00+01:00">
+                Published: Sat 11 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/arm.html">ARM</a> <a href="../tag/clocking.html">Clocking</a> <a href="../tag/power-management.html">Power Management</a> <a href="../tag/dvfs.html">DVFS</a> <a href="../tag/pll.html">PLL</a> </p>        
+</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 7 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>Every digital circuit needs a clock -- a periodic signal that synchronises all the flip-flops in the design, causing them to sample their inputs and update their outputs in a coordinated fashion. The clock is so fundamental that designing, distributing, and managing it is an entire sub-discipline of SoC engineering.</p>
+<p>Alongside the clock, <strong>reset</strong> -- the mechanism that places a chip in a known initial state -- and <strong>power management</strong> -- dynamically controlling which blocks are active and at what voltage -- are critical infrastructure topics that every SoC designer must understand.</p>
+<hr>
+<h2>Why Clocking is Hard</h2>
+<p>Generating a clock signal that oscillates at a precise frequency seems straightforward. The real challenge is delivering that signal to millions of flip-flops distributed across a die that may be 100 mm² or larger, all arriving at exactly the same time (to within picoseconds), despite:</p>
+<ul>
+<li><strong>Wire resistance and capacitance</strong> -- which delay signals differently depending on path length</li>
+<li><strong>Process variation</strong> -- transistors at different corners of the die behave slightly differently</li>
+<li><strong>Temperature gradients</strong> -- hot areas near power-hungry cores have slower transistors</li>
+<li><strong>Voltage droop</strong> -- areas with high switching activity momentarily drop in supply voltage</li>
+</ul>
+<p>This collection of problems is called <strong>clock skew</strong> (spatial variation) and <strong>clock jitter</strong> (temporal variation). Both reduce the timing margin available for logic between flip-flops.</p>
+<hr>
+<h2>The Clock Distribution Tree</h2>
+<p>The solution is a carefully engineered <strong>clock tree</strong>: a hierarchical network of buffers that distributes the clock signal from a single source to all destinations, with each branch sized so that all paths have approximately equal delay.</p>
+<p><a href="../07-clock-tree-HQ.png"><img alt="H-tree clock distribution showing equal-length paths from PLL output through hierarchical buffers to leaf flip-flops" src="../07-clock-tree-900w.png"></a></p>
+<p>All paths from source to leaf flip-flops are equal length, giving equal delay and low skew.</p>
+<p><strong>Clock tree synthesis (CTS)</strong> is an automated step in the physical design flow that constructs this tree. It is one of the most critical steps in achieving timing closure.</p>
+<hr>
+<h2>Phase-Locked Loops (PLLs)</h2>
+<p>SoCs do not use their raw crystal oscillator frequency (typically 24--100 MHz from an external crystal) directly. Instead, a <strong>Phase-Locked Loop (PLL)</strong> multiplies and divides this reference to generate the precise frequencies needed by each subsystem.</p>
+<p><a href="../07-pll-block-HQ.png"><img alt="PLL block diagram showing reference clock into phase/frequency detector, loop filter, VCO producing output, with feedback divider closing the loop" src="../07-pll-block-900w.png"></a></p>
+<p>Output frequency = Ref × (N/M) where N and M are programmable dividers.</p>
+<p>A PLL is an <strong>analog circuit</strong> embedded in the otherwise digital SoC. Its output frequency is controlled by a digital divider, but the loop filter and VCO (Voltage-Controlled Oscillator) are analog. This makes PLLs sensitive to supply noise -- which is why they have their own isolated power supply on-chip.</p>
+<p>A typical large SoC has 4--12 PLLs:
+- CPU PLL (0.8--3.5 GHz)
+- GPU PLL
+- DDR PLL (matched to DRAM frequency)
+- Peripheral PLL (100--400 MHz for buses)
+- USB/PCIe PLLs (specific protocol reference frequencies)</p>
+<hr>
+<h2>Multiple Clock Domains</h2>
+<p>Different parts of a SoC operate at different frequencies, and often from different clocks. A <strong>clock domain</strong> is a group of flip-flops all clocked by the same source.</p>
+<p><a href="../07-clock-domains-HQ.png"><img alt="Clock domain tree showing crystal oscillator feeding multiple PLLs that fan out to CPU, GPU, DDR, AXI bus, APB peripherals, and always-on RTC domains at different frequencies" src="../07-clock-domains-900w.png"></a></p>
+<p>When data must cross from one clock domain to another -- for example, from the CPU domain to the peripheral APB domain -- a <strong>Clock Domain Crossing (CDC)</strong> circuit is required. Failure to handle CDCs correctly is one of the most common sources of functional bugs in SoC designs.</p>
+<h3>The Metastability Problem</h3>
+<p>When a flip-flop's input changes near its sampling edge, the flip-flop may enter a <strong>metastable</strong> state -- neither a clean 0 nor a clean 1. If the metastable state propagates, it can corrupt data or cause unexpected behaviour.</p>
+<p>The probability of metastability resolving correctly increases with time. A <strong>two-stage synchroniser</strong> provides enough time for resolution before the signal is used:</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_dcd24b7d8b64e99398c9a88d6f7afeff.svg"></p>
+<p>The two-stage synchroniser adds <strong>two destination-clock cycles of latency</strong> but reduces the probability of a metastability-induced failure to negligible levels. More complex CDCs (for multi-bit signals or FIFOs) use more sophisticated structures.</p>
+<hr>
+<h2>Reset: Getting to a Known State</h2>
+<p><strong>Reset</strong> is the mechanism that places all flip-flops in their initial, known state. Without reset, the behaviour of a digital circuit after power-up is undefined -- flip-flops can power up in either state.</p>
+<h3>Reset Sources</h3>
+<p>A SoC typically has several reset sources:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_a691125c1c9c3bd03bd690886221aec9.svg"></p>
+<h3>Synchronous vs Asynchronous Reset</h3>
+<p>RTL designers must choose between two reset styles:</p>
+<p><strong>Asynchronous reset</strong> -- the flip-flop resets immediately when RST is asserted, regardless of the clock. Fast response, but the reset de-assertion must be synchronised to avoid metastability.</p>
+<p><strong>Synchronous reset</strong> -- the flip-flop only resets on the next rising clock edge after RST is asserted. Requires a clean clock, but avoids de-assertion timing issues.</p>
+<p>In practice, most SoC designs use <strong>asynchronous assert, synchronous de-assert</strong> (ASAD) -- the reset asserts immediately for reliability, and de-asserts through a synchroniser to prevent metastability.</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_c7f72d040abcd0cef5a040dacb184fd6.svg"></p>
+<hr>
+<h2>Power Domains and Power Management</h2>
+<p>A modern SoC is not a single block of silicon that is either fully on or fully off. It is divided into <strong>power domains</strong> -- regions that can be independently powered up or down. This enables enormous power savings by only energising the blocks that are currently needed.</p>
+<h3>Power States</h3>
+<p>A typical SoC power state machine:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_fe8a56134e225fc3451ba555b719be7f.svg"></p>
+<h3>Power Gating</h3>
+<p><strong>Power gating</strong> uses header or footer switches (large PMOS or NMOS transistors) to physically disconnect a domain from its supply rail, reducing leakage current to near zero:</p>
+<p><a href="../07-power-gating-HQ.png"><img alt="Power gating diagram showing VDD connected through a PMOS header switch to a virtual VDD rail supplying a logic block, with an NMOS footer switch to GND, both controlled by the PMU" src="../07-power-gating-900w.png"></a></p>
+<p>When the block is gated off, its internal state is lost. If the state must be preserved (e.g., cache contents, CPU registers), <strong>retention registers</strong> -- special flip-flops with a separate, always-powered supply -- save critical state before power-down.</p>
+<h3>DVFS -- Dynamic Voltage and Frequency Scaling</h3>
+<p><strong>DVFS</strong> reduces power consumption by lowering both the supply voltage and clock frequency when full performance is not needed. Power consumption of CMOS logic scales approximately as:</p>
+<div class="highlight"><pre><span></span><code>P_dynamic ≈ α × C × V² × f
+
+Where:
+  α = activity factor (fraction of gates switching per cycle)
+  C = total capacitance
+  V = supply voltage
+  f = clock frequency
+</code></pre></div>
+
+<p>Since power scales with V², halving the voltage reduces dynamic power by 4×. Modern SoC CPUs support many operating points, and the OS uses a <strong>DVFS governor</strong> to select the appropriate operating point based on workload.</p>
+<p><a href="../07-dvfs-HQ.png"><img alt="DVFS operating points table showing five performance levels from Ultra Low at 600 MHz / 0.65 V up to Ultra High at 3.0 GHz / 1.05 V" src="../07-dvfs-900w.png"></a></p>
+<h3>Clock Gating</h3>
+<p>A lighter-weight alternative to power gating is <strong>clock gating</strong>: stopping the clock to a region of logic. With the clock stopped, flip-flops no longer switch, and dynamic power drops to near zero (though leakage continues). Clock gating is implemented with an <strong>integrated clock gating cell (ICG)</strong>:</p>
+<p><a href="../07-clock-gating-HQ.png"><img alt="Integrated clock gating cell schematic showing EN input into a latch clocked by CLK, with the latch output ANDed with CLK to produce GATED_CLK, preventing glitches on enable transitions" src="../07-clock-gating-900w.png"></a></p>
+<p>When EN = 0, GATED_CLK is held low (no switching). When EN = 1, GATED_CLK follows CLK normally.</p>
+<p>Modern synthesis tools automatically insert clock gating cells throughout the design, reducing dynamic power by 20--40% with no architect effort.</p>
+<hr>
+<h2>The Always-On Domain</h2>
+<p>Even in the deepest sleep state, some logic must remain powered: the real-time clock (to wake the system at a scheduled time), the power management unit itself (to manage power-up sequencing), and retention registers holding critical context. This collection of always-powered logic is the <strong>Always-On (AO) domain</strong> -- it draws power from a supply that is never switched off as long as the battery is present.</p>
+<hr>
+<h2>Summary</h2>
+<p>Clocking, reset, and power management are the infrastructure that makes a SoC run correctly and efficiently. PLLs generate the precise, stable frequencies required by each subsystem. The clock tree distributes the clock signal with minimal skew. Clock domain crossings require careful synchronisation to prevent metastability. Reset places all logic in a known initial state, with the source and polarity carefully considered. Power domains, gating, and DVFS together reduce energy consumption dramatically -- enabling always-on devices to run for days or years on a small battery.</p>
+<hr>
+<h2>Intermediate Articles This Topic Connects To</h2>
+<ul>
+<li><em>Clock Domain Crossing Techniques</em> -- Metastability in depth, multi-bit CDC, async FIFOs</li>
+<li><em>Power Management Techniques</em> -- DVFS, retention, power sequencing, PMU firmware</li>
+<li><em>Physical Design: Floorplanning and Place-and-Route (Advanced)</em> -- CTS, IR drop analysis</li>
+</ul>
+<hr>
+<p><em>Previous: <a href="../soc-article-06-interconnects-and-bus-protocols.html">Article 06 -- Interconnects and Bus Protocols</a></em>
+<em>Next: Article 08 -- Peripherals and I/O: Connecting the SoC to the World (coming soon)</em></p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../soc-article-06-interconnects-and-bus-protocols.html" rel="bookmark"
+                               title="Permalink to SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB">SoC Article 06: Interconnects and Bus Protocols - AXI, AHB, and APB</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-04-09T00:00:00+01:00">
                 Published: Thu 09 April 2026
@@ -37,153 +159,10 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/arm.html">ARM</a> <a href="../tag/amba.html">AMBA</a> <a href="../tag/axi.html">AXI</a> <a href="../tag/ahb.html">AHB</a> <a href="../tag/apb.html">APB</a> <a href="../tag/bus-protocols.html">Bus Protocols</a> </p>        
-</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 6 of 11</em></p>
-<hr>
-<h2>Introduction</h2>
-<p>Every block on a SoC -- CPUs, DMA engines, memory controllers, peripherals -- must communicate with every other block. The internal communication fabric that makes this possible is called the <strong>interconnect</strong> or <strong>bus</strong>. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.</p>
-<p>This article introduces the major bus standards used in modern SoCs, with emphasis on <strong>ARM's AMBA (Advanced Microcontroller Bus Architecture)</strong> family, which is the dominant standard in the industry.</p>
-<hr>
-<h2>Why a Standard Bus Matters</h2>
-<p>Without a standard interface, every IP block would need a custom interface to every other block -- an impractical explosion of design effort. A standard bus protocol defines:</p>
-<ul>
-<li><strong>Signal names and widths</strong> -- both sides know how to connect</li>
-<li><strong>Handshake mechanism</strong> -- how a master requests and a slave responds</li>
-<li><strong>Transaction semantics</strong> -- what "read", "write", and "burst" mean</li>
-<li><strong>Timing requirements</strong> -- setup times, hold times, latency bounds</li>
-</ul>
-<p>IP vendors design their blocks to be <strong>plug-compatible</strong> with the standard, so a UART controller from one vendor and a DMA engine from another can both connect to the same ARM CoreLink interconnect without any custom glue logic.</p>
-<hr>
-<h2>The AMBA Family</h2>
-<p>ARM's <strong>AMBA</strong> specification, first published in 1996 and evolving through multiple generations, defines a family of bus protocols at different performance tiers:</p>
-<p><a href="../06-amba-family-HQ.png"><img alt="AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple" src="../06-amba-family-900w.png"></a></p>
-<p>The family spans from simple, low-power APB peripherals on the right through pipelined AHB, high-performance AXI4, all the way to cache-coherent ACE/CHI protocols used in multi-core processor clusters on the left.</p>
-<hr>
-<h2>APB -- Advanced Peripheral Bus</h2>
-<p><strong>APB</strong> is the simplest AMBA protocol, designed for low-bandwidth, low-power peripheral registers. It is a <strong>synchronous, non-pipelined</strong> bus with no burst mode -- every transfer takes a minimum of two clock cycles.</p>
-<h3>APB Signals</h3>
-<p>Key APB signals:</p>
-<ul>
-<li><code>PCLK</code> -- Clock</li>
-<li><code>PRESETn</code> -- Active-low reset</li>
-<li><code>PADDR</code> -- Address (12-32 bit)</li>
-<li><code>PSEL</code> -- Select: asserted to indicate target peripheral</li>
-<li><code>PENABLE</code> -- Enable: on second cycle of every transfer</li>
-<li><code>PWRITE</code> -- Direction: high = write, low = read</li>
-<li><code>PWDATA</code> -- Write data</li>
-<li><code>PRDATA</code> -- Read data (from slave)</li>
-<li><code>PREADY</code> -- Slave extends transfer if not ready</li>
-<li><code>PSLVERR</code> -- Slave error response</li>
-</ul>
-<h3>APB Write Timing</h3>
-<p>An APB write transaction takes place over two phases: <strong>Setup</strong> and <strong>Access</strong>:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_09ef87f95dc8f74f62f977bf68033a1e.svg"></p>
-<p>In the <strong>Setup</strong> phase, PSEL is asserted and the address and write data are presented. In the <strong>Access</strong> phase, PENABLE goes high confirming the transfer. PREADY allows a slow peripheral to extend the access phase by holding it low.</p>
-<p>APB is ideal for: UART, SPI, I2C, GPIO, timer, and watchdog registers -- anything that does not require high data throughput.</p>
-<hr>
-<h2>AHB -- Advanced High-performance Bus</h2>
-<p><strong>AHB</strong> sits in the middle tier. It is a <strong>pipelined</strong>, higher-bandwidth protocol supporting burst transfers. AHB separates the <strong>address phase</strong> and <strong>data phase</strong>, allowing the next address to be issued while the current data transfer is in progress.</p>
-<h3>Key AHB Signals</h3>
-<ul>
-<li><code>HCLK</code>, <code>HRESETn</code> -- Clock and reset</li>
-<li><code>HADDR</code> -- Address (32-bit)</li>
-<li><code>HTRANS</code> -- Transfer type: IDLE / BUSY / NONSEQ / SEQ</li>
-<li><code>HWRITE</code> -- Direction</li>
-<li><code>HSIZE</code> -- Transfer size (8, 16, 32, 64... bit)</li>
-<li><code>HBURST</code> -- Burst type (SINGLE, INCR, WRAP4, INCR4...)</li>
-<li><code>HWDATA</code> / <code>HRDATA</code> -- Write and read data</li>
-<li><code>HREADY</code> -- Transfer complete / extend</li>
-<li><code>HRESP</code> -- Response (OKAY / ERROR)</li>
-</ul>
-<h3>AHB Pipelined Burst Read</h3>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_b51c9049a22ed7556c47b205afac8c07.svg"></p>
-<p>The key insight: while the data for A0 is being returned, the address A1 is already being presented. This pipeline overlap hides address-to-data latency and improves throughput.</p>
-<h3>AHB Arbitration</h3>
-<p>When multiple masters (CPU, DMA) contend for the AHB, an <strong>arbiter</strong> decides who gets access using a bus grant / bus request protocol. Masters assert <code>HBUSREQx</code> when they want the bus; the arbiter asserts <code>HGRANTx</code> to indicate the winner. This round-robin or priority-based arbitration introduces a form of time-division multiplexing onto the shared bus.</p>
-<hr>
-<h2>AXI -- Advanced eXtensible Interface</h2>
-<p><strong>AXI4</strong> is the highest-performance AMBA protocol, used to connect CPUs, memory controllers, DMA engines, GPUs, and other high-bandwidth masters and slaves. It is the backbone of most modern SoCs.</p>
-<p>AXI4's key innovation is <strong>independent channels</strong>: read and write transactions are completely separate, and multiple transactions can be in flight simultaneously.</p>
-<h3>The Five AXI Channels</h3>
-<p><a href="../06-axi-channels-HQ.png"><img alt="AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names" src="../06-axi-channels-900w.png"></a></p>
-<p>The five channels are:</p>
-<ul>
-<li><strong>AW (Write Address)</strong> -- master sends the address and burst parameters for a write</li>
-<li><strong>W (Write Data)</strong> -- master sends the data beats with byte strobes and WLAST flag</li>
-<li><strong>B (Write Response)</strong> -- slave confirms the write completed (or reports an error)</li>
-<li><strong>AR (Read Address)</strong> -- master sends the address and burst parameters for a read</li>
-<li><strong>R (Read Data)</strong> -- slave returns data beats with RLAST flag</li>
-</ul>
-<h3>Valid/Ready Handshake</h3>
-<p>Every AXI channel uses the same <strong>valid/ready handshake</strong> protocol. The sender asserts <code>VALID</code> when it has data to transfer. The receiver asserts <code>READY</code> when it can accept data. The transfer completes on the rising clock edge when <strong>both</strong> are high:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_bdf5614eafeb6fb4c582b3cf98b83a3e.svg"></p>
-<p>This decoupled handshake is powerful: the master can issue addresses continuously; the slave can stall when its internal buffers are full, without requiring the master to back off.</p>
-<h3>AXI Burst Transfers</h3>
-<p>Rather than issuing many single transactions, AXI supports <strong>burst transfers</strong> -- a single address phase followed by multiple data beats. This dramatically improves efficiency for sequential memory access.</p>
-<p>Key burst parameters:</p>
-<ul>
-<li><strong>AWLEN / ARLEN</strong> -- number of data beats (0=1 beat, 255=256 beats for AXI4)</li>
-<li><strong>AWSIZE / ARSIZE</strong> -- bytes per beat (1, 2, 4, 8, 16, 32, 64, 128)</li>
-<li><strong>AWBURST / ARBURST</strong> -- burst type:</li>
-<li><code>FIXED</code> -- same address repeated (useful for FIFOs)</li>
-<li><code>INCR</code> -- address increments each beat (normal memory access)</li>
-<li><code>WRAP</code> -- like INCR but wraps at a boundary (useful for cache lines)</li>
-</ul>
-<h3>AXI IDs and Out-of-Order Transactions</h3>
-<p>AXI assigns each transaction an <strong>ID</strong> (<code>AWID</code> / <code>ARID</code>). A slave may respond to transactions <strong>out of order</strong> as long as responses within the same ID are in order. This allows a memory controller to optimise DRAM access patterns rather than being forced to respond in the exact order of requests.</p>
-<hr>
-<h2>The Interconnect: From Bus to Crossbar</h2>
-<p>A simple shared bus forces all masters to share a single data path -- only one master can use it at a time. This creates a bottleneck in systems with multiple high-bandwidth masters.</p>
-<p>The solution is an <strong>AXI crossbar</strong> (also called a <strong>switch matrix</strong>): it provides dedicated paths between every master-slave pair, allowing multiple simultaneous transfers as long as they target different slaves.</p>
-<p><a href="../06-bus-vs-crossbar-HQ.png"><img alt="Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right" src="../06-bus-vs-crossbar-900w.png"></a></p>
-<p>ARM's CoreLink NIC-400 and CoreLink CCI-550 are examples of AXI interconnect IP used in real SoCs. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.</p>
-<hr>
-<h2>QoS: Quality of Service in Interconnects</h2>
-<p>Not all traffic is equal. A display engine reading pixel data must deliver frames at a guaranteed rate, or the screen will tear. A background DMA transfer moving log data is not time-critical. AXI4 supports <strong>QoS signalling</strong> (<code>ARQOS</code> / <code>AWQOS</code>) -- a 4-bit priority tag attached to every transaction.</p>
-<p>The interconnect uses these tags to arbitrate between competing masters, ensuring that time-sensitive traffic is served first without starvation of low-priority traffic.</p>
-<hr>
-<h2>AXI4-Lite: The Simplified Register Interface</h2>
-<p>Full AXI4 has substantial complexity -- burst management, ID tracking, out-of-order responses. For accessing peripheral register banks (where individual 32-bit reads and writes are all that is needed), <strong>AXI4-Lite</strong> offers a simplified subset:</p>
-<ul>
-<li>No burst support (single transfers only)</li>
-<li>No transaction IDs</li>
-<li>No out-of-order support</li>
-<li>Simple 32-bit or 64-bit data width</li>
-</ul>
-<p>AXI4-Lite is extremely common for connecting peripheral IP blocks to the system bus, where its simplicity makes it easy to implement correctly.</p>
-<hr>
-<h2>APB Bridge: Connecting the Bus Tiers</h2>
-<p>Because APB is simpler and lower power, slow peripherals are typically attached to an <strong>APB bus</strong> rather than directly to the AXI/AHB backbone. An <strong>AXI-to-APB bridge</strong> converts between the protocols:</p>
-<p><a href="../06-soc-bus-hierarchy-HQ.png"><img alt="SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus" src="../06-soc-bus-hierarchy-900w.png"></a></p>
-<p>The bridge runs the APB at a lower, slower clock (e.g., 100 MHz) while the AXI backbone runs at 500 MHz or more, reducing dynamic power in the peripherals.</p>
-<hr>
-<h2>Network-on-Chip (NoC)</h2>
-<p>In the largest, most complex SoCs -- server processors, AI accelerators -- even an AXI crossbar becomes a bottleneck. The solution is a <strong>Network-on-Chip (NoC)</strong>: a switched packet network embedded on the die, with routers at each node and links between them.</p>
-<p><a href="../06-noc-mesh-HQ.png"><img alt="Network-on-Chip 4x4 mesh topology showing router nodes connected by bidirectional links with CPU, GPU, DRAM, and NPU blocks at the edges" src="../06-noc-mesh-900w.png"></a></p>
-<p>NoCs provide:</p>
-<ul>
-<li><strong>Scalability</strong> -- adding more processing tiles does not require redesigning the interconnect</li>
-<li><strong>Bandwidth</strong> -- multiple simultaneous transfers across different links</li>
-<li><strong>Modularity</strong> -- standard router IP can be assembled in different topologies</li>
-</ul>
-<p>This is an advanced topic covered in the advanced article series.</p>
-<hr>
-<h2>Summary</h2>
-<p>SoC interconnects form the communication backbone that links every functional block. The AMBA protocol family provides a hierarchy of protocols: APB for simple peripherals, AHB for mid-range transfers, and AXI for high-performance connections. AXI's independent channel architecture and valid/ready handshake enable high-throughput, pipelined, out-of-order transfers. Crossbar interconnects replace shared buses to allow simultaneous transfers between different master-slave pairs. Understanding these protocols is essential for designing IP blocks that plug into an SoC and for debugging system-level performance issues.</p>
-<hr>
-<h2>Further Reading</h2>
-<ul>
-<li><em>AXI4 Protocol Deep Dive</em> -- Burst types, transaction IDs, out-of-order response ordering</li>
-<li><em>DMA Controller Architecture</em> -- How a DMA engine uses AXI to move data autonomously</li>
-<li><em>Network-on-Chip Design (Advanced)</em> -- Topology, routing algorithms, virtual channels</li>
-</ul>
-<hr>
-<p><em>Previous: <a href="../soc-article-05-memory-architecture.html">Article 05 -- Memory Architecture</a></em></p>
-<p><em>Next: <a href="../drafts/soc-article-07-clocking-reset-and-power-domains.html">Article 07 - Clocking, Reset, and Power Domains</a></em></p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>How SoC blocks communicate: the AMBA bus family from simple APB peripherals through pipelined AHB to the high-performance AXI4 with its five independent channels, valid/ready handshake, and crossbar interconnects.</p>
+                        <a class="readmore" href="../soc-article-06-interconnects-and-bus-protocols.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>

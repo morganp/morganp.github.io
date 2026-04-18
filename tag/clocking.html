@@ -4,10 +4,9 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>SoC Article 07: Clocking, Reset, and Power Domains</title>
+                        <title>Lizard-Spock - Clocking</title>
                         <link rel="stylesheet" href="../theme/css/main.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
-    <meta name="description" content="The infrastructure that makes a SoC run correctly and efficiently: PLLs for frequency synthesis, clock trees for low-skew distribution, clock..." />
         </head>
 
         <body id="index" class="home">
@@ -15,7 +14,7 @@
                         <h1><a href="../">Lizard-Spock</a></h1>
                         <nav><ul>
                                                 <li><a href="../pages/about.html">About</a></li>
-                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
                                                 <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
                                                 <li><a href="../category/home-garden.html">Home & Garden</a></li>
                                                 <li><a href="../category/music.html">Music</a></li>
@@ -24,15 +23,10 @@
                                                 <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
-  <section id="content" class="body">
-    <article>
-      <header>
-        <h1 class="entry-title">
-          <a href="../drafts/soc-article-07-clocking-reset-and-power-domains.html" rel="bookmark"
-             title="Permalink to SoC Article 07: Clocking, Reset, and Power Domains">SoC Article 07: Clocking, Reset, and Power Domains</a></h1>
-      </header>
 
-      <div class="entry-content">
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../soc-article-07-clocking-reset-and-power-domains.html">SoC Article 07: Clocking, Reset, and Power Domains</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2026-04-11T00:00:00+01:00">
                 Published: Sat 11 April 2026
@@ -43,7 +37,7 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/arm.html">ARM</a> <a href="../tag/clocking.html">Clocking</a> <a href="../tag/power-management.html">Power Management</a> <a href="../tag/dvfs.html">DVFS</a> <a href="../tag/pll.html">PLL</a> </p>        
-</footer><!-- /.post-info -->        <p><em>Series: Introduction to SoC Design | Article 7 of 11</em></p>
+</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 7 of 11</em></p>
 <hr>
 <h2>Introduction</h2>
 <p>Every digital circuit needs a clock -- a periodic signal that synchronises all the flip-flops in the design, causing them to sample their inputs and update their outputs in a coordinated fashion. The clock is so fundamental that designing, distributing, and managing it is an entire sub-discipline of SoC engineering.</p>
@@ -61,13 +55,13 @@
 <hr>
 <h2>The Clock Distribution Tree</h2>
 <p>The solution is a carefully engineered <strong>clock tree</strong>: a hierarchical network of buffers that distributes the clock signal from a single source to all destinations, with each branch sized so that all paths have approximately equal delay.</p>
-<p><a href="../drafts/07-clock-tree-HQ.png"><img alt="H-tree clock distribution showing equal-length paths from PLL output through hierarchical buffers to leaf flip-flops" src="../drafts/07-clock-tree-900w.png"></a></p>
+<p><a href="../07-clock-tree-HQ.png"><img alt="H-tree clock distribution showing equal-length paths from PLL output through hierarchical buffers to leaf flip-flops" src="../07-clock-tree-900w.png"></a></p>
 <p>All paths from source to leaf flip-flops are equal length, giving equal delay and low skew.</p>
 <p><strong>Clock tree synthesis (CTS)</strong> is an automated step in the physical design flow that constructs this tree. It is one of the most critical steps in achieving timing closure.</p>
 <hr>
 <h2>Phase-Locked Loops (PLLs)</h2>
 <p>SoCs do not use their raw crystal oscillator frequency (typically 24--100 MHz from an external crystal) directly. Instead, a <strong>Phase-Locked Loop (PLL)</strong> multiplies and divides this reference to generate the precise frequencies needed by each subsystem.</p>
-<p><a href="../drafts/07-pll-block-HQ.png"><img alt="PLL block diagram showing reference clock into phase/frequency detector, loop filter, VCO producing output, with feedback divider closing the loop" src="../drafts/07-pll-block-900w.png"></a></p>
+<p><a href="../07-pll-block-HQ.png"><img alt="PLL block diagram showing reference clock into phase/frequency detector, loop filter, VCO producing output, with feedback divider closing the loop" src="../07-pll-block-900w.png"></a></p>
 <p>Output frequency = Ref × (N/M) where N and M are programmable dividers.</p>
 <p>A PLL is an <strong>analog circuit</strong> embedded in the otherwise digital SoC. Its output frequency is controlled by a digital divider, but the loop filter and VCO (Voltage-Controlled Oscillator) are analog. This makes PLLs sensitive to supply noise -- which is why they have their own isolated power supply on-chip.</p>
 <p>A typical large SoC has 4--12 PLLs:
@@ -79,7 +73,7 @@
 <hr>
 <h2>Multiple Clock Domains</h2>
 <p>Different parts of a SoC operate at different frequencies, and often from different clocks. A <strong>clock domain</strong> is a group of flip-flops all clocked by the same source.</p>
-<p><a href="../drafts/07-clock-domains-HQ.png"><img alt="Clock domain tree showing crystal oscillator feeding multiple PLLs that fan out to CPU, GPU, DDR, AXI bus, APB peripherals, and always-on RTC domains at different frequencies" src="../drafts/07-clock-domains-900w.png"></a></p>
+<p><a href="../07-clock-domains-HQ.png"><img alt="Clock domain tree showing crystal oscillator feeding multiple PLLs that fan out to CPU, GPU, DDR, AXI bus, APB peripherals, and always-on RTC domains at different frequencies" src="../07-clock-domains-900w.png"></a></p>
 <p>When data must cross from one clock domain to another -- for example, from the CPU domain to the peripheral APB domain -- a <strong>Clock Domain Crossing (CDC)</strong> circuit is required. Failure to handle CDCs correctly is one of the most common sources of functional bugs in SoC designs.</p>
 <h3>The Metastability Problem</h3>
 <p>When a flip-flop's input changes near its sampling edge, the flip-flop may enter a <strong>metastable</strong> state -- neither a clean 0 nor a clean 1. If the metastable state propagates, it can corrupt data or cause unexpected behaviour.</p>
@@ -106,7 +100,7 @@
 <p><img alt="FSM diagram" src="../images/fsm/fsm_fe8a56134e225fc3451ba555b719be7f.svg"></p>
 <h3>Power Gating</h3>
 <p><strong>Power gating</strong> uses header or footer switches (large PMOS or NMOS transistors) to physically disconnect a domain from its supply rail, reducing leakage current to near zero:</p>
-<p><a href="../drafts/07-power-gating-HQ.png"><img alt="Power gating diagram showing VDD connected through a PMOS header switch to a virtual VDD rail supplying a logic block, with an NMOS footer switch to GND, both controlled by the PMU" src="../drafts/07-power-gating-900w.png"></a></p>
+<p><a href="../07-power-gating-HQ.png"><img alt="Power gating diagram showing VDD connected through a PMOS header switch to a virtual VDD rail supplying a logic block, with an NMOS footer switch to GND, both controlled by the PMU" src="../07-power-gating-900w.png"></a></p>
 <p>When the block is gated off, its internal state is lost. If the state must be preserved (e.g., cache contents, CPU registers), <strong>retention registers</strong> -- special flip-flops with a separate, always-powered supply -- save critical state before power-down.</p>
 <h3>DVFS -- Dynamic Voltage and Frequency Scaling</h3>
 <p><strong>DVFS</strong> reduces power consumption by lowering both the supply voltage and clock frequency when full performance is not needed. Power consumption of CMOS logic scales approximately as:</p>
@@ -120,10 +114,10 @@ Where:
 </code></pre></div>
 
 <p>Since power scales with V², halving the voltage reduces dynamic power by 4×. Modern SoC CPUs support many operating points, and the OS uses a <strong>DVFS governor</strong> to select the appropriate operating point based on workload.</p>
-<p><a href="../drafts/07-dvfs-HQ.png"><img alt="DVFS operating points table showing five performance levels from Ultra Low at 600 MHz / 0.65 V up to Ultra High at 3.0 GHz / 1.05 V" src="../drafts/07-dvfs-900w.png"></a></p>
+<p><a href="../07-dvfs-HQ.png"><img alt="DVFS operating points table showing five performance levels from Ultra Low at 600 MHz / 0.65 V up to Ultra High at 3.0 GHz / 1.05 V" src="../07-dvfs-900w.png"></a></p>
 <h3>Clock Gating</h3>
 <p>A lighter-weight alternative to power gating is <strong>clock gating</strong>: stopping the clock to a region of logic. With the clock stopped, flip-flops no longer switch, and dynamic power drops to near zero (though leakage continues). Clock gating is implemented with an <strong>integrated clock gating cell (ICG)</strong>:</p>
-<p><a href="../drafts/07-clock-gating-HQ.png"><img alt="Integrated clock gating cell schematic showing EN input into a latch clocked by CLK, with the latch output ANDed with CLK to produce GATED_CLK, preventing glitches on enable transitions" src="../drafts/07-clock-gating-900w.png"></a></p>
+<p><a href="../07-clock-gating-HQ.png"><img alt="Integrated clock gating cell schematic showing EN input into a latch clocked by CLK, with the latch output ANDed with CLK to produce GATED_CLK, preventing glitches on enable transitions" src="../07-clock-gating-900w.png"></a></p>
 <p>When EN = 0, GATED_CLK is held low (no switching). When EN = 1, GATED_CLK follows CLK normally.</p>
 <p>Modern synthesis tools automatically insert clock gating cells throughout the design, reducing dynamic power by 20--40% with no architect effort.</p>
 <hr>
@@ -141,11 +135,8 @@ Where:
 </ul>
 <hr>
 <p><em>Previous: <a href="../soc-article-06-interconnects-and-bus-protocols.html">Article 06 -- Interconnects and Bus Protocols</a></em>
-<em>Next: Article 08 -- Peripherals and I/O: Connecting the SoC to the World (coming soon)</em></p>
-      </div><!-- /.entry-content -->
-
-    </article>
-  </section>
+<em>Next: Article 08 -- Peripherals and I/O: Connecting the SoC to the World (coming soon)</em></p>                    </article>
+                </aside><!-- /#featured -->
                 <section id="extras" class="body">
                                 <div class="social">
                                         <h2>social</h2>
