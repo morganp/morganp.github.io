@@ -168,5 +168,5 @@ A System on Chip integrates what was once a board full of discrete chips - proce
 
 ---
 
-*Previous: [Article 01 - From Room to Silicon](|filename|../2026-03-07_SoC_Article_01_From_Room_to_Silicon/2026-03-07_SoC_Article_01_From_Room_to_Silicon.md)*
-*Next: [Article 03 - The SoC Design Stack: From Transistors to Software](|filename|../2026-03-21_SoC_Article_03_Design_Stack/2026-03-21_SoC_Article_03_Design_Stack.md)*
+*Previous: [Article 01 -- From Room to Silicon]({filename}../2026-03-07_SoC_Article_01_From_Room_to_Silicon/2026-03-07_SoC_Article_01_From_Room_to_Silicon.md)*
+*Next: [Article 03 -- The SoC Design Stack: From Transistors to Software]({filename}../2026-03-21_SoC_Article_03_Design_Stack/2026-03-21_SoC_Article_03_Design_Stack.md)*

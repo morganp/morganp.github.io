@@ -244,6 +244,5 @@ The SoC memory architecture is a carefully designed hierarchy that bridges the s
 
 ---
 
-*Previous: [SoC Article 04 - Processor Cores]({filename}/posts/2026-03-27_SoC_Article_04_Processor_Cores/2026-03-27_SoC_Article_04_Processor_Cores.md)*
-
-*Next: [Article 06 - Interconnects and Bus Protocols]({filename}/posts/2026-04-09_SoC_Article_06_Interconnects_and_Bus_Protocols/2026-04-09_SoC_Article_06_Interconnects_and_Bus_Protocols.md)*
+*Previous: [Article 04 -- Processor Cores]({filename}../2026-03-27_SoC_Article_04_Processor_Cores/2026-03-27_SoC_Article_04_Processor_Cores.md)*
+*Next: [Article 06 -- Interconnects and Bus Protocols]({filename}../2026-04-09_SoC_Article_06_Interconnects_and_Bus_Protocols/2026-04-09_SoC_Article_06_Interconnects_and_Bus_Protocols.md)*

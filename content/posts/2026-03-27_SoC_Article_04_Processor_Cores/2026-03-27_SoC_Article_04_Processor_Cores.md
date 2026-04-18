@@ -243,6 +243,5 @@ SoC processing subsystems are not monolithic: they combine CPUs for general-purp
 
 ---
 
-*Previous: [Article 03 - The SoC Design Stack]({filename}/posts/2026-03-21_SoC_Article_03_Design_Stack/2026-03-21_SoC_Article_03_Design_Stack.md)*
-
-*Next: [Article 05 - Memory Architecture: Caches, DRAM, and On-chip Storage]({filename}/posts/2026-04-04_SoC_Article_05_Memory_Architecture/2026-04-04_SoC_Article_05_Memory_Architecture.md)*
+*Previous: [Article 03 -- The SoC Design Stack]({filename}../2026-03-21_SoC_Article_03_Design_Stack/2026-03-21_SoC_Article_03_Design_Stack.md)*
+*Next: [Article 05 -- Memory Architecture: Caches, DRAM, and On-chip Storage]({filename}../2026-04-04_SoC_Article_05_Memory_Architecture/2026-04-04_SoC_Article_05_Memory_Architecture.md)*

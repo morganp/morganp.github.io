@@ -381,3 +381,4 @@ Peripherals are the interface between a SoC and the physical world. GPIO provide
 ---
 
 *Previous: [Article 07 -- Clocking, Reset, and Power Domains]({filename}../2026-04-11_SoC_Article_07_Clocking_Reset_and_Power_Domains/2026-04-11_SoC_Article_07_Clocking_Reset_and_Power_Domains.md)*
+*Next: [Article 09 -- Hardware Description Languages and RTL Design]({filename}../2026-04-18_SoC_Article_09_HDL_RTL_Design/2026-04-18_SoC_Article_09_HDL_RTL_Design.md)*

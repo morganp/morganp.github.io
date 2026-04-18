@@ -249,5 +249,5 @@ Clocking, reset, and power management are the infrastructure that makes a SoC ru
 
 ---
 
-*Previous: [Article 06 -- Interconnects and Bus Protocols]({filename}/posts/2026-04-09_SoC_Article_06_Interconnects_and_Bus_Protocols/2026-04-09_SoC_Article_06_Interconnects_and_Bus_Protocols.md)*
-*Next: Article 08 -- Peripherals and I/O: Connecting the SoC to the World (coming soon)*
+*Previous: [Article 06 -- Interconnects and Bus Protocols]({filename}../2026-04-09_SoC_Article_06_Interconnects_and_Bus_Protocols/2026-04-09_SoC_Article_06_Interconnects_and_Bus_Protocols.md)*
+*Next: [Article 08 -- Peripherals and I/O: Connecting the SoC to the World]({filename}../2026-04-18_SoC_Article_08_Peripherals_and_IO/2026-04-18_SoC_Article_08_Peripherals_and_IO.md)*

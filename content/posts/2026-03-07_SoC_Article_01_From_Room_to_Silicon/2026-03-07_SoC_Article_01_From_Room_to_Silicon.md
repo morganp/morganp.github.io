@@ -306,4 +306,4 @@ Computer systems began as room-filling collections of vacuum tubes. The transist
 
 ---
 
-*Next: [Article 02 - What is a System on Chip? Anatomy and Motivation](|filename|../2026-03-15_SoC_Article_02_Anatomy_and_Motivation/2026-03-15_SoC_Article_02_Anatomy_and_Motivation.md)*
+*Next: [Article 02 -- What is a System on Chip? Anatomy and Motivation]({filename}../2026-03-15_SoC_Article_02_Anatomy_and_Motivation/2026-03-15_SoC_Article_02_Anatomy_and_Motivation.md)*
