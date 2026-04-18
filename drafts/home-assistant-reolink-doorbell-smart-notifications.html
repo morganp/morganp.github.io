@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Smart Doorbell Notifications with Home Assistant, Reolink and Sonoff</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="How to wire up a Reolink doorbell and a Sonoff door sensor in Home Assistant to send a camera snapshot push notification when someone rings, then..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li class="active"><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/home-assistant-reolink-doorbell-smart-notifications.html" rel="bookmark"
+             title="Permalink to Smart Doorbell Notifications with Home Assistant, Reolink and Sonoff">Smart Doorbell Notifications with Home Assistant, Reolink and Sonoff</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-04-18T00:00:00+01:00">
+                Published: Sat 18 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="../tag/home-assistant.html">Home Assistant</a> <a href="../tag/smart-home.html">Smart Home</a> <a href="../tag/reolink.html">Reolink</a> <a href="../tag/sonoff.html">Sonoff</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/notifications.html">Notifications</a> <a href="../tag/zigbee.html">Zigbee</a> </p>        
+</footer><!-- /.post-info -->        <p>The problem with most doorbell automations is that the notification lingers on your phone long after you have already answered the door. This post sets up an automation that sends a push notification with a doorbell camera snapshot when someone rings, then automatically clears it the moment the door is opened -- so your notification shade stays clean.</p>
+<hr>
+<h2>Components</h2>
+<ul>
+<li><strong>Reolink doorbell</strong> (PoE or Wi-Fi) -- integrated via the official <a href="https://www.home-assistant.io/integrations/reolink/">Reolink integration</a></li>
+<li><strong>Sonoff SNZB-04 door/window sensor</strong> -- a Zigbee sensor paired via Zigbee2MQTT or ZHA</li>
+<li><strong>Home Assistant</strong> with the mobile companion app installed on your phone (iOS or Android)</li>
+</ul>
+<hr>
+<h2>Push Notification Setup</h2>
+<p>Install the <strong>Home Assistant Companion App</strong> on each phone that should receive doorbell alerts (available on iOS and Android). Once logged in to your HA instance, the app registers a notify service automatically.</p>
+<p>To find your service name go to <strong>Developer Tools &gt; Actions</strong>, search for <code>notify.mobile_app</code> and you will see one entry per registered device -- for example <code>notify.mobile_app_morgan_iphone</code>. Use this name in the automation below.</p>
+<h3>Notifying Multiple People</h3>
+<p>To send to several phones, define a notification group in <code>configuration.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">notify</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">group</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">household</span>
+<span class="w">    </span><span class="nt">services</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mobile_app_phone_one</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mobile_app_phone_two</span>
+</code></pre></div>
+
+<p>Then use <code>notify.household</code> in the automation. The clear notification must also target the group so it dismisses on all devices.</p>
+<hr>
+<h2>Integrations Setup</h2>
+<h3>Reolink</h3>
+<p>Add the Reolink integration from <strong>Settings &gt; Devices &amp; Services &gt; Add Integration</strong>. Enter the doorbell's IP address, username, and password. Once added it exposes:</p>
+<ul>
+<li><code>binary_sensor.&lt;name&gt;_visitor</code> -- goes <code>on</code> when the doorbell button is pressed</li>
+<li><code>camera.&lt;name&gt;</code> -- live and snapshot camera feed</li>
+</ul>
+<p>Set a static IP for the doorbell on your router so the integration never loses it.</p>
+<h3>Sonoff SNZB-04 via Zigbee2MQTT</h3>
+<p>Pair the sensor by holding the reset button until the LED flashes. In Zigbee2MQTT it appears as a contact sensor. Home Assistant autodiscovers it as:</p>
+<ul>
+<li><code>binary_sensor.&lt;name&gt;_contact</code> -- <code>off</code> = closed, <code>on</code> = open</li>
+</ul>
+<p>If you are using ZHA the entity name follows the same pattern.</p>
+<hr>
+<h2>How the Automation Works</h2>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_92e1cd5233df7fe258a7c64d03f8988b.svg"></p>
+<ol>
+<li>Doorbell button pressed -- triggers the automation</li>
+<li>Push notification sent immediately with a camera snapshot attached</li>
+<li>Automation waits up to 2 minutes for the door sensor to report open</li>
+<li>If the door opens -- a second notification with the same <code>tag</code> clears the first from the device</li>
+<li>If nobody answers within 2 minutes -- the notification stays until manually dismissed</li>
+</ol>
+<hr>
+<h2>The Automation YAML</h2>
+<p>In Home Assistant go to <strong>Settings &gt; Automations &gt; New Automation &gt; Edit in YAML</strong> and paste:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Doorbell -- Smart Notification</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+<span class="w">  </span><span class="no">Send a doorbell snapshot notification. Clear it automatically if the door</span>
+<span class="w">  </span><span class="no">is opened within 2 minutes.</span>
+<span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">single</span>
+<span class="nt">max_exceeded</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">silent</span>
+
+<span class="nt">triggers</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">state</span>
+<span class="w">    </span><span class="nt">entity_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">binary_sensor.reolink_doorbell_visitor</span>
+<span class="w">    </span><span class="nt">to</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;on&quot;</span>
+
+<span class="nt">actions</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notify.mobile_app_your_phone</span>
+<span class="w">    </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Doorbell&quot;</span>
+<span class="w">      </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Someone</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">at</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">door&quot;</span>
+<span class="w">      </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">doorbell_alert</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/api/camera_proxy/camera.reolink_doorbell</span>
+<span class="w">        </span><span class="nt">ttl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">        </span><span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">high</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">wait_for_trigger</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">state</span>
+<span class="w">        </span><span class="nt">entity_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">binary_sensor.front_door_contact</span>
+<span class="w">        </span><span class="nt">to</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;on&quot;</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">    </span><span class="nt">continue_on_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">template</span>
+<span class="w">        </span><span class="nt">value_template</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">wait.timed_out</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">    </span><span class="nt">then</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notify.mobile_app_your_phone</span>
+<span class="w">        </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;clear_notification&quot;</span>
+<span class="w">          </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">doorbell_alert</span>
+</code></pre></div>
+
+<p>Replace <code>notify.mobile_app_your_phone</code> with your actual notify service name and <code>binary_sensor.front_door_contact</code> with your Sonoff sensor entity.</p>
+<hr>
+<h2>Camera Snapshot in the Notification</h2>
+<p>The <code>image</code> field uses the HA camera proxy URL. This serves a still image from the camera at the moment the notification is generated. On iOS the image appears as a thumbnail; long-press expands it. On Android it appears in the expanded notification view.</p>
+<p>If you want a fresh snapshot captured at doorbell-press time rather than the proxy serving a cached frame, take an explicit snapshot first:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">actions</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">camera.snapshot</span>
+<span class="w">    </span><span class="nt">target</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">entity_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">camera.reolink_doorbell</span>
+<span class="w">    </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/config/www/doorbell_snapshot.jpg</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notify.mobile_app_your_phone</span>
+<span class="w">    </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Doorbell&quot;</span>
+<span class="w">      </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Someone</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">at</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">door&quot;</span>
+<span class="w">      </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">doorbell_alert</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/local/doorbell_snapshot.jpg</span>
+</code></pre></div>
+
+<p><code>/config/www/</code> maps to <code>/local/</code> in the HA web server, making the image accessible to the companion app.</p>
+<hr>
+<h2>mode: single</h2>
+<p>The automation uses <code>mode: single</code> with <code>max_exceeded: silent</code>. This means if the doorbell is pressed again while the automation is already waiting (someone rings twice), the second press is ignored. This prevents duplicate notifications and competing clear triggers.</p>
+<p>If you want each ring to send a fresh notification, use <code>mode: restart</code> instead -- the wait timer resets on each press.</p>
+<hr>
+<h2>Testing</h2>
+<ol>
+<li>Press the doorbell button -- notification should arrive within a second or two with the camera image</li>
+<li>Open the front door -- notification should disappear from your lock screen and notification shade</li>
+<li>Press the doorbell but wait 2 minutes without opening the door -- notification should remain</li>
+</ol>
+<p>Check <strong>Settings &gt; Automations</strong>, open the automation, and use <strong>Traces</strong> to step through exactly what happened on each trigger.</p>
+<hr>
+<h2>Extending the Automation</h2>
+<ul>
+<li><strong>Announce on smart speakers</strong> -- add a <code>media_player</code> TTS action before the <code>wait_for_trigger</code></li>
+<li><strong>Record a clip</strong> -- trigger <code>camera.record</code> on the Reolink entity when the bell rings</li>
+<li><strong>Night mode</strong> -- wrap the notify action in a condition that checks <code>input_boolean.night_mode</code> to suppress notifications after midnight</li>
+<li><strong>Actionable notifications</strong> -- add action buttons to the notification (Unlock door, Ignore) using the companion app's actionable notification feature</li>
+</ul>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

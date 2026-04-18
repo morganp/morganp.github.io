@@ -141,7 +141,7 @@
 <p>A simple shared bus forces all masters to share a single data path -- only one master can use it at a time. This creates a bottleneck in systems with multiple high-bandwidth masters.</p>
 <p>The solution is an <strong>AXI crossbar</strong> (also called a <strong>switch matrix</strong>): it provides dedicated paths between every master-slave pair, allowing multiple simultaneous transfers as long as they target different slaves.</p>
 <p><a href="./06-bus-vs-crossbar-HQ.png"><img alt="Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right" src="./06-bus-vs-crossbar-900w.png"></a></p>
-<p>ARM's CoreLink NIC-400 and CoreLink CCI-550 are examples of AXI interconnect IP used in real SoCs. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.</p>
+<p>ARM's CoreLink NIC-400 and NIC-450 are examples of AXI mux-style interconnects, where a fixed matrix routes each master to a set of slaves. The CoreLink NI-700 takes a different approach: it is a Network-on-Chip (NoC) switched network that routes transactions independently through the fabric, allowing better scalability for large numbers of endpoints. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.</p>
 <hr>
 <h2>QoS: Quality of Service in Interconnects</h2>
 <p>Not all traffic is equal. A display engine reading pixel data must deliver frames at a guaranteed rate, or the screen will tear. A background DMA transfer moving log data is not time-critical. AXI4 supports <strong>QoS signalling</strong> (<code>ARQOS</code> / <code>AWQOS</code>) -- a 4-bit priority tag attached to every transaction.</p>
