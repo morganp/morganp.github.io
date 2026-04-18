@@ -1,5 +1,5 @@
 Title: SoC Article 07: Clocking, Reset, and Power Domains
-Date: 2026-04-11
+Date: 2026-04-18
 Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems, ARM, Clocking, Power Management, DVFS, PLL
 Slug: soc-article-07-clocking-reset-and-power-domains
