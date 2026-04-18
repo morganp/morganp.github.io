@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Article 09: Hardware Description Languages and RTL Design</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="How SoC hardware is described in code: the fundamental difference between sequential software and parallel hardware, RTL vs behavioural vs..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/soc-article-09-hardware-description-languages-rtl-design.html" rel="bookmark"
+             title="Permalink to SoC Article 09: Hardware Description Languages and RTL Design">SoC Article 09: Hardware Description Languages and RTL Design</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-04-18T00:00:00+01:00">
+                Published: Sat 18 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/systemverilog.html">SystemVerilog</a> <a href="../tag/vhdl.html">VHDL</a> <a href="../tag/rtl.html">RTL</a> <a href="../tag/hdl.html">HDL</a> <a href="../tag/fpga.html">FPGA</a> <a href="../tag/synthesis.html">Synthesis</a> </p>        
+</footer><!-- /.post-info -->        <p><em>Series: Introduction to SoC Design | Article 9 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>Hardware does not appear from nowhere. Before a single transistor is manufactured, a SoC's behaviour must be described in a language that both engineers and computers can process -- simulating it, verifying it, and ultimately synthesising it into real logic gates.</p>
+<p><strong>Hardware Description Languages (HDLs)</strong> are that language. They look superficially like programming languages, but they describe hardware -- circuits that exist and operate in parallel, not sequential lists of instructions. Understanding this distinction is the single most important step in learning HDL design.</p>
+<hr>
+<h2>The Fundamental Difference: Parallelism</h2>
+<p>In a software program, statements execute one after another:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Software: sequential execution</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">read_sensor</span><span class="p">()</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">output</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>      <span class="c1"># c is calculated AFTER b is calculated</span>
+</code></pre></div>
+
+<p>In hardware, all blocks of logic are <strong>always active simultaneously</strong>. Every combinational logic path is constantly computing its output from its inputs, every clock edge triggers every flip-flop at once:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Hardware: everything runs concurrently</span>
+<span class="c1">// All these assignments happen in PARALLEL, every clock cycle</span>
+<span class="k">always_ff</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="n">reg_a</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">input_a</span><span class="p">;</span><span class="w">      </span><span class="c1">// This flip-flop samples input_a</span>
+<span class="w">    </span><span class="n">reg_b</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">reg_a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span><span class="w">    </span><span class="c1">// This flip-flop samples reg_a + 1</span>
+<span class="w">    </span><span class="n">reg_c</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">reg_b</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mh">2</span><span class="p">;</span><span class="w">   </span><span class="c1">// This flip-flop samples reg_b shifted left</span>
+<span class="k">end</span>
+<span class="c1">// All three updates happen simultaneously on every rising clock edge</span>
+</code></pre></div>
+
+<p>This parallel nature is what makes HDL difficult for software engineers at first: there is no "sequence of operations" -- there is a network of logic gates and registers, all computing simultaneously.</p>
+<hr>
+<h2>The Two Major HDLs: Verilog and VHDL</h2>
+<p>The industry is divided between two languages, both established in the 1980s and both IEEE-standardised:</p>
+<p><strong>Verilog</strong> -- C-like syntax, concise, originally designed for simulation. Extended into <strong>SystemVerilog</strong> (IEEE 1800) which adds OOP features, assertions, and randomised verification constructs.</p>
+<p><strong>VHDL</strong> (VHSIC Hardware Description Language) -- Ada-like syntax, strongly typed, verbose. Historically dominant in Europe, aerospace, and defence.</p>
+<p>For this series, examples use <strong>SystemVerilog</strong> for hardware design and VHDL where instructive for comparison. The concepts are identical.</p>
+<hr>
+<h2>RTL vs Behavioural vs Structural</h2>
+<p>HDL code can be written at different levels of abstraction:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_be4b1b73ee5d6b84122a2e2376ba9d43.svg"></p>
+<p><strong>Structural</strong> -- instantiate specific gates and connect them with wires:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Structural: instantiate specific primitives</span>
+<span class="n">and_gate</span><span class="w"> </span><span class="n">U0</span><span class="w"> </span><span class="p">(.</span><span class="n">a</span><span class="p">(</span><span class="n">in_a</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">b</span><span class="p">(</span><span class="n">in_b</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">y</span><span class="p">(</span><span class="n">wire_and</span><span class="p">));</span>
+<span class="n">or_gate</span><span class="w">  </span><span class="n">U1</span><span class="w"> </span><span class="p">(.</span><span class="n">a</span><span class="p">(</span><span class="n">wire_and</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">c</span><span class="p">(</span><span class="n">in_c</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">y</span><span class="p">(</span><span class="n">out</span><span class="p">));</span>
+</code></pre></div>
+
+<p><strong>Behavioural</strong> -- describe <em>what</em> the circuit does:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Behavioural: synthesis tool decides the gates</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">in_a</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">in_b</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">in_c</span><span class="p">;</span>
+</code></pre></div>
+
+<p><strong>RTL</strong> -- explicit registers and data paths:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// RTL: explicit registers and data paths</span>
+<span class="k">always_ff</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">rst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rst_n</span><span class="p">)</span><span class="w">   </span><span class="n">data_reg</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">else</span><span class="w">          </span><span class="n">data_reg</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">data_in</span><span class="p">;</span>
+<span class="k">end</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">data_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data_reg</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">offset</span><span class="p">;</span>
+</code></pre></div>
+
+<hr>
+<h2>SystemVerilog Key Constructs</h2>
+<h3>Modules</h3>
+<p>The <strong>module</strong> is the fundamental building block -- equivalent to a function or class in software, but representing a hardware block with defined ports:</p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span><span class="w"> </span><span class="n">adder</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">    </span><span class="k">parameter</span><span class="w"> </span><span class="n">WIDTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">8</span><span class="w">          </span><span class="c1">// configurable width</span>
+<span class="p">)</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">WIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">a</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">WIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">b</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w">             </span><span class="n">cin</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">WIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">sum</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w">             </span><span class="n">cout</span>
+<span class="p">);</span>
+<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="p">{</span><span class="n">cout</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cin</span><span class="p">;</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+
+<p>Modules are <strong>instantiated</strong> to create the structural hierarchy of a SoC:</p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span><span class="w"> </span><span class="n">alu</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">src_a</span><span class="p">,</span><span class="w"> </span><span class="n">src_b</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">3</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">  </span><span class="n">op</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">result</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w">        </span><span class="n">zero</span>
+<span class="p">);</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">add_result</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w">        </span><span class="n">add_carry</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">adder</span><span class="w"> </span><span class="p">#(.</span><span class="n">WIDTH</span><span class="p">(</span><span class="mh">32</span><span class="p">))</span><span class="w"> </span><span class="n">u_adder</span><span class="w"> </span><span class="p">(</span>
+<span class="w">        </span><span class="p">.</span><span class="n">a</span><span class="w">    </span><span class="p">(</span><span class="n">src_a</span><span class="p">),</span>
+<span class="w">        </span><span class="p">.</span><span class="n">b</span><span class="w">    </span><span class="p">(</span><span class="n">src_b</span><span class="p">),</span>
+<span class="w">        </span><span class="p">.</span><span class="n">cin</span><span class="w">  </span><span class="p">(</span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">),</span>
+<span class="w">        </span><span class="p">.</span><span class="n">sum</span><span class="w">  </span><span class="p">(</span><span class="n">add_result</span><span class="p">),</span>
+<span class="w">        </span><span class="p">.</span><span class="n">cout</span><span class="w"> </span><span class="p">(</span><span class="n">add_carry</span><span class="p">)</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">always_comb</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+<span class="w">            </span><span class="mh">4</span><span class="mb">&#39;b0000</span><span class="o">:</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add_result</span><span class="p">;</span><span class="w">          </span><span class="c1">// ADD</span>
+<span class="w">            </span><span class="mh">4</span><span class="mb">&#39;b0001</span><span class="o">:</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">src_b</span><span class="p">;</span><span class="w">       </span><span class="c1">// SUB</span>
+<span class="w">            </span><span class="mh">4</span><span class="mb">&#39;b0010</span><span class="o">:</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_a</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">src_b</span><span class="p">;</span><span class="w">       </span><span class="c1">// AND</span>
+<span class="w">            </span><span class="mh">4</span><span class="mb">&#39;b0011</span><span class="o">:</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_a</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">src_b</span><span class="p">;</span><span class="w">       </span><span class="c1">// OR</span>
+<span class="w">            </span><span class="mh">4</span><span class="mb">&#39;b0100</span><span class="o">:</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_a</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">src_b</span><span class="p">;</span><span class="w">       </span><span class="c1">// XOR</span>
+<span class="w">            </span><span class="mh">4</span><span class="mb">&#39;b0101</span><span class="o">:</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_a</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">src_b</span><span class="p">[</span><span class="mh">4</span><span class="o">:</span><span class="mh">0</span><span class="p">];</span><span class="w"> </span><span class="c1">// SLL</span>
+<span class="w">            </span><span class="k">default</span><span class="o">:</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">endcase</span>
+<span class="w">        </span><span class="n">zero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">);</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+
+<h3>Sequential Logic: always_ff</h3>
+<p>The <code>always_ff</code> block describes registers. It executes on every rising (or falling) clock edge:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 8-entry FIFO with synchronous read and write</span>
+<span class="k">module</span><span class="w"> </span><span class="n">fifo8</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w">       </span><span class="n">clk</span><span class="p">,</span><span class="w"> </span><span class="n">rst_n</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">wdata</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w">       </span><span class="n">wen</span><span class="p">,</span><span class="w"> </span><span class="n">ren</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">rdata</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w">       </span><span class="n">full</span><span class="p">,</span><span class="w"> </span><span class="n">empty</span>
+<span class="p">);</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">mem</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">7</span><span class="p">];</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">2</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">wptr</span><span class="p">,</span><span class="w"> </span><span class="n">rptr</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">3</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">always_ff</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">rst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">wptr</span><span class="w">  </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">rptr</span><span class="w">  </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">count</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wen</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">full</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">                </span><span class="n">mem</span><span class="p">[</span><span class="n">wptr</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">wdata</span><span class="p">;</span>
+<span class="w">                </span><span class="n">wptr</span><span class="w">      </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">wptr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
+<span class="w">                </span><span class="n">count</span><span class="w">     </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
+<span class="w">            </span><span class="k">end</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ren</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">empty</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">                </span><span class="n">rptr</span><span class="w">  </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">rptr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
+<span class="w">                </span><span class="n">count</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
+<span class="w">            </span><span class="k">end</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">rdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mem</span><span class="p">[</span><span class="n">rptr</span><span class="p">];</span>
+<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">full</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">4</span><span class="mi">&#39;d8</span><span class="p">);</span>
+<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">empty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">4</span><span class="mi">&#39;d0</span><span class="p">);</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+
+<h3>Combinational Logic: always_comb</h3>
+<p>The <code>always_comb</code> block describes purely combinational logic -- it re-evaluates whenever any of its inputs change:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Priority encoder: find the index of the highest-priority set bit</span>
+<span class="k">module</span><span class="w"> </span><span class="n">priority_enc</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">req</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">2</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">grant_id</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w">       </span><span class="n">valid</span>
+<span class="p">);</span>
+<span class="w">    </span><span class="k">always_comb</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">valid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="o">|</span><span class="n">req</span><span class="p">;</span>
+<span class="w">        </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w">      </span><span class="p">(</span><span class="n">req</span><span class="p">[</span><span class="mh">7</span><span class="p">])</span><span class="w"> </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d7</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">[</span><span class="mh">6</span><span class="p">])</span><span class="w"> </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d6</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">[</span><span class="mh">5</span><span class="p">])</span><span class="w"> </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d5</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">[</span><span class="mh">4</span><span class="p">])</span><span class="w"> </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d4</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">[</span><span class="mh">3</span><span class="p">])</span><span class="w"> </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d3</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">[</span><span class="mh">2</span><span class="p">])</span><span class="w"> </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d2</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">[</span><span class="mh">1</span><span class="p">])</span><span class="w"> </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w">             </span><span class="n">grant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+
+<hr>
+<h2>Finite State Machines in RTL</h2>
+<p>The <strong>Finite State Machine (FSM)</strong> is one of the most important patterns in digital design. An FSM transitions between a finite set of states based on inputs and the current state, producing outputs based on state.</p>
+<h3>Example: Simple UART Receiver FSM</h3>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">IDLE</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mh">2</span><span class="mb">&#39;b00</span><span class="p">,</span>
+<span class="w">    </span><span class="n">START</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">2</span><span class="mb">&#39;b01</span><span class="p">,</span>
+<span class="w">    </span><span class="n">DATA</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mh">2</span><span class="mb">&#39;b10</span><span class="p">,</span>
+<span class="w">    </span><span class="n">STOP</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mh">2</span><span class="mb">&#39;b11</span>
+<span class="p">}</span><span class="w"> </span><span class="n">uart_state_t</span><span class="p">;</span>
+
+<span class="k">module</span><span class="w"> </span><span class="n">uart_rx</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w">       </span><span class="n">clk</span><span class="p">,</span><span class="w"> </span><span class="n">rst_n</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="kt">logic</span><span class="w">       </span><span class="n">rx</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">data</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w">       </span><span class="n">valid</span>
+<span class="p">);</span>
+<span class="w">    </span><span class="n">uart_state_t</span><span class="w"> </span><span class="n">state</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">2</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">  </span><span class="n">bit_cnt</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">  </span><span class="n">shift_reg</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">always_ff</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">rst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">state</span><span class="w">     </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">IDLE</span><span class="p">;</span>
+<span class="w">            </span><span class="n">bit_cnt</span><span class="w">   </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">shift_reg</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">valid</span><span class="w">     </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">valid</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="w">                </span><span class="nl">IDLE:</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rx</span><span class="p">)</span><span class="w">            </span><span class="n">state</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">START</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">START:</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">                    </span><span class="n">bit_cnt</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">state</span><span class="w">   </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">DATA</span><span class="p">;</span>
+<span class="w">                </span><span class="k">end</span>
+<span class="w">                </span><span class="nl">DATA:</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">                    </span><span class="n">shift_reg</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="p">{</span><span class="n">rx</span><span class="p">,</span><span class="w"> </span><span class="n">shift_reg</span><span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">1</span><span class="p">]};</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bit_cnt</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">3</span><span class="mi">&#39;d7</span><span class="p">)</span><span class="w"> </span><span class="n">state</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">STOP</span><span class="p">;</span>
+<span class="w">                    </span><span class="k">else</span><span class="w">                 </span><span class="n">bit_cnt</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">bit_cnt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
+<span class="w">                </span><span class="k">end</span>
+<span class="w">                </span><span class="nl">STOP:</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rx</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">                        </span><span class="n">data</span><span class="w">  </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">shift_reg</span><span class="p">;</span>
+<span class="w">                        </span><span class="n">valid</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
+<span class="w">                    </span><span class="k">end</span>
+<span class="w">                    </span><span class="n">state</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">IDLE</span><span class="p">;</span>
+<span class="w">                </span><span class="k">end</span>
+<span class="w">            </span><span class="k">endcase</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+
+<p>The corresponding state diagram:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_4a564833658ab6fd609f49b340607e27.svg"></p>
+<hr>
+<h2>Simulation and Testbenches</h2>
+<p>HDL code is verified by <strong>simulation</strong> -- running the design against a set of inputs (a <strong>testbench</strong>) and checking the outputs.</p>
+<p>A testbench is not synthesisable. Its job is to:
+1. Instantiate the <strong>DUT (Device Under Test)</strong>
+2. Generate stimulus (clock, inputs)
+3. Check outputs against expected values
+4. Report pass/fail</p>
+<div class="highlight"><pre><span></span><code><span class="no">`timescale</span><span class="w"> </span><span class="mh">1</span><span class="n">ns</span><span class="o">/</span><span class="mh">1</span><span class="n">ps</span>
+<span class="k">module</span><span class="w"> </span><span class="n">tb_counter</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w">       </span><span class="n">clk</span><span class="p">,</span><span class="w"> </span><span class="n">rst_n</span><span class="p">,</span><span class="w"> </span><span class="n">en</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="mh">3</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">counter</span><span class="w"> </span><span class="p">#(.</span><span class="n">WIDTH</span><span class="p">(</span><span class="mh">4</span><span class="p">))</span><span class="w"> </span><span class="n">dut</span><span class="w"> </span><span class="p">(.</span><span class="o">*</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">initial</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">#</span><span class="mh">5</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">clk</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">initial</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">rst_n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span><span class="w"> </span><span class="n">en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">);</span><span class="w"> </span><span class="p">#</span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">rst_n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">);</span><span class="w"> </span><span class="p">#</span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">repeat</span><span class="p">(</span><span class="mh">20</span><span class="p">)</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">);</span>
+<span class="w">        </span><span class="n">en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">repeat</span><span class="p">(</span><span class="mh">5</span><span class="p">)</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">count</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="mh">4</span><span class="mi">&#39;d4</span><span class="p">)</span>
+<span class="w">            </span><span class="n">$error</span><span class="p">(</span><span class="s">&quot;FAIL: expected 4, got %0d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="nb">$display</span><span class="p">(</span><span class="s">&quot;PASS&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="nb">$finish</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="k">initial</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">$dumpfile</span><span class="p">(</span><span class="s">&quot;counter_tb.vcd&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">$dumpvars</span><span class="p">(</span><span class="mh">0</span><span class="p">,</span><span class="w"> </span><span class="n">tb_counter</span><span class="p">);</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+
+<hr>
+<h2>SystemVerilog Assertions (SVA)</h2>
+<p><strong>Assertions</strong> are formal, self-checking properties embedded directly in the design or testbench. They check that the hardware obeys its specification throughout simulation.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Assert: write enable must not be asserted when full</span>
+<span class="n">property</span><span class="w"> </span><span class="n">no_overflow</span><span class="p">;</span>
+<span class="w">    </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">)</span><span class="w"> </span><span class="k">disable</span><span class="w"> </span><span class="n">iff</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rst_n</span><span class="p">)</span>
+<span class="w">    </span><span class="p">(</span><span class="n">full</span><span class="w"> </span><span class="o">|-&gt;</span><span class="w"> </span><span class="o">!</span><span class="n">wen</span><span class="p">);</span>
+<span class="n">endproperty</span>
+<span class="n">assert</span><span class="w"> </span><span class="n">property</span><span class="w"> </span><span class="p">(</span><span class="n">no_overflow</span><span class="p">)</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="n">$error</span><span class="p">(</span><span class="s">&quot;FIFO overflow attempted!&quot;</span><span class="p">);</span>
+
+<span class="c1">// Assert: data must be stable while valid and not yet consumed</span>
+<span class="n">property</span><span class="w"> </span><span class="n">data_stable</span><span class="p">;</span>
+<span class="w">    </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">)</span><span class="w"> </span><span class="k">disable</span><span class="w"> </span><span class="n">iff</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rst_n</span><span class="p">)</span>
+<span class="w">    </span><span class="p">(</span><span class="n">valid</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">ready</span><span class="p">)</span><span class="w"> </span><span class="o">|=&gt;</span><span class="w"> </span><span class="n">$stable</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<span class="n">endproperty</span>
+<span class="n">assert</span><span class="w"> </span><span class="n">property</span><span class="w"> </span><span class="p">(</span><span class="n">data_stable</span><span class="p">)</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="n">$error</span><span class="p">(</span><span class="s">&quot;Data changed while valid/!ready&quot;</span><span class="p">);</span>
+
+<span class="c1">// Cover: verify the full condition is exercised in tests</span>
+<span class="n">cover</span><span class="w"> </span><span class="n">property</span><span class="w"> </span><span class="p">(@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">)</span><span class="w"> </span><span class="n">full</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Assertions serve as <strong>executable specifications</strong> -- they document intended behaviour and catch violations automatically during simulation.</p>
+<hr>
+<h2>Common RTL Pitfalls</h2>
+<h3>Unintended Latches</h3>
+<p>If a <code>case</code> or <code>if</code> statement in <code>always_comb</code> does not cover all possible input combinations, synthesis infers a <strong>latch</strong> -- level-sensitive storage that was not intended:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// BAD: missing default -&gt; inferred latch on &#39;out&#39;</span>
+<span class="k">always_comb</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">sel</span><span class="p">)</span>
+<span class="w">        </span><span class="mh">2</span><span class="mb">&#39;b00</span><span class="o">:</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="w">        </span><span class="mh">2</span><span class="mb">&#39;b01</span><span class="o">:</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">// 2&#39;b10 and 2&#39;b11 not covered -&gt; LATCH!</span>
+<span class="w">    </span><span class="k">endcase</span>
+<span class="k">end</span>
+
+<span class="c1">// GOOD: add default assignment before the case</span>
+<span class="k">always_comb</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">sel</span><span class="p">)</span>
+<span class="w">        </span><span class="mh">2</span><span class="mb">&#39;b00</span><span class="o">:</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="w">        </span><span class="mh">2</span><span class="mb">&#39;b01</span><span class="o">:</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="k">endcase</span>
+<span class="k">end</span>
+</code></pre></div>
+
+<h3>Simulation-Synthesis Mismatch</h3>
+<p>Some SystemVerilog constructs simulate differently from how they synthesise. <code>initial</code> blocks, delays (<code>#100</code>), and complex data types exist only for simulation and are ignored or unsupported during synthesis. Always verify that RTL synthesises to the intended hardware, not just simulates correctly.</p>
+<hr>
+<h2>The Synthesis Step</h2>
+<p><strong>Synthesis</strong> transforms RTL into a <strong>gate-level netlist</strong> -- a description in terms of actual standard cells (AND, OR, flip-flop, multiplexer cells) from a technology library.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_b7885858d1b92706e35cc05075ab3aa8.svg"></p>
+<p>The synthesis tool reads the RTL plus a <strong>constraints file</strong> (<code>.sdc</code>) that specifies the target clock frequency and I/O timing budgets, then maps to whatever cell library the target process provides.</p>
+<hr>
+<h2>Summary</h2>
+<p>Hardware Description Languages are the foundation of SoC design. SystemVerilog (and VHDL) describe digital logic at the Register Transfer Level -- specifying registers and the combinational logic that transfers data between them. The key mental model shift from software is parallelism: all RTL executes simultaneously, not sequentially. Modules provide the structural hierarchy for building large designs from smaller, verifiable blocks. FSMs are a core design pattern for controlling sequential behaviour. Simulation and assertions verify correctness before committing to silicon. Synthesis transforms the RTL into gate-level hardware.</p>
+<hr>
+<h2>Further Reading</h2>
+<ul>
+<li><em>RTL Synthesis and Timing Closure</em> -- Constraint writing, static timing analysis, ECO flows</li>
+<li><em>SoC Verification with UVM</em> -- SystemVerilog class-based testbench architecture</li>
+<li><em>Formal Verification Methods</em> -- SVA property specification, model checking</li>
+</ul>
+<hr>
+<p><em>Previous: <a href="../drafts/soc-article-08-peripherals-and-io.html">Article 08 -- Peripherals and I/O</a></em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

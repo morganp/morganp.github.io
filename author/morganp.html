@@ -26,7 +26,129 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../proxmox-disable-root-login-sudo-user.html">Proxmox: Disable root@pam Login and Create a Sudo User</a></h1>
+                        <h1 class="entry-title"><a href="../soc-article-07-clocking-reset-and-power-domains.html">SoC Article 07: Clocking, Reset, and Power Domains</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-18T00:00:00+01:00">
+                Published: Sat 18 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/arm.html">ARM</a> <a href="../tag/clocking.html">Clocking</a> <a href="../tag/power-management.html">Power Management</a> <a href="../tag/dvfs.html">DVFS</a> <a href="../tag/pll.html">PLL</a> </p>        
+</footer><!-- /.post-info --><p><em>Series: Introduction to SoC Design | Article 7 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>Every digital circuit needs a clock -- a periodic signal that synchronises all the flip-flops in the design, causing them to sample their inputs and update their outputs in a coordinated fashion. The clock is so fundamental that designing, distributing, and managing it is an entire sub-discipline of SoC engineering.</p>
+<p>Alongside the clock, <strong>reset</strong> -- the mechanism that places a chip in a known initial state -- and <strong>power management</strong> -- dynamically controlling which blocks are active and at what voltage -- are critical infrastructure topics that every SoC designer must understand.</p>
+<hr>
+<h2>Why Clocking is Hard</h2>
+<p>Generating a clock signal that oscillates at a precise frequency seems straightforward. The real challenge is delivering that signal to millions of flip-flops distributed across a die that may be 100 mm² or larger, all arriving at exactly the same time (to within picoseconds), despite:</p>
+<ul>
+<li><strong>Wire resistance and capacitance</strong> -- which delay signals differently depending on path length</li>
+<li><strong>Process variation</strong> -- transistors at different corners of the die behave slightly differently</li>
+<li><strong>Temperature gradients</strong> -- hot areas near power-hungry cores have slower transistors</li>
+<li><strong>Voltage droop</strong> -- areas with high switching activity momentarily drop in supply voltage</li>
+</ul>
+<p>This collection of problems is called <strong>clock skew</strong> (spatial variation) and <strong>clock jitter</strong> (temporal variation). Both reduce the timing margin available for logic between flip-flops.</p>
+<hr>
+<h2>The Clock Distribution Tree</h2>
+<p>The solution is a carefully engineered <strong>clock tree</strong>: a hierarchical network of buffers that distributes the clock signal from a single source to all destinations, with each branch sized so that all paths have approximately equal delay.</p>
+<p><a href="../07-clock-tree-HQ.png"><img alt="H-tree clock distribution showing equal-length paths from PLL output through hierarchical buffers to leaf flip-flops" src="../07-clock-tree-900w.png"></a></p>
+<p>All paths from source to leaf flip-flops are equal length, giving equal delay and low skew.</p>
+<p><strong>Clock tree synthesis (CTS)</strong> is an automated step in the physical design flow that constructs this tree. It is one of the most critical steps in achieving timing closure.</p>
+<hr>
+<h2>Phase-Locked Loops (PLLs)</h2>
+<p>SoCs do not use their raw crystal oscillator frequency (typically 24--100 MHz from an external crystal) directly. Instead, a <strong>Phase-Locked Loop (PLL)</strong> multiplies and divides this reference to generate the precise frequencies needed by each subsystem.</p>
+<p><a href="../07-pll-block-HQ.png"><img alt="PLL block diagram showing reference clock into phase/frequency detector, loop filter, VCO producing output, with feedback divider closing the loop" src="../07-pll-block-900w.png"></a></p>
+<p>Output frequency = Ref × (N/M) where N and M are programmable dividers.</p>
+<p>A PLL is an <strong>analog circuit</strong> embedded in the otherwise digital SoC. Its output frequency is controlled by a digital divider, but the loop filter and VCO (Voltage-Controlled Oscillator) are analog. This makes PLLs sensitive to supply noise -- which is why they have their own isolated power supply on-chip.</p>
+<p>A typical large SoC has 4--12 PLLs:
+- CPU PLL (0.8--3.5 GHz)
+- GPU PLL
+- DDR PLL (matched to DRAM frequency)
+- Peripheral PLL (100--400 MHz for buses)
+- USB/PCIe PLLs (specific protocol reference frequencies)</p>
+<hr>
+<h2>Multiple Clock Domains</h2>
+<p>Different parts of a SoC operate at different frequencies, and often from different clocks. A <strong>clock domain</strong> is a group of flip-flops all clocked by the same source.</p>
+<p><a href="../07-clock-domains-HQ.png"><img alt="Clock domain tree showing crystal oscillator feeding multiple PLLs that fan out to CPU, GPU, DDR, AXI bus, APB peripherals, and always-on RTC domains at different frequencies" src="../07-clock-domains-900w.png"></a></p>
+<p>When data must cross from one clock domain to another -- for example, from the CPU domain to the peripheral APB domain -- a <strong>Clock Domain Crossing (CDC)</strong> circuit is required. Failure to handle CDCs correctly is one of the most common sources of functional bugs in SoC designs.</p>
+<h3>The Metastability Problem</h3>
+<p>When a flip-flop's input changes near its sampling edge, the flip-flop may enter a <strong>metastable</strong> state -- neither a clean 0 nor a clean 1. If the metastable state propagates, it can corrupt data or cause unexpected behaviour.</p>
+<p>The probability of metastability resolving correctly increases with time. A <strong>two-stage synchroniser</strong> provides enough time for resolution before the signal is used:</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_dcd24b7d8b64e99398c9a88d6f7afeff.svg"></p>
+<p>The two-stage synchroniser adds <strong>two destination-clock cycles of latency</strong> but reduces the probability of a metastability-induced failure to negligible levels. More complex CDCs (for multi-bit signals or FIFOs) use more sophisticated structures.</p>
+<hr>
+<h2>Reset: Getting to a Known State</h2>
+<p><strong>Reset</strong> is the mechanism that places all flip-flops in their initial, known state. Without reset, the behaviour of a digital circuit after power-up is undefined -- flip-flops can power up in either state.</p>
+<h3>Reset Sources</h3>
+<p>A SoC typically has several reset sources:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_a691125c1c9c3bd03bd690886221aec9.svg"></p>
+<h3>Synchronous vs Asynchronous Reset</h3>
+<p>RTL designers must choose between two reset styles:</p>
+<p><strong>Asynchronous reset</strong> -- the flip-flop resets immediately when RST is asserted, regardless of the clock. Fast response, but the reset de-assertion must be synchronised to avoid metastability.</p>
+<p><strong>Synchronous reset</strong> -- the flip-flop only resets on the next rising clock edge after RST is asserted. Requires a clean clock, but avoids de-assertion timing issues.</p>
+<p>In practice, most SoC designs use <strong>asynchronous assert, synchronous de-assert</strong> (ASAD) -- the reset asserts immediately for reliability, and de-asserts through a synchroniser to prevent metastability.</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_c7f72d040abcd0cef5a040dacb184fd6.svg"></p>
+<hr>
+<h2>Power Domains and Power Management</h2>
+<p>A modern SoC is not a single block of silicon that is either fully on or fully off. It is divided into <strong>power domains</strong> -- regions that can be independently powered up or down. This enables enormous power savings by only energising the blocks that are currently needed.</p>
+<h3>Power States</h3>
+<p>A typical SoC power state machine:</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_fe8a56134e225fc3451ba555b719be7f.svg"></p>
+<h3>Power Gating</h3>
+<p><strong>Power gating</strong> uses header or footer switches (large PMOS or NMOS transistors) to physically disconnect a domain from its supply rail, reducing leakage current to near zero:</p>
+<p><a href="../07-power-gating-HQ.png"><img alt="Power gating diagram showing VDD connected through a PMOS header switch to a virtual VDD rail supplying a logic block, with an NMOS footer switch to GND, both controlled by the PMU" src="../07-power-gating-900w.png"></a></p>
+<p>When the block is gated off, its internal state is lost. If the state must be preserved (e.g., cache contents, CPU registers), <strong>retention registers</strong> -- special flip-flops with a separate, always-powered supply -- save critical state before power-down.</p>
+<h3>DVFS -- Dynamic Voltage and Frequency Scaling</h3>
+<p><strong>DVFS</strong> reduces power consumption by lowering both the supply voltage and clock frequency when full performance is not needed. Power consumption of CMOS logic scales approximately as:</p>
+<div class="highlight"><pre><span></span><code>P_dynamic ≈ α × C × V² × f
+
+Where:
+  α = activity factor (fraction of gates switching per cycle)
+  C = total capacitance
+  V = supply voltage
+  f = clock frequency
+</code></pre></div>
+
+<p>Since power scales with V², halving the voltage reduces dynamic power by 4×. Modern SoC CPUs support many operating points, and the OS uses a <strong>DVFS governor</strong> to select the appropriate operating point based on workload.</p>
+<p><a href="../07-dvfs-HQ.png"><img alt="DVFS operating points table showing five performance levels from Ultra Low at 600 MHz / 0.65 V up to Ultra High at 3.0 GHz / 1.05 V" src="../07-dvfs-900w.png"></a></p>
+<h3>Clock Gating</h3>
+<p>A lighter-weight alternative to power gating is <strong>clock gating</strong>: stopping the clock to a region of logic. With the clock stopped, flip-flops no longer switch, and dynamic power drops to near zero (though leakage continues). Clock gating is implemented with an <strong>integrated clock gating cell (ICG)</strong>:</p>
+<p><a href="../07-clock-gating-HQ.png"><img alt="Integrated clock gating cell schematic showing EN input into a latch clocked by CLK, with the latch output ANDed with CLK to produce GATED_CLK, preventing glitches on enable transitions" src="../07-clock-gating-900w.png"></a></p>
+<p>When EN = 0, GATED_CLK is held low (no switching). When EN = 1, GATED_CLK follows CLK normally.</p>
+<p>Modern synthesis tools automatically insert clock gating cells throughout the design, reducing dynamic power by 20--40% with no architect effort.</p>
+<hr>
+<h2>The Always-On Domain</h2>
+<p>Even in the deepest sleep state, some logic must remain powered: the real-time clock (to wake the system at a scheduled time), the power management unit itself (to manage power-up sequencing), and retention registers holding critical context. This collection of always-powered logic is the <strong>Always-On (AO) domain</strong> -- it draws power from a supply that is never switched off as long as the battery is present.</p>
+<hr>
+<h2>Summary</h2>
+<p>Clocking, reset, and power management are the infrastructure that makes a SoC run correctly and efficiently. PLLs generate the precise, stable frequencies required by each subsystem. The clock tree distributes the clock signal with minimal skew. Clock domain crossings require careful synchronisation to prevent metastability. Reset places all logic in a known initial state, with the source and polarity carefully considered. Power domains, gating, and DVFS together reduce energy consumption dramatically -- enabling always-on devices to run for days or years on a small battery.</p>
+<hr>
+<h2>Intermediate Articles This Topic Connects To</h2>
+<ul>
+<li><em>Clock Domain Crossing Techniques</em> -- Metastability in depth, multi-bit CDC, async FIFOs</li>
+<li><em>Power Management Techniques</em> -- DVFS, retention, power sequencing, PMU firmware</li>
+<li><em>Physical Design: Floorplanning and Place-and-Route (Advanced)</em> -- CTS, IR drop analysis</li>
+</ul>
+<hr>
+<p><em>Previous: <a href="../soc-article-06-interconnects-and-bus-protocols.html">Article 06 -- Interconnects and Bus Protocols</a></em>
+<em>Next: <a href="../drafts/soc-article-08-peripherals-and-io.html">Article 08 -- Peripherals and I/O: Connecting the SoC to the World</a></em></p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../proxmox-disable-root-login-sudo-user.html" rel="bookmark"
+                               title="Permalink to Proxmox: Disable root@pam Login and Create a Sudo User">Proxmox: Disable root@pam Login and Create a Sudo User</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-04-17T00:00:00+01:00">
                 Published: Fri 17 April 2026
@@ -37,208 +159,10 @@
                 </address>
         <p>In <a href="../category/hardware-homelab.html">Hardware & Homelab</a>.</p>
 <p>tags: <a href="../tag/proxmox.html">Proxmox</a> <a href="../tag/security.html">Security</a> <a href="../tag/linux.html">Linux</a> <a href="../tag/homelab.html">Homelab</a> <a href="../tag/virtualisation.html">Virtualisation</a> </p>        
-</footer><!-- /.post-info --><p>Out of the box, Proxmox VE only has the <code>root@pam</code> account. Logging in directly as root is convenient during initial setup, but it is a bad habit to keep. This post walks through creating a named PAM user, granting it sudo access, and then disabling root login via both SSH and the web UI.</p>
-<h2>Authentication Realms: @pam vs @pve</h2>
-<p>The <code>@</code> suffix in Proxmox usernames is not cosmetic -- it identifies which authentication realm validates the password.</p>
-<p><strong><code>@pam</code></strong> -- Linux Pluggable Authentication Modules. Proxmox delegates the password check to the host operating system. The user must exist as a real UNIX account in <code>/etc/passwd</code>. Password changes happen with <code>passwd</code> on the shell. SSH login uses the same credentials. This is the realm for admin accounts that also need shell access.</p>
-<p><strong><code>@pve</code></strong> -- Proxmox Virtual Environment internal realm. Passwords are stored in Proxmox's own database (<code>/etc/pve/priv/shadow.cfg</code>), completely separate from the OS. The user has no UNIX account and cannot SSH in. This is the right realm for giving colleagues or tenants web UI access without touching the OS user database.</p>
-<p><strong><code>@ldap</code> / <code>@ad</code></strong> -- Optional realms for binding to an LDAP directory or Active Directory. Not covered here.</p>
-<table>
-<thead>
-<tr>
-<th>Realm</th>
-<th>Password stored</th>
-<th>SSH access</th>
-<th>UNIX account required</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>@pam</code></td>
-<td>Linux PAM (<code>/etc/shadow</code>)</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>@pve</code></td>
-<td>Proxmox internal DB</td>
-<td>No</td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p>For the admin account in this guide we use <code>@pam</code> because we also want sudo and SSH access.</p>
-<h2>Why Bother</h2>
-<ul>
-<li>Audit logs become meaningful. <code>root</code> in auth logs could be anyone; <code>dave</code> is traceable.</li>
-<li>SSH brute-force tools target <code>root</code> first. Disabling it removes the most-attacked entry point.</li>
-<li>Sudo with <code>NOPASSWD</code> for specific commands is still safer than a permanent root shell.</li>
-</ul>
-<h2>1. Install sudo</h2>
-<p>Proxmox minimal installs may not include sudo:</p>
-<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>sudo
-</code></pre></div>
-
-<h2>2. Create the System User</h2>
-<p>Log in as root on the Proxmox host (via console or SSH) and add the new UNIX account:</p>
-<div class="highlight"><pre><span></span><code>useradd<span class="w"> </span>-m<span class="w"> </span>-s<span class="w"> </span>/bin/bash<span class="w"> </span>dave
-passwd<span class="w"> </span>dave
-</code></pre></div>
-
-<p><code>-m</code> creates a home directory. Set a strong password when prompted.</p>
-<h2>3. Grant sudo Access</h2>
-<p>Add <code>dave</code> to the <code>sudo</code> group, which is already configured in <code>/etc/sudoers</code> to allow full sudo:</p>
-<div class="highlight"><pre><span></span><code>usermod<span class="w"> </span>-aG<span class="w"> </span>sudo<span class="w"> </span>dave
-</code></pre></div>
-
-<p>To verify the group membership took effect:</p>
-<div class="highlight"><pre><span></span><code>id<span class="w"> </span>dave
-</code></pre></div>
-
-<p>You should see <code>sudo</code> in the groups list.</p>
-<h2>4. Register the User in Proxmox</h2>
-<p>Proxmox has its own user database separate from the Linux PAM database. The <code>@pam</code> realm bridges them, but you still need to add the user in the Proxmox layer.</p>
-<p><strong>Via the web UI:</strong> Datacenter &gt; Permissions &gt; Users &gt; Add</p>
-<ul>
-<li>User: <code>dave</code></li>
-<li>Realm: <code>pam</code></li>
-<li>Enable: checked</li>
-</ul>
-<p><strong>Via the CLI:</strong></p>
-<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>user<span class="w"> </span>add<span class="w"> </span>dave@pam
-</code></pre></div>
-
-<h2>5. Assign a Proxmox Role</h2>
-<p>The user needs at least one permission to do anything useful. For a full admin, assign the built-in <code>Administrator</code> role at the root path <code>/</code>:</p>
-<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>acl<span class="w"> </span>modify<span class="w"> </span>/<span class="w"> </span>-user<span class="w"> </span>dave@pam<span class="w"> </span>-role<span class="w"> </span>Administrator
-</code></pre></div>
-
-<p>For a more restricted setup, use <code>PVEAdmin</code> (everything except node-level config) or define a custom role.</p>
-<h2>6. Test the New Account</h2>
-<p>Before locking out root, confirm the new account works end to end:</p>
-<ol>
-<li>Open a new terminal (do not close the existing root session).</li>
-<li>
-<p>SSH in as <code>dave</code>:</p>
-<p><code>bash
-ssh dave@&lt;proxmox-ip&gt;</code></p>
-</li>
-<li>
-<p>Confirm sudo works:</p>
-<p><code>bash
-sudo -i</code></p>
-</li>
-<li>
-<p>Log in to the Proxmox web UI at <code>https://&lt;proxmox-ip&gt;:8006</code> as <code>dave@pam</code>.</p>
-</li>
-</ol>
-<p>Do not proceed to the next step until all three work.</p>
-<h2>7. Disable root SSH Login</h2>
-<p>Edit <code>/etc/ssh/sshd_config</code>:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/ssh/sshd_config
-</code></pre></div>
-
-<p>Find or add the following line:</p>
-<div class="highlight"><pre><span></span><code>PermitRootLogin no
-</code></pre></div>
-
-<p>Reload SSH without dropping existing connections:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>sshd
-</code></pre></div>
-
-<p>Verify by attempting <code>ssh root@&lt;proxmox-ip&gt;</code> -- it should now be refused.</p>
-<h2>8. Disable root@pam in the Proxmox Web UI</h2>
-<p>Even with SSH root login disabled, <code>root@pam</code> can still authenticate through the Proxmox web UI. To disable it:</p>
-<p><strong>Via the web UI:</strong> Datacenter &gt; Permissions &gt; Users &gt; select <code>root</code> &gt; Edit &gt; uncheck Enable</p>
-<p><strong>Via the CLI:</strong></p>
-<div class="highlight"><pre><span></span><code>pveum<span class="w"> </span>user<span class="w"> </span>modify<span class="w"> </span>root@pam<span class="w"> </span>--enable<span class="w"> </span><span class="m">0</span>
-</code></pre></div>
-
-<p>This does not delete root or change anything at the Linux level. It only prevents login through the Proxmox authentication stack.</p>
-<blockquote>
-<p><strong>Note:</strong> The Linux <code>root</code> account remains intact. You can always recover it from the physical console or by re-enabling <code>root@pam</code> through the CLI as your admin user with sudo.</p>
-</blockquote>
-<h2>Verification Checklist</h2>
-<table>
-<thead>
-<tr>
-<th>Check</th>
-<th>Command</th>
-<th>Expected Result</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>dave SSH login</td>
-<td><code>ssh dave@&lt;ip&gt;</code></td>
-<td>Login prompt</td>
-</tr>
-<tr>
-<td>dave sudo</td>
-<td><code>sudo -i</code></td>
-<td>Root shell</td>
-</tr>
-<tr>
-<td>dave web UI</td>
-<td>Browser <code>https://&lt;ip&gt;:8006</code></td>
-<td>Logged in as dave@pam</td>
-</tr>
-<tr>
-<td>root SSH blocked</td>
-<td><code>ssh root@&lt;ip&gt;</code></td>
-<td>Permission denied</td>
-</tr>
-<tr>
-<td>root web UI blocked</td>
-<td>Browser login as root@pam</td>
-<td>Login rejected</td>
-</tr>
-</tbody>
-</table>
-<h2>Summary</h2>
-<table>
-<thead>
-<tr>
-<th>Step</th>
-<th>What It Does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>useradd</code></td>
-<td>Creates the Linux PAM account</td>
-</tr>
-<tr>
-<td><code>apt install sudo</code></td>
-<td>Ensures sudo is present</td>
-</tr>
-<tr>
-<td><code>usermod -aG sudo</code></td>
-<td>Grants full sudo via the sudo group</td>
-</tr>
-<tr>
-<td><code>pveum user add</code></td>
-<td>Registers the account in Proxmox</td>
-</tr>
-<tr>
-<td><code>pveum acl modify</code></td>
-<td>Assigns a Proxmox role</td>
-</tr>
-<tr>
-<td><code>PermitRootLogin no</code></td>
-<td>Blocks root SSH</td>
-</tr>
-<tr>
-<td><code>pveum user modify root@pam --enable 0</code></td>
-<td>Blocks root Proxmox web UI login</td>
-</tr>
-</tbody>
-</table>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>How to harden a Proxmox VE host by disabling direct root@pam login, creating a named admin user dave@pam, and granting it passwordless sudo access.</p>
+                        <a class="readmore" href="../proxmox-disable-root-login-sudo-user.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -347,28 +271,6 @@ sudo -i</code></p>
 <p>tags: <a href="../tag/openscad.html">OpenSCAD</a> <a href="../tag/3d-printing.html">3D Printing</a> <a href="../tag/bosl2.html">BOSL2</a> <a href="../tag/woodworking.html">Woodworking</a> <a href="../tag/cad.html">CAD</a> <a href="../tag/parametric-design.html">Parametric Design</a> </p>        
 </footer><!-- /.post-info -->                        <p>Designing a parametric set of pinch rods in OpenSCAD using the BOSL2 library. Pinch rods are a traditional woodworking tool for checking carcases for square and transferring interior dimensions without measuring.</p>
                         <a class="readmore" href="../openscad-pinch-rods.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="../soc-article-07-clocking-reset-and-power-domains.html" rel="bookmark"
-                               title="Permalink to SoC Article 07: Clocking, Reset, and Power Domains">SoC Article 07: Clocking, Reset, and Power Domains</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2026-04-11T00:00:00+01:00">
-                Published: Sat 11 April 2026
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
-                </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/arm.html">ARM</a> <a href="../tag/clocking.html">Clocking</a> <a href="../tag/power-management.html">Power Management</a> <a href="../tag/dvfs.html">DVFS</a> <a href="../tag/pll.html">PLL</a> </p>        
-</footer><!-- /.post-info -->                        <p>The infrastructure that makes a SoC run correctly and efficiently: PLLs for frequency synthesis, clock trees for low-skew distribution, clock domain crossings and metastability, reset sources and synchronisation, and power domains with gating and DVFS.</p>
-                        <a class="readmore" href="../soc-article-07-clocking-reset-and-power-domains.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
 
