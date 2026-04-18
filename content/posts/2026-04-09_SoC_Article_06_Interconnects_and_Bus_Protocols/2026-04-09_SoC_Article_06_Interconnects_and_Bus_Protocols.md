@@ -78,7 +78,8 @@ An APB write transaction takes place over two phases: **Setup** and **Access**:
     {},
     {"name": "Phase",   "wave": "x.23x.", "data": ["Setup","Access"]}
   ],
-  "head": {"text": "APB Write Transaction (no wait states)"}
+  "head": {"text": "APB Write Transaction (no wait states)"},
+  "config": {"hscale": 2}
 }
 ```
 
