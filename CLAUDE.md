@@ -13,6 +13,7 @@ Pelican static site generator blog, hosted on GitHub Pages at lizard-spock.co.uk
 ## Commands
 - before python, make commands run `source ./venv/bin/activate`
 - do not use em-dash in posts.
+- After creating a new draft post, suggest the user preview it with `make devserver` and visit `http://localhost:8000/drafts/<slug>.html`.
 - do not use tabs in post, spaces only.
 
 ### Creating New Posts
