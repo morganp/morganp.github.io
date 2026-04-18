@@ -119,7 +119,8 @@ APB is ideal for: UART, SPI, I2C, GPIO, timer, and watchdog registers -- anythin
     {},
     {"name": "Phase",  "wave": "x2.2.2.2.x.", "data": ["A0 Addr","A1 Addr","A2 Addr","A3 Addr"]}
   ],
-  "head": {"text": "AHB Pipelined Burst Read (INCR4)"}
+  "head": {"text": "AHB Pipelined Burst Read (INCR4)"},
+  "config": {"hscale": 2}
 }
 ```
 
@@ -163,7 +164,8 @@ Every AXI channel uses the same **valid/ready handshake** protocol. The sender a
     {},
     {"name": "Transfer", "wave": "x....1x.", "node": "....A"}
   ],
-  "head": {"text": "AXI Valid/Ready Handshake - Write Address Channel"}
+  "head": {"text": "AXI Valid/Ready Handshake - Write Address Channel"},
+  "config": {"hscale": 2}
 }
 ```
 
