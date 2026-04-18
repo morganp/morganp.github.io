@@ -14,6 +14,7 @@ Pelican static site generator blog, hosted on GitHub Pages at lizard-spock.co.uk
 - before python, make commands run `source ./venv/bin/activate`
 - do not use em-dash in posts.
 - After creating a new draft post, suggest the user preview it with `make devserver` and visit `http://localhost:8000/drafts/<slug>.html`.
+- When moving an article from draft to published, ask the user if the Date metadata should be updated to today's date before publishing.
 - do not use tabs in post, spaces only.
 
 ### Creating New Posts
