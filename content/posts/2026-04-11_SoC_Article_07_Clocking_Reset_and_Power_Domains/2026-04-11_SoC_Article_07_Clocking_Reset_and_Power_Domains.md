@@ -5,7 +5,7 @@ Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems, ARM, 
 Slug: soc-article-07-clocking-reset-and-power-domains
 Author: morganp
 Summary: The infrastructure that makes a SoC run correctly and efficiently: PLLs for frequency synthesis, clock trees for low-skew distribution, clock domain crossings and metastability, reset sources and synchronisation, and power domains with gating and DVFS.
-Status: draft
+Status: published
 
 *Series: Introduction to SoC Design | Article 7 of 11*
 
