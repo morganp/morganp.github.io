@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Python Parsing XML</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Parsing XML with Python using the standard library xml.etree.ElementTree. It converts XML text into a tree of Element …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li class="active"><a href="./category/programming.html">Programming</a></li>
+                                                <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./python-parsing-xml.html" rel="bookmark"
+             title="Permalink to Python Parsing XML">Python Parsing XML</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-01-05T13:31:00+00:00">
+                Published: Sun 05 January 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/programming.html">Programming</a>.</p>
+<p>tags: <a href="./tag/python.html">Python</a> </p>        
+</footer><!-- /.post-info -->        <p>Parsing XML with Python using the standard library <code>xml.etree.ElementTree</code>. It converts XML text into a tree of <code>Element</code> objects you can traverse and query.</p>
+<h2>Basic Parsing</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
+
+<span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;&#39;&lt;person&gt;</span>
+<span class="s1">  &lt;name&gt;Chuck&lt;/name&gt;</span>
+<span class="s1">  &lt;phone type=&quot;intl&quot;&gt;</span>
+<span class="s1">    +1 734 303 4456</span>
+<span class="s1">  &lt;/phone&gt;</span>
+<span class="s1">  &lt;email hide=&quot;yes&quot; /&gt;</span>
+<span class="s1">&lt;/person&gt;&#39;&#39;&#39;</span>
+
+<span class="n">tree</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Name:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">tree</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Attr:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">tree</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hide&#39;</span><span class="p">))</span>
+</code></pre></div>
+
+<h2>Parsing from a File</h2>
+<div class="highlight"><pre><span></span><code><span class="n">tree = ET.parse(&#39;data.xml&#39;)</span>
+<span class="n">root = tree.getroot()</span>
+<span class="n">print(root.tag)</span>
+</code></pre></div>
+
+<h2>Iterating over Children</h2>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="nv">child</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">root</span>:
+<span class="w">    </span><span class="nv">print</span><span class="ss">(</span><span class="nv">child</span>.<span class="nv">tag</span>,<span class="w"> </span><span class="nv">child</span>.<span class="nv">attrib</span><span class="ss">)</span>
+</code></pre></div>
+
+<p>Use <code>iter()</code> to walk the entire tree recursively:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="nv">elem</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">root</span>.<span class="nv">iter</span><span class="ss">(</span><span class="s1">&#39;phone&#39;</span><span class="ss">)</span>:
+<span class="w">    </span><span class="nv">print</span><span class="ss">(</span><span class="nv">elem</span>.<span class="nv">text</span>.<span class="nv">strip</span><span class="ss">())</span>
+</code></pre></div>
+
+<h2>Accessing Attributes and Text</h2>
+<div class="highlight"><pre><span></span><code><span class="nx">elem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">root</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="err">&#39;</span><span class="nx">phone</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="nx">elem</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">strip</span><span class="p">()</span><span class="w">       </span><span class="err">#</span><span class="w"> </span><span class="nx">text</span><span class="w"> </span><span class="nx">content</span>
+<span class="nx">elem</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="err">&#39;</span><span class="k">type</span><span class="err">&#39;</span><span class="p">)</span><span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="nx">attribute</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="p">(</span><span class="nx">None</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nx">missing</span><span class="p">)</span>
+<span class="nx">elem</span><span class="p">.</span><span class="nx">attrib</span><span class="w">             </span><span class="err">#</span><span class="w"> </span><span class="nx">dict</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="nx">all</span><span class="w"> </span><span class="nx">attributes</span>
+</code></pre></div>
+
+<h2>Finding Multiple Elements</h2>
+<div class="highlight"><pre><span></span><code><span class="err">#</span><span class="w"> </span><span class="ow">All</span><span class="w"> </span><span class="n">direct</span><span class="w"> </span><span class="n">children</span><span class="w"> </span><span class="n">matching</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">tag</span>
+<span class="n">root</span><span class="p">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">)</span>
+
+<span class="err">#</span><span class="w"> </span><span class="n">XPath</span><span class="o">-</span><span class="n">style</span><span class="w"> </span><span class="n">expressions</span>
+<span class="n">root</span><span class="p">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;./items/item&#39;</span><span class="p">)</span>
+<span class="n">root</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./items/item[@id=&quot;1&quot;]&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2>Handling Namespaces</h2>
+<p>XML namespaces appear as <code>{uri}tag</code>. Register a prefix to keep queries readable:</p>
+<div class="highlight"><pre><span></span><code>ns = {&#39;ns&#39;: &#39;http://example.com/schema&#39;}
+root.find(&#39;ns:item&#39;, ns)
+</code></pre></div>
+
+<p>For larger or more complex XML, consider <code>lxml</code> which is faster and supports full XPath:</p>
+<div class="highlight"><pre><span></span><code>pip install lxml
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
