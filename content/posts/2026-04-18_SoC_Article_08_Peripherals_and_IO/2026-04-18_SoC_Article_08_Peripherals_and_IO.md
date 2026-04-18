@@ -23,19 +23,25 @@ This article surveys the most common peripheral types found in SoCs, explains th
 
 Peripherals vary enormously in bandwidth, latency, and complexity:
 
-```text
-SoC Peripheral Classification
+```dot
+digraph PeripheralBandwidth {
+    rankdir=LR;
+    graph [label="SoC Peripheral Bandwidth: High to Low", fontsize=13, labelloc=t];
+    node [shape=box, fontsize=10, style=filled];
 
-  High Speed                                   Low Speed
-  High Bandwidth     <- Bandwidth ->         Low Bandwidth
-  +------------------------------------------------------+
-  | PCIe   | USB3 | Ethernet | USB2 | SPI | I2C | UART  |
-  | 32GB/s |5Gb/s |  1Gb/s   |480Mb/s|50Mb/s|4Mb/s|115kb/s|
-  +--------+------+----------+-------+-----+-----+-------+
-     NVMe,    USB    Network   USB1.1  Flash, Sensors, Debug
-     GPU      3.0    packets   devices OLED   IMU     console
+    PCIe [label="PCIe\n32 GB/s\nNVMe / GPU",      fillcolor="#4472C4", fontcolor=white];
+    USB3 [label="USB 3.0\n5 Gb/s\nExternal",       fillcolor="#5B9BD5", fontcolor=white];
+    ETH  [label="Ethernet\n1 Gb/s\nNetwork",        fillcolor="#70AD47"];
+    USB2 [label="USB 2.0\n480 Mb/s\nLegacy USB",   fillcolor="#A9D18E"];
+    SPI  [label="SPI\n50 Mb/s\nFlash / OLED",      fillcolor="#FFD966"];
+    I2C  [label="I2C\n4 Mb/s\nSensors / IMU",      fillcolor="#FFE699"];
+    UART [label="UART\n115 kb/s\nDebug console",    fillcolor="#FFF2CC"];
 
-  On AXI/AHB fabric                     On APB / slow bus
+    PCIe -> USB3 -> ETH -> USB2 -> SPI -> I2C -> UART [label="  decreasing bandwidth  ", fontsize=8];
+
+    subgraph cluster_high { label="AXI / AHB Fabric"; style=dashed; PCIe; USB3; ETH; USB2; }
+    subgraph cluster_low  { label="APB / Slow Bus";   style=dashed; SPI; I2C; UART; }
+}
 ```
 
 ---
@@ -44,40 +50,52 @@ SoC Peripheral Classification
 
 **GPIO** is the simplest peripheral: a set of pins that can be individually configured as either digital inputs or digital outputs, under software control.
 
-```text
-GPIO Port Architecture (8-bit example):
+```dot
+digraph GPIO {
+    rankdir=TB;
+    graph [label="GPIO Port Architecture (8-bit example)", fontsize=13];
+    node [fontsize=10];
 
-  Software Registers:
-  +-------------------------------------------------+
-  | GPIO_DIR   [7:0] -- 1=Output, 0=Input per pin  |
-  | GPIO_OUT   [7:0] -- Value to drive on output    |
-  | GPIO_IN    [7:0] -- Current value on input pins |
-  | GPIO_IE    [7:0] -- Interrupt enable per pin    |
-  | GPIO_ITYPE [7:0] -- Edge/Level trigger type     |
-  +-------------------------------------------------+
-           |
-    +------+----------------------------------------------+
-    |  GPIO Controller                                     |
-    |  +---+ +---+ +---+ +---+ +---+ +---+ ...            |
-    |  |Pin| |Pin| |Pin| |Pin| |Pin| |Pin|                 |
-    |  | 0 | | 1 | | 2 | | 3 | | 4 | | 5 |                |
-    |  +-+-+ +-+-+ +-+-+ +-+-+ +-+-+ +-+-+                 |
-    +----+-----+-----+-----+-----+-----+-------------------+
-         |     |     |     |     |     |
-        IO0   IO1   IO2   IO3   IO4   IO5    <- Physical pins
+    regs [shape=record, style=filled, fillcolor=lightyellow,
+          label="{Software Registers|{GPIO_DIR   [7:0]|1=Output, 0=Input per pin}|{GPIO_OUT   [7:0]|Value to drive on output pins}|{GPIO_IN    [7:0]|Current value on input pins}|{GPIO_IE    [7:0]|Interrupt enable per pin}|{GPIO_ITYPE [7:0]|Edge / Level trigger type}}"];
+
+    ctrl [shape=box, label="GPIO Controller", style=filled, fillcolor=lightblue, fontsize=11];
+
+    subgraph cluster_pins {
+        label="Physical Chip Pins"; style=filled; fillcolor="#E2EFDA";
+        IO0 [shape=box, label="IO0"]; IO1 [shape=box, label="IO1"];
+        IO2 [shape=box, label="IO2"]; IO3 [shape=box, label="IO3"];
+        IO4 [shape=box, label="IO4"]; IO5 [shape=box, label="IO5"];
+    }
+
+    regs -> ctrl;
+    ctrl -> IO0; ctrl -> IO1; ctrl -> IO2;
+    ctrl -> IO3; ctrl -> IO4; ctrl -> IO5;
+}
 ```
 
 GPIO pins on modern SoCs are typically multiplexed -- the same physical pin can serve as GPIO or as a dedicated function for a peripheral like UART or SPI. The **IOMUX (I/O Multiplexer)** hardware block selects which function a pin serves:
 
-```text
-Pin Multiplexing (IOMUX):
+```dot
+digraph IOMUX {
+    rankdir=LR;
+    graph [label="Pin Multiplexing (IOMUX)", fontsize=13];
+    node [shape=box, fontsize=10];
 
-  Physical Pin ---- IOMUX --+-- GPIO controller
-                             +-- UART TX
-                             +-- SPI CLK
-                             +-- I2C SDA
+    pin   [label="Physical Pin", style=filled, fillcolor=lightgrey];
+    iomux [label="IOMUX\n(IOMUX_CFG register\nselects function at boot)",
+           shape=diamond, style=filled, fillcolor=lightyellow];
+    gpio  [label="GPIO Controller"];
+    uart  [label="UART TX"];
+    spi   [label="SPI CLK"];
+    i2c   [label="I2C SDA"];
 
-  Selection controlled by IOMUX_CFG register (written during boot)
+    pin -> iomux;
+    iomux -> gpio;
+    iomux -> uart;
+    iomux -> spi;
+    iomux -> i2c;
+}
 ```
 
 ---
@@ -114,22 +132,28 @@ UARTs are used primarily for **debug consoles** -- they are the "printf over har
 
 ### SPI Signals
 
-```text
-SPI Connection (4-wire, single slave):
+```dot
+digraph SPI {
+    rankdir=LR;
+    graph [label="SPI 4-Wire Connection (Single Slave)", fontsize=13];
+    node [shape=box, fontsize=10, style=filled];
 
-  SoC (Master)                   Device (Slave)
-  +--------------+               +--------------+
-  |   SCLK ---------------------------------> SCLK         |
-  |   MOSI ---------------------------------> MOSI (SDI)   |
-  |   MISO <--------------------------------- MISO (SDO)   |
-  |   CS   ---------------------------------> CS (active   |
-  |        |               |                  low)         |
-  +--------------+               +--------------+
+    subgraph cluster_master {
+        label="SoC (Master)"; style=filled; fillcolor=lightblue;
+        m_sclk [label="SCLK"]; m_mosi [label="MOSI"];
+        m_miso [label="MISO"]; m_cs   [label="CS"];
+    }
+    subgraph cluster_slave {
+        label="Device (Slave)"; style=filled; fillcolor=lightyellow;
+        s_sclk [label="SCLK"];       s_mosi [label="MOSI (SDI)"];
+        s_miso [label="MISO (SDO)"]; s_cs   [label="CS (active low)"];
+    }
 
-  SCLK = Serial Clock (from master)
-  MOSI = Master Out, Slave In
-  MISO = Master In, Slave Out
-  CS   = Chip Select (one per slave)
+    m_sclk -> s_sclk [label="Clock"];
+    m_mosi -> s_mosi [label="Data out"];
+    s_miso -> m_miso [label="Data in"];
+    m_cs   -> s_cs   [label="Select (active low)"];
+}
 ```
 
 ### SPI Timing
@@ -158,21 +182,24 @@ SPI has no addressing scheme -- the chip select line selects the target device. 
 
 ### I2C Signals
 
-```text
-I2C Bus (multiple devices on same two wires):
+```dot
+digraph I2C {
+    rankdir=LR;
+    graph [label="I2C Bus: Multiple Devices on Two Wires", fontsize=13];
+    node [shape=box, fontsize=10, style=filled];
 
-  SoC (Master)
-  +----------------+
-  |           SCL  +--------------------------------------------------
-  |  I2C           |              |           |           |
-  |  Controller    |              |           |           |
-  |           SDA  +--------------------------------------------------
-  +----------------+              |           |           |
-                              [Sensor]    [PMIC]     [EEPROM]
-                              Addr:0x48   0x58        0x50
+    master [label="SoC\nI2C Controller\n(Master)", fillcolor=lightblue];
+    bus    [label="SCL + SDA\nopen-drain bus\npull-up resistors to VCC",
+            shape=ellipse, fillcolor=lightyellow];
+    sensor [label="Temp Sensor\nAddr: 0x48", fillcolor="#E2EFDA"];
+    pmic   [label="PMIC\nAddr: 0x58",        fillcolor="#E2EFDA"];
+    eeprom [label="EEPROM\nAddr: 0x50",      fillcolor="#E2EFDA"];
 
-  Both lines have pull-up resistors (open-drain bus)
-  Any device can pull low; no device drives high
+    master -> bus [dir=both];
+    bus -> sensor [dir=both];
+    bus -> pmic   [dir=both];
+    bus -> eeprom [dir=both];
+}
 ```
 
 ### I2C Transaction Format
@@ -225,12 +252,24 @@ USB 3.x adds **SuperSpeed** lanes with completely different physical layer (8b/1
 
 **PHY (Physical Layer)** -- converts between the digital MAC signals and the analog signals on the twisted-pair cable. The PHY is usually a separate chip, connected to the MAC via the **RGMII** or **SGMII** interface.
 
-```text
-Ethernet Path:
+```dot
+digraph Ethernet {
+    rankdir=LR;
+    graph [label="Ethernet Signal Path", fontsize=13];
+    node [shape=box, fontsize=10, style=filled];
 
-  CPU -- AXI -- [Ethernet MAC] -- RGMII/SGMII -- [PHY chip] -- RJ45 jack
-                      |
-               [DMA Engine] -- (packet DMA to/from DRAM buffers)
+    CPU  [label="CPU",              fillcolor=lightblue];
+    AXI  [label="AXI Bus",         fillcolor=lightblue];
+    MAC  [label="Ethernet MAC\n(on-chip)", fillcolor=lightblue];
+    DMA  [label="DMA Engine",      fillcolor=lightyellow];
+    DRAM [label="DRAM\nPacket Buffers", fillcolor=lightyellow];
+    PHY  [label="PHY Chip\n(off-chip)\nRGMII / SGMII", fillcolor="#FFF2CC"];
+    RJ45 [label="RJ45 Jack",       fillcolor=lightgrey];
+
+    CPU -> AXI -> MAC -> PHY -> RJ45;
+    MAC -> DMA [dir=both];
+    DMA -> DRAM [dir=both, label="packet DMA\nto/from buffers"];
+}
 ```
 
 The MAC operates as a **DMA master**: when a packet arrives, the MAC's DMA engine writes it to a pre-allocated buffer in DRAM and signals the CPU via interrupt. Outgoing packets are described by descriptors pointing to DRAM buffers, and the MAC fetches and transmits them independently.
@@ -241,25 +280,22 @@ The MAC operates as a **DMA master**: when a packet arrives, the MAC's DMA engin
 
 Almost all high-bandwidth peripherals include or connect to a **Direct Memory Access (DMA)** engine. DMA allows peripherals to transfer large blocks of data to/from memory without the CPU being involved for every byte.
 
-```text
-DMA Transfer Flow:
+```mermaid
+sequenceDiagram
+    participant CPU
+    participant DMA as DMA Controller
+    participant Periph as Peripheral FIFO
+    participant DRAM
 
-  1. CPU programs DMA:
-     - Source address
-     - Destination address
-     - Transfer size
-     - Peripheral ID / channel
-     -> writes to DMA controller registers
-
-  2. DMA takes over:
-     CPU --------- (free to run other code) --------
-     DMA reads from peripheral FIFO using AXI reads
-     DMA writes to DRAM using AXI writes
-     (all autonomously, CPU not involved)
-
-  3. DMA signals completion:
-     DMA asserts interrupt to CPU -> "transfer done"
-     CPU processes the data
+    CPU->>DMA: Program: src, dst, size, channel
+    activate DMA
+    Note over CPU: CPU free to run other code
+    DMA->>Periph: Read data (AXI reads)
+    Periph-->>DMA: Data
+    DMA->>DRAM: Write to buffer (AXI writes)
+    DMA-->>CPU: Interrupt: transfer complete
+    deactivate DMA
+    CPU->>DRAM: Process received data
 ```
 
 DMA is essential for audio streaming, video capture, USB bulk transfers, UART high-speed data, and anything involving moving more than a few bytes at a time.
@@ -284,10 +320,10 @@ digraph InterruptController {
     GPIO  [label="GPIO IRQ"];
     TIMER [label="Timer IRQ"];
 
-    GIC [label="Generic Interrupt\nController (GIC)\n\n- 256+ interrupt inputs\n- Per-interrupt priority\n- Per-interrupt CPU targeting\n- Edge/Level config\n- Secure/Non-secure\n  partitioning", shape=ellipse];
+    GIC [label="Generic Interrupt\nController (GIC)\n\n- 256+ interrupt inputs\n- Per-interrupt priority\n- Per-interrupt CPU targeting\n- Edge/Level config\n- Secure/Non-secure\n  partitioning", shape=ellipse, style=filled, fillcolor=lightyellow];
 
-    CPU0 [label="CPU Core 0\nnIRQ / nFIQ"];
-    CPU1 [label="CPU Core 1\nnIRQ / nFIQ"];
+    CPU0 [label="CPU Core 0\nnIRQ / nFIQ", style=filled, fillcolor=lightblue];
+    CPU1 [label="CPU Core 1\nnIRQ / nFIQ", style=filled, fillcolor=lightblue];
 
     UART  -> GIC;
     SPI   -> GIC;
