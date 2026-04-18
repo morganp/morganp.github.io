@@ -19,6 +19,29 @@ The problem with most doorbell automations is that the notification lingers on y
 
 ---
 
+## Push Notification Setup
+
+Install the **Home Assistant Companion App** on each phone that should receive doorbell alerts (available on iOS and Android). Once logged in to your HA instance, the app registers a notify service automatically.
+
+To find your service name go to **Developer Tools > Actions**, search for `notify.mobile_app` and you will see one entry per registered device -- for example `notify.mobile_app_morgan_iphone`. Use this name in the automation below.
+
+### Notifying Multiple People
+
+To send to several phones, define a notification group in `configuration.yaml`:
+
+```yaml
+notify:
+  - platform: group
+    name: household
+    services:
+      - service: mobile_app_phone_one
+      - service: mobile_app_phone_two
+```
+
+Then use `notify.household` in the automation. The clear notification must also target the group so it dismisses on all devices.
+
+---
+
 ## Integrations Setup
 
 ### Reolink
@@ -115,22 +138,7 @@ action:
             tag: doorbell_alert
 ```
 
-Replace `notify.mobile_app_your_phone` with your actual notify service name (found under **Developer Tools > Services**) and `binary_sensor.front_door_contact` with your Sonoff sensor entity.
-
-### Notifying Multiple People
-
-To send to several phones, use a notification group. Define it in `configuration.yaml`:
-
-```yaml
-notify:
-  - platform: group
-    name: household
-    services:
-      - service: mobile_app_phone_one
-      - service: mobile_app_phone_two
-```
-
-Then use `notify.household` in the automation. The clear notification must also be sent to the group so it dismisses on all devices.
+Replace `notify.mobile_app_your_phone` with your actual notify service name and `binary_sensor.front_door_contact` with your Sonoff sensor entity.
 
 ---
 
