@@ -103,13 +103,13 @@ description: >
 mode: single
 max_exceeded: silent
 
-trigger:
-  - platform: state
+triggers:
+  - trigger: state
     entity_id: binary_sensor.reolink_doorbell_visitor
     to: "on"
 
-action:
-  - service: notify.mobile_app_your_phone
+actions:
+  - action: notify.mobile_app_your_phone
     data:
       title: "Doorbell"
       message: "Someone is at the door"
@@ -120,7 +120,7 @@ action:
         priority: high
 
   - wait_for_trigger:
-      - platform: state
+      - trigger: state
         entity_id: binary_sensor.front_door_contact
         to: "on"
     timeout:
@@ -131,7 +131,7 @@ action:
       - condition: template
         value_template: "{{ not wait.timed_out }}"
     then:
-      - service: notify.mobile_app_your_phone
+      - action: notify.mobile_app_your_phone
         data:
           message: "clear_notification"
           data:
@@ -149,14 +149,14 @@ The `image` field uses the HA camera proxy URL. This serves a still image from t
 If you want a fresh snapshot captured at doorbell-press time rather than the proxy serving a cached frame, take an explicit snapshot first:
 
 ```yaml
-action:
-  - service: camera.snapshot
+actions:
+  - action: camera.snapshot
     target:
       entity_id: camera.reolink_doorbell
     data:
       filename: /config/www/doorbell_snapshot.jpg
 
-  - service: notify.mobile_app_your_phone
+  - action: notify.mobile_app_your_phone
     data:
       title: "Doorbell"
       message: "Someone is at the door"
