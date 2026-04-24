@@ -1,11 +1,11 @@
 Title: SoC Article 08: Peripherals and I/O -- Connecting the SoC to the World
-Date: 2026-04-18
+Date: 2026-04-24
 Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems, Peripherals, I/O, UART, SPI, I2C, USB, Ethernet, DMA, GPIO
 Slug: soc-article-08-peripherals-and-io
 Author: morganp
 Summary: A survey of the most common peripheral types found in SoCs -- GPIO, UART, SPI, I2C, USB, Ethernet, DMA, and interrupt controllers -- and how they connect the digital logic inside the chip to the physical world outside it.
-Status: draft
+Status: published
 
 *Series: Introduction to SoC Design | Article 8 of 11*
 
