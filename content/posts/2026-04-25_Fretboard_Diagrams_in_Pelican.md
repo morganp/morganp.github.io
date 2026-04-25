@@ -9,6 +9,8 @@ Status: published
 
 For a long time my guitar diagrams lived on paper -- annotated chord boxes and scale grids scribbled in notebooks. When it came to writing them up digitally I found the process time consuming and the results inconsistent: different posts would use different styles, sizes, or notation conventions with no easy way to keep them in sync. This post introduces [pelican-fretboard](https://github.com/morganp/pelican-fretboard), a plugin that renders chord charts, scale boxes, and tab directly from fenced code blocks in Markdown. Diagrams are generated as SVGs, cached on disk, and served as static files -- nothing to install on the reader's side.
 
+<!-- PELICAN_END_SUMMARY -->
+
 ---
 
 ## The problem with ASCII diagrams

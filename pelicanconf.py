@@ -87,3 +87,5 @@ PLUGINS = [
 
 FRETBOARD_CACHE_PATH = 'content/images/fretboard'
 FRETBOARD_CACHE_URL  = '/images/fretboard'
+
+THEME_TEMPLATES_OVERRIDES = ['templates']
