@@ -37,39 +37,7 @@
                 </address>
         <p>In <a href="../category/programming.html">Programming</a>.</p>
 <p>tags: <a href="../tag/heroku.html">Heroku</a> <a href="../tag/rack.html">Rack</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> <a href="../tag/webfaction.html">WebFaction</a> </p>        
-</footer><!-- /.post-info --><p>I have been setting up my recent Sinatra projects with a standard ruby project layout putting all of the application code within a lib folder. When running locally I have been cding in to the lib folder and just running: </p>
-<div class="highlight"><pre><span></span><code>ruby app.rb
-</code></pre></div>
-
-<p>I often found that when deploying (WebFaction or Heroku) that I had to make several attempts to get the config.ru correct. I then found that thin can load and run using the config.ru.</p>
-<div class="highlight"><pre><span></span><code>thin start --port 4567 -R config.ru
-</code></pre></div>
-
-<p>Which worked until I tried it on a non trivial application which used (erb) templates and then I started seeing these errors, when viewing 127:0.0.1:4567</p>
-<div class="highlight"><pre><span></span><code>Errno::ENOENT at /
-No such file or directory - ./views/home.erb
-file: template.rb location: binread line: 67
-</code></pre></div>
-
-<p>The problem is that we are now a level above where we use to be, not sure whay this has never been a problem in production before. </p>
-<div class="highlight"><pre><span></span><code><span class="k">module</span> <span class="n">AnotherWebApp</span>
-  <span class="n">VERSION</span> = <span class="s">&#39;0.0.1&#39;</span>
-  <span class="k">class</span> <span class="n">App</span> &lt; <span class="n">Sinatra::Base</span>
-    <span class="k">use</span> <span class="n">Rack::MethodOverride</span>
-    <span class="c1">#set :public_folder, &quot;public&quot; # &lt;-- Old version</span>
-    <span class="n">set</span> :<span class="n">public_folder</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/public&quot;</span>   <span class="c1"># &lt;-- New Version</span>
-
-    <span class="c1"># Older ersions of Thin/Sinatra May require</span>
-    <span class="n">set</span> :<span class="n">public</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/public&quot;</span>              <span class="c1"># &lt;-- public changed to public_folder in newer release</span>
-    <span class="n">set</span> :<span class="n">views</span>, <span class="s">&quot;#{File.dirname(__FILE__)}/views&quot;</span>                <span class="c1"># &lt;-- Need to set View</span>
-
-    <span class="nb">get</span> <span class="s">&#39;/&#39;</span> <span class="nb">do</span>
-      <span class="n">erb</span> :<span class="n">home</span>
-    <span class="nb">end</span>
-
-  <span class="nb">end</span>
-<span class="nb">end</span>
-</code></pre></div>                    </article>
+</footer><!-- /.post-info --><p>I have been setting up my recent Sinatra projects with a standard ruby project layout putting all of the application …</p><a class="readmore" href="../sinatra-application-in-lib-and-views-public-routes-not-working.html">read more</a>                    </article>
                 </aside><!-- /#featured -->
                     <section id="content" class="body">
                         <h1>Other articles</h1>

@@ -38,58 +38,7 @@
         <p>In <a href="../category/programming.html">Programming</a>.</p>
 <p>tags: <a href="../tag/active-record.html">Active Record</a> <a href="../tag/automation.html">Automation</a> <a href="../tag/database.html">Database</a> <a href="../tag/heroku.html">Heroku</a> <a href="../tag/regex.html">Regex</a> <a href="../tag/ruby.html">Ruby</a> <a href="../tag/sequel.html">Sequel</a> <a href="../tag/sinatra.html">Sinatra</a> <a href="../tag/web.html">Web</a> </p>        
 </footer><!-- /.post-info --><p>To make an automatic <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html">ActiveRecord</a> database connection using ENV['DATABASE_URL'] The following snippet can be used:</p>
-<p>From <a href="http://apidock.com/rails/v3.2.1/ActiveRecord/Base/establish_connection/class">ActiveRecord 3.2.1</a> connections can be made with :</p>
-<div class="highlight"><pre><span></span><code>ActiveRecord::Base.establish_connection(ENV[&quot;DATABASE_URL&quot;])
-</code></pre></div>
-
-<p>At some stage My first example also stopped working, Heroku have this example on there pages:</p>
-<div class="highlight"><pre><span></span><code>  db = URI.parse(ENV[&#39;DATABASE_URL&#39;] || &#39;postgres://localhost/mydb&#39;)
-
-  ActiveRecord::Base.establish_connection(
-    :adapter  =&gt; db.scheme == &#39;postgres&#39; ? &#39;postgresql&#39; : db.scheme,
-    :host     =&gt; db.host,
-    :port     =&gt; db.port,
-    :username =&gt; db.user,
-    :password =&gt; db.password,
-    :database =&gt; db.path[1..-1],
-    :encoding =&gt; &#39;utf8&#39;
-  )
-</code></pre></div>
-
-<p>My original example for parsing the env variable and making he DB connection.</p>
-<div class="highlight"><pre><span></span><code><span class="k">module</span> <span class="n">ExampleSinatra</span>
-  <span class="k">class</span> <span class="n">App</span> &lt; <span class="n">Sinatra::Base</span>
-    <span class="k">use</span> <span class="n">Rack::MethodOverride</span>
-    <span class="n">set</span> :<span class="n">public</span>, <span class="s">&quot;public&quot;</span>
-
-    <span class="n">configure</span> :<span class="n">production</span> <span class="nb">do</span>
-      <span class="n">db</span> = <span class="n">ENV</span>[<span class="s">&quot;DATABASE_URL&quot;</span>]
-      <span class="k">if</span> <span class="n">db</span>.<span class="nb">match</span>(<span class="sr">/postgres:\/\/(.*):(.*)@(.*)\/(.*)/</span>) 
-        <span class="n">username</span> = <span class="nv">$1</span>
-        <span class="n">password</span> = <span class="nv">$2</span>
-        <span class="n">hostname</span> = <span class="nv">$3</span>
-        <span class="n">database</span> = <span class="nv">$4</span>
-
-        <span class="n">ActiveRecord::Base</span>.<span class="n">establish_connection</span>(
-          :<span class="n">adapter</span>  =&gt; <span class="s">&#39;postgresql&#39;</span>,
-          :<span class="n">host</span>     =&gt; <span class="n">hostname</span>,
-          :<span class="n">username</span> =&gt; <span class="n">username</span>,
-          :<span class="n">password</span> =&gt; <span class="n">password</span>,
-          :<span class="n">database</span> =&gt; <span class="n">database</span>
-        )
-      <span class="nb">end</span>
-    <span class="nb">end</span>
-  <span class="nb">end</span>
-<span class="nb">end</span>
-<span class="k">if</span> <span class="nv">$0</span> == <span class="n">__FILE__</span>
-  <span class="n">ExampleSinatra::App</span>.<span class="nb">run</span>!
-<span class="nb">end</span>
-</code></pre></div>
-
-<p>From Heroku connecting using <a href="http://sequel.rubyforge.org/">Sequel</a> or <a href="http://datamapper.org/">Datamapper</a> is a little simpler:</p>
-<div class="highlight"><pre><span></span><code>Sequel.connect(ENV[&#39;DATABASE_URL&#39;] || &#39;sqlite://my.db&#39;)
-DataMapper.setup(:default, ENV[&#39;DATABASE_URL&#39;] || &#39;sqlite3://my.db&#39;)
-</code></pre></div>                    </article>
+<p>From <a href="http://apidock.com/rails/v3.2.1/ActiveRecord/Base/establish_connection/class">ActiveRecord 3.2 …</a></p><a class="readmore" href="../sinatra-activerecord-db-config-on-heroku.html">read more</a>                    </article>
                 </aside><!-- /#featured -->
                     <section id="content" class="body">
                         <h1>Other articles</h1>

@@ -40,63 +40,7 @@
 </footer><!-- /.post-info --><p>Based on my answer to <a href="http://stackoverflow.com/q/27461173/97073">this SO Question</a>.</p>
 <p><strong><a href="http://www.mathsisfun.com/definitions/prime-number.html">Definition of Prime</a>:</strong></p>
 <blockquote>
-<p>A Prime Number can be divided evenly only by 1, or itself. 
-And it must be a whole number greater than 1.</p>
-</blockquote>
-<p>A simple method would be to iterate over numbers 2 to N, checking if it was divisible by all natural numbers greater than 2, and below the current value.</p>
-<p>Once checked that it is not divisible by 2 there is not point checking for 4, 6, 8 etc. 
-Remembering the definition of prime all numbers that are not prime are integer multiples of prime. so we have reduced the amount of work involved in testing primality.</p>
-<div class="highlight"><pre><span></span><code><span class="k">parameter</span><span class="w">        </span><span class="n">N</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w">          </span>
-<span class="n">reg</span><span class="w">       </span><span class="o">[</span><span class="n">31:0</span><span class="o">]</span><span class="w"> </span><span class="n">prime_number</span><span class="w"> </span><span class="o">[</span><span class="n">0:N-1</span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="n">Store</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="n">prime</span><span class="w"> </span><span class="n">numbers</span>
-<span class="k">integer</span><span class="w">          </span><span class="n">test</span><span class="w">     </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="k">Result</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">primality</span><span class="w"> </span><span class="n">test</span>
-<span class="k">integer</span><span class="w">          </span><span class="n">k</span><span class="w">        </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">Currently</span><span class="w"> </span><span class="n">looking</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="s1">&#39;th prime </span>
-<span class="s1">integer          index    ; // Counts 1 to k, indexing previous primes </span>
-<span class="s1">integer          number_ut; // Number Under test</span>
-
-<span class="s1">reg        [1:0] state   ; </span>
-<span class="s1">localparam       S_INC   = 2&#39;</span><span class="n">b01</span><span class="p">;</span>
-<span class="n">localparam</span><span class="w">       </span><span class="n">S_CHECK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="s1">&#39;b10;</span>
-
-<span class="s1">initial begin</span>
-<span class="s1">  prime_number[0] = &#39;</span><span class="n">d2</span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="n">Preload</span><span class="w"> </span><span class="k">first</span><span class="w"> </span><span class="n">Prime</span>
-<span class="w">  </span><span class="k">state</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="n">S_CHECK</span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="k">Check</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="nf">count</span><span class="w"> </span><span class="k">first</span>
-<span class="w">  </span><span class="n">number_ut</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;d3; // Number Under Test</span>
-<span class="s1">  k               = &#39;</span><span class="n">d1</span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="k">Position</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="n">preloaded</span>
-<span class="w">  </span><span class="k">index</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;d0;</span>
-<span class="s1">  test            = &#39;</span><span class="n">d1</span><span class="p">;</span>
-<span class="k">end</span>
-
-<span class="n">always</span><span class="w"> </span><span class="err">@</span><span class="p">(</span><span class="n">posedge</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">S_INC</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">    </span><span class="n">number_ut</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">number_ut</span><span class="o">+</span><span class="mi">1</span><span class="w"> </span><span class="p">;</span>
-<span class="w">    </span><span class="k">state</span><span class="w">     </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">S_CHECK</span><span class="w"> </span><span class="p">;</span>
-<span class="w">    </span><span class="k">index</span><span class="w">     </span><span class="o">&lt;=</span><span class="w"> </span><span class="s1">&#39;d0;</span>
-<span class="s1">    test      &lt;= &#39;</span><span class="n">d1</span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">Safe</span><span class="w"> </span><span class="k">default</span>
-<span class="w">  </span><span class="k">end</span>
-<span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">S_CHECK</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">test</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">      </span><span class="o">//</span><span class="w"> </span><span class="n">Failed</span><span class="w"> </span><span class="n">Prime</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="p">(</span><span class="n">exact</span><span class="w"> </span><span class="n">divisor</span><span class="w"> </span><span class="k">found</span><span class="p">)</span>
-<span class="w">      </span><span class="err">$</span><span class="n">display</span><span class="p">(</span><span class="ss">&quot;Reject %3d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">number_ut</span><span class="p">);</span>
-<span class="w">      </span><span class="k">state</span><span class="w">           </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">S_INC</span><span class="w"> </span><span class="p">;</span>
-<span class="w">    </span><span class="k">end</span>
-<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">index</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">      </span><span class="o">//</span><span class="n">Passed</span><span class="w"> </span><span class="n">Prime</span><span class="w"> </span><span class="k">check</span>
-<span class="w">      </span><span class="o">//</span><span class="k">Use</span><span class="w"> </span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="w"> </span><span class="n">so</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="mi">2</span><span class="n">nd</span><span class="w"> </span><span class="n">etc</span>
-<span class="w">      </span><span class="err">$</span><span class="n">display</span><span class="p">(</span><span class="ss">&quot;Found the %1d th Prime, it is %1d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">number_ut</span><span class="p">);</span>
-<span class="w">      </span><span class="n">prime_number</span><span class="o">[</span><span class="n">k</span><span class="o">]</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">number_ut</span><span class="p">;</span>
-<span class="w">      </span><span class="n">k</span><span class="w">               </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
-<span class="w">      </span><span class="k">state</span><span class="w">           </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">S_INC</span><span class="w"> </span><span class="p">;</span>
-<span class="w">    </span><span class="k">end</span>
-<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">      </span><span class="n">test</span><span class="w">  </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">number_ut</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">prime_number</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="w"> </span><span class="p">;</span>
-<span class="w">      </span><span class="k">index</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">          </span>
-<span class="w">    </span><span class="k">end</span>
-<span class="w">  </span><span class="k">end</span>
-<span class="k">end</span>
-</code></pre></div>
-
-<p><a href="http://www.edaplayground.com/x/BzX">Example on EDA Playground</a>.</p>
-<p>This is however just a programming exercise as the resulting hardware is likely substantially bigger than just implementing a look up table to the maxim number of primes you can fit in <code>prime_number</code>. The look up table will also be ready from time zero and not need to recompute every time you power up.</p>                    </article>
+<p>A Prime Number can be divided evenly only by …</p></blockquote><a class="readmore" href="../verilog-calculate-primes.html">read more</a>                    </article>
                 </aside><!-- /#featured -->
                     <section id="content" class="body">
                         <h1>Other articles</h1>
