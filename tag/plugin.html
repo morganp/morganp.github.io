@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Lizard-Spock - Plugin</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="../fretboard-diagrams-in-pelican.html">Fretboard Diagrams in Pelican</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-25T00:00:00+01:00">
+                Published: Sat 25 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/music.html">Music</a>.</p>
+<p>tags: <a href="../tag/guitar.html">Guitar</a> <a href="../tag/pelican.html">Pelican</a> <a href="../tag/plugin.html">Plugin</a> <a href="../tag/svg.html">SVG</a> <a href="../tag/chord.html">Chord</a> <a href="../tag/tab.html">Tab</a> <a href="../tag/music-theory.html">Music Theory</a> </p>        
+</footer><!-- /.post-info --><p>For a long time my guitar diagrams lived on paper -- annotated chord boxes and scale grids scribbled in notebooks. When it came to writing them up digitally I found the process time consuming and the results inconsistent: different posts would use different styles, sizes, or notation conventions with no easy way to keep them in sync. This post introduces <a href="https://github.com/morganp/pelican-fretboard">pelican-fretboard</a>, a plugin that renders chord charts, scale boxes, and tab directly from fenced code blocks in Markdown. Diagrams are generated as SVGs, cached on disk, and served as static files -- nothing to install on the reader's side.</p>
+<hr>
+<h2>The problem with ASCII diagrams</h2>
+<p>The classic way to notate a chord in plain text looks like this:</p>
+<div class="highlight"><pre><span></span><code>E Major
+
+e ---0---
+B ---0---
+G ---1---
+D ---2---
+A ---2---
+E ---0---
+
+Fingers: - 2 3 1 - -
+</code></pre></div>
+
+<p>It works, but it is fragile to copy-paste, hard to scan at a glance, and carries no colour or visual hierarchy to distinguish the root note from the rest of the chord.</p>
+<hr>
+<h2>Chord diagrams</h2>
+<p>The plugin renders a <code>chord</code> block into a standard box diagram. The <code>frets</code> array runs low string to high (E A D G B e for standard tuning). <code>x</code> means muted, <code>0</code> is open.</p>
+<h3>Fingers view</h3>
+<p>Add a <code>fingers</code> array and each fretted dot shows the finger number:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: E Major</span>
+<span class="s">frets: [0, 2, 2, 1, 0, 0]</span>
+<span class="s">fingers: [-, 2, 3, 1, -, -]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">Major</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[-,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="o">-]</span>
+</code></pre></div>
+
+<p>Open strings show a small circle above the nut; the first fret is drawn as a thicker nut line.</p>
+<h3>Intervals view</h3>
+<p>Supply a <code>harmony</code> array instead and each dot shows its interval relative to the root. Root strings are highlighted in purple and the subheading changes to <em>Intervals</em>:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: E Major</span>
+<span class="s">frets: [0, 2, 2, 1, 0, 0]</span>
+<span class="s">harmony: [R, 5, R, 3, 5, R]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">Major</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">]</span>
+<span class="n">harmony</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">]</span>
+</code></pre></div>
+
+<p>Both arrays can coexist in one block. <code>harmony</code> is shown by default; add <code>show: fingers</code> to flip to the fingering view:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: E Major</span>
+<span class="s">frets: [0, 2, 2, 1, 0, 0]</span>
+<span class="s">fingers: [-, 2, 3, 1, -, -]</span>
+<span class="s">harmony: [R, 5, R, 3, 5, R]</span>
+<span class="s">show: fingers</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">Major</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[-,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="o">-]</span>
+<span class="n">harmony</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">]</span>
+<span class="n">show</span><span class="o">:</span><span class="w"> </span><span class="n">fingers</span>
+</code></pre></div>
+
+<p>Comparing the two views of the same chord makes it easy to see which finger lands on which interval -- useful when discussing voicings or substitutions.</p>
+<hr>
+<h2>A seventh chord</h2>
+<p>G7 is a good test because it includes four distinct intervals. The <code>harmony</code> view makes the b7 on the high e string immediately visible:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: G7</span>
+<span class="s">frets: [3, 2, 0, 0, 0, 1]</span>
+<span class="s">harmony: [R, 5, 3, R, 5, b7]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">G7</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">harmony</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">b7</span><span class="o">]</span>
+</code></pre></div>
+
+<p>The same shape in fingers mode:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: G7</span>
+<span class="s">frets: [3, 2, 0, 0, 0, 1]</span>
+<span class="s">fingers: [3, 2, -, -, -, 1]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">G7</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+</code></pre></div>
+
+<hr>
+<h2>Barre chords</h2>
+<p>The <code>barre</code> key draws the barre bar. <code>from_string</code> and <code>to_string</code> are 1-indexed, low string to high:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: F Major (barre)</span>
+<span class="s">frets: [1, 1, 2, 3, 3, 1]</span>
+<span class="s">fingers: [1, 1, 2, 3, 4, 1]</span>
+<span class="s">root_strings: [1, 6]</span>
+<span class="s">barre: {fret: 1, from_string: 1, to_string: 6}</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">F</span><span class="w"> </span><span class="n">Major</span><span class="w"> </span><span class="o">(</span><span class="n">barre</span><span class="o">)</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">4</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">root_strings</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">6</span><span class="o">]</span>
+<span class="n">barre</span><span class="o">:</span><span class="w"> </span><span class="o">{</span><span class="n">fret</span><span class="o">:</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="n">from_string</span><span class="o">:</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="n">to_string</span><span class="o">:</span><span class="w"> </span><span class="mi">6</span><span class="o">}</span>
+</code></pre></div>
+
+<hr>
+<h2>Scale diagrams</h2>
+<p>The <code>scale</code> block renders a fretboard grid. Each row is a string (low E first), each column is a fret starting at <code>start_fret</code>. Cell values: <code>R</code> = root (purple), <code>x</code> = scale note (charcoal), <code>.</code> = empty.</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```scale</span>
+<span class="s">name: A Minor Pentatonic</span>
+<span class="s">start_fret: 5</span>
+<span class="s">num_frets: 5</span>
+<span class="s">grid:</span>
+<span class="s">  - &quot;R . . x .&quot;</span>
+<span class="s">  - &quot;x . x . .&quot;</span>
+<span class="s">  - &quot;x . R . .&quot;</span>
+<span class="s">  - &quot;x . x . .&quot;</span>
+<span class="s">  - &quot;x . . x .&quot;</span>
+<span class="s">  - &quot;R . . x .&quot;</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">Minor</span><span class="w"> </span><span class="n">Pentatonic</span>
+<span class="n">start_fret</span><span class="o">:</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">num_frets</span><span class="o">:</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">grid</span><span class="o">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;R . . x .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;x . x . .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;x . R . .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;x . x . .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;x . . x .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;R . . x .&quot;</span>
+</code></pre></div>
+
+<p>Fret numbers are shown on the left so the position on the neck is always clear.</p>
+<hr>
+<h2>Tab</h2>
+<p>Standard ASCII tab syntax works inside a <code>tab</code> block. Barlines become light vertical rules; note numbers sit on the string lines with the line knocked out behind them so they remain readable:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```tab</span>
+<span class="s">name: E String Blues Riff</span>
+<span class="s">tab: |</span>
+<span class="s">  e|----------------|</span>
+<span class="s">  B|----------------|</span>
+<span class="s">  G|----------------|</span>
+<span class="s">  D|----------------|</span>
+<span class="s">  A|----------------|</span>
+<span class="s">  E|0--3-5-3--0-----|</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c">name: E String Blues Riff</span>
+<span class="c">tab: |</span>
+<span class="c">  e|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  B|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  G|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  D|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  A|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  E|0</span><span class="nb">--</span><span class="c">3</span><span class="nb">-</span><span class="c">5</span><span class="nb">-</span><span class="c">3</span><span class="nb">--</span><span class="c">0</span><span class="nb">-----</span><span class="c">|</span>
+</code></pre></div>
+
+<hr>
+<h2>Any fretted instrument</h2>
+<p>Set <code>tuning</code> to match your instrument and the string count adjusts automatically:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: E (bass)</span>
+<span class="s">tuning: EADG</span>
+<span class="s">frets: [0, 2, 2, 1]</span>
+<span class="s">fingers: [-, 2, 3, 1]</span>
+<span class="s">root_strings: [1]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="o">(</span><span class="n">bass</span><span class="o">)</span>
+<span class="n">tuning</span><span class="o">:</span><span class="w"> </span><span class="n">EADG</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[-,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">root_strings</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
+</code></pre></div>
+
+<p>The same syntax works for ukulele (<code>GCEA</code>), five-string bass (<code>BEADG</code>), mandola (<code>CGDAE</code>), or any open tuning.</p>
+<hr>
+<h2>How it works</h2>
+<p>The plugin registers a Markdown preprocessor that intercepts <code>chord</code>, <code>scale</code>, and <code>tab</code> fenced blocks before they reach the syntax highlighter. Each block is parsed as YAML, rendered to an SVG, and saved to <code>content/images/fretboard/</code> using a SHA-256 hash of the block content as the filename. The fenced block is replaced inline with a <code>&lt;figure&gt;&lt;img /&gt;&lt;/figure&gt;</code> tag. The SVG cache persists across <code>make clean</code> -- diagrams are only regenerated when their source content changes.</p>
+<p>Source and installation instructions are at <a href="https://github.com/morganp/pelican-fretboard">github.com/morganp/pelican-fretboard</a>.</p>                    </article>
+                </aside><!-- /#featured -->
+                <section id="extras" class="body">
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

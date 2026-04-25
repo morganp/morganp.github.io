@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Article 10: The SoC Design Flow -- From Specification to Silicon</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+    <meta name="description" content="A complete walkthrough of the SoC design flow -- from specification and architecture through RTL coding, functional verification, synthesis,..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/soc-article-10-design-flow.html" rel="bookmark"
+             title="Permalink to SoC Article 10: The SoC Design Flow -- From Specification to Silicon">SoC Article 10: The SoC Design Flow -- From Specification to Silicon</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-04-24T00:00:00+01:00">
+                Published: Fri 24 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/rtl.html">RTL</a> <a href="../tag/verification.html">Verification</a> <a href="../tag/synthesis.html">Synthesis</a> <a href="../tag/physical-design.html">Physical Design</a> <a href="../tag/tape-out.html">Tape-out</a> <a href="../tag/vlsi.html">VLSI</a> </p>        
+</footer><!-- /.post-info -->        <p><em>Series: Introduction to SoC Design | Article 10 of 11</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>Designing a SoC is not a single act of creation -- it is a disciplined, iterative engineering process that takes a team of hundreds (sometimes thousands) of engineers anywhere from one to three years to complete. The <strong>design flow</strong> is the structured sequence of phases, tools, and verification checkpoints that transforms an initial concept into a physical chip ready for manufacture.</p>
+<p>This article walks through the entire flow, from the first line of specification to the GDSII file sent to the foundry, explaining what happens at each stage and why each step is necessary.</p>
+<hr>
+<h2>Why the Flow Matters</h2>
+<p>Semiconductor manufacturing is <strong>extraordinarily expensive and irreversible</strong>. Taping out a 7 nm chip can cost $20--50 million in NRE (Non-Recurring Engineering) costs. A single bug that reaches silicon -- a wrong bit in a register address, a timing path that fails at high temperature -- can require a complete re-spin, delaying the product by 6--12 months and costing tens of millions of dollars.</p>
+<p>The design flow exists to make bugs <strong>cheap to find early</strong> and <strong>impossible to reach silicon</strong>. Every stage adds more confidence that the design will work correctly when manufactured.</p>
+<hr>
+<h2>Overview of the Flow</h2>
+<p><a href="../drafts/10-design-flow-HQ.png"><img alt="SoC design flow overview" src="../drafts/10-design-flow-900w.png"></a></p>
+<hr>
+<h2>Stage 1: Specification</h2>
+<p>The design begins with a <strong>specification document</strong> -- a detailed description of what the chip must do, including:</p>
+<ul>
+<li><strong>Functional requirements</strong> -- what operations it must support</li>
+<li><strong>Performance targets</strong> -- minimum operating frequency, latency, throughput</li>
+<li><strong>Power budget</strong> -- maximum active power, standby power</li>
+<li><strong>Area budget</strong> -- die size constraint (directly affects cost)</li>
+<li><strong>Interface requirements</strong> -- which external protocols must be supported</li>
+<li><strong>Operating conditions</strong> -- voltage range, temperature range, process corners</li>
+</ul>
+<p>Specifications are typically written by system architects and product managers. They are often imprecise at first -- the design process refines them as constraints become clearer.</p>
+<hr>
+<h2>Stage 2: Architecture</h2>
+<p>The architecture phase translates requirements into a block-level design. Key decisions:</p>
+<p><strong>IP selection</strong> -- Which CPU core? Which bus protocol? Which memory interface? Purchased IP (ARM Cortex-A, Synopsys DesignWare USB) or custom-designed?</p>
+<p><strong>HW/SW partitioning</strong> -- Which functions are implemented in fixed hardware, and which in software running on the CPU? Hardware is faster and more energy-efficient but inflexible; software is flexible but slower.</p>
+<p><strong>Memory map</strong> -- Where in the 32- or 64-bit address space does each block live? The memory map is fundamental -- once set, changing it breaks all software.</p>
+<p><strong>Block diagram and interface specification</strong> -- Defining the ports of each block and how they connect to the bus.</p>
+<p>The output of the architecture phase is an <strong>architecture specification</strong> -- a document that all downstream engineers work from.</p>
+<hr>
+<h2>Stage 3: RTL Design</h2>
+<p>Each block in the architecture is coded in SystemVerilog or VHDL at RTL level. This phase is typically the longest and involves the most engineers.</p>
+<p><strong>IP integration</strong> -- Licensed IP is delivered as RTL source files or encrypted IP. They are instantiated in the top-level integration and connected to the bus fabric.</p>
+<p><strong>Custom RTL</strong> -- Blocks that do not exist as purchasable IP are designed from scratch by the team's RTL engineers.</p>
+<p><strong>Lint checking</strong> -- Automated tools scan the RTL for common coding mistakes (undriven signals, unintended latches, undeclared ports) before simulation.</p>
+<div class="highlight"><pre><span></span><code><span class="n">RTL</span><span class="w"> </span><span class="n">Lint</span><span class="w"> </span><span class="n">Checks</span><span class="w"> </span><span class="p">(</span><span class="n">examples</span><span class="p">)</span><span class="o">:</span>
+
+<span class="w">  </span><span class="err">✗</span><span class="w"> </span><span class="n">Combinational</span><span class="w"> </span><span class="n">loop</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">combinational</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">no</span><span class="w"> </span><span class="n">register</span>
+<span class="w">  </span><span class="err">✗</span><span class="w"> </span><span class="n">Multi</span><span class="o">-</span><span class="n">driven</span><span class="w"> </span><span class="n">net</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">two</span><span class="w"> </span><span class="n">drivers</span><span class="w"> </span><span class="n">connected</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="kt">wire</span>
+<span class="w">  </span><span class="err">✗</span><span class="w"> </span><span class="n">Unintended</span><span class="w"> </span><span class="n">latch</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">missing</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="k">always_comb</span><span class="w"> </span><span class="k">case</span>
+<span class="w">  </span><span class="err">✗</span><span class="w"> </span><span class="n">Width</span><span class="w"> </span><span class="n">mismatch</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="mh">8</span><span class="o">-</span><span class="kt">bit</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="n">assigned</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mh">16</span><span class="o">-</span><span class="kt">bit</span><span class="w"> </span><span class="n">port</span>
+<span class="w">  </span><span class="err">✗</span><span class="w"> </span><span class="n">Reset</span><span class="w"> </span><span class="n">missing</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">flip</span><span class="o">-</span><span class="n">flop</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="n">no</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="n">path</span>
+<span class="w">  </span><span class="err">✗</span><span class="w"> </span><span class="n">X</span><span class="o">-</span><span class="n">propagation</span><span class="w"> </span><span class="n">risk</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">uninitialized</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="n">used</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="kt">logic</span>
+</code></pre></div>
+
+<hr>
+<h2>Stage 4: Functional Verification</h2>
+<p>Verification is the process of proving (to sufficient confidence) that the RTL correctly implements the specification. It is <strong>the biggest investment in a modern SoC project</strong> -- typically consuming 60--70% of total design effort and schedule.</p>
+<h3>Simulation</h3>
+<p>The RTL is simulated against a <strong>testbench</strong> that models the SoC's environment:</p>
+<p><a href="../drafts/10-verification-uvm-HQ.png"><img alt="UVM verification environment" src="../drafts/10-verification-uvm-900w.png"></a></p>
+<h3>Coverage-Driven Verification</h3>
+<p>Engineers define <strong>coverage metrics</strong> -- measurable goals that indicate whether enough of the design space has been tested:</p>
+<p><strong>Code coverage</strong> -- has every line and branch of the RTL been exercised?</p>
+<p><strong>Functional coverage</strong> -- have all interesting combinations of inputs occurred? (e.g., FIFO full during reset, all AXI burst lengths, all interrupt priority combinations)</p>
+<p>Verification is <strong>complete</strong> when coverage goals are met, all bugs have been fixed and re-verified, and a formal sign-off review has been passed.</p>
+<h3>Formal Verification</h3>
+<p><strong>Formal verification</strong> uses mathematical techniques to prove properties about the design, rather than testing with specific inputs. It can exhaustively check all possible input sequences (up to a bounded depth).</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Formal</span><span class="w"> </span><span class="nv">vs</span><span class="w"> </span><span class="nv">Simulation</span>:
+
+<span class="w">  </span><span class="nv">Simulation</span>:<span class="w">         </span><span class="nv">Tests</span><span class="w"> </span><span class="nv">specific</span><span class="w"> </span><span class="nv">sequences</span><span class="w"> </span><span class="nv">chosen</span><span class="w"> </span><span class="nv">by</span><span class="w"> </span><span class="nv">engineers</span>
+<span class="w">                      </span>→<span class="w"> </span><span class="nv">Can</span><span class="w"> </span><span class="nv">miss</span><span class="w"> </span><span class="nv">corner</span><span class="w"> </span><span class="nv">cases</span>
+<span class="w">                      </span>→<span class="w"> </span><span class="nv">Fast</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">common</span><span class="w"> </span><span class="nv">cases</span>
+
+<span class="w">  </span><span class="nv">Formal</span>:<span class="w">             </span><span class="nv">Mathematically</span><span class="w"> </span><span class="nv">proves</span><span class="w"> </span><span class="nv">properties</span><span class="w"> </span><span class="nv">hold</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">ALL</span><span class="w"> </span><span class="nv">inputs</span>
+<span class="w">                      </span>→<span class="w"> </span><span class="nv">Complete</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">bounded</span><span class="w"> </span><span class="nv">depth</span>
+<span class="w">                      </span>→<span class="w"> </span><span class="nv">Can</span><span class="w"> </span><span class="nv">find</span><span class="w"> </span><span class="nv">bugs</span><span class="w"> </span><span class="nv">simulation</span><span class="w"> </span><span class="nv">never</span><span class="w"> </span><span class="nv">would</span>
+<span class="w">                      </span>→<span class="w"> </span><span class="nv">Slower</span>,<span class="w"> </span><span class="nv">limited</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">smaller</span><span class="w"> </span><span class="nv">blocks</span>
+</code></pre></div>
+
+<p>Formal verification tools (Cadence JasperGold, Synopsys VC Formal) are used for:
+- Block-level property checking
+- Clock domain crossing analysis
+- Security property verification
+- Register model consistency</p>
+<h3>Hardware Emulation</h3>
+<p>For large SoCs, simulation is too slow to run real software. <strong>Hardware emulators</strong> (Cadence Palladium, Synopsys ZeBu) compile the RTL into custom FPGAs or ASICs that run 100--1000x faster than software simulation. This allows booting Linux, running real drivers, and executing application-level tests before silicon is available.</p>
+<hr>
+<h2>Stage 5: Synthesis</h2>
+<p>Once RTL verification is complete, <strong>synthesis</strong> converts the RTL into a gate-level netlist using a specific technology's standard cell library.</p>
+<h3>Synthesis Constraints</h3>
+<p>The synthesis tool needs to know the timing requirements -- expressed in <strong>Synopsys Design Constraints (SDC)</strong> format:</p>
+<div class="highlight"><pre><span></span><code><span class="c"># SDC constraint example</span>
+<span class="nv">create_clock</span><span class="w"> </span><span class="o">-</span>name<span class="w"> </span><span class="s2">&quot;cpu_clk&quot;</span><span class="w"> </span><span class="o">-</span>period<span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="k">[</span><span class="nv">get_ports</span><span class="w"> </span>clk_in<span class="k">]</span><span class="w">  </span><span class="k">;</span><span class="w"> </span><span class="c"># 2 GHz clock</span>
+<span class="nv">set_input_delay</span><span class="w">  </span><span class="mf">0.1</span><span class="w"> </span><span class="o">-</span>clock<span class="w"> </span>cpu_clk<span class="w"> </span><span class="k">[</span><span class="nv">all_inputs</span><span class="k">]</span>
+<span class="nv">set_output_delay</span><span class="w"> </span><span class="mf">0.1</span><span class="w"> </span><span class="o">-</span>clock<span class="w"> </span>cpu_clk<span class="w"> </span><span class="k">[</span><span class="nv">all_outputs</span><span class="k">]</span>
+<span class="nv">set_max_fanout</span><span class="w">   </span><span class="mi">20</span><span class="w">  </span><span class="k">[</span><span class="nv">all_registers</span><span class="k">]</span>
+</code></pre></div>
+
+<p>The tool then maps each RTL construct to available cells from the <strong>standard cell library</strong> -- a characterised set of gates (AND2, OR3, DFF, MUX2, ...) provided by the foundry or cell library vendor.</p>
+<h3>Gate-Level Netlist</h3>
+<p>The output is a <strong>gate-level netlist</strong> -- a flat or hierarchical description of the design in terms of specific cell instances and their interconnections:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Example gate-level netlist fragment (post-synthesis)</span>
+<span class="k">module</span><span class="w"> </span><span class="n">counter_synth</span><span class="w"> </span><span class="p">(</span><span class="n">clk</span><span class="p">,</span><span class="w"> </span><span class="n">rst_n</span><span class="p">,</span><span class="w"> </span><span class="n">en</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// Cell instances from the standard cell library:</span>
+<span class="w">  </span><span class="n">DFF_X1</span><span class="w"> </span><span class="n">FF0</span><span class="w"> </span><span class="p">(.</span><span class="n">D</span><span class="p">(</span><span class="n">n12</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">CK</span><span class="p">(</span><span class="n">clk</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">Q</span><span class="p">(</span><span class="n">count</span><span class="p">[</span><span class="mh">0</span><span class="p">]));</span>
+<span class="w">  </span><span class="n">DFF_X1</span><span class="w"> </span><span class="n">FF1</span><span class="w"> </span><span class="p">(.</span><span class="n">D</span><span class="p">(</span><span class="n">n14</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">CK</span><span class="p">(</span><span class="n">clk</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">Q</span><span class="p">(</span><span class="n">count</span><span class="p">[</span><span class="mh">1</span><span class="p">]));</span>
+<span class="w">  </span><span class="n">AND2_X1</span><span class="w"> </span><span class="n">U1</span><span class="w"> </span><span class="p">(.</span><span class="n">A1</span><span class="p">(</span><span class="n">en</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">A2</span><span class="p">(</span><span class="n">count</span><span class="p">[</span><span class="mh">0</span><span class="p">]),</span><span class="w"> </span><span class="p">.</span><span class="n">ZN</span><span class="p">(</span><span class="n">n12</span><span class="p">));</span>
+<span class="w">  </span><span class="n">XOR2_X1</span><span class="w"> </span><span class="n">U2</span><span class="w"> </span><span class="p">(.</span><span class="n">A</span><span class="p">(</span><span class="n">count</span><span class="p">[</span><span class="mh">1</span><span class="p">]),</span><span class="w"> </span><span class="p">.</span><span class="n">B</span><span class="p">(</span><span class="n">n12</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">Z</span><span class="p">(</span><span class="n">n14</span><span class="p">));</span>
+<span class="w">  </span><span class="c1">// ... hundreds or thousands of cells</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+
+<hr>
+<h2>Stage 6: Physical Design (Back-End)</h2>
+<p>Physical design transforms the logical netlist into a physical layout -- geometric shapes on the silicon that will be manufactured. This is the "back-end" of the design flow.</p>
+<h3>Floorplanning</h3>
+<p>The die is partitioned into regions, and major blocks are placed at approximate locations. Analog macros (PLLs, PHYs), memories (SRAM), and IP hard macros are placed first.</p>
+<p><a href="../drafts/10-physical-design-HQ.png"><img alt="Physical design floorplan" src="../drafts/10-physical-design-900w.png"></a></p>
+<h3>Placement</h3>
+<p>The automatic <strong>placement</strong> tool places all standard cells within each block's area, minimising wire length and ensuring timing constraints can be met.</p>
+<h3>Clock Tree Synthesis (CTS)</h3>
+<p>As discussed in Article 06, CTS builds the clock distribution tree that delivers the clock signal with minimal skew and jitter to every flip-flop. CTS is one of the most critical and time-consuming back-end steps.</p>
+<h3>Routing</h3>
+<p><strong>Routing</strong> connects all cell inputs and outputs with metal wires according to the netlist. Modern designs have 10--15 metal layers; the router must find paths for millions of wires without violations.</p>
+<h3>Verification After Routing: Sign-off Checks</h3>
+<div class="highlight"><pre><span></span><code><span class="n">Physical</span><span class="w"> </span><span class="n">Verification</span><span class="w"> </span><span class="nl">Checks:</span>
+
+<span class="w">  </span><span class="n">DRC</span><span class="w"> </span><span class="p">(</span><span class="n">Design</span><span class="w"> </span><span class="n">Rule</span><span class="w"> </span><span class="n">Check</span><span class="p">)</span>
+<span class="w">      </span><span class="err">✓</span><span class="w"> </span><span class="n">Minimum</span><span class="w"> </span><span class="kt">wire</span><span class="w"> </span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">spacing</span><span class="p">,</span><span class="w"> </span><span class="n">via</span><span class="w"> </span><span class="n">rules</span>
+<span class="w">      </span><span class="err">✓</span><span class="w"> </span><span class="n">Antenna</span><span class="w"> </span><span class="n">rules</span><span class="w"> </span><span class="p">(</span><span class="n">charge</span><span class="w"> </span><span class="n">accumulation</span><span class="w"> </span><span class="n">during</span><span class="w"> </span><span class="n">manufacture</span><span class="p">)</span>
+<span class="w">      </span><span class="err">✓</span><span class="w"> </span><span class="n">Process</span><span class="o">-</span><span class="n">specific</span><span class="w"> </span><span class="n">rules</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">foundry</span>
+
+<span class="w">  </span><span class="n">LVS</span><span class="w"> </span><span class="p">(</span><span class="n">Layout</span><span class="w"> </span><span class="n">vs</span><span class="w"> </span><span class="n">Schematic</span><span class="p">)</span>
+<span class="w">      </span><span class="err">✓</span><span class="w"> </span><span class="n">Does</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">physical</span><span class="w"> </span><span class="n">layout</span><span class="w"> </span><span class="n">match</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">netlist</span><span class="o">?</span>
+<span class="w">      </span><span class="err">✓</span><span class="w"> </span><span class="n">No</span><span class="w"> </span><span class="n">extra</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="n">missing</span><span class="w"> </span><span class="n">connections</span><span class="o">?</span>
+
+<span class="w">  </span><span class="n">ERC</span><span class="w"> </span><span class="p">(</span><span class="n">Electrical</span><span class="w"> </span><span class="n">Rule</span><span class="w"> </span><span class="n">Check</span><span class="p">)</span>
+<span class="w">      </span><span class="err">✓</span><span class="w"> </span><span class="n">Short</span><span class="w"> </span><span class="n">circuits</span><span class="p">,</span><span class="w"> </span><span class="n">open</span><span class="w"> </span><span class="n">nets</span>
+<span class="w">      </span><span class="err">✓</span><span class="w"> </span><span class="n">Floating</span><span class="w"> </span><span class="n">inputs</span><span class="p">,</span><span class="w"> </span><span class="n">missing</span><span class="w"> </span><span class="n">power</span><span class="w"> </span><span class="n">connections</span>
+</code></pre></div>
+
+<hr>
+<h2>Stage 7: Sign-Off</h2>
+<p>Before tape-out, the design must pass a series of <strong>sign-off checks</strong> that certify it will work correctly after fabrication:</p>
+<p><strong>Static Timing Analysis (STA)</strong> -- verifies that every logic path in the design meets the required timing, across all process corners (fast/slow transistors), voltages (nominal/low), and temperatures (cold/hot):</p>
+<div class="highlight"><pre><span></span><code><span class="n">STA</span><span class="w"> </span><span class="n">Timing</span><span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">Example</span><span class="o">:</span>
+
+<span class="w">  </span><span class="n">Launch</span><span class="w"> </span><span class="n">FF</span><span class="w">               </span><span class="n">Capture</span><span class="w"> </span><span class="n">FF</span>
+<span class="w">      </span><span class="err">│</span><span class="w">                       </span><span class="err">│</span>
+<span class="w">  </span><span class="n">clk</span><span class="err">→</span><span class="p">[</span><span class="n">FF1</span><span class="p">]</span><span class="err">──</span><span class="p">[</span><span class="n">Comb</span><span class="w"> </span><span class="n">Logic</span><span class="p">]</span><span class="err">──►</span><span class="p">[</span><span class="n">FF2</span><span class="p">]</span><span class="err">←</span><span class="n">clk</span>
+<span class="w">              </span><span class="p">(</span><span class="n">delay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35</span><span class="w"> </span><span class="n">ns</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">Setup</span><span class="w"> </span><span class="n">check</span><span class="o">:</span>
+<span class="w">    </span><span class="n">Required</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Clock</span><span class="w"> </span><span class="n">period</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Setup</span><span class="w"> </span><span class="n">time</span>
+<span class="w">                  </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="n">ns</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.03</span><span class="w"> </span><span class="n">ns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.47</span><span class="w"> </span><span class="n">ns</span>
+<span class="w">    </span><span class="n">Data</span><span class="w"> </span><span class="n">arrival</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">Launch</span><span class="w"> </span><span class="n">clock</span><span class="w"> </span><span class="n">edge</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="n">delay</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">logic</span><span class="w"> </span><span class="n">delay</span>
+<span class="w">                  </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.10</span><span class="w"> </span><span class="n">ns</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.35</span><span class="w"> </span><span class="n">ns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45</span><span class="w"> </span><span class="n">ns</span>
+<span class="w">    </span><span class="n">Slack</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="mf">0.47</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.45</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">+</span><span class="mf">0.02</span><span class="w"> </span><span class="n">ns</span><span class="w"> </span><span class="err">✓</span><span class="w"> </span><span class="p">(</span><span class="n">positive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PASS</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">If</span><span class="w"> </span><span class="n">slack</span><span class="w"> </span><span class="n">were</span><span class="w"> </span><span class="n">negative</span><span class="p">,</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="n">would</span><span class="w"> </span><span class="n">need</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">fixed</span>
+<span class="w">  </span><span class="p">(</span><span class="n">by</span><span class="w"> </span><span class="n">resizing</span><span class="w"> </span><span class="n">cells</span><span class="p">,</span><span class="w"> </span><span class="n">restructuring</span><span class="w"> </span><span class="n">logic</span><span class="p">,</span><span class="w"> </span><span class="n">or</span><span class="w"> </span><span class="n">relaxing</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">clock</span><span class="p">).</span>
+</code></pre></div>
+
+<p><strong>Power Analysis</strong> -- estimates active and leakage power consumption across typical and worst-case workloads.</p>
+<p><strong>IR Drop Analysis</strong> -- verifies that the power distribution network delivers sufficient voltage to every cell, accounting for resistive drops through the metal power rails.</p>
+<hr>
+<h2>Stage 8: Tape-Out and Fabrication</h2>
+<p><strong>Tape-out</strong> is the formal submission of the GDSII file to the foundry -- the geometric database of every polygon on every mask layer that will be used to manufacture the chip.</p>
+<p>After tape-out:</p>
+<ol>
+<li><strong>Mask making</strong> -- the foundry converts GDSII into photomasks (~$1M--$5M per mask set for advanced nodes)</li>
+<li><strong>Wafer fabrication</strong> -- 8--24 week process, typically 400--900 process steps</li>
+<li><strong>Wafer probing</strong> -- each die is tested electrically before dicing</li>
+<li><strong>Dicing</strong> -- wafer cut into individual dies</li>
+<li><strong>Packaging</strong> -- die bonded into a package (BGA, QFP, etc.)</li>
+<li><strong>Final test</strong> -- packaged devices tested at speed, temperature</li>
+<li><strong>Characterisation</strong> -- a sample of devices is measured to build a statistical model of the process</li>
+</ol>
+<hr>
+<h2>State Machine of the Design Flow</h2>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_ab730b9bce731cd4bdc47370270712af.svg"></p>
+<hr>
+<h2>Tools of the Trade</h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Industry Tools</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTL Lint</td>
+<td>Mentor Questa Lint, Synopsys Spyglass</td>
+</tr>
+<tr>
+<td>Simulation</td>
+<td>Synopsys VCS, Cadence Xcelium, Mentor Questa</td>
+</tr>
+<tr>
+<td>Formal Verification</td>
+<td>Cadence JasperGold, Synopsys VC Formal</td>
+</tr>
+<tr>
+<td>Emulation</td>
+<td>Cadence Palladium, Synopsys ZeBu</td>
+</tr>
+<tr>
+<td>Synthesis</td>
+<td>Synopsys Design Compiler / Fusion Compiler, Cadence Genus</td>
+</tr>
+<tr>
+<td>Physical Design</td>
+<td>Cadence Innovus, Synopsys IC Compiler II</td>
+</tr>
+<tr>
+<td>STA Sign-off</td>
+<td>Synopsys PrimeTime, Cadence Tempus</td>
+</tr>
+<tr>
+<td>Physical Verification</td>
+<td>Siemens Calibre, Cadence PVS</td>
+</tr>
+<tr>
+<td>Open-Source Alternatives</td>
+<td>Yosys (synthesis), OpenROAD (PD), KLayout (viewing GDSII)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Summary</h2>
+<p>The SoC design flow is a rigorous, multi-stage process designed to catch errors at the cheapest possible point -- before they reach silicon. It begins with specification and architecture, progresses through RTL coding and verification, then synthesis, physical design, and sign-off, culminating in tape-out. Verification is the largest time investment, spanning simulation, assertion-based checking, and formal methods. Physical design transforms the logical netlist into real geometry on the wafer. Every phase generates new insights that may require revisiting earlier phases -- the flow is iterative, not linear.</p>
+<hr>
+<h2>Advanced Articles This Topic Connects To</h2>
+<ul>
+<li><em>RTL Synthesis and Timing Closure</em> -- Constraint writing, ECO, multi-corner STA</li>
+<li><em>Physical Design: Floorplanning and Place-and-Route</em> -- In-depth CTS, routing, signoff</li>
+<li><em>Post-Silicon Debug and Validation</em> -- What happens when the chip comes back from the foundry</li>
+</ul>
+<hr>
+<p><em>Previous: <a href="../drafts/soc-article-09-hardware-description-languages-rtl-design.html">Article 09 -- Hardware Description Languages</a></em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

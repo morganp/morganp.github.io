@@ -1,5 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Music</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/music.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2025-12-05T14:50:00+00:00</updated><entry><title>Reduce Rack Drum Kit Size</title><link href="http://lizard-spock.co.uk/reduce-rack-drum-kit-size.html" rel="alternate"></link><published>2025-12-05T14:50:00+00:00</published><updated>2025-12-05T14:50:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/reduce-rack-drum-kit-size.html</id><summary type="html">&lt;p&gt;For the Yamaha DTX8 the cymbals mount on to the horizontal drum rack tubes. A more compact setup can be …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For the Yamaha DTX8 the cymbals mount on to the horizontal drum rack tubes. A more compact setup can be achieved if the cymbal mounts are onto of the vertical tubes. Some drum racks already have this setup, typically on the lower end as it requires less harder to be supplied. It seems like a great way to save space if trying to fit a drum kit into your home!  &lt;a href="https://www.musicstore.com/en_GB/GBP/Gibraltar-Rack-Tube-Attachment-SC-RMAA-/art-DRU0025312-000?campaign=GShopping/GB&amp;amp;ProgramUUID=fp4KAQMEqOEAAAGSjgtiaHEt&amp;amp;gad_source=1"&gt;Gibraltar have this clamp&lt;/a&gt;, to convert other drum racks with (1.5”) 38.1mm tubing.&lt;/p&gt;</content><category term="Music"></category><category term="Drum"></category></entry><entry><title>Expanding Yamaha DTX8 Drum Kit</title><link href="http://lizard-spock.co.uk/expanding-yamaha-dtx8-drum-kit.html" rel="alternate"></link><published>2025-12-05T14:43:00+00:00</published><updated>2025-12-05T14:43:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/expanding-yamaha-dtx8-drum-kit.html</id><summary type="html">&lt;h2&gt;TOM&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Music</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/music.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-25T00:00:00+01:00</updated><entry><title>Fretboard Diagrams in Pelican</title><link href="http://lizard-spock.co.uk/fretboard-diagrams-in-pelican.html" rel="alternate"></link><published>2026-04-25T00:00:00+01:00</published><updated>2026-04-25T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-25:/fretboard-diagrams-in-pelican.html</id><summary type="html">&lt;p&gt;A walkthrough of the pelican-fretboard plugin -- chord charts, scale boxes, and tab rendered as SVGs directly from fenced code blocks, with a comparison of finger-number and interval-label views.&lt;/p&gt;</summary><content type="html">&lt;p&gt;For a long time my guitar diagrams lived on paper -- annotated chord boxes and scale grids scribbled in notebooks. When it came to writing them up digitally I found the process time consuming and the results inconsistent: different posts would use different styles, sizes, or notation conventions with no easy way to keep them in sync. This post introduces &lt;a href="https://github.com/morganp/pelican-fretboard"&gt;pelican-fretboard&lt;/a&gt;, a plugin that renders chord charts, scale boxes, and tab directly from fenced code blocks in Markdown. Diagrams are generated as SVGs, cached on disk, and served as static files -- nothing to install on the reader's side.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The problem with ASCII diagrams&lt;/h2&gt;
+&lt;p&gt;The classic way to notate a chord in plain text looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;E Major
+
+e ---0---
+B ---0---
+G ---1---
+D ---2---
+A ---2---
+E ---0---
+
+Fingers: - 2 3 1 - -
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;It works, but it is fragile to copy-paste, hard to scan at a glance, and carries no colour or visual hierarchy to distinguish the root note from the rest of the chord.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Chord diagrams&lt;/h2&gt;
+&lt;p&gt;The plugin renders a &lt;code&gt;chord&lt;/code&gt; block into a standard box diagram. The &lt;code&gt;frets&lt;/code&gt; array runs low string to high (E A D G B e for standard tuning). &lt;code&gt;x&lt;/code&gt; means muted, &lt;code&gt;0&lt;/code&gt; is open.&lt;/p&gt;
+&lt;h3&gt;Fingers view&lt;/h3&gt;
+&lt;p&gt;Add a &lt;code&gt;fingers&lt;/code&gt; array and each fretted dot shows the finger number:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```chord&lt;/span&gt;
+&lt;span class="s"&gt;name: E Major&lt;/span&gt;
+&lt;span class="s"&gt;frets: [0, 2, 2, 1, 0, 0]&lt;/span&gt;
+&lt;span class="s"&gt;fingers: [-, 2, 3, 1, -, -]&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-chord"&gt;&lt;img src="/images/fretboard/fretboard_3d10f214300697cc.svg" alt="E Major" loading="lazy" /&gt;&lt;figcaption&gt;E Major&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;Open strings show a small circle above the nut; the first fret is drawn as a thicker nut line.&lt;/p&gt;
+&lt;h3&gt;Intervals view&lt;/h3&gt;
+&lt;p&gt;Supply a &lt;code&gt;harmony&lt;/code&gt; array instead and each dot shows its interval relative to the root. Root strings are highlighted in purple and the subheading changes to &lt;em&gt;Intervals&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```chord&lt;/span&gt;
+&lt;span class="s"&gt;name: E Major&lt;/span&gt;
+&lt;span class="s"&gt;frets: [0, 2, 2, 1, 0, 0]&lt;/span&gt;
+&lt;span class="s"&gt;harmony: [R, 5, R, 3, 5, R]&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-chord"&gt;&lt;img src="/images/fretboard/fretboard_fc5c0858c8a54301.svg" alt="E Major" loading="lazy" /&gt;&lt;figcaption&gt;E Major&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;Both arrays can coexist in one block. &lt;code&gt;harmony&lt;/code&gt; is shown by default; add &lt;code&gt;show: fingers&lt;/code&gt; to flip to the fingering view:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```chord&lt;/span&gt;
+&lt;span class="s"&gt;name: E Major&lt;/span&gt;
+&lt;span class="s"&gt;frets: [0, 2, 2, 1, 0, 0]&lt;/span&gt;
+&lt;span class="s"&gt;fingers: [-, 2, 3, 1, -, -]&lt;/span&gt;
+&lt;span class="s"&gt;harmony: [R, 5, R, 3, 5, R]&lt;/span&gt;
+&lt;span class="s"&gt;show: fingers&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-chord"&gt;&lt;img src="/images/fretboard/fretboard_d69fb2dcf79069ea.svg" alt="E Major" loading="lazy" /&gt;&lt;figcaption&gt;E Major&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;Comparing the two views of the same chord makes it easy to see which finger lands on which interval -- useful when discussing voicings or substitutions.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;A seventh chord&lt;/h2&gt;
+&lt;p&gt;G7 is a good test because it includes four distinct intervals. The &lt;code&gt;harmony&lt;/code&gt; view makes the b7 on the high e string immediately visible:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```chord&lt;/span&gt;
+&lt;span class="s"&gt;name: G7&lt;/span&gt;
+&lt;span class="s"&gt;frets: [3, 2, 0, 0, 0, 1]&lt;/span&gt;
+&lt;span class="s"&gt;harmony: [R, 5, 3, R, 5, b7]&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-chord"&gt;&lt;img src="/images/fretboard/fretboard_24daf36839e9e84f.svg" alt="G7" loading="lazy" /&gt;&lt;figcaption&gt;G7&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;The same shape in fingers mode:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```chord&lt;/span&gt;
+&lt;span class="s"&gt;name: G7&lt;/span&gt;
+&lt;span class="s"&gt;frets: [3, 2, 0, 0, 0, 1]&lt;/span&gt;
+&lt;span class="s"&gt;fingers: [3, 2, -, -, -, 1]&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-chord"&gt;&lt;img src="/images/fretboard/fretboard_4f7e1d4798e418fd.svg" alt="G7" loading="lazy" /&gt;&lt;figcaption&gt;G7&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;Barre chords&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;barre&lt;/code&gt; key draws the barre bar. &lt;code&gt;from_string&lt;/code&gt; and &lt;code&gt;to_string&lt;/code&gt; are 1-indexed, low string to high:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```chord&lt;/span&gt;
+&lt;span class="s"&gt;name: F Major (barre)&lt;/span&gt;
+&lt;span class="s"&gt;frets: [1, 1, 2, 3, 3, 1]&lt;/span&gt;
+&lt;span class="s"&gt;fingers: [1, 1, 2, 3, 4, 1]&lt;/span&gt;
+&lt;span class="s"&gt;root_strings: [1, 6]&lt;/span&gt;
+&lt;span class="s"&gt;barre: {fret: 1, from_string: 1, to_string: 6}&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-chord"&gt;&lt;img src="/images/fretboard/fretboard_0a40e287652cf558.svg" alt="F Major (barre)" loading="lazy" /&gt;&lt;figcaption&gt;F Major (barre)&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;Scale diagrams&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;scale&lt;/code&gt; block renders a fretboard grid. Each row is a string (low E first), each column is a fret starting at &lt;code&gt;start_fret&lt;/code&gt;. Cell values: &lt;code&gt;R&lt;/code&gt; = root (purple), &lt;code&gt;x&lt;/code&gt; = scale note (charcoal), &lt;code&gt;.&lt;/code&gt; = empty.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```scale&lt;/span&gt;
+&lt;span class="s"&gt;name: A Minor Pentatonic&lt;/span&gt;
+&lt;span class="s"&gt;start_fret: 5&lt;/span&gt;
+&lt;span class="s"&gt;num_frets: 5&lt;/span&gt;
+&lt;span class="s"&gt;grid:&lt;/span&gt;
+&lt;span class="s"&gt;  - &amp;quot;R . . x .&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;  - &amp;quot;x . x . .&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;  - &amp;quot;x . R . .&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;  - &amp;quot;x . x . .&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;  - &amp;quot;x . . x .&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;  - &amp;quot;R . . x .&amp;quot;&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-scale"&gt;&lt;img src="/images/fretboard/fretboard_7882289b845db360.svg" alt="A Minor Pentatonic" loading="lazy" /&gt;&lt;figcaption&gt;A Minor Pentatonic&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;Fret numbers are shown on the left so the position on the neck is always clear.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Tab&lt;/h2&gt;
+&lt;p&gt;Standard ASCII tab syntax works inside a &lt;code&gt;tab&lt;/code&gt; block. Barlines become light vertical rules; note numbers sit on the string lines with the line knocked out behind them so they remain readable:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```tab&lt;/span&gt;
+&lt;span class="s"&gt;name: E String Blues Riff&lt;/span&gt;
+&lt;span class="s"&gt;tab: |&lt;/span&gt;
+&lt;span class="s"&gt;  e|----------------|&lt;/span&gt;
+&lt;span class="s"&gt;  B|----------------|&lt;/span&gt;
+&lt;span class="s"&gt;  G|----------------|&lt;/span&gt;
+&lt;span class="s"&gt;  D|----------------|&lt;/span&gt;
+&lt;span class="s"&gt;  A|----------------|&lt;/span&gt;
+&lt;span class="s"&gt;  E|0--3-5-3--0-----|&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-tab"&gt;&lt;img src="/images/fretboard/fretboard_cf203f458711f534.svg" alt="E String Blues Riff" loading="lazy" /&gt;&lt;figcaption&gt;E String Blues Riff&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;Any fretted instrument&lt;/h2&gt;
+&lt;p&gt;Set &lt;code&gt;tuning&lt;/code&gt; to match your instrument and the string count adjusts automatically:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```chord&lt;/span&gt;
+&lt;span class="s"&gt;name: E (bass)&lt;/span&gt;
+&lt;span class="s"&gt;tuning: EADG&lt;/span&gt;
+&lt;span class="s"&gt;frets: [0, 2, 2, 1]&lt;/span&gt;
+&lt;span class="s"&gt;fingers: [-, 2, 3, 1]&lt;/span&gt;
+&lt;span class="s"&gt;root_strings: [1]&lt;/span&gt;
+&lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure class="fretboard-diagram fretboard-chord"&gt;&lt;img src="/images/fretboard/fretboard_56dec855662c5492.svg" alt="E (bass)" loading="lazy" /&gt;&lt;figcaption&gt;E (bass)&lt;/figcaption&gt;&lt;/figure&gt;
+
+&lt;p&gt;The same syntax works for ukulele (&lt;code&gt;GCEA&lt;/code&gt;), five-string bass (&lt;code&gt;BEADG&lt;/code&gt;), mandola (&lt;code&gt;CGDAE&lt;/code&gt;), or any open tuning.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;How it works&lt;/h2&gt;
+&lt;p&gt;The plugin registers a Markdown preprocessor that intercepts &lt;code&gt;chord&lt;/code&gt;, &lt;code&gt;scale&lt;/code&gt;, and &lt;code&gt;tab&lt;/code&gt; fenced blocks before they reach the syntax highlighter. Each block is parsed as YAML, rendered to an SVG, and saved to &lt;code&gt;content/images/fretboard/&lt;/code&gt; using a SHA-256 hash of the block content as the filename. The fenced block is replaced inline with a &lt;code&gt;&amp;lt;figure&amp;gt;&amp;lt;img /&amp;gt;&amp;lt;/figure&amp;gt;&lt;/code&gt; tag. The SVG cache persists across &lt;code&gt;make clean&lt;/code&gt; -- diagrams are only regenerated when their source content changes.&lt;/p&gt;
+&lt;p&gt;Source and installation instructions are at &lt;a href="https://github.com/morganp/pelican-fretboard"&gt;github.com/morganp/pelican-fretboard&lt;/a&gt;.&lt;/p&gt;</content><category term="Music"></category><category term="Guitar"></category><category term="Pelican"></category><category term="Plugin"></category><category term="SVG"></category><category term="Chord"></category><category term="Tab"></category><category term="Music Theory"></category></entry><entry><title>Reduce Rack Drum Kit Size</title><link href="http://lizard-spock.co.uk/reduce-rack-drum-kit-size.html" rel="alternate"></link><published>2025-12-05T14:50:00+00:00</published><updated>2025-12-05T14:50:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/reduce-rack-drum-kit-size.html</id><summary type="html">&lt;p&gt;For the Yamaha DTX8 the cymbals mount on to the horizontal drum rack tubes. A more compact setup can be …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For the Yamaha DTX8 the cymbals mount on to the horizontal drum rack tubes. A more compact setup can be achieved if the cymbal mounts are onto of the vertical tubes. Some drum racks already have this setup, typically on the lower end as it requires less harder to be supplied. It seems like a great way to save space if trying to fit a drum kit into your home!  &lt;a href="https://www.musicstore.com/en_GB/GBP/Gibraltar-Rack-Tube-Attachment-SC-RMAA-/art-DRU0025312-000?campaign=GShopping/GB&amp;amp;ProgramUUID=fp4KAQMEqOEAAAGSjgtiaHEt&amp;amp;gad_source=1"&gt;Gibraltar have this clamp&lt;/a&gt;, to convert other drum racks with (1.5”) 38.1mm tubing.&lt;/p&gt;</content><category term="Music"></category><category term="Drum"></category></entry><entry><title>Expanding Yamaha DTX8 Drum Kit</title><link href="http://lizard-spock.co.uk/expanding-yamaha-dtx8-drum-kit.html" rel="alternate"></link><published>2025-12-05T14:43:00+00:00</published><updated>2025-12-05T14:43:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/expanding-yamaha-dtx8-drum-kit.html</id><summary type="html">&lt;h2&gt;TOM&lt;/h2&gt;
 &lt;p&gt;Parts Required for adding 4th Tom (second floor tom) to a Yamaha DTX8 kit.&lt;/p&gt;
 &lt;p&gt;Mounting bracket for rack: Yamaha …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;TOM&lt;/h2&gt;
 &lt;p&gt;Parts Required for adding 4th Tom (second floor tom) to a Yamaha DTX8 kit.&lt;/p&gt;

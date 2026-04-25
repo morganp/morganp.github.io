@@ -6,7 +6,6 @@
                         <meta name="generator" content="Pelican" />
                         <title>Lizard-Spock - Pelican</title>
                         <link rel="stylesheet" href="../theme/css/main.css" />
-                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
         </head>
 
         <body id="index" class="home">
@@ -26,7 +25,223 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="../fsm-diagrams-in-pelican-and-claude-code.html">FSM Diagrams in Pelican and Claude Code</a></h1>
+                        <h1 class="entry-title"><a href="../fretboard-diagrams-in-pelican.html">Fretboard Diagrams in Pelican</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2026-04-25T00:00:00+01:00">
+                Published: Sat 25 April 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/music.html">Music</a>.</p>
+<p>tags: <a href="../tag/guitar.html">Guitar</a> <a href="../tag/pelican.html">Pelican</a> <a href="../tag/plugin.html">Plugin</a> <a href="../tag/svg.html">SVG</a> <a href="../tag/chord.html">Chord</a> <a href="../tag/tab.html">Tab</a> <a href="../tag/music-theory.html">Music Theory</a> </p>        
+</footer><!-- /.post-info --><p>For a long time my guitar diagrams lived on paper -- annotated chord boxes and scale grids scribbled in notebooks. When it came to writing them up digitally I found the process time consuming and the results inconsistent: different posts would use different styles, sizes, or notation conventions with no easy way to keep them in sync. This post introduces <a href="https://github.com/morganp/pelican-fretboard">pelican-fretboard</a>, a plugin that renders chord charts, scale boxes, and tab directly from fenced code blocks in Markdown. Diagrams are generated as SVGs, cached on disk, and served as static files -- nothing to install on the reader's side.</p>
+<hr>
+<h2>The problem with ASCII diagrams</h2>
+<p>The classic way to notate a chord in plain text looks like this:</p>
+<div class="highlight"><pre><span></span><code>E Major
+
+e ---0---
+B ---0---
+G ---1---
+D ---2---
+A ---2---
+E ---0---
+
+Fingers: - 2 3 1 - -
+</code></pre></div>
+
+<p>It works, but it is fragile to copy-paste, hard to scan at a glance, and carries no colour or visual hierarchy to distinguish the root note from the rest of the chord.</p>
+<hr>
+<h2>Chord diagrams</h2>
+<p>The plugin renders a <code>chord</code> block into a standard box diagram. The <code>frets</code> array runs low string to high (E A D G B e for standard tuning). <code>x</code> means muted, <code>0</code> is open.</p>
+<h3>Fingers view</h3>
+<p>Add a <code>fingers</code> array and each fretted dot shows the finger number:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: E Major</span>
+<span class="s">frets: [0, 2, 2, 1, 0, 0]</span>
+<span class="s">fingers: [-, 2, 3, 1, -, -]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">Major</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[-,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="o">-]</span>
+</code></pre></div>
+
+<p>Open strings show a small circle above the nut; the first fret is drawn as a thicker nut line.</p>
+<h3>Intervals view</h3>
+<p>Supply a <code>harmony</code> array instead and each dot shows its interval relative to the root. Root strings are highlighted in purple and the subheading changes to <em>Intervals</em>:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: E Major</span>
+<span class="s">frets: [0, 2, 2, 1, 0, 0]</span>
+<span class="s">harmony: [R, 5, R, 3, 5, R]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">Major</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">]</span>
+<span class="n">harmony</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">]</span>
+</code></pre></div>
+
+<p>Both arrays can coexist in one block. <code>harmony</code> is shown by default; add <code>show: fingers</code> to flip to the fingering view:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: E Major</span>
+<span class="s">frets: [0, 2, 2, 1, 0, 0]</span>
+<span class="s">fingers: [-, 2, 3, 1, -, -]</span>
+<span class="s">harmony: [R, 5, R, 3, 5, R]</span>
+<span class="s">show: fingers</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">Major</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[-,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="o">-]</span>
+<span class="n">harmony</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">]</span>
+<span class="n">show</span><span class="o">:</span><span class="w"> </span><span class="n">fingers</span>
+</code></pre></div>
+
+<p>Comparing the two views of the same chord makes it easy to see which finger lands on which interval -- useful when discussing voicings or substitutions.</p>
+<hr>
+<h2>A seventh chord</h2>
+<p>G7 is a good test because it includes four distinct intervals. The <code>harmony</code> view makes the b7 on the high e string immediately visible:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: G7</span>
+<span class="s">frets: [3, 2, 0, 0, 0, 1]</span>
+<span class="s">harmony: [R, 5, 3, R, 5, b7]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">G7</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">harmony</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="n">R</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="o">,</span><span class="w"> </span><span class="n">b7</span><span class="o">]</span>
+</code></pre></div>
+
+<p>The same shape in fingers mode:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: G7</span>
+<span class="s">frets: [3, 2, 0, 0, 0, 1]</span>
+<span class="s">fingers: [3, 2, -, -, -, 1]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">G7</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="o">-,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+</code></pre></div>
+
+<hr>
+<h2>Barre chords</h2>
+<p>The <code>barre</code> key draws the barre bar. <code>from_string</code> and <code>to_string</code> are 1-indexed, low string to high:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: F Major (barre)</span>
+<span class="s">frets: [1, 1, 2, 3, 3, 1]</span>
+<span class="s">fingers: [1, 1, 2, 3, 4, 1]</span>
+<span class="s">root_strings: [1, 6]</span>
+<span class="s">barre: {fret: 1, from_string: 1, to_string: 6}</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">F</span><span class="w"> </span><span class="n">Major</span><span class="w"> </span><span class="o">(</span><span class="n">barre</span><span class="o">)</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">4</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">root_strings</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">6</span><span class="o">]</span>
+<span class="n">barre</span><span class="o">:</span><span class="w"> </span><span class="o">{</span><span class="n">fret</span><span class="o">:</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="n">from_string</span><span class="o">:</span><span class="w"> </span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="n">to_string</span><span class="o">:</span><span class="w"> </span><span class="mi">6</span><span class="o">}</span>
+</code></pre></div>
+
+<hr>
+<h2>Scale diagrams</h2>
+<p>The <code>scale</code> block renders a fretboard grid. Each row is a string (low E first), each column is a fret starting at <code>start_fret</code>. Cell values: <code>R</code> = root (purple), <code>x</code> = scale note (charcoal), <code>.</code> = empty.</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```scale</span>
+<span class="s">name: A Minor Pentatonic</span>
+<span class="s">start_fret: 5</span>
+<span class="s">num_frets: 5</span>
+<span class="s">grid:</span>
+<span class="s">  - &quot;R . . x .&quot;</span>
+<span class="s">  - &quot;x . x . .&quot;</span>
+<span class="s">  - &quot;x . R . .&quot;</span>
+<span class="s">  - &quot;x . x . .&quot;</span>
+<span class="s">  - &quot;x . . x .&quot;</span>
+<span class="s">  - &quot;R . . x .&quot;</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">Minor</span><span class="w"> </span><span class="n">Pentatonic</span>
+<span class="n">start_fret</span><span class="o">:</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">num_frets</span><span class="o">:</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">grid</span><span class="o">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;R . . x .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;x . x . .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;x . R . .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;x . x . .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;x . . x .&quot;</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;R . . x .&quot;</span>
+</code></pre></div>
+
+<p>Fret numbers are shown on the left so the position on the neck is always clear.</p>
+<hr>
+<h2>Tab</h2>
+<p>Standard ASCII tab syntax works inside a <code>tab</code> block. Barlines become light vertical rules; note numbers sit on the string lines with the line knocked out behind them so they remain readable:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```tab</span>
+<span class="s">name: E String Blues Riff</span>
+<span class="s">tab: |</span>
+<span class="s">  e|----------------|</span>
+<span class="s">  B|----------------|</span>
+<span class="s">  G|----------------|</span>
+<span class="s">  D|----------------|</span>
+<span class="s">  A|----------------|</span>
+<span class="s">  E|0--3-5-3--0-----|</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c">name: E String Blues Riff</span>
+<span class="c">tab: |</span>
+<span class="c">  e|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  B|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  G|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  D|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  A|</span><span class="nb">----------------</span><span class="c">|</span>
+<span class="c">  E|0</span><span class="nb">--</span><span class="c">3</span><span class="nb">-</span><span class="c">5</span><span class="nb">-</span><span class="c">3</span><span class="nb">--</span><span class="c">0</span><span class="nb">-----</span><span class="c">|</span>
+</code></pre></div>
+
+<hr>
+<h2>Any fretted instrument</h2>
+<p>Set <code>tuning</code> to match your instrument and the string count adjusts automatically:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```chord</span>
+<span class="s">name: E (bass)</span>
+<span class="s">tuning: EADG</span>
+<span class="s">frets: [0, 2, 2, 1]</span>
+<span class="s">fingers: [-, 2, 3, 1]</span>
+<span class="s">root_strings: [1]</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="o">(</span><span class="n">bass</span><span class="o">)</span>
+<span class="n">tuning</span><span class="o">:</span><span class="w"> </span><span class="n">EADG</span>
+<span class="n">frets</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">fingers</span><span class="o">:</span><span class="w"> </span><span class="o">[-,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">1</span><span class="o">]</span>
+<span class="n">root_strings</span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
+</code></pre></div>
+
+<p>The same syntax works for ukulele (<code>GCEA</code>), five-string bass (<code>BEADG</code>), mandola (<code>CGDAE</code>), or any open tuning.</p>
+<hr>
+<h2>How it works</h2>
+<p>The plugin registers a Markdown preprocessor that intercepts <code>chord</code>, <code>scale</code>, and <code>tab</code> fenced blocks before they reach the syntax highlighter. Each block is parsed as YAML, rendered to an SVG, and saved to <code>content/images/fretboard/</code> using a SHA-256 hash of the block content as the filename. The fenced block is replaced inline with a <code>&lt;figure&gt;&lt;img /&gt;&lt;/figure&gt;</code> tag. The SVG cache persists across <code>make clean</code> -- diagrams are only regenerated when their source content changes.</p>
+<p>Source and installation instructions are at <a href="https://github.com/morganp/pelican-fretboard">github.com/morganp/pelican-fretboard</a>.</p>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="../fsm-diagrams-in-pelican-and-claude-code.html" rel="bookmark"
+                               title="Permalink to FSM Diagrams in Pelican and Claude Code">FSM Diagrams in Pelican and Claude Code</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2026-02-22T18:00:00+00:00">
                 Published: Sun 22 February 2026
@@ -37,204 +252,10 @@
                 </address>
         <p>In <a href="../category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="../tag/fsm.html">FSM</a> <a href="../tag/pelican.html">Pelican</a> <a href="../tag/mermaid.html">Mermaid</a> <a href="../tag/graphviz.html">Graphviz</a> <a href="../tag/claude.html">claude</a> <a href="../tag/ai.html">ai</a> <a href="../tag/python.html">Python</a> <a href="../tag/git.html">Git</a> <a href="../tag/bash.html">Bash</a> <a href="../tag/homebrew.html">Homebrew</a> <a href="../tag/ubuntu.html">Ubuntu</a> <a href="../tag/rtl.html">RTL</a> </p>        
-</footer><!-- /.post-info --><p>Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious. This post covers two tools I've built: a Pelican plugin that renders FSM diagrams at build time so they appear as images in published posts, and a Claude Code skill that generates diagrams from plain-English descriptions.</p>
-<p>The pattern is identical to the <a href="../wavedrom-timing-diagrams-in-pelican-with-claude-code.html">WaveDrom plugin and skill</a>: describe what you want, get a fenced code block, paste it into a post, and the build renders it to SVG automatically.</p>
-<h2>The Pelican plugin</h2>
-<p>The plugin is at <a href="https://github.com/morganp/pelican-fsm">github.com/morganp/pelican-fsm</a>, cloned to <code>~/Code/pelican-fsm</code> (a sibling directory to the blog repo). It intercepts fenced <code>```mermaid ```</code> and <code>```dot ```</code> code blocks before Pelican's standard Markdown processing, renders each one to an SVG using the appropriate CLI tool, caches the result by content hash in <code>content/images/fsm/</code>, and replaces the block with a standard image reference. Pelican then copies the SVG to <code>output/images/fsm/</code> as a static asset.</p>
-<p>SVGs are cached across builds, so only diagrams whose source has changed are re-rendered.</p>
-<h3>Requirements</h3>
-<ul>
-<li><a href="https://github.com/mermaid-js/mermaid-cli">Mermaid CLI</a> for <code>mermaid</code> blocks:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@mermaid-js/mermaid-cli
-</code></pre></div>
-
-<ul>
-<li><a href="https://graphviz.org/">Graphviz</a> for <code>dot</code> blocks:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>graphviz<span class="w">      </span><span class="c1"># macOS</span>
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>graphviz<span class="w">  </span><span class="c1"># Debian/Ubuntu</span>
-</code></pre></div>
-
-<p>Both tools are optional. If one is missing, blocks for that type fall back gracefully to a fenced <code>text</code> block without failing the build.</p>
-<h3>Installation</h3>
-<p>Clone the plugin alongside your Pelican project and install it into the Pelican virtualenv in editable mode:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/pelican-fsm<span class="w"> </span>../pelican-fsm
-<span class="nb">source</span><span class="w"> </span>venv/bin/activate
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>../pelican-fsm<span class="w"> </span>--config-settings<span class="w"> </span><span class="nv">editable_mode</span><span class="o">=</span>compat
-</code></pre></div>
-
-<p>The <code>editable_mode=compat</code> flag is required. Without it, modern setuptools editable installs use a path-hook mechanism that prevents Pelican's namespace plugin auto-discovery from finding the plugin.</p>
-<p>Pelican 4.5+ auto-discovers namespace plugins, so no changes to <code>pelicanconf.py</code> are needed.</p>
-<h3>Optional config</h3>
-<p>If <code>mmdc</code> or <code>dot</code> are not on your <code>PATH</code> during the build, set their full paths in <code>pelicanconf.py</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">FSM_MERMAID_CLI</span> <span class="o">=</span> <span class="s1">&#39;/opt/homebrew/bin/mmdc&#39;</span>
-<span class="n">FSM_DOT_CLI</span> <span class="o">=</span> <span class="s1">&#39;/opt/homebrew/bin/dot&#39;</span>
-</code></pre></div>
-
-<h3>Using it in a post</h3>
-<p>Write a fenced code block with the language set to <code>mermaid</code> or <code>dot</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="sb">```mermaid</span>
-<span class="s">stateDiagram-v2</span>
-<span class="s">    [*] --&gt; Idle</span>
-<span class="s">    Idle --&gt; Running : start</span>
-<span class="s">    Running --&gt; Idle : stop</span>
-<span class="s">    Running --&gt; Error : fault</span>
-<span class="s">    Error --&gt; Idle : reset</span>
-<span class="sb">```</span>
-</code></pre></div>
-
-<p>At build time this becomes an SVG embedded in the page:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg"></p>
-<p>Graphviz DOT works the same way, and is a better fit for hardware and RTL documentation where the compact box-and-arrow style is conventional:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_d33619e8d6e9ae49f343c57a8f6db1e1.svg"></p>
-<p>If the CLI is not found or rendering fails, the block falls back to fenced <code>text</code> — the post still builds, you just see the raw source instead of a diagram.</p>
-<h2>The Claude Code skill</h2>
-<p>The skill lives at <a href="https://github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm">github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm</a>. Claude Code auto-discovers skills from <code>~/.claude/skills/</code> and loads them on demand.</p>
-<p>The skill triggers automatically when you describe anything involving states, transitions, or control flow: protocol implementations, UI flows, hardware FSMs, parsers, game logic. You describe the system in plain English and Claude generates the diagram.</p>
-<p>The skill knows:</p>
-<ul>
-<li>Full Mermaid <code>stateDiagram-v2</code> syntax: plain states, display labels, transitions with events/guards/actions, composite (nested) states, choice pseudostates, fork/join for parallel regions, concurrent regions (<code>--</code>), notes, direction, and classDef styling</li>
-<li>Graphviz DOT FSM conventions: Moore vs Mealy annotation, initial pseudostate arrow, accepting states as double circles</li>
-<li>When to prefer each format: Mermaid for software/web docs, DOT for hardware/RTL</li>
-</ul>
-<h3>Example workflow</h3>
-<p>Describe the system:</p>
-<blockquote>
-<p>"Draw the states for a TCP connection"</p>
-</blockquote>
-<p>Claude produces:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_03bf39c43e71e98bd12e737558c3f9e3.svg"></p>
-<p>Because the skill outputs a <code>mermaid</code> fenced block, you can paste it directly into a blog post and the Pelican plugin renders it automatically.</p>
-<h3>Installing the skill</h3>
-<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.claude/skills/fsm
-curl<span class="w"> </span>-o<span class="w"> </span>~/.claude/skills/fsm/SKILL.md<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://raw.githubusercontent.com/morganp/dotfiles/main/config/claude/skills/fsm/SKILL.md
-</code></pre></div>
-
-<p>Or clone the dotfiles repo and symlink:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/morganp/dotfiles<span class="w"> </span>~/dotfiles
-ln<span class="w"> </span>-s<span class="w"> </span>~/dotfiles/config/claude/skills/fsm<span class="w"> </span>~/.claude/skills/fsm
-</code></pre></div>
-
-<h2>Syntax quick reference</h2>
-<p>Both formats can express the same FSM concepts, but use different syntax. The table below maps them side by side.</p>
-<table>
-<thead>
-<tr>
-<th>Concept</th>
-<th>Mermaid <code>stateDiagram-v2</code></th>
-<th>Graphviz DOT</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Graph declaration</td>
-<td><code>stateDiagram-v2</code></td>
-<td><code>digraph FSM { ... }</code></td>
-</tr>
-<tr>
-<td>Default node style</td>
-<td>automatic</td>
-<td><code>node [shape=circle]</code></td>
-</tr>
-<tr>
-<td>Left-to-right layout</td>
-<td><code>direction LR</code></td>
-<td><code>rankdir=LR</code></td>
-</tr>
-<tr>
-<td>Comment</td>
-<td><code>%% comment</code></td>
-<td><code>// comment</code></td>
-</tr>
-<tr>
-<td>Plain state</td>
-<td><code>StateName</code></td>
-<td><code>StateName</code></td>
-</tr>
-<tr>
-<td>State with display label</td>
-<td><code>state "Label" as Name</code></td>
-<td><code>Name [label="Label"]</code></td>
-</tr>
-<tr>
-<td>Initial pseudostate</td>
-<td><code>[*] --&gt; State</code></td>
-<td><code>__start [shape=point width=0.2]</code> + <code>__start -&gt; State</code></td>
-</tr>
-<tr>
-<td>Final/accepting state</td>
-<td><code>State --&gt; [*]</code></td>
-<td><code>State [shape=doublecircle]</code></td>
-</tr>
-<tr>
-<td>Transition</td>
-<td><code>A --&gt; B</code></td>
-<td><code>A -&gt; B</code></td>
-</tr>
-<tr>
-<td>Transition with event</td>
-<td><code>A --&gt; B : event</code></td>
-<td><code>A -&gt; B [label="event"]</code></td>
-</tr>
-<tr>
-<td>Transition with action</td>
-<td><code>A --&gt; B : event / action()</code></td>
-<td><code>A -&gt; B [label="event / action()"]</code></td>
-</tr>
-<tr>
-<td>Guarded transition</td>
-<td><code>A --&gt; B : [guard]</code></td>
-<td><code>A -&gt; B [label="[guard]"]</code></td>
-</tr>
-<tr>
-<td>Composite (nested) state</td>
-<td><code>state S { ... }</code></td>
-<td><code>subgraph cluster_S { ... }</code></td>
-</tr>
-<tr>
-<td>Choice pseudostate</td>
-<td><code>state C &lt;&lt;choice&gt;&gt;</code></td>
-<td><code>C [shape=diamond]</code></td>
-</tr>
-<tr>
-<td>Fork pseudostate</td>
-<td><code>state F &lt;&lt;fork&gt;&gt;</code></td>
-<td>invisible node + multiple outgoing edges</td>
-</tr>
-<tr>
-<td>Join pseudostate</td>
-<td><code>state J &lt;&lt;join&gt;&gt;</code></td>
-<td>invisible node + multiple incoming edges</td>
-</tr>
-<tr>
-<td>Concurrent regions</td>
-<td><code>--</code> inside composite</td>
-<td>parallel <code>subgraph</code> blocks</td>
-</tr>
-</tbody>
-</table>
-<h2>Project structure</h2>
-<div class="highlight"><pre><span></span><code><span class="o">~/</span><span class="n">Code</span><span class="o">/</span>
-<span class="err">├──</span><span class="w"> </span><span class="n">morganp</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="w">              </span><span class="c1"># blog source (main branch)</span>
-<span class="err">│</span><span class="w">   </span><span class="err">└──</span><span class="w"> </span><span class="n">content</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">fsm</span><span class="o">/</span><span class="w">         </span><span class="c1"># SVG cache (persists across make clean)</span>
-<span class="err">└──</span><span class="w"> </span><span class="n">pelican</span><span class="o">-</span><span class="n">fsm</span><span class="o">/</span><span class="w">                    </span><span class="c1"># github.com/morganp/pelican-fsm</span>
-<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">pelican</span><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">fsm_renderer</span><span class="o">/</span>
-<span class="w">        </span><span class="err">├──</span><span class="w"> </span><span class="n">__init__</span><span class="o">.</span><span class="n">py</span><span class="w">             </span><span class="c1"># plugin entry point, signal registration</span>
-<span class="w">        </span><span class="err">└──</span><span class="w"> </span><span class="n">preprocessor</span><span class="o">.</span><span class="n">py</span><span class="w">        </span><span class="c1"># Markdown extension + preprocessor</span>
-
-<span class="o">~/.</span><span class="n">claude</span><span class="o">/</span><span class="n">skills</span><span class="o">/</span>
-<span class="err">└──</span><span class="w"> </span><span class="n">fsm</span><span class="o">/</span>
-<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">SKILL</span><span class="o">.</span><span class="n">md</span><span class="w">                    </span><span class="c1"># Claude Code skill definition</span>
-</code></pre></div>
-
-<p>The combination is useful for any documentation that involves control flow: describe the behaviour, get the diagram from Claude, drop it into a post, and the plugin renders it at build time. No manual editing of diagram syntax, no copy-pasting between browser tabs.</p>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                        <p>Finite state machines turn up everywhere: protocol implementations, hardware controllers, UI flows, parsers. Drawing them well is useful but tedious …</p>
+                        <a class="readmore" href="../fsm-diagrams-in-pelican-and-claude-code.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -381,13 +402,6 @@ List installed themes via:</p>
                     </ol><!-- /#posts-list -->
                     </section><!-- /#content -->
                 <section id="extras" class="body">
-                                <div class="social">
-                                        <h2>social</h2>
-                                        <ul>
-                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
-
-                                        </ul>
-                                </div><!-- /.social -->
                 </section><!-- /#extras -->
 
                 <footer id="contentinfo" class="body">
