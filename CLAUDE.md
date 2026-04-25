@@ -97,3 +97,45 @@ Images go in `content/images/` and are configured as a static path.
 
 - **python_search_and_replace.py** — Batch convert legacy `.markdown` metadata format
 - **python_search_category.py** — Filter/search posts by category
+
+## Plugin Development and Stale Cache
+
+### The devserver rebuild loop
+
+The devserver watches `content/` for changes. Plugins that write generated files into `content/images/` (fretboard SVGs, wavedrom SVGs, FSM SVGs) trigger a rebuild the moment those files are written, which then writes the same files again, causing another rebuild. This loop runs indefinitely but is harmless -- it stabilises once the files stop changing. It does mean the devserver is a poor tool for iterating on plugin code.
+
+**When developing or debugging a plugin, use `make html` for all test builds instead of `make devserver`.**
+
+### Stale HTML after plugin code changes
+
+Pelican caches processed article content. If plugin code changes but the post source has not changed, Pelican may reuse the cached rendered HTML from a previous build, meaning new plugin behaviour is not reflected in the output even after a successful `make html`.
+
+Two things must be cleared when plugin rendering logic changes:
+
+1. **Plugin SVG cache** -- the hash-keyed files in `content/images/fretboard/` (and equivalents for wavedrom/fsm). If the SVG already exists on disk the plugin skips regeneration entirely.
+2. **Pelican's reader cache** -- stored in `output/` (or `.cache/` if configured). `make clean` removes `output/` and forces a full rebuild.
+
+**Full reset command after plugin changes:**
+
+```bash
+source venv/bin/activate
+rm -f content/images/fretboard/*.svg   # clear fretboard SVG cache
+make clean                             # remove output/
+make html                              # full rebuild
+```
+
+After confirming the build looks correct, restart the devserver:
+
+```bash
+make devserver
+```
+
+### Verifying plugin output
+
+To check how many diagrams rendered in a draft post without opening a browser:
+
+```bash
+grep -c "fretboard-diagram" output/drafts/<slug>.html
+```
+
+A count of 0 means the plugin preprocessor did not run or all renders failed. Check for Python tracebacks in the build output -- silent failures write a warning to the log and fall through to Pygments, which displays the raw block as a syntax-highlighted code block instead of an image.
