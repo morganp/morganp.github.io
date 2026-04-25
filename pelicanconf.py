@@ -78,3 +78,12 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 DEFAULT_PAGINATION = False
 PAGINATED_TEMPLATES = {'index': 10, 'tag': None, 'category': None, 'author': None}
+
+PLUGINS = [
+    'pelican.plugins.wavedrom_generator',
+    'pelican.plugins.fsm_renderer',
+    'pelican.plugins.fretboard',
+]
+
+FRETBOARD_CACHE_PATH = 'content/images/fretboard'
+FRETBOARD_CACHE_URL  = '/images/fretboard'
