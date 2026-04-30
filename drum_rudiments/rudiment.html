@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drum Rudiment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0c0a08; --surface: #141109; --card: #1a170f;
+    --border: #2c2820; --text: #d8cfb4; --muted: #6b6250;
+    --accent: #e8a020; --r: #ff8060; --l: #5a9fff;
+  }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    background-image: radial-gradient(ellipse 70% 30% at 50% 0%, rgba(232,160,32,0.05) 0%, transparent 60%);
+  }
+
+  /* ── NOTATION SCROLL ── */
+  .notation-scroll { overflow-x: auto; overflow-y: hidden; padding-bottom: 8px; }
+  .notation-scroll::-webkit-scrollbar { height: 4px; }
+  .notation-scroll::-webkit-scrollbar-track { background: var(--border); border-radius: 2px; }
+  .notation-scroll::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+
+  /* ── STICK ANIMATIONS — two identical pairs so alternating names restart animation ── */
+  @keyframes strikeLeft1  { 0%{transform:rotate(-22deg)} 20%{transform:rotate(14deg)} 100%{transform:rotate(-22deg)} }
+  @keyframes strikeLeft2  { 0%{transform:rotate(-22deg)} 20%{transform:rotate(14deg)} 100%{transform:rotate(-22deg)} }
+  @keyframes strikeRight1 { 0%{transform:rotate(22deg)}  20%{transform:rotate(-14deg)} 100%{transform:rotate(22deg)} }
+  @keyframes strikeRight2 { 0%{transform:rotate(22deg)}  20%{transform:rotate(-14deg)} 100%{transform:rotate(22deg)} }
+  .stick-l { transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(-22deg); }
+  .stick-r { transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(22deg); }
+
+  /* ── NOTE PULSE ── */
+  @keyframes notePulse {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+    .print-only { display: block !important; }
+    body { background: #fff; color: #000; }
+    .notation-card { background: #fff !important; border: 1px solid #ccc !important; }
+  }
+  .print-only { display: none; }
+
+  /* ── CONTROLS ── */
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    height: 4px; border-radius: 2px;
+    background: var(--border); outline: none; cursor: pointer;
+    flex: 1;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    box-shadow: 0 0 8px rgba(232,160,32,0.5);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); cursor: pointer; border: none;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="rudiments.js"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+const LEARNED_KEY = 'drum_rudiments_learned';
+function getLearned() {
+  try { return new Set(JSON.parse(localStorage.getItem(LEARNED_KEY)) || []); }
+  catch { return new Set(); }
+}
+
+/* ── AUDIO ── */
+function playClick(ctx, time, accent) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = accent ? 1400 : 900;
+  gain.gain.setValueAtTime(accent ? 0.35 : 0.18, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(time); osc.stop(time + 0.06);
+}
+
+/* ── STICKING STRING ── */
+function stickingString(pattern) {
+  return pattern.map(n => {
+    let s = '';
+    if (n.drag)  s += (n.h === 'R' ? 'llR' : 'rrL');
+    else if (n.grace) s += (n.grace.toLowerCase() + n.h);
+    else s += n.h;
+    return s;
+  }).join(' ');
+}
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "layout": "side",
+  "drumScale": 1.4
+}/*EDITMODE-END*/;
+
+/* ── DRUM PAD SVG ── */
+function DrumPad({ activeHand, lKey, rKey, scale = 1 }) {
+  const W = Math.round(220 * scale), H = Math.round(215 * scale);
+  // Alternate between two identical animation names so the browser restarts
+  // the animation every time the key increments — no imperative DOM manipulation.
+  const lAnim = lKey > 0
+    ? `${lKey % 2 ? 'strikeLeft1' : 'strikeLeft2'} 0.14s ease-out`
+    : 'none';
+  const rAnim = rKey > 0
+    ? `${rKey % 2 ? 'strikeRight1' : 'strikeRight2'} 0.14s ease-out`
+    : 'none';
+
+  return (
+    <svg viewBox="0 0 220 215" width={W} height={H} aria-hidden="true">
+      {/* Shell */}
+      <ellipse cx="110" cy="148" rx="82" ry="20" fill="#1a140a" stroke="#2e2010" strokeWidth="2"/>
+      <rect x="28" y="120" width="164" height="28" fill="#1a140a"/>
+      {/* Snare wires */}
+      {[0,1,2,3,4].map(i => (
+        <line key={i} x1="50" y1={142+i} x2="170" y2={142+i}
+          stroke="#3a2c18" strokeWidth="0.5" opacity="0.6"/>
+      ))}
+      {/* Head shadow */}
+      <ellipse cx="110" cy="122" rx="82" ry="22" fill="#0d0905"/>
+      {/* Head */}
+      <ellipse cx="110" cy="118" rx="82" ry="22" fill="#c8b480" stroke="#907850" strokeWidth="1.5"/>
+      <ellipse cx="110" cy="118" rx="70" ry="18" fill="none" stroke="#b0a068" strokeWidth="0.8" opacity="0.5"/>
+      <ellipse cx="110" cy="118" rx="50" ry="13" fill="none" stroke="#b0a068" strokeWidth="0.5" opacity="0.3"/>
+      {/* Tension rods */}
+      {[0,45,90,135,180,225,270,315].map((deg, i) => {
+        const rad = deg * Math.PI / 180;
+        const ex = 85 * Math.cos(rad), ey = 23 * Math.sin(rad) * 0.95;
+        return (
+          <rect key={i} x={107+ex} y={115+ey-5} width={6} height={10} rx={1.5}
+            fill="#2e2210" stroke="#1a1408" strokeWidth={0.8}
+            transform={`rotate(${deg},${110+ex},${118+ey})`}/>
+        );
+      })}
+      {/* Hit flash on drum head */}
+      {activeHand && (
+        <ellipse cx="110" cy="118" rx="36" ry="10"
+          fill={activeHand === 'R' ? 'rgba(255,128,96,0.28)' : 'rgba(90,159,255,0.28)'}/>
+      )}
+
+      {/* LEFT STICK — animation driven by lAnim prop */}
+      <g className="stick-l" style={{ animation: lAnim }}>
+        <rect x="59" y="82" width="6" height="113" rx="3" fill="#c88840" stroke="#a06828" strokeWidth="1"/>
+        <circle cx="62" cy="80" r="7.5" fill="#c88840" stroke="#a06828" strokeWidth="1"/>
+      </g>
+      <text x="62" y="212" textAnchor="middle" fontSize="12"
+        fill="#5a9fff" fontFamily="DM Mono,monospace" fontWeight="600">L</text>
+
+      {/* RIGHT STICK */}
+      <g className="stick-r" style={{ animation: rAnim }}>
+        <rect x="155" y="82" width="6" height="113" rx="3" fill="#c88840" stroke="#a06828" strokeWidth="1"/>
+        <circle cx="158" cy="80" r="7.5" fill="#c88840" stroke="#a06828" strokeWidth="1"/>
+      </g>
+      <text x="158" y="212" textAnchor="middle" fontSize="12"
+        fill="#ff8060" fontFamily="DM Mono,monospace" fontWeight="600">R</text>
+    </svg>
+  );
+}
+
+/* ── NOTATION SVG ── */
+function NotationSVG({ pattern, currentIdx }) {
+  const CLEF_W = 48;
+  const NOTE_W = 46;
+  const GRACE_EXTRA = 22;
+  const DRAG_EXTRA = 30;
+  const H = 115;
+  const staffY = 54;
+
+  // Calculate x positions
+  const positions = [];
+  let x = CLEF_W + 10;
+  pattern.forEach((note) => {
+    let pre = 0;
+    if (note.grace) pre = GRACE_EXTRA;
+    if (note.drag)  pre = DRAG_EXTRA;
+    positions.push({ x: x + pre, pre });
+    x += NOTE_W + pre;
+  });
+  const totalW = Math.max(x + 20, 400);
+
+  return (
+    <svg width={totalW} height={H} style={{ display: 'block', minWidth: totalW }}>
+      {/* Staff line */}
+      <line x1={16} y1={staffY} x2={totalW - 10} y2={staffY}
+        stroke="#3a3428" strokeWidth={1.5}/>
+      {/* Percussion clef */}
+      <rect x={18} y={staffY - 15} width={3} height={30} fill="#665e48" rx={1}/>
+      <rect x={24} y={staffY - 15} width={3} height={30} fill="#665e48" rx={1}/>
+
+      {pattern.map((note, i) => {
+        const { x } = positions[i];
+        const active = i === currentIdx;
+        const col   = active ? '#e8a020' : '#d0c8a8';
+        const muted = active ? '#e8a020' : '#5a5040';
+        const glow  = active ? 'drop-shadow(0 0 7px rgba(232,160,32,0.9))' : 'none';
+        const hcol  = note.h === 'R'
+          ? (active ? '#ff8060' : '#7a6050')
+          : (active ? '#5a9fff' : '#506070');
+
+        return (
+          <g key={i} style={{ filter: glow }}>
+            {/* Grace note (flam) */}
+            {note.grace && (() => {
+              const gx = x - GRACE_EXTRA + 3;
+              const gc = active ? '#e8a020' : '#5a5040';
+              return (
+                <g opacity={0.85}>
+                  <circle cx={gx} cy={staffY} r={3.5} fill={gc}/>
+                  <line x1={gx + 3.5} y1={staffY - 1} x2={gx + 3.5} y2={staffY - 15}
+                    stroke={gc} strokeWidth={1.2}/>
+                  {/* grace slash */}
+                  <line x1={gx - 3} y1={staffY - 18} x2={gx + 9} y2={staffY - 9}
+                    stroke={gc} strokeWidth={1}/>
+                  <text x={gx} y={staffY + 18} textAnchor="middle"
+                    fontSize="9" fill={gc} fontFamily="DM Mono,monospace" fontStyle="italic">
+                    {note.grace.toLowerCase()}
+                  </text>
+                </g>
+              );
+            })()}
+
+            {/* Drag (two grace notes) */}
+            {note.drag && (() => {
+              const d1x = x - DRAG_EXTRA + 3;
+              const d2x = x - DRAG_EXTRA + 16;
+              const dc = active ? '#e8a020' : '#5a5040';
+              return (
+                <g opacity={0.85}>
+                  {[d1x, d2x].map((dx, di) => (
+                    <g key={di}>
+                      <circle cx={dx} cy={staffY} r={3} fill={dc}/>
+                      <line x1={dx + 3} y1={staffY - 1} x2={dx + 3} y2={staffY - 13}
+                        stroke={dc} strokeWidth={1.2}/>
+                    </g>
+                  ))}
+                  {/* beam */}
+                  <line x1={d1x + 3} y1={staffY - 13} x2={d2x + 3} y2={staffY - 13}
+                    stroke={dc} strokeWidth={2}/>
+                  <text x={(d1x + d2x) / 2} y={staffY + 18} textAnchor="middle"
+                    fontSize="8" fill={dc} fontFamily="DM Mono,monospace" fontStyle="italic">
+                    {note.drag.toLowerCase()}
+                  </text>
+                </g>
+              );
+            })()}
+
+            {/* Accent */}
+            {note.accent && (
+              <text x={x} y={staffY - 22} textAnchor="middle"
+                fontSize="16" fill={muted} style={{ fontStyle: 'normal' }}>›</text>
+            )}
+
+            {/* Buzz symbol */}
+            {note.buzz && (
+              <text x={x} y={staffY - 19} textAnchor="middle"
+                fontSize="10" fill={muted} fontFamily="DM Mono,monospace">z</text>
+            )}
+
+            {/* Notehead */}
+            {note.buzz ? (
+              <>
+                <line x1={x-5.5} y1={staffY-5.5} x2={x+5.5} y2={staffY+5.5}
+                  stroke={col} strokeWidth={2.2} strokeLinecap="round"/>
+                <line x1={x+5.5} y1={staffY-5.5} x2={x-5.5} y2={staffY+5.5}
+                  stroke={col} strokeWidth={2.2} strokeLinecap="round"/>
+              </>
+            ) : (
+              <circle cx={x} cy={staffY} r={5.8} fill={col}/>
+            )}
+
+            {/* Stem */}
+            {!note.buzz && (
+              <line x1={x + 5.8} y1={staffY} x2={x + 5.8} y2={staffY - 24}
+                stroke={muted} strokeWidth={1.5}/>
+            )}
+
+            {/* Sticking label */}
+            <text x={x} y={staffY + 24} textAnchor="middle"
+              fontSize="13" fontWeight={active ? '700' : '400'}
+              fontFamily="DM Mono,monospace" fill={hcol}>
+              {note.h}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ── STICKING ROW ── */
+function StickingRow({ pattern, currentIdx }) {
+  return (
+    <div style={{
+      display: 'flex', gap: '6px', flexWrap: 'wrap',
+      fontFamily: "'DM Mono', monospace", fontSize: '14px',
+      padding: '4px 0'
+    }}>
+      {pattern.map((note, i) => {
+        const active = i === currentIdx;
+        let label = '';
+        if (note.drag)  label = (note.h === 'R' ? 'llR' : 'rrL');
+        else if (note.grace) label = note.grace.toLowerCase() + note.h;
+        else label = note.h;
+
+        return (
+          <span key={i} style={{
+            padding: '3px 8px', borderRadius: '5px',
+            background: active ? 'rgba(232,160,32,0.18)' : 'transparent',
+            border: `1px solid ${active ? 'rgba(232,160,32,0.5)' : 'transparent'}`,
+            color: active
+              ? '#e8a020'
+              : (note.h === 'R' ? '#7a6050' : '#506070'),
+            transition: 'all 0.06s ease',
+            letterSpacing: '0.5px',
+            fontWeight: active ? '600' : '400',
+            boxShadow: active ? '0 0 10px rgba(232,160,32,0.3)' : 'none'
+          }}>
+            {label.split('').map((ch, ci) => (
+              <span key={ci} style={{
+                color: active
+                  ? '#e8a020'
+                  : (ch === ch.toUpperCase() && ch !== ch.toLowerCase()
+                     ? (ch === 'R' ? '#ff8060' : '#5a9fff')
+                     : '#5a5040')
+              }}>{ch}</span>
+            ))}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── MAIN APP ── */
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const isCenterStage = tweaks.layout === 'center';
+
+  const params   = new URLSearchParams(location.search);
+  const id       = parseInt(params.get('id')) || 1;
+  const rudiment = window.RUDIMENTS.find(r => r.id === id) || window.RUDIMENTS[0];
+  const catInfo  = window.CATEGORIES[rudiment.category] || {};
+
+  const [isPlaying, setIsPlaying]   = useState(false);
+  const [bpm, setBpm]               = useState(80);
+  const [clickOn, setClickOn]       = useState(true);
+  const [currentIdx, setCurrentIdx] = useState(-1);
+  const [lKey, setLKey]             = useState(0);
+  const [rKey, setRKey]             = useState(0);
+  const [activeHand, setActiveHand] = useState(null);
+  const [learned, setLearned]       = useState(() => getLearned());
+  const [tipsOpen, setTipsOpen]     = useState(false);
+
+  const audioCtxRef     = useRef(null);
+  const isPlayingRef    = useRef(false);
+  const bpmRef          = useRef(bpm);
+  const clickRef        = useRef(clickOn);
+  const noteTimerRef    = useRef(null);
+  const noteIdxRef      = useRef(0);
+  const activeHandTimer = useRef(null);
+
+  useEffect(() => { bpmRef.current = bpm; }, [bpm]);
+  useEffect(() => { clickRef.current = clickOn; }, [clickOn]);
+
+  // Page title
+  useEffect(() => {
+    document.title = `${rudiment.name} — Drum Rudiments`;
+  }, [rudiment]);
+
+  const { pattern, subdivision } = rudiment;
+
+  function getNoteInterval() {
+    return 60 / bpmRef.current / subdivision;
+  }
+
+  function triggerVisual(noteIdx) {
+    const note = pattern[noteIdx];
+    setCurrentIdx(noteIdx);
+    if (note.h === 'R') setRKey(k => k + 1);
+    else setLKey(k => k + 1);
+    setActiveHand(note.h);
+    if (activeHandTimer.current) clearTimeout(activeHandTimer.current);
+    activeHandTimer.current = setTimeout(() => setActiveHand(null), 90);
+  }
+
+  // Recursive setTimeout scheduler — reads bpmRef each tick so BPM changes
+  // take effect immediately without restarting playback.
+  function scheduleNext() {
+    if (!isPlayingRef.current) return;
+    const ni = noteIdxRef.current % pattern.length;
+
+    triggerVisual(ni);
+
+    // Click track on beat boundaries
+    if (clickRef.current && audioCtxRef.current && ni % subdivision === 0) {
+      const ctx = audioCtxRef.current;
+      playClick(ctx, ctx.currentTime + 0.005, ni === 0);
+    }
+
+    noteIdxRef.current++;
+    const interval = 60000 / bpmRef.current / subdivision;
+    noteTimerRef.current = setTimeout(scheduleNext, interval);
+  }
+
+  async function startPlay() {
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    await audioCtxRef.current.resume();
+    isPlayingRef.current = true;
+    noteIdxRef.current = 0;
+    setIsPlaying(true);
+    scheduleNext();
+  }
+
+  function stopPlay() {
+    isPlayingRef.current = false;
+    clearTimeout(noteTimerRef.current);
+    setIsPlaying(false);
+    setCurrentIdx(-1);
+    setActiveHand(null);
+  }
+
+  function togglePlay() {
+    isPlaying ? stopPlay() : startPlay();
+  }
+
+  // Stop on unmount
+  useEffect(() => () => { isPlayingRef.current = false; clearTimeout(noteTimerRef.current); }, []);
+
+  // Keyboard: space = play/pause
+  useEffect(() => {
+    function onKey(e) {
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+        e.preventDefault(); togglePlay();
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isPlaying]);
+
+  function toggleLearned() {
+    const next = new Set(learned);
+    if (next.has(rudiment.id)) next.delete(rudiment.id);
+    else next.add(rudiment.id);
+    localStorage.setItem(LEARNED_KEY, JSON.stringify([...next]));
+    setLearned(next);
+  }
+
+  const isLearned = learned.has(rudiment.id);
+  const prev = window.RUDIMENTS.find(r => r.id === id - 1);
+  const next = window.RUDIMENTS.find(r => r.id === id + 1);
+
+  // BPM presets
+  const presets = [40, 60, 80, 100, 120, 160];
+
+  const S = {
+    page: { minHeight: '100vh', display: 'flex', flexDirection: 'column' },
+    topBar: {
+      padding: '14px 24px', display: 'flex', alignItems: 'center',
+      gap: '16px', borderBottom: '1px solid #2c2820',
+      background: 'rgba(12,10,8,0.9)', backdropFilter: 'blur(12px)',
+      position: 'sticky', top: 0, zIndex: 50
+    },
+    backBtn: {
+      textDecoration: 'none', color: '#6b6250',
+      fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px',
+      padding: '6px 12px', borderRadius: '6px', border: '1px solid #2c2820',
+      transition: 'all 0.15s', background: 'none'
+    },
+    navBtn: {
+      textDecoration: 'none', color: '#6b6250', fontSize: '12px',
+      padding: '6px 12px', borderRadius: '6px', border: '1px solid #2c2820',
+      transition: 'all 0.15s', fontFamily: "'DM Mono', monospace",
+      whiteSpace: 'nowrap'
+    },
+    catBadge: {
+      padding: '3px 10px', borderRadius: '20px', fontSize: '11px',
+      fontWeight: '600', letterSpacing: '0.5px',
+      border: `1px solid ${catInfo.color || '#e8a020'}44`,
+      color: catInfo.color || '#e8a020',
+      background: `${catInfo.color || '#e8a020'}14`
+    },
+    content: { flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%', padding: '32px 24px 60px' },
+    titleRow: { display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px', flexWrap: 'wrap' },
+    title: { fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: '700', letterSpacing: '-1px', flex: 1 },
+    learnBtn: {
+      padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: '600',
+      cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px',
+      border: `1px solid ${isLearned ? '#7ec87e44' : '#2c2820'}`,
+      background: isLearned ? 'rgba(126,200,126,0.1)' : '#1a170f',
+      color: isLearned ? '#7ec87e' : '#6b6250',
+      transition: 'all 0.15s', fontFamily: "'Space Grotesk', sans-serif"
+    },
+    mainGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'minmax(0, 240px) 1fr',
+      gap: '24px', alignItems: 'start'
+    },
+    card: {
+      background: '#141109', border: '1px solid #2c2820',
+      borderRadius: '12px', padding: '20px'
+    },
+    notationCard: {
+      background: '#141109', border: '1px solid #2c2820',
+      borderRadius: '12px', padding: '24px 20px 16px',
+      marginBottom: '16px'
+    },
+    sectionLabel: {
+      fontSize: '10px', fontWeight: '600', letterSpacing: '1.5px',
+      color: '#5a5040', textTransform: 'uppercase', marginBottom: '12px'
+    },
+    controlsCard: {
+      background: '#141109', border: '1px solid #2c2820',
+      borderRadius: '12px', padding: '20px',
+      display: 'flex', flexDirection: 'column', gap: '16px'
+    },
+    playBtn: {
+      width: '100%', padding: '14px', borderRadius: '8px', fontSize: '15px',
+      fontWeight: '700', cursor: 'pointer', display: 'flex',
+      alignItems: 'center', justifyContent: 'center', gap: '10px',
+      border: 'none',
+      background: isPlaying
+        ? 'rgba(232,160,32,0.15)'
+        : 'linear-gradient(135deg, #e8a020 0%, #c87818 100%)',
+      color: isPlaying ? '#e8a020' : '#0c0a08',
+      transition: 'all 0.15s', fontFamily: "'Space Grotesk', sans-serif",
+      boxShadow: isPlaying ? '0 0 20px rgba(232,160,32,0.2)' : 'none',
+      outline: isPlaying ? '1px solid rgba(232,160,32,0.4)' : 'none'
+    },
+    bpmRow: { display: 'flex', alignItems: 'center', gap: '10px' },
+    bpmLabel: { fontSize: '12px', color: '#6b6250', fontFamily: "'DM Mono', monospace", minWidth: '28px' },
+    bpmVal: { fontSize: '18px', fontWeight: '700', color: '#e8a020', fontFamily: "'DM Mono', monospace", minWidth: '46px', textAlign: 'right' },
+    presetsRow: { display: 'flex', gap: '6px', flexWrap: 'wrap' },
+    presetBtn: (active) => ({
+      padding: '5px 10px', borderRadius: '5px', fontSize: '11px',
+      fontFamily: "'DM Mono', monospace", cursor: 'pointer',
+      border: `1px solid ${active ? 'rgba(232,160,32,0.5)' : '#2c2820'}`,
+      background: active ? 'rgba(232,160,32,0.12)' : '#1a170f',
+      color: active ? '#e8a020' : '#6b6250',
+      transition: 'all 0.1s'
+    }),
+    clickRow: {
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '10px 12px', borderRadius: '7px',
+      background: '#111008', border: '1px solid #252118'
+    },
+    toggle: (on) => ({
+      width: '40px', height: '22px', borderRadius: '11px', cursor: 'pointer',
+      background: on ? '#e8a020' : '#2c2820',
+      position: 'relative', transition: 'background 0.2s', border: 'none',
+      flexShrink: 0
+    }),
+    toggleKnob: (on) => ({
+      position: 'absolute', top: '3px',
+      left: on ? '21px' : '3px',
+      width: '16px', height: '16px', borderRadius: '50%',
+      background: '#fff', transition: 'left 0.2s',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.4)'
+    }),
+    desc: { fontSize: '14px', color: '#8a8070', lineHeight: '1.6', marginBottom: '20px' },
+    tipsBtn: {
+      width: '100%', padding: '12px 16px', borderRadius: '8px',
+      background: '#111008', border: '1px solid #252118',
+      color: '#8a8070', fontSize: '13px', fontWeight: '500',
+      cursor: 'pointer', display: 'flex', justifyContent: 'space-between',
+      alignItems: 'center', transition: 'all 0.15s',
+      fontFamily: "'Space Grotesk', sans-serif"
+    },
+    tipsList: {
+      padding: '12px 0 0', display: 'flex', flexDirection: 'column', gap: '8px'
+    },
+    tipItem: {
+      fontSize: '13px', color: '#8a8070', lineHeight: '1.5',
+      paddingLeft: '16px', position: 'relative'
+    },
+    printBtn: {
+      marginTop: '8px', padding: '9px 14px', borderRadius: '7px',
+      background: 'none', border: '1px solid #252118',
+      color: '#5a5040', fontSize: '12px', cursor: 'pointer',
+      width: '100%', fontFamily: "'Space Grotesk', sans-serif",
+      transition: 'all 0.15s', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', gap: '7px'
+    }
+  };
+
+  return (
+    <div style={S.page}>
+      {/* Top Bar */}
+      <div style={S.topBar} className="no-print">
+        <a href="index.html" style={S.backBtn} onMouseOver={e=>e.currentTarget.style.color='#d8cfb4'} onMouseOut={e=>e.currentTarget.style.color='#6b6250'}>
+          ← All Rudiments
+        </a>
+        <span style={{ color: '#2c2820', fontSize: '18px' }}>|</span>
+        <span style={{ fontSize: '12px', color: '#5a5040', fontFamily: "'DM Mono',monospace" }}>
+          #{String(rudiment.id).padStart(2,'0')} of 40
+        </span>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+          {prev && (
+            <a href={`rudiment.html?id=${prev.id}`} style={S.navBtn}
+              onMouseOver={e=>e.currentTarget.style.color='#d8cfb4'}
+              onMouseOut={e=>e.currentTarget.style.color='#6b6250'}>
+              ← {prev.name}
+            </a>
+          )}
+          {next && (
+            <a href={`rudiment.html?id=${next.id}`} style={S.navBtn}
+              onMouseOver={e=>e.currentTarget.style.color='#d8cfb4'}
+              onMouseOut={e=>e.currentTarget.style.color='#6b6250'}>
+              {next.name} →
+            </a>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div style={S.content}>
+        {/* Title Row */}
+        <div style={S.titleRow}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <span style={S.catBadge}>{rudiment.category}</span>
+              <span style={{ fontSize: '12px', color: '#5a5040', fontFamily: "'DM Mono',monospace" }}>
+                Rudiment #{rudiment.id}
+              </span>
+            </div>
+            <h1 style={S.title}>{rudiment.name}</h1>
+          </div>
+          <button style={S.learnBtn} onClick={toggleLearned}
+            onMouseOver={e=>{ if(!isLearned) e.currentTarget.style.color='#d8cfb4'; }}
+            onMouseOut={e=>{ if(!isLearned) e.currentTarget.style.color='#6b6250'; }}>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"
+                fill={isLearned ? 'rgba(126,200,126,0.2)' : 'transparent'}/>
+              {isLearned && <path d="M5 8l2 2 4-4" stroke="#7ec87e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>}
+            </svg>
+            {isLearned ? 'Learned' : 'Mark Learned'}
+          </button>
+        </div>
+
+        {/* ── SIDE-BY-SIDE LAYOUT ── */}
+        {!isCenterStage && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,240px) 1fr', gap: '24px', alignItems: 'start' }}
+          className="main-grid">
+          {/* Left: drum pad + controls */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ ...S.card, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 16px 12px' }}>
+              <div style={S.sectionLabel}>Drum Pad</div>
+              <DrumPad activeHand={activeHand} lKey={lKey} rKey={rKey}/>
+              <HandDots activeHand={activeHand}/>
+            </div>
+            <ControlsPanel {...{isPlaying,togglePlay,bpm,setBpm,clickOn,setClickOn,presets,S}}/>
+          </div>
+          {/* Right: notation + info */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <NotationCard {...{pattern,currentIdx,S}}/>
+            <StickingCard {...{pattern,currentIdx,S}}/>
+            <AboutCard {...{rudiment,tipsOpen,setTipsOpen,S}}/>
+            <StatsCard {...{subdivision,pattern,rudiment,S}}/>
+            <PrintBtn S={S}/>
+          </div>
+        </div>
+        )}
+
+        {/* ── CENTER STAGE LAYOUT ── */}
+        {isCenterStage && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Top: drum pad centred + compact controls on the right */}
+          <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+            {/* Drum pad — large, centred */}
+            <div style={{
+              flex: 1, display: 'flex', flexDirection: 'column',
+              alignItems: 'center',
+              background: '#141109', border: '1px solid #2c2820',
+              borderRadius: '14px', padding: '28px 20px 16px'
+            }}>
+              <DrumPad activeHand={activeHand} lKey={lKey} rKey={rKey} scale={tweaks.drumScale}/>
+              <HandDots activeHand={activeHand}/>
+            </div>
+            {/* Compact controls column */}
+            <div style={{ width: '180px', display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0 }} className="no-print">
+              {/* Small play button */}
+              <button onClick={togglePlay} style={{
+                height: '44px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                fontFamily: "'Space Grotesk',sans-serif", fontWeight: '700', fontSize: '14px',
+                background: isPlaying ? 'rgba(232,160,32,0.12)' : 'linear-gradient(135deg,#e8a020,#c87818)',
+                color: isPlaying ? '#e8a020' : '#0c0a08',
+                outline: isPlaying ? '1px solid rgba(232,160,32,0.4)' : 'none',
+                transition: 'all 0.15s'
+              }}>
+                {isPlaying
+                  ? <><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="4" height="12" rx="1"/><rect x="9" y="2" width="4" height="12" rx="1"/></svg>Pause</>
+                  : <><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>Play</>
+                }
+              </button>
+              {/* BPM */}
+              <div style={{ background: '#141109', border: '1px solid #2c2820', borderRadius: '10px', padding: '14px 12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '10px', color: '#5a5040', textTransform: 'uppercase', letterSpacing: '1px' }}>BPM</span>
+                  <span style={{ fontSize: '16px', fontWeight: '700', color: '#e8a020', fontFamily: "'DM Mono',monospace" }}>{bpm}</span>
+                </div>
+                <input type="range" min="40" max="200" step="1" value={bpm}
+                  onChange={e => setBpm(Number(e.target.value))}
+                  style={{ width: '100%', background: `linear-gradient(to right,#e8a020 ${(bpm-40)/160*100}%,#2c2820 ${(bpm-40)/160*100}%)` }}/>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '8px' }}>
+                  {presets.map(p => (
+                    <button key={p} style={S.presetBtn(bpm===p)} onClick={() => setBpm(p)}>{p}</button>
+                  ))}
+                </div>
+              </div>
+              {/* Click toggle */}
+              <div style={{ ...S.clickRow }}>
+                <span style={{ fontSize: '12px', color: '#a09080' }}>Click</span>
+                <button style={S.toggle(clickOn)} onClick={() => setClickOn(v=>!v)}>
+                  <div style={S.toggleKnob(clickOn)}/>
+                </button>
+              </div>
+              <div style={{ fontSize: '10px', color: '#3a3428', textAlign: 'center', fontFamily: "'DM Mono',monospace" }}>
+                Space = play / pause
+              </div>
+            </div>
+          </div>
+
+          {/* Notation full width */}
+          <NotationCard {...{pattern,currentIdx,S}}/>
+          <StickingCard {...{pattern,currentIdx,S}}/>
+          {/* Info row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px' }}>
+            <AboutCard {...{rudiment,tipsOpen,setTipsOpen,S}}/>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <StatsCard {...{subdivision,pattern,rudiment,S}}/>
+              <PrintBtn S={S}/>
+            </div>
+          </div>
+        </div>
+        )}
+      </div>
+
+      <style>{`
+        @media (max-width: 700px) {
+          .main-grid { grid-template-columns: 1fr !important; }
+        }
+        a:hover { opacity: 0.85; }
+      `}</style>
+
+      <TweaksPanel>
+        <TweakSection label="Layout">
+          <TweakRadio
+            id="layout"
+            label="View style"
+            value={tweaks.layout}
+            onChange={v => setTweak('layout', v)}
+            options={[
+              { value: 'side',   label: 'Side by Side' },
+              { value: 'center', label: 'Center Stage' }
+            ]}
+          />
+        </TweakSection>
+        {tweaks.layout === 'center' && (
+          <TweakSection label="Drum Size">
+            <TweakSlider
+              id="drumScale"
+              label="Scale"
+              min={0.8} max={2.2} step={0.1}
+              value={tweaks.drumScale}
+              onChange={v => setTweak('drumScale', v)}
+            />
+          </TweakSection>
+        )}
+      </TweaksPanel>
+    </div>
+  );
+}
+
+/* ── SHARED SUB-COMPONENTS ── */
+function HandDots({ activeHand }) {
+  return (
+    <div style={{ display: 'flex', gap: '16px', marginTop: '6px' }}>
+      {['L','R'].map(h => (
+        <div key={h} style={{ display: 'flex', alignItems: 'center', gap: '5px',
+          fontSize: '11px', fontFamily: "'DM Mono',monospace",
+          color: activeHand === h ? (h==='R'?'#ff8060':'#5a9fff') : '#5a5040',
+          transition: 'color 0.08s', fontWeight: activeHand===h?'700':'400' }}>
+          <div style={{ width:'7px', height:'7px', borderRadius:'50%',
+            background: h==='R'?'#ff8060':'#5a9fff',
+            opacity: activeHand===h?1:0.25, transition:'opacity 0.08s' }}/>
+          {h==='L'?'Left':'Right'}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ControlsPanel({ isPlaying, togglePlay, bpm, setBpm, clickOn, setClickOn, presets, S }) {
+  return (
+    <div style={S.controlsCard} className="no-print">
+      <button style={S.playBtn} onClick={togglePlay}>
+        {isPlaying
+          ? <><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="4" height="12" rx="1"/><rect x="9" y="2" width="4" height="12" rx="1"/></svg>Pause</>
+          : <><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>Play</>
+        }
+      </button>
+      <div>
+        <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'8px' }}>
+          <span style={{ fontSize:'11px', color:'#5a5040', textTransform:'uppercase', letterSpacing:'1px' }}>Tempo</span>
+          <span style={S.bpmVal}>{bpm} <span style={{ fontSize:'11px', color:'#5a5040' }}>BPM</span></span>
+        </div>
+        <div style={S.bpmRow}>
+          <span style={S.bpmLabel}>40</span>
+          <input type="range" min="40" max="200" step="1" value={bpm}
+            onChange={e=>setBpm(Number(e.target.value))}
+            style={{ flex:1, background:`linear-gradient(to right,#e8a020 ${(bpm-40)/160*100}%,#2c2820 ${(bpm-40)/160*100}%)` }}/>
+          <span style={{ ...S.bpmLabel, textAlign:'right' }}>200</span>
+        </div>
+        <div style={{ ...S.presetsRow, marginTop:'10px' }}>
+          {presets.map(p => <button key={p} style={S.presetBtn(bpm===p)} onClick={()=>setBpm(p)}>{p}</button>)}
+        </div>
+      </div>
+      <div style={S.clickRow}>
+        <div>
+          <div style={{ fontSize:'13px', color:'#a09080', fontWeight:'500' }}>Click Track</div>
+          <div style={{ fontSize:'11px', color:'#5a5040', marginTop:'2px' }}>{clickOn?'Metronome on':'Silent'}</div>
+        </div>
+        <button style={S.toggle(clickOn)} onClick={()=>setClickOn(v=>!v)}>
+          <div style={S.toggleKnob(clickOn)}/>
+        </button>
+      </div>
+      <div style={{ fontSize:'11px', color:'#3a3428', textAlign:'center', fontFamily:"'DM Mono',monospace" }}>
+        Space bar = play / pause
+      </div>
+    </div>
+  );
+}
+
+function NotationCard({ pattern, currentIdx, S }) {
+  return (
+    <div style={S.notationCard} className="notation-card">
+      <div style={S.sectionLabel}>Notation</div>
+      <div className="notation-scroll">
+        <NotationSVG pattern={pattern} currentIdx={currentIdx}/>
+      </div>
+    </div>
+  );
+}
+
+function StickingCard({ pattern, currentIdx, S }) {
+  return (
+    <div style={S.card}>
+      <div style={S.sectionLabel}>Sticking</div>
+      <StickingRow pattern={pattern} currentIdx={currentIdx}/>
+      <div style={{ marginTop:'10px', display:'flex', gap:'12px', flexWrap:'wrap' }}>
+        {[['R','#ff8060','Right hand'],['L','#5a9fff','Left hand']].map(([h,c,lbl])=>(
+          <span key={h} style={{ fontSize:'11px', fontFamily:"'DM Mono',monospace", color:'#5a5040' }}>
+            <span style={{ color:c }}>{h}</span> = {lbl}
+          </span>
+        ))}
+        <span style={{ fontSize:'11px', fontFamily:"'DM Mono',monospace", color:'#5a5040' }}>
+          <span style={{ color:'#7a6840', fontStyle:'italic' }}>ll/rr</span> = drag
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function AboutCard({ rudiment, tipsOpen, setTipsOpen, S }) {
+  return (
+    <div style={S.card}>
+      <div style={S.sectionLabel}>About</div>
+      <p style={S.desc}>{rudiment.description}</p>
+      <button style={S.tipsBtn} onClick={()=>setTipsOpen(v=>!v)} className="no-print"
+        onMouseOver={e=>e.currentTarget.style.color='#d8cfb4'}
+        onMouseOut={e=>e.currentTarget.style.color='#8a8070'}>
+        <span>Practice Tips</span>
+        <span style={{ transform:tipsOpen?'rotate(180deg)':'none', transition:'transform 0.2s', display:'inline-block' }}>▾</span>
+      </button>
+      {tipsOpen && (
+        <div style={S.tipsList}>
+          {rudiment.tips.map((tip,i)=>(
+            <div key={i} style={S.tipItem}>
+              <span style={{ position:'absolute', left:0, color:'#e8a020' }}>·</span>{tip}
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="print-only" style={S.tipsList}>
+        {rudiment.tips.map((tip,i)=>(
+          <div key={i} style={S.tipItem}><span style={{ position:'absolute', left:0 }}>·</span>{tip}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StatsCard({ subdivision, pattern, rudiment, S }) {
+  return (
+    <div style={{ ...S.card, display:'flex', gap:'20px', flexWrap:'wrap' }}>
+      {[
+        { label:'Subdivision', val: subdivision===4?'16th notes':subdivision===3?'Triplets':'8th notes' },
+        { label:'Notes in pattern', val: pattern.length },
+        { label:'Category', val: rudiment.category }
+      ].map(({ label, val })=>(
+        <div key={label}>
+          <div style={{ fontSize:'10px', color:'#5a5040', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'4px' }}>{label}</div>
+          <div style={{ fontSize:'15px', fontWeight:'600', color:'#d8cfb4' }}>{val}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PrintBtn({ S }) {
+  return (
+    <button style={S.printBtn} onClick={()=>window.print()} className="no-print"
+      onMouseOver={e=>{ e.currentTarget.style.color='#d8cfb4'; e.currentTarget.style.borderColor='#e8a02044'; }}
+      onMouseOut={e=>{ e.currentTarget.style.color='#5a5040'; e.currentTarget.style.borderColor='#252118'; }}>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M4 5V2h8v3M3 5h10a1 1 0 011 1v5H2V6a1 1 0 011-1zM4 11v3h8v-3"/>
+      </svg>
+      Print Notation
+    </button>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
