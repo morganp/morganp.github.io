@@ -5,44 +5,44 @@
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
                         <title>SoC Article 09: Hardware Description Languages and RTL Design</title>
-                        <link rel="stylesheet" href="../theme/css/main.css" />
+                        <link rel="stylesheet" href="./theme/css/main.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
     <meta name="description" content="How SoC hardware is described in code: the fundamental difference between sequential software and parallel hardware, RTL vs behavioural vs..." />
         </head>
 
         <body id="index" class="home">
                 <header id="banner" class="body">
-                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <h1><a href="./">Lizard-Spock</a></h1>
                         <nav><ul>
-                                                <li><a href="../pages/about.html">About</a></li>
-                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
-                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
-                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
-                                                <li><a href="../category/music.html">Music</a></li>
-                                                <li><a href="../category/photography.html">Photography</a></li>
-                                                <li><a href="../category/programming.html">Programming</a></li>
-                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li class="active"><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/programming.html">Programming</a></li>
+                                                <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
   <section id="content" class="body">
     <article>
       <header>
         <h1 class="entry-title">
-          <a href="../drafts/soc-article-09-hardware-description-languages-rtl-design.html" rel="bookmark"
+          <a href="./soc-article-09-hardware-description-languages-rtl-design.html" rel="bookmark"
              title="Permalink to SoC Article 09: Hardware Description Languages and RTL Design">SoC Article 09: Hardware Description Languages and RTL Design</a></h1>
       </header>
 
       <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2026-04-18T00:00:00+01:00">
-                Published: Sat 18 April 2026
+        <abbr class="published" title="2026-05-01T00:00:00+01:00">
+                Published: Fri 01 May 2026
         </abbr>
 
                 <address class="vcard author">
-                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
                 </address>
-        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/embedded-systems.html">Embedded Systems</a> <a href="../tag/verilog.html">Verilog</a> <a href="../tag/systemverilog.html">SystemVerilog</a> <a href="../tag/vhdl.html">VHDL</a> <a href="../tag/rtl.html">RTL</a> <a href="../tag/hdl.html">HDL</a> <a href="../tag/fpga.html">FPGA</a> <a href="../tag/synthesis.html">Synthesis</a> </p>        
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/computer-architecture.html">Computer Architecture</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/embedded-systems.html">Embedded Systems</a> <a href="./tag/verilog.html">Verilog</a> <a href="./tag/systemverilog.html">SystemVerilog</a> <a href="./tag/vhdl.html">VHDL</a> <a href="./tag/rtl.html">RTL</a> <a href="./tag/hdl.html">HDL</a> <a href="./tag/fpga.html">FPGA</a> <a href="./tag/synthesis.html">Synthesis</a> </p>        
 </footer><!-- /.post-info -->        <p><em>Series: Introduction to SoC Design | Article 9 of 11</em></p>
 <hr>
 <h2>Introduction</h2>
@@ -78,7 +78,7 @@
 <hr>
 <h2>RTL vs Behavioural vs Structural</h2>
 <p>HDL code can be written at different levels of abstraction:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_be4b1b73ee5d6b84122a2e2376ba9d43.svg"></p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_be4b1b73ee5d6b84122a2e2376ba9d43.svg"></p>
 <p><strong>Structural</strong> -- instantiate specific gates and connect them with wires:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// Structural: instantiate specific primitives</span>
 <span class="n">and_gate</span><span class="w"> </span><span class="n">U0</span><span class="w"> </span><span class="p">(.</span><span class="n">a</span><span class="p">(</span><span class="n">in_a</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">b</span><span class="p">(</span><span class="n">in_b</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">y</span><span class="p">(</span><span class="n">wire_and</span><span class="p">));</span>
@@ -264,7 +264,7 @@
 </code></pre></div>
 
 <p>The corresponding state diagram:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_4a564833658ab6fd609f49b340607e27.svg"></p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_4a564833658ab6fd609f49b340607e27.svg"></p>
 <hr>
 <h2>Simulation and Testbenches</h2>
 <p>HDL code is verified by <strong>simulation</strong> -- running the design against a set of inputs (a <strong>testbench</strong>) and checking the outputs.</p>
@@ -359,7 +359,7 @@
 <hr>
 <h2>The Synthesis Step</h2>
 <p><strong>Synthesis</strong> transforms RTL into a <strong>gate-level netlist</strong> -- a description in terms of actual standard cells (AND, OR, flip-flop, multiplexer cells) from a technology library.</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_b7885858d1b92706e35cc05075ab3aa8.svg"></p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_b7885858d1b92706e35cc05075ab3aa8.svg"></p>
 <p>The synthesis tool reads the RTL plus a <strong>constraints file</strong> (<code>.sdc</code>) that specifies the target clock frequency and I/O timing budgets, then maps to whatever cell library the target process provides.</p>
 <hr>
 <h2>Summary</h2>
@@ -372,7 +372,7 @@
 <li><em>Formal Verification Methods</em> -- SVA property specification, model checking</li>
 </ul>
 <hr>
-<p><em>Previous: <a href="../soc-article-08-peripherals-and-io.html">Article 08 -- Peripherals and I/O</a></em></p>
+<p><em>Previous: <a href="./soc-article-08-peripherals-and-io.html">Article 08 -- Peripherals and I/O</a></em></p>
       </div><!-- /.entry-content -->
 
     </article>
