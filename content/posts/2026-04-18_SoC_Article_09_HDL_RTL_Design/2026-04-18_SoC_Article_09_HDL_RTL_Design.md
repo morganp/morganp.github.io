@@ -1,11 +1,11 @@
 Title: SoC Article 09: Hardware Description Languages and RTL Design
-Date: 2026-04-18
+Date: 2026-05-01
 Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems, Verilog, SystemVerilog, VHDL, RTL, HDL, FPGA, Synthesis
 Slug: soc-article-09-hardware-description-languages-rtl-design
 Author: morganp
 Summary: How SoC hardware is described in code: the fundamental difference between sequential software and parallel hardware, RTL vs behavioural vs structural design, SystemVerilog key constructs, FSMs, testbenches, assertions, and the synthesis step that turns RTL into gates.
-Status: draft
+Status: published
 
 *Series: Introduction to SoC Design | Article 9 of 11*
 
