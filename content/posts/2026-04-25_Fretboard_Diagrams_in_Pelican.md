@@ -11,6 +11,8 @@ For a long time my guitar diagrams lived on paper -- annotated chord boxes and s
 
 <!-- PELICAN_END_SUMMARY -->
 
+The plugin uses [fretdrom](https://github.com/morganp/fretdrom) as its rendering engine. Fretdrom takes JSON5 input -- the same wavedrom-style philosophy of a single top-level key determining diagram type -- and emits clean SVG. Blocks use the `fretdrom` language identifier in Markdown fences.
+
 ---
 
 ## The problem with ASCII diagrams
@@ -36,102 +38,66 @@ It works, but it is fragile to copy-paste, hard to scan at a glance, and carries
 
 ## Chord diagrams
 
-The plugin renders a `chord` block into a standard box diagram. The `frets` array runs low string to high (E A D G B e for standard tuning). `x` means muted, `0` is open.
+The plugin renders a `fretdrom` block with a `chord` key into a standard box diagram. The `frets` string runs low string to high (E A D G B e for standard tuning). `x` means muted, `0` is open, `1`-`9` are fret numbers.
 
 ### Fingers view
 
-Add a `fingers` array and each fretted dot shows the finger number:
+Add a `fingers` string and each fretted dot shows the finger number. `-` means no label:
 
 ````markdown
-```chord
-name: E Major
-frets: [0, 2, 2, 1, 0, 0]
-fingers: [-, 2, 3, 1, -, -]
+```fretdrom
+{ chord: { name: "E Major", frets: "022100", fingers: "-231--" } }
 ```
 ````
 
-```chord
-name: E Major
-frets: [0, 2, 2, 1, 0, 0]
-fingers: [-, 2, 3, 1, -, -]
+```fretdrom
+{ chord: { name: "E Major", frets: "022100", fingers: "-231--" } }
 ```
 
 Open strings show a small circle above the nut; the first fret is drawn as a thicker nut line.
 
 ### Intervals view
 
-Supply a `harmony` array instead and each dot shows its interval relative to the root. Root strings are highlighted in purple and the subheading changes to *Intervals*:
+Supply an `intervals` array instead and each dot shows its interval relative to the root. When `intervals` is present the subtitle automatically shows *Intervals*:
 
 ````markdown
-```chord
-name: E Major
-frets: [0, 2, 2, 1, 0, 0]
-harmony: [R, 5, R, 3, 5, R]
+```fretdrom
+{ chord: { name: "E Major", frets: "022100", intervals: ["R", "5", "R", "3", "5", "R"] } }
 ```
 ````
 
-```chord
-name: E Major
-frets: [0, 2, 2, 1, 0, 0]
-harmony: [R, 5, R, 3, 5, R]
+```fretdrom
+{ chord: { name: "E Major", frets: "022100", intervals: ["R", "5", "R", "3", "5", "R"] } }
 ```
 
-Both arrays can coexist in one block. `harmony` is shown by default; add `show: fingers` to flip to the fingering view:
-
-````markdown
-```chord
-name: E Major
-frets: [0, 2, 2, 1, 0, 0]
-fingers: [-, 2, 3, 1, -, -]
-harmony: [R, 5, R, 3, 5, R]
-show: fingers
-```
-````
-
-```chord
-name: E Major
-frets: [0, 2, 2, 1, 0, 0]
-fingers: [-, 2, 3, 1, -, -]
-harmony: [R, 5, R, 3, 5, R]
-show: fingers
-```
-
-Comparing the two views of the same chord makes it easy to see which finger lands on which interval -- useful when discussing voicings or substitutions.
+Comparing fingers and intervals views of the same chord makes it easy to see which finger lands on which interval -- useful when discussing voicings or substitutions.
 
 ---
 
 ## A seventh chord
 
-G7 is a good test because it includes four distinct intervals. The `harmony` view makes the b7 on the high e string immediately visible:
+G7 is a good test because it includes four distinct intervals. The intervals view makes the b7 on the high e string immediately visible:
 
 ````markdown
-```chord
-name: G7
-frets: [3, 2, 0, 0, 0, 1]
-harmony: [R, 5, 3, R, 5, b7]
+```fretdrom
+{ chord: { name: "G7", frets: "320001", intervals: ["R", "5", "3", "R", "5", "b7"] } }
 ```
 ````
 
-```chord
-name: G7
-frets: [3, 2, 0, 0, 0, 1]
-harmony: [R, 5, 3, R, 5, b7]
+```fretdrom
+{ chord: { name: "G7", frets: "320001", intervals: ["R", "5", "3", "R", "5", "b7"] } }
 ```
 
 The same shape in fingers mode:
 
 ````markdown
-```chord
-name: G7
-frets: [3, 2, 0, 0, 0, 1]
-fingers: [3, 2, -, -, -, 1]
+```fretdrom
+{ chord: { name: "G7", frets: "320001", fingers: "32---1" } }
 ```
 ````
 
-```chord
-name: G7
-frets: [3, 2, 0, 0, 0, 1]
-fingers: [3, 2, -, -, -, 1]
+```fretdrom
+{ chord: { name: "G7", frets: "320001", fingers: "32---1" } }
 ```
 
 ---
@@ -141,87 +107,103 @@ fingers: [3, 2, -, -, -, 1]
 The `barre` key draws the barre bar. `from_string` and `to_string` are 1-indexed, low string to high:
 
 ````markdown
-```chord
-name: F Major (barre)
-frets: [1, 1, 2, 3, 3, 1]
-fingers: [1, 1, 2, 3, 4, 1]
-root_strings: [1, 6]
-barre: {fret: 1, from_string: 1, to_string: 6}
+```fretdrom
+{ chord: {
+  name: "F Major (barre)",
+  frets: "112331",
+  fingers: "112341",
+  root_strings: [1, 6],
+  barre: { fret: 1, from_string: 1, to_string: 6 }
+}}
 ```
 ````
 
-```chord
-name: F Major (barre)
-frets: [1, 1, 2, 3, 3, 1]
-fingers: [1, 1, 2, 3, 4, 1]
-root_strings: [1, 6]
-barre: {fret: 1, from_string: 1, to_string: 6}
+```fretdrom
+{ chord: {
+  name: "F Major (barre)",
+  frets: "112331",
+  fingers: "112341",
+  root_strings: [1, 6],
+  barre: { fret: 1, from_string: 1, to_string: 6 }
+}}
 ```
 
 ---
 
 ## Scale diagrams
 
-The `scale` block renders a fretboard grid. Each row is a string (low E first), each column is a fret starting at `start_fret`. Cell values: `R` = root (purple), `x` = scale note (charcoal), `.` = empty.
+The `scale` key renders a fretboard grid. `grid` is an array of rows, one per string (low E first), each row an array of cell values. `"R"` = root, `"x"` = scale note, `"."` = empty.
 
 ````markdown
-```scale
-name: A Minor Pentatonic
-start_fret: 5
-num_frets: 5
-grid:
-  - "R . . x ."
-  - "x . x . ."
-  - "x . R . ."
-  - "x . x . ."
-  - "x . . x ."
-  - "R . . x ."
+```fretdrom
+{ scale: {
+  name: "A Minor Pentatonic",
+  start_fret: 5,
+  num_frets: 5,
+  grid: [
+    ["R", ".", ".", "x", "."],
+    ["x", ".", "x", ".", "."],
+    ["x", ".", "R", ".", "."],
+    ["x", ".", "x", ".", "."],
+    ["x", ".", ".", "x", "."],
+    ["R", ".", ".", "x", "."]
+  ]
+}}
 ```
 ````
 
-```scale
-name: A Minor Pentatonic
-start_fret: 5
-num_frets: 5
-grid:
-  - "R . . x ."
-  - "x . x . ."
-  - "x . R . ."
-  - "x . x . ."
-  - "x . . x ."
-  - "R . . x ."
+```fretdrom
+{ scale: {
+  name: "A Minor Pentatonic",
+  start_fret: 5,
+  num_frets: 5,
+  grid: [
+    ["R", ".", ".", "x", "."],
+    ["x", ".", "x", ".", "."],
+    ["x", ".", "R", ".", "."],
+    ["x", ".", "x", ".", "."],
+    ["x", ".", ".", "x", "."],
+    ["R", ".", ".", "x", "."]
+  ]
+}}
 ```
 
-Fret numbers are shown on the left so the position on the neck is always clear.
+Fret numbers are shown on the left so the position on the neck is always clear. Cell values other than `R`, `x`, and `.` are treated as interval labels and rendered inside the dot.
 
 ---
 
 ## Tab
 
-Standard ASCII tab syntax works inside a `tab` block. Barlines become light vertical rules; note numbers sit on the string lines with the line knocked out behind them so they remain readable:
+The `tab` key takes an array of string lanes, highest string first (standard tab order). Each lane has a `name` and a `wave` string where each character is one beat: `.` is an empty beat (dash), `0`-`9` are fret numbers. `config.bar` draws bar lines every N beats:
 
 ````markdown
-```tab
-name: E String Blues Riff
-tab: |
-  e|----------------|
-  B|----------------|
-  G|----------------|
-  D|----------------|
-  A|----------------|
-  E|0--3-5-3--0-----|
+```fretdrom
+{ name: "E String Blues Riff",
+  tab: [
+    { name: "e", wave: "................" },
+    { name: "B", wave: "................" },
+    { name: "G", wave: "................" },
+    { name: "D", wave: "................" },
+    { name: "A", wave: "................" },
+    { name: "E", wave: "0..3.5.3..0....." }
+  ],
+  config: { bar: 8 }
+}
 ```
 ````
 
-```tab
-name: E String Blues Riff
-tab: |
-  e|----------------|
-  B|----------------|
-  G|----------------|
-  D|----------------|
-  A|----------------|
-  E|0--3-5-3--0-----|
+```fretdrom
+{ name: "E String Blues Riff",
+  tab: [
+    { name: "e", wave: "................" },
+    { name: "B", wave: "................" },
+    { name: "G", wave: "................" },
+    { name: "D", wave: "................" },
+    { name: "A", wave: "................" },
+    { name: "E", wave: "0..3.5.3..0....." }
+  ],
+  config: { bar: 8 }
+}
 ```
 
 ---
@@ -231,29 +213,23 @@ tab: |
 Set `tuning` to match your instrument and the string count adjusts automatically:
 
 ````markdown
-```chord
-name: E (bass)
-tuning: EADG
-frets: [0, 2, 2, 1]
-fingers: [-, 2, 3, 1]
-root_strings: [1]
+```fretdrom
+{ chord: { name: "E (bass)", tuning: "EADG", frets: "0221", fingers: "-231", root_strings: [1] } }
 ```
 ````
 
-```chord
-name: E (bass)
-tuning: EADG
-frets: [0, 2, 2, 1]
-fingers: [-, 2, 3, 1]
-root_strings: [1]
+```fretdrom
+{ chord: { name: "E (bass)", tuning: "EADG", frets: "0221", fingers: "-231", root_strings: [1] } }
 ```
 
-The same syntax works for ukulele (`GCEA`), five-string bass (`BEADG`), mandola (`CGDAE`), or any open tuning.
+The same syntax works for ukulele (`GCEA`), five-string bass (`BEADG`), mandola (`GDAE`), or any open tuning.
 
 ---
 
 ## How it works
 
-The plugin registers a Markdown preprocessor that intercepts `chord`, `scale`, and `tab` fenced blocks before they reach the syntax highlighter. Each block is parsed as YAML, rendered to an SVG, and saved to `content/images/fretboard/` using a SHA-256 hash of the block content as the filename. The fenced block is replaced inline with a `<figure><img /></figure>` tag. The SVG cache persists across `make clean` -- diagrams are only regenerated when their source content changes.
+The plugin registers a Markdown preprocessor that intercepts `fretdrom` fenced blocks before they reach the syntax highlighter. Each block is parsed as JSON5 and passed to the [fretdrom](https://github.com/morganp/fretdrom) CLI, which returns an SVG on stdout. The SVG is saved to `content/images/fretboard/` using an MD5 hash of the block content as the filename. The fenced block is replaced inline with a Markdown image reference. The SVG cache persists across `make clean` -- diagrams are only regenerated when their source content changes.
+
+If the `fretdrom` binary is not found the block falls back to a `json5` code block so the build never fails.
 
 Source and installation instructions are at [github.com/morganp/pelican-fretboard](https://github.com/morganp/pelican-fretboard).
