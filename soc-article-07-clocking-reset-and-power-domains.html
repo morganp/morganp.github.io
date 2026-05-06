@@ -83,9 +83,10 @@
 <p>When data must cross from one clock domain to another -- for example, from the CPU domain to the peripheral APB domain -- a <strong>Clock Domain Crossing (CDC)</strong> circuit is required. Failure to handle CDCs correctly is one of the most common sources of functional bugs in SoC designs.</p>
 <h3>The Metastability Problem</h3>
 <p>When a flip-flop's input changes near its sampling edge, the flip-flop may enter a <strong>metastable</strong> state -- neither a clean 0 nor a clean 1. If the metastable state propagates, it can corrupt data or cause unexpected behaviour.</p>
-<p>The probability of metastability resolving correctly increases with time. A <strong>two-stage synchroniser</strong> provides enough time for resolution before the signal is used:</p>
-<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_dcd24b7d8b64e99398c9a88d6f7afeff.svg"></p>
+<p>The probability of metastability resolving correctly increases with time. A <strong>two-stage synchroniser</strong> provides enough time in most situations for resolution before the signal is used:</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_e89c24ae179973d4a3d0d7532f569d57.svg"></p>
 <p>The two-stage synchroniser adds <strong>two destination-clock cycles of latency</strong> but reduces the probability of a metastability-induced failure to negligible levels. More complex CDCs (for multi-bit signals or FIFOs) use more sophisticated structures.</p>
+<p><img alt="1-bit two-stage synchroniser schematic: D_in feeds FF1 (teal, may be metastable), FF1 Q feeds FF2, both clocked by DST_CLK, output is SYNC_OUT" src="./07-sync-2stage-900w.png"></p>
 <hr>
 <h2>Reset: Getting to a Known State</h2>
 <p><strong>Reset</strong> is the mechanism that places all flip-flops in their initial, known state. Without reset, the behaviour of a digital circuit after power-up is undefined -- flip-flops can power up in either state.</p>
