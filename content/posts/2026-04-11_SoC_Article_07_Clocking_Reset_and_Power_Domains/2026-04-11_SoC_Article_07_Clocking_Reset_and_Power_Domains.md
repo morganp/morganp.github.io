@@ -75,17 +75,17 @@ When data must cross from one clock domain to another -- for example, from the C
 
 When a flip-flop's input changes near its sampling edge, the flip-flop may enter a **metastable** state -- neither a clean 0 nor a clean 1. If the metastable state propagates, it can corrupt data or cause unexpected behaviour.
 
-The probability of metastability resolving correctly increases with time. A **two-stage synchroniser** provides enough time for resolution before the signal is used:
+The probability of metastability resolving correctly increases with time. A **two-stage synchroniser** provides enough time in most situations for resolution before the signal is used:
 
 ```wavedrom
 {
   "signal": [
-    {"name": "SRC_CLK",    "wave": "P.P.P.P.P.", "period": 1},
-    {"name": "DST_CLK",    "wave": "P..P..P..P", "period": 1.5},
-    {"name": "DATA_IN",    "wave": "0..1......"},
-    {"name": "FF1_Q",      "wave": "0...x1....", "node": "....A"},
-    {"name": "FF2_Q",      "wave": "0.....1...", "node": "......B"},
-    {"name": "SYNC_OUT",   "wave": "0.....1..."}
+    {"name": "SRC_CLK",  "wave": "p........"},
+    {"name": "DST_CLK",  "wave": "p.....", "period": 1.5},
+    {"name": "DATA_IN",  "wave": "0.1......"},
+    {"name": "FF1_Q",    "wave": "0..x1....", "node": "...A....."},
+    {"name": "FF2_Q",    "wave": "0....1...", "node": ".....B..."},
+    {"name": "SYNC_OUT", "wave": "0....1..."}
   ],
   "edge": ["A metastable (resolves to 1)", "B safe to use"],
   "head": {"text": "Two-Stage Synchroniser for CDC"}
@@ -93,6 +93,8 @@ The probability of metastability resolving correctly increases with time. A **tw
 ```
 
 The two-stage synchroniser adds **two destination-clock cycles of latency** but reduces the probability of a metastability-induced failure to negligible levels. More complex CDCs (for multi-bit signals or FIFOs) use more sophisticated structures.
+
+![1-bit two-stage synchroniser schematic: D_in feeds FF1 (teal, may be metastable), FF1 Q feeds FF2, both clocked by DST_CLK, output is SYNC_OUT]({attach}/images/SoC/Article07/07-sync-2stage-900w.png)
 
 ---
 
