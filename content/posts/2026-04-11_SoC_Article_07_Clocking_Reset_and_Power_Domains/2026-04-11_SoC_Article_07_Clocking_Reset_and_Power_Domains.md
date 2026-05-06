@@ -80,12 +80,12 @@ The probability of metastability resolving correctly increases with time. A **tw
 ```wavedrom
 {
   "signal": [
-    {"name": "SRC_CLK",  "wave": "p........"},
-    {"name": "DST_CLK",  "wave": "p.....", "period": 1.5},
-    {"name": "DATA_IN",  "wave": "0.1......"},
-    {"name": "FF1_Q",    "wave": "0..x1....", "node": "...A....."},
-    {"name": "FF2_Q",    "wave": "0....1...", "node": ".....B..."},
-    {"name": "SYNC_OUT", "wave": "0....1..."}
+    {"name": "SRC_CLK",  "wave": "p......."},
+    {"name": "DST_CLK",  "wave": "p...", "period": 2},
+    {"name": "DATA_IN",  "wave": "01......"},
+    {"name": "FF1_Q",    "wave": "0.x1....", "node": "..A....."},
+    {"name": "FF2_Q",    "wave": "0...1...", "node": "....B..."},
+    {"name": "SYNC_OUT", "wave": "0...1..."}
   ],
   "edge": ["A metastable (resolves to 1)", "B safe to use"],
   "head": {"text": "Two-Stage Synchroniser for CDC"}
