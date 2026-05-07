@@ -4,7 +4,7 @@ Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, History, Electronics
 Slug: soc-article-01-from-room-to-silicon
 Author: morganp
-Summary: How computing evolved from room-filling mainframes to a sliver of silicon in your pocket — and why that history shapes modern SoC design.
+Summary: How computing evolved from room-filling mainframes to a sliver of silicon in your pocket, and why that history shapes modern SoC design.
 
 *Series: Introduction to SoC Design | Article 1 of 11*
 
@@ -18,7 +18,7 @@ There is a photograph from 1964 that captures the scale of computing at the time
 
 That machine cost around $3.5 million in 1964 dollars. It performed roughly 500,000 operations per second.
 
-The phone in your pocket performs about 15 *trillion* operations per second - thirty million times more — on a sliver of silicon roughly 100 mm² in area, weighing a fraction of a gram, drawing less than three watts. It fits comfortably in a jacket pocket.
+The phone in your pocket performs about 15 trillion operations per second, thirty million times more, on a sliver of silicon roughly 100 mm² in area, weighing a fraction of a gram, drawing less than three watts. It fits comfortably in a jacket pocket.
 
 This article is the story of how we got from there to here. It is not just a history lesson. Understanding the shape of that journey — what drove miniaturisation at each step, and what trade-offs were made along the way — is essential context for understanding why modern SoC design is structured the way it is.
 
@@ -26,18 +26,18 @@ This article is the story of how we got from there to here. It is not just a his
 
 ---
 
-## What is a "System"?
+## What is a "system"?
 
 Before discussing a *System* on Chip, we should understand what the word "system" means in this context.
 
 In engineering, a **system** is a collection of components that work together to perform a function greater than any single component could achieve alone. A computer *system*, in the classical sense, means all the hardware necessary to store, retrieve, and process information:
 
-- **processor** — the arithmetic and logic engine
-- **Memory** — where programs and data live
-- **Storage** - where data persists when power is off
-- **Input/Output** — keyboards, displays, printers, serial ports
-- **Interconnect** — the buses and cables that tie it all together
-- **Power supply** — the electrical infrastructure
+- **processor**: the arithmetic and logic engine
+- **memory**: where programs and data live
+- **storage**: where data persists when power is off
+- **input and output**: keyboards, displays, printers, serial ports
+- **interconnect**: the buses and cables that tie it all together
+- **power supply**: the electrical infrastructure
 
 For decades, each of these was a separate physical unit, often made by different vendors, assembled on a raised floor in a dedicated machine room. The history of computing is largely the story of these components shrinking, converging, and ultimately merging.
 
@@ -68,7 +68,7 @@ Approximate Physical Scale — 1950s Computer Systems
   └──────────────────────────────────────────────────────────────────┘
 ```
 
-### The Transistor Changes Everything
+### The transistor changes everything
 
 In 1947, [Bell Labs](https://en.wikipedia.org/wiki/Bell_Labs) invented the [transistor](https://en.wikipedia.org/wiki/Transistor). It did the same job as a vacuum tube — acting as an electronic switch — but was smaller, faster, cooler, more reliable, and consumed far less power. By the late 1950s, computers began to be built from transistors instead.
 
@@ -115,19 +115,19 @@ DEC PDP-11 (1970) — Physical Footprint:
 
 The PDP-11 introduced several ideas that persist in modern SoC design: [memory-mapped I/O](https://en.wikipedia.org/wiki/Memory-mapped_I/O) (where peripherals appear as addresses in the memory map), a bus standard ([UNIBUS](https://en.wikipedia.org/wiki/Unibus)), and the concept of a clean separation between the processor and the rest of the system through a well-defined bus interface.
 
-### The Minicomputer Era's Legacy
+### The minicomputer era's legacy
 
 The minicomputer era produced ideas that underpin every SoC today:
 
-- **Bus standards** — the UNIBUS, [Multibus](https://en.wikipedia.org/wiki/Multibus), and [S-100](https://en.wikipedia.org/wiki/S-100_bus) buses established the principle that components from different vendors could interoperate on a common bus
-- **Operating systems** — Unix was born on the PDP-11; its model of processes, file descriptors, and device drivers lives on in [Linux](https://en.wikipedia.org/wiki/Linux) running on modern SoCs
-- **Modular architecture** — CPU, memory, and I/O were separate cards in the same backplane, a precursor to the IP block model
+- **Bus standards**: the UNIBUS, [Multibus](https://en.wikipedia.org/wiki/Multibus), and [S-100](https://en.wikipedia.org/wiki/S-100_bus) buses established the principle that components from different vendors could interoperate on a common bus
+- **Operating systems**: Unix was born on the PDP-11; its model of processes, file descriptors, and device drivers lives on in [Linux](https://en.wikipedia.org/wiki/Linux) running on modern SoCs
+- **Modular architecture**: CPU, memory, and I/O were separate cards in the same backplane, a precursor to the IP block model
 
 ---
 
 ## Era 3: The Microprocessor (1971–1980)
 
-### Everything on One Chip
+### Everything on one chip
 
 In 1971, Intel introduced the **[4004](https://en.wikipedia.org/wiki/Intel_4004)** — the first microprocessor. It placed the entire CPU — arithmetic unit, registers, control logic — onto a single chip about 12 mm². It ran at 740 kHz and processed 4-bit numbers.
 
@@ -145,7 +145,7 @@ But the microprocessor alone was just the CPU. Everything else — memory, stora
 
 ## Era 4: The Personal Computer (1977–1990)
 
-### The Desktop System
+### The desktop system
 
 The first personal computers were kits for hobbyists. The **[Altair 8800](https://en.wikipedia.org/wiki/Altair_8800)** (1975) was an 8080-based machine with no keyboard, no display, and no software beyond a bootloader — users programmed it by toggling switches on the front panel.
 
@@ -178,9 +178,9 @@ The chip count had fallen from thousands (mainframe) to hundreds (minicomputer) 
 
 ---
 
-## Era 5: The Laptop — Mobile Demands Integration
+## Era 5: The laptop and mobile computing
 
-### Batteries Change Everything
+### Batteries change everything
 
 The first truly portable computers appeared around 1981. The **[Grid Compass](https://en.wikipedia.org/wiki/GRiD_Compass)** (1982) was used by NASA and the US military — it was functional but cost $8,000 and ran for barely four hours on battery. The **[Compaq LTE](https://en.wikipedia.org/wiki/Compaq_LTE)** (1987) was the first laptop to use a 3.5" hard drive and internal battery in a genuinely portable form factor.
 
@@ -208,9 +208,9 @@ Power pressure drove two responses:
 
 ---
 
-## Era 6: The Mobile Phone and the ARM Architecture
+## Era 6: The mobile phone and the ARM architecture
 
-### An Architecture Built for Efficiency
+### An architecture built for efficiency
 
 In 1983, [Acorn Computers](https://en.wikipedia.org/wiki/Acorn_Computers) in Cambridge designed their own processor: the **[Acorn RISC Machine](https://en.wikipedia.org/wiki/ARM_architecture_family)**, or **ARM**. It was a 32-bit RISC processor designed to be simple, low-power, and fast enough for interactive computing in an inexpensive product. The original ARM1 ran at 6 MHz and consumed a fraction of a watt — remarkable for 1985.
 
@@ -228,7 +228,7 @@ This was the moment before SoC. All the pieces existed — they just were not ye
 
 ## Era 7: The System on Chip (1995–present)
 
-### Integration Crosses a Threshold
+### Integration crosses a threshold
 
 As process technology advanced through the 1990s — from 350 nm to 250 nm to 180 nm — the number of transistors that could be fabricated reliably on a single die crossed 100 million. That is enough transistors to implement not just a CPU, but everything around it: memory controllers, DSPs, display engines, USB, audio, and power management.
 
@@ -258,7 +258,7 @@ The Integration Journey — Same Computational Power, Shrinking Footprint:
 
 ---
 
-## Moore's Law: The Engine of Miniaturisation
+## Moore's Law: the engine of miniaturisation
 
 No account of this journey is complete without **[Moore's Law](https://en.wikipedia.org/wiki/Moore%27s_law)**. In 1965, [Gordon Moore](https://en.wikipedia.org/wiki/Gordon_Moore) (co-founder of Intel) observed that the number of transistors on a commercially practical integrated circuit doubled approximately every two years. This was an empirical observation about the economics of the semiconductor industry, but it became a self-fulfilling prophecy: the industry organised itself to deliver that doubling, and did so for more than fifty years.
 
