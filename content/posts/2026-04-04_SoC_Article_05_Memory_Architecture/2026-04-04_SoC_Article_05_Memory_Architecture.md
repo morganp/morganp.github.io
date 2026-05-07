@@ -80,7 +80,7 @@ Three important cache parameters:
 
 ---
 
-## Static RAM (SRAM): The Cache Technology
+## Static RAM (SRAM): the cache technology
 
 Caches are built from **SRAM** (Static RAM). Each bit is stored in a **six-transistor cell** (6T SRAM) - two cross-coupled inverters and two access transistors.
 
@@ -88,7 +88,7 @@ SRAM retains data as long as power is applied (it is *volatile*). It is fast (su
 
 ---
 
-## DRAM: The Main Memory Technology
+## DRAM: the main memory technology
 
 External DRAM uses a **one-transistor, one-capacitor** (1T1C) cell. The charge on a capacitor represents the bit value.
 
@@ -147,7 +147,7 @@ Between the SoC's system bus and the DRAM package sits the **DRAM controller** -
 - Schedules requests to maximise row-buffer hit rate and memory bandwidth
 - Issues periodic **refresh** commands to prevent data loss
 - Manages multiple banks and ranks for parallel access
-- Implements **QoS (Quality of Service)** to ensure latency-sensitive initiators (e.g., display engines) get priority
+- Implements **QoS (Quality of Service)** to ensure latency-sensitive initiators (for example, display engines) get priority
 
 [![DRAM controller architecture block diagram showing AXI slave interface, command scheduler, refresh engine, and PHY interface connecting to LPDDR5 DRAM]({attach}/images/SoC/Article05/05-dram-controller-900w.png)]({attach}/images/SoC/Article05/05-dram-controller-HQ.png)
 
@@ -169,7 +169,7 @@ The SoC connects to these through dedicated controller IP blocks: eMMC controlle
 
 ---
 
-## Memory Mapping: The Software View
+## Memory mapping: the software view
 
 From software's perspective, all memory - SRAM, DRAM, memory-mapped registers, flash - appears as a flat **address space**. The processor simply reads and writes to 32-bit or 64-bit addresses; the hardware decides which memory or peripheral handles each range.
 
@@ -179,7 +179,7 @@ The **memory map** is one of the first things a firmware developer consults when
 
 ---
 
-## Cache Coherency: The Multi-Core Problem
+## Cache coherency: the multi-core problem
 
 When multiple CPU cores share a memory system, a challenge arises: **what happens if two cores have different cached copies of the same address?**
 
@@ -238,9 +238,9 @@ The SoC memory architecture is a carefully designed hierarchy that bridges the s
 
 ## Intermediate Articles This Topic Connects To
 
-- *Cache Coherency Protocols* - MESI, MOESI, directory-based coherency in detail
-- *DRAM Subsystem Timing (Advanced)* - tRCD, tCL, CWL, refresh, power states, LPDDR5
-- *Memory-Mapped I/O and Linux Device Drivers* - How software talks to hardware registers
+- *Cache Coherency Protocols*: MESI, MOESI, directory-based coherency in detail
+- *DRAM Subsystem Timing (Advanced)*: tRCD, tCL, CWL, refresh, power states, LPDDR5
+- *Memory-Mapped I/O and Linux Device Drivers*: how software talks to hardware registers
 
 ---
 
