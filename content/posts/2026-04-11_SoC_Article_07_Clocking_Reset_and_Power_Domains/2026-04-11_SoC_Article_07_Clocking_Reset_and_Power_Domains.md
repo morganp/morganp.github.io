@@ -225,7 +225,21 @@ A lighter-weight alternative to power gating is **clock gating**: stopping the c
 
 [![Integrated clock gating cell schematic showing EN input into a latch clocked by CLK, with the latch output ANDed with CLK to produce GATED_CLK, preventing glitches on enable transitions]({attach}/images/SoC/Article07/07-clock-gating-900w.png)]({attach}/images/SoC/Article07/07-clock-gating-HQ.png)
 
-When EN = 0, GATED_CLK is held low (no switching). When EN = 1, GATED_CLK follows CLK normally.
+When EN = 0, GATED_CLK is held low (no switching). When EN = 1, GATED_CLK follows CLK normally. The internal latch captures EN during the CLK=low phase, ensuring GATED_CLK transitions only at clock boundaries and never produces a glitch:
+
+```wavedrom
+{
+  "signal": [
+    {"name": "CLK",        "wave": "lhlhlhlhlhlhlhlhlhlhlh"},
+    {"name": "EN",         "wave": "1......0..........1..."},
+    {"name": "EN_latched", "wave": "1.......0.........1..."},
+    {},
+    {"name": "GATED_CLK",  "wave": "lhlhlhlh00000000lhlhlh"}
+  ],
+  "head": {"text": "ICG timing: EN captured at CLK=low to prevent glitches on GATED_CLK"},
+  "config": {"hscale": 1.5}
+}
+```
 
 Modern synthesis tools automatically insert clock gating cells throughout the design, reducing dynamic power by 20--40% with no architect effort.
 
