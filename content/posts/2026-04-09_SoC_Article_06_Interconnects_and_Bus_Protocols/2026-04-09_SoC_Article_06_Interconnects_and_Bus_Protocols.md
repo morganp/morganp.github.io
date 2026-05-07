@@ -13,7 +13,7 @@ Status: published
 
 ## Introduction
 
-Every block on a SoC -- CPUs, DMA engines, memory controllers, peripherals -- must communicate with every other block. The internal communication fabric that makes this possible is called the **interconnect** or **bus**. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.
+Every SoC block, including CPUs, DMA engines, memory controllers, and peripherals, must communicate with every other block. The internal communication fabric that makes this possible is called the **interconnect** or **bus**. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.
 
 This article introduces the major bus standards used in modern SoCs, with emphasis on **ARM's AMBA (Advanced Microcontroller Bus Architecture)** family, which is the dominant standard in the industry.
 
@@ -21,7 +21,7 @@ This article introduces the major bus standards used in modern SoCs, with emphas
 
 ## Why a Standard Bus Matters
 
-Without a standard interface, every IP block would need a custom interface to every other block -- an impractical explosion of design effort. A standard bus protocol defines:
+Without a standard interface, every IP block would need a custom interface to every other block: an impractical explosion of design effort. A standard bus protocol defines:
 
 - **Signal names and widths** -- both sides know how to connect
 - **Handshake mechanism** -- how a master requests and a slave responds
@@ -42,7 +42,7 @@ The family spans from simple, low-power APB peripherals on the right through pip
 
 ---
 
-## APB -- Advanced Peripheral Bus
+## APB: advanced peripheral bus
 
 **APB** is the simplest AMBA protocol, designed for low-bandwidth, low-power peripheral registers. It is a **synchronous, non-pipelined** bus with no burst mode -- every transfer takes a minimum of two clock cycles.
 
@@ -50,16 +50,16 @@ The family spans from simple, low-power APB peripherals on the right through pip
 
 Key APB signals:
 
-- `PCLK` -- Clock
-- `PRESETn` -- Active-low reset
-- `PADDR` -- Address (12-32 bit)
-- `PSEL` -- Select: asserted to indicate target peripheral
-- `PENABLE` -- Enable: on second cycle of every transfer
-- `PWRITE` -- Direction: high = write, low = read
-- `PWDATA` -- Write data
-- `PRDATA` -- Read data (from slave)
-- `PREADY` -- Slave extends transfer if not ready
-- `PSLVERR` -- Slave error response
+- `PCLK`: clock
+- `PRESETn`: active-low reset
+- `PADDR`: address (12-32 bit)
+- `PSEL`: select, asserted to indicate target peripheral
+- `PENABLE`: enable, on second cycle of every transfer
+- `PWRITE`: direction, high = write, low = read
+- `PWDATA`: write data
+- `PRDATA`: read data (from slave)
+- `PREADY`: slave extends transfer if not ready
+- `PSLVERR`: slave error response
 
 ### APB Write Timing
 
@@ -89,21 +89,21 @@ APB is ideal for: UART, SPI, I2C, GPIO, timer, and watchdog registers -- anythin
 
 ---
 
-## AHB -- Advanced High-performance Bus
+## AHB: advanced high-performance bus
 
 **AHB** sits in the middle tier. It is a **pipelined**, higher-bandwidth protocol supporting burst transfers. AHB separates the **address phase** and **data phase**, allowing the next address to be issued while the current data transfer is in progress.
 
 ### Key AHB Signals
 
-- `HCLK`, `HRESETn` -- Clock and reset
-- `HADDR` -- Address (32-bit)
-- `HTRANS` -- Transfer type: IDLE / BUSY / NONSEQ / SEQ
-- `HWRITE` -- Direction
-- `HSIZE` -- Transfer size (8, 16, 32, 64... bit)
-- `HBURST` -- Burst type (SINGLE, INCR, WRAP4, INCR4...)
-- `HWDATA` / `HRDATA` -- Write and read data
-- `HREADY` -- Transfer complete / extend
-- `HRESP` -- Response (OKAY / ERROR)
+- `HCLK`, `HRESETn`: clock and reset
+- `HADDR`: address (32-bit)
+- `HTRANS`: transfer type, IDLE, BUSY, NONSEQ, or SEQ
+- `HWRITE`: direction
+- `HSIZE`: transfer size (8, 16, 32, 64... bit)
+- `HBURST`: burst type (SINGLE, INCR, WRAP4, INCR4...)
+- `HWDATA` and `HRDATA`: write and read data
+- `HREADY`: transfer complete or extend
+- `HRESP`: response (OKAY or ERROR)
 
 ### AHB Pipelined Burst Read
 
@@ -132,23 +132,23 @@ When multiple masters (CPU, DMA) contend for the AHB, an **arbiter** decides who
 
 ---
 
-## AXI -- Advanced eXtensible Interface
+## AXI: advanced eXtensible interface
 
 **AXI4** is the highest-performance AMBA protocol, used to connect CPUs, memory controllers, DMA engines, GPUs, and other high-bandwidth masters and slaves. It is the backbone of most modern SoCs.
 
 AXI4's key innovation is **independent channels**: read and write transactions are completely separate, and multiple transactions can be in flight simultaneously.
 
-### The Five AXI Channels
+### The five AXI channels
 
 [![AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names]({attach}/images/SoC/Article06/06-axi-channels-900w.png)]({attach}/images/SoC/Article06/06-axi-channels-HQ.png)
 
 The five channels are:
 
-- **AW (Write Address)** -- master sends the address and burst parameters for a write
-- **W (Write Data)** -- master sends the data beats with byte strobes and WLAST flag
-- **B (Write Response)** -- slave confirms the write completed (or reports an error)
-- **AR (Read Address)** -- master sends the address and burst parameters for a read
-- **R (Read Data)** -- slave returns data beats with RLAST flag
+- **AW (Write Address)**: master sends the address and burst parameters for a write
+- **W (Write Data)**: master sends the data beats with byte strobes and WLAST flag
+- **B (Write Response)**: slave confirms the write completed (or reports an error)
+- **AR (Read Address)**: master sends the address and burst parameters for a read
+- **R (Read Data)**: slave returns data beats with RLAST flag
 
 ### Valid/Ready Handshake
 
@@ -171,7 +171,7 @@ Every AXI channel uses the same **valid/ready handshake** protocol. The sender a
 
 This decoupled handshake is powerful: the master can issue addresses continuously; the slave can stall when its internal buffers are full, without requiring the master to back off.
 
-### AXI Burst Transfers
+### AXI burst transfers
 
 Rather than issuing many single transactions, AXI supports **burst transfers** -- a single address phase followed by multiple data beats. This dramatically improves efficiency for sequential memory access.
 
@@ -184,13 +184,13 @@ Key burst parameters:
   - `INCR` -- address increments each beat (normal memory access)
   - `WRAP` -- like INCR but wraps at a boundary (useful for cache lines)
 
-### AXI IDs and Out-of-Order Transactions
+### AXI IDs and out-of-order transactions
 
 AXI assigns each transaction an **ID** (`AWID` / `ARID`). A slave may respond to transactions **out of order** as long as responses within the same ID are in order. This allows a memory controller to optimise DRAM access patterns rather than being forced to respond in the exact order of requests.
 
 ---
 
-## The Interconnect: From Bus to Crossbar
+## The interconnect: from bus to crossbar
 
 A simple shared bus forces all masters to share a single data path -- only one master can use it at a time. This creates a bottleneck in systems with multiple high-bandwidth masters.
 
@@ -210,7 +210,7 @@ The interconnect uses these tags to arbitrate between competing masters, ensurin
 
 ---
 
-## AXI4-Lite: The Simplified Register Interface
+## AXI4-Lite: the simplified register interface
 
 Full AXI4 has substantial complexity -- burst management, ID tracking, out-of-order responses. For accessing peripheral register banks (where individual 32-bit reads and writes are all that is needed), **AXI4-Lite** offers a simplified subset:
 
@@ -223,7 +223,7 @@ AXI4-Lite is extremely common for connecting peripheral IP blocks to the system 
 
 ---
 
-## APB Bridge: Connecting the Bus Tiers
+## APB bridge: connecting the bus tiers
 
 Because APB is simpler and lower power, slow peripherals are typically attached to an **APB bus** rather than directly to the AXI/AHB backbone. An **AXI-to-APB bridge** converts between the protocols:
 
@@ -257,9 +257,9 @@ SoC interconnects form the communication backbone that links every functional bl
 
 ## Further Reading
 
-- *AXI4 Protocol Deep Dive* -- Burst types, transaction IDs, out-of-order response ordering
-- *DMA Controller Architecture* -- How a DMA engine uses AXI to move data autonomously
-- *Network-on-Chip Design (Advanced)* -- Topology, routing algorithms, virtual channels
+- *AXI4 Protocol Deep Dive*: burst types, transaction IDs, out-of-order response ordering
+- *DMA Controller Architecture*: how a DMA engine uses AXI to move data autonomously
+- *Network-on-Chip Design (Advanced)*: topology, routing algorithms, virtual channels
 
 ---
 
