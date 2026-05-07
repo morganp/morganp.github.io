@@ -1,4 +1,4 @@
-Title: SoC Article 02: What is a System on Chip? - Anatomy and Motivation
+Title: SoC Article 02: What is a System on Chip, anatomy and motivation
 Date: 2026-03-15
 Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems
@@ -13,7 +13,7 @@ Status: published
 
 ## Introduction
 
-In the previous article we traced the seventy-year journey from room-sized mainframes to silicon-level integration, arriving at the **System on Chip** - a complete computer system fabricated on a single piece of silicon. Now it is time to look inside one: what blocks does it contain, how do they relate, and why does integration deliver such dramatic benefits?
+In the previous article we traced the seventy-year journey from room-sized mainframes to silicon-level integration, arriving at the **System on Chip**: a complete computer system fabricated on a single piece of silicon. Now it is time to look inside one: what blocks does it contain, how do they relate, and why does integration deliver such dramatic benefits?
 
 ---
 
@@ -27,7 +27,7 @@ A **System on Chip** collapses most or all of those components onto a **single p
 
 [![Side-by-side comparison: a traditional board-level system with many discrete chips connected by slow PCB traces versus a System on Chip with the same blocks integrated onto a single die connected by fast on-chip wires]({attach}/images/SoC/Article02/01-board-vs-soc-900w.png)]({attach}/images/SoC/Article02/01-board-vs-soc-HQ.png)
 
-The term "SoC" emerged formally in the mid-1990s when transistor densities crossed roughly 100 million per chip - the threshold at which integrating a complete system became both technically practical and economically compelling. Today, modern SoCs routinely contain **tens of billions of transistors**.
+The term "SoC" emerged formally in the mid-1990s when transistor densities crossed roughly 100 million per chip, the threshold at which integrating a complete system became both technically practical and economically compelling. Today, modern SoCs routinely contain **tens of billions of transistors**.
 
 ---
 
@@ -41,7 +41,7 @@ Putting everything on one die is not just about convenience. It delivers fundame
 
 ### Speed
 
-On-chip wires are nanometres wide and micrometres long. Signals cross them in fractions of a nanosecond. Signals crossing a PCB encounter far greater inductance and capacitance, longer paths, and the need for high-drive output buffers - all of which introduce significant delay. An on-chip memory access takes 1-5 ns; an off-chip access might take 60-100 ns for the same data.
+On-chip wires are nanometres wide and micrometres long. Signals cross them in fractions of a nanosecond. Signals crossing a PCB encounter far greater inductance and capacitance, longer paths, and the need for high-drive output buffers, all of which introduce significant delay. An on-chip memory access takes 1-5 ns; an off-chip access might take 60-100 ns for the same data.
 
 ### Power Efficiency
 
@@ -162,9 +162,9 @@ A System on Chip integrates what was once a board full of discrete chips - proce
 
 ## Intermediate Articles This Topic Connects To
 
-- *AXI4 Protocol Deep Dive* - The interconnect in detail
-- *SoC Power Management Techniques* - DVFS, power gating, retention
-- *Heterogeneous SoC Partitioning (Advanced)* - Formal HW/SW co-exploration
+- *AXI4 Protocol Deep Dive*: the interconnect in detail
+- *SoC Power Management Techniques*: DVFS, power gating, retention
+- *Heterogeneous SoC Partitioning (Advanced)*: formal HW/SW co-exploration
 
 ---
 
