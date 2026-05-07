@@ -61,7 +61,7 @@ A five-stage pipeline is the canonical teaching model:
 }
 ```
 
-### The Big-Little Concept
+### The big.LITTLE concept
 
 For power-sensitive SoCs (smartphones, wearables), ARM developed the **big.LITTLE** architecture, which pairs high-performance "big" cores with energy-efficient "little" cores on the same die:
 
@@ -100,7 +100,7 @@ SoC designers on FPGAs (see Article 09) almost always use soft cores since they 
 
 A **DSP** is a processor specialised for signal processing algorithms. Its architecture is tuned for two operations that appear constantly in such algorithms: **multiply-accumulate (MAC)** and **data movement**.
 
-### The MAC Operation
+### The MAC operation
 
 The core of almost all digital signal processing is the **dot product**: multiply pairs of numbers and sum the results. This appears in:
 - **FIR filters**: y[n] = h[0]x[n] + h[1]x[n-1] + ... + h[N]x[n-N]
@@ -111,7 +111,7 @@ A MAC operation computes: **Accumulator += A x B** in a single cycle.
 
 [![DSP MAC Unit showing the single-cycle multiply-accumulate pipeline: A and B input registers feeding a multiplier, then an adder, then a 40-bit accumulator with feedback]({attach}/images/SoC/Article04/04-dsp-mac-unit-900w.png)]({attach}/images/SoC/Article04/04-dsp-mac-unit-HQ.png)
 
-### DSP Architecture Features
+### DSP architecture features
 
 DSPs include hardware features that a general-purpose CPU lacks:
 
@@ -147,29 +147,29 @@ Common mobile GPU families include **ARM Mali**, **Qualcomm Adreno**, and **Appl
 
 As compute-intensive AI workloads have become dominant, SoC vendors have added **dedicated hardware accelerators** - fixed-function silicon blocks that execute one type of computation extremely efficiently.
 
-### Neural Processing Unit (NPU / Neural Engine)
+### Neural processing unit (NPU and neural engine)
 
 An NPU accelerates neural network inference - the process of running a trained model on new input data. The core operation is matrix-vector multiplication (essentially a large MAC array).
 
 [![Systolic array architecture used in NPU designs: a grid of Processing Elements (PEs) where weights flow downward and activations flow rightward, each PE computing one MAC per clock cycle, with partial sums accumulating downward]({attach}/images/SoC/Article04/04-systolic-array-900w.png)]({attach}/images/SoC/Article04/04-systolic-array-HQ.png)
 
-In a systolic array, data flows through the processing elements rhythmically (like blood through a heart - hence "systolic"). Weights are pre-loaded; activations and partial sums flow through, with each PE performing one MAC per cycle. This achieves very high utilisation of the multiplication hardware.
+In a systolic array, data flows through the processing elements rhythmically. Weights are pre-loaded; activations and partial sums flow through, with each PE performing one MAC per cycle. This achieves very high utilisation of the multiplication hardware.
 
-### Video Codec Engine
+### Video codec engine
 
 Encoding and decoding H.264/H.265/AV1 video in software is extremely CPU-intensive. A dedicated hardware codec can process 4K video at 30+ frames per second while drawing milliwatts, compared to watts for a software implementation. Modern SoCs include fixed-function codec blocks that implement the specific algorithms of each video standard.
 
-### Cryptographic Accelerator
+### Cryptographic accelerator
 
 AES encryption, SHA hashing, RSA/ECC public-key operations, and True Random Number Generation (TRNG) are all candidates for hardware acceleration. Performing AES-128 in hardware can be 50-100x more energy-efficient than software.
 
-### Image Signal Processor (ISP)
+### Image signal processor (ISP)
 
 The camera pipeline - demosaicing, noise reduction, white balance, tone mapping, HDR merging - runs in a dedicated ISP. This is a DSP-like block hardwired to the specific algorithms of computational photography.
 
 ---
 
-## The Processor Cluster: Putting It Together
+## The processor cluster: putting it together
 
 A high-end mobile SoC might contain the following processing elements:
 
@@ -177,7 +177,7 @@ A high-end mobile SoC might contain the following processing elements:
 
 ---
 
-## Processor State Machine: A Simplified View
+## Processor state machine: a simplified view
 
 Every processor can be modelled as a state machine. Here is a simplified view of a CPU's states in a typical embedded SoC context:
 
@@ -213,7 +213,7 @@ digraph CPU_State {
 
 ---
 
-## Choosing the Right Processor for Your SoC
+## Choosing the right processor for your SoC
 
 The processor choice depends critically on the application:
 
@@ -237,9 +237,9 @@ SoC processing subsystems are not monolithic: they combine CPUs for general-purp
 
 ## Intermediate Articles This Topic Connects To
 
-- *Pipeline Design and Hazards* - Data, structural, and control hazards; forwarding networks
-- *Cache Coherency Protocols* - How multiple CPU cores agree on the state of shared memory
-- *AI Accelerator Architecture (Advanced)* - Dataflow, weight stationarity, memory bandwidth
+- *Pipeline Design and Hazards*: data, structural, and control hazards; forwarding networks
+- *Cache Coherency Protocols*: how multiple CPU cores agree on the state of shared memory
+- *AI Accelerator Architecture (Advanced)*: dataflow, weight stationarity, memory bandwidth
 
 ---
 
