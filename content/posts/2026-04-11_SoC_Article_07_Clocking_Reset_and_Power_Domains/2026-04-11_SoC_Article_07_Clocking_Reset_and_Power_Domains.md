@@ -100,7 +100,7 @@ The two-stage synchroniser adds **two destination-clock cycles of latency** but 
 
 ## Reset: Getting to a known state
 
-**Reset** is the mechanism that places all flip-flops in their initial, known state. Without reset, the behaviour of a digital circuit after power-up is undefined: flip-flops can power up in either state.
+**Reset** is the mechanism that places all flip-flops in their initial, known state. Without reset, the behaviour of a digital circuit after power-up is non-deterministic. Each flip-flop powers up in either 0 or 1, but which value depends on manufacturing variation and environmental conditions. Simulation tools represent this uncertain power-up state as `x` (unknown). The state is definite at the hardware level but unpredictable across devices and power cycles. Reset resolves the non-determinism by driving every flip-flop to a specified, known value.
 
 ### Reset sources
 
