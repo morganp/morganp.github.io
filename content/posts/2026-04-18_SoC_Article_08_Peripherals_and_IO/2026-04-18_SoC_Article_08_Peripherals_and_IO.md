@@ -1,10 +1,10 @@
-Title: SoC Article 08: Peripherals and I/O -- Connecting the SoC to the World
+Title: SoC Article 08: Peripherals and I/O - Connecting the SoC to the world
 Date: 2026-04-24
 Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems, Peripherals, I/O, UART, SPI, I2C, USB, Ethernet, DMA, GPIO
 Slug: soc-article-08-peripherals-and-io
 Author: morganp
-Summary: A survey of the most common peripheral types found in SoCs -- GPIO, UART, SPI, I2C, USB, Ethernet, DMA, and interrupt controllers -- and how they connect the digital logic inside the chip to the physical world outside it.
+Summary: A survey of the most common peripheral types found in SoCs: GPIO, UART, SPI, I2C, USB, Ethernet, DMA, and interrupt controllers, and how they connect the digital logic inside the chip to the physical world outside it.
 Status: published
 
 *Series: Introduction to SoC Design | Article 8 of 11*
@@ -13,13 +13,13 @@ Status: published
 
 ## Introduction
 
-A SoC without I/O is a black box -- no matter how powerful its processors or how fast its memory, it has no way to receive information from the world or send results back out. **Peripherals** are the hardware blocks that bridge the gap between the digital logic inside the chip and the physical world outside it: sensors, displays, storage, networks, and human interfaces.
+A System-on-Chip (SoC) without input/output (I/O) is a black box. No matter how powerful its central processing units (CPUs) or how fast its memory, it has no way to receive information from the world or send results back out. **Peripherals** are the hardware blocks that bridge the gap between the digital logic inside the chip and the physical world outside it: sensors, displays, storage, networks, and human interfaces.
 
 This article surveys the most common peripheral types found in SoCs, explains the protocols they use, and shows how they connect to the rest of the chip.
 
 ---
 
-## The Peripheral Landscape
+## The peripheral landscape
 
 Peripherals vary enormously in bandwidth, latency, and complexity:
 
@@ -46,9 +46,9 @@ digraph PeripheralBandwidth {
 
 ---
 
-## GPIO -- General Purpose Input/Output
+## GPIO
 
-**GPIO** is the simplest peripheral: a set of pins that can be individually configured as either digital inputs or digital outputs, under software control.
+**General-purpose input/output (GPIO)** is the simplest peripheral: a set of pins that can be individually configured as either digital inputs or digital outputs, under software control.
 
 ```dot
 digraph GPIO {
@@ -74,7 +74,7 @@ digraph GPIO {
 }
 ```
 
-GPIO pins on modern SoCs are typically multiplexed -- the same physical pin can serve as GPIO or as a dedicated function for a peripheral like UART or SPI. The **IOMUX (I/O Multiplexer)** hardware block selects which function a pin serves:
+GPIO pins on modern SoCs are typically multiplexed: the same physical pin can serve as GPIO or as a dedicated function for a peripheral like UART or SPI. The **IOMUX (I/O multiplexer)** hardware block selects which function a pin serves:
 
 ```dot
 digraph IOMUX {
@@ -100,11 +100,11 @@ digraph IOMUX {
 
 ---
 
-## UART -- Universal Asynchronous Receiver/Transmitter
+## UART
 
-**UART** is the oldest and simplest serial communication protocol. It is asynchronous (no shared clock between sender and receiver) and full-duplex (simultaneous send and receive on separate wires).
+**Universal Asynchronous Receiver/Transmitter (UART)** is the oldest and simplest serial communication protocol. It is asynchronous (no shared clock between sender and receiver) and full-duplex (simultaneous send and receive on separate wires).
 
-### UART Frame Format
+### UART frame format
 
 A UART frame consists of: start bit, 7-9 data bits, optional parity bit, and 1-2 stop bits.
 
@@ -120,17 +120,17 @@ A UART frame consists of: start bit, 7-9 data bits, optional parity bit, and 1-2
 }
 ```
 
-The receiver **samples** the line at 16x the baud rate to detect the start bit edge, then samples each data bit at the midpoint of its period. Both sides must be configured to the same baud rate (e.g., 115200 bps).
+The receiver **samples** the line at 16x the baud rate to detect the start bit edge, then samples each data bit at the midpoint of its period. Both sides must be configured to the same baud rate (for example, 115200 bps).
 
-UARTs are used primarily for **debug consoles** -- they are the "printf over hardware" of embedded systems. Almost every SoC has at least one UART that provides a serial terminal during boot.
+UARTs serve primarily as debug consoles: they are the primary serial debug output tool in embedded systems. Almost every SoC has at least one UART that provides a serial terminal during boot.
 
 ---
 
-## SPI -- Serial Peripheral Interface
+## SPI
 
-**SPI** is a synchronous serial protocol (master provides the clock) designed for short-distance communication between a SoC and peripheral ICs such as flash memory, sensors, DACs, and displays.
+**Serial Peripheral Interface (SPI)** is a synchronous serial protocol where the master provides the clock. It is designed for short-distance communication between a SoC and peripheral ICs such as flash memory, sensors, digital-to-analogue converters (DACs), and displays.
 
-### SPI Signals
+### SPI signals
 
 ```dot
 digraph SPI {
@@ -156,7 +156,7 @@ digraph SPI {
 }
 ```
 
-### SPI Timing
+### SPI timing
 
 ```wavedrom
 {
@@ -170,17 +170,17 @@ digraph SPI {
 }
 ```
 
-SPI supports four **modes** (combinations of CPOL -- clock polarity and CPHA -- clock phase), allowing compatibility with different devices. Most flash memories and sensors use Mode 0 or Mode 3.
+SPI supports four **modes** based on CPOL (clock polarity) and CPHA (clock phase), enabling compatibility with different devices. Most flash memories and sensors use Mode 0 or Mode 3.
 
-SPI has no addressing scheme -- the chip select line selects the target device. Multiple slaves require one CS line per slave. **Quad-SPI (QSPI)** uses four data lines instead of one, quadrupling throughput.
+SPI has no addressing scheme: the chip select line selects the target device. Multiple slaves require one CS line per slave. **Quad-SPI (QSPI)** uses four data lines instead of one, quadrupling throughput.
 
 ---
 
-## I2C -- Inter-Integrated Circuit
+## I2C
 
-**I2C** is a two-wire synchronous protocol supporting multiple masters and multiple slaves on the same bus. It uses **7-bit or 10-bit addressing** to select which device a transaction targets.
+**Inter-Integrated Circuit (I2C)** is a two-wire synchronous protocol supporting multiple masters and multiple slaves on the same bus. It uses **7-bit or 10-bit addressing** to select which device a transaction targets.
 
-### I2C Signals
+### I2C signals
 
 ```dot
 digraph I2C {
@@ -202,7 +202,7 @@ digraph I2C {
 }
 ```
 
-### I2C Transaction Format
+### I2C transaction format
 
 ```wavedrom
 {
@@ -215,21 +215,21 @@ digraph I2C {
 }
 ```
 
-The **START** condition (SDA falls while SCL is high) begins every transaction. The master sends 7 address bits + a R/W bit, then waits for an **ACK** (the addressed slave pulls SDA low for one clock cycle). Data bytes follow, each acknowledged by the receiver.
+The **START** condition (SDA falls while SCL is high) begins every transaction. The master sends 7 address bits and an R/W bit, then waits for an **ACK**: the addressed slave pulls SDA low for one clock cycle. Data bytes follow, each acknowledged by the receiver.
 
-I2C standard speeds: 100 kHz (standard), 400 kHz (fast), 1 MHz (fast-plus), 3.4 MHz (high-speed). Used for: temperature sensors, IMUs, PMICs, cameras, EEPROM, displays.
+I2C standard speeds are 100 kHz (standard), 400 kHz (fast), 1 MHz (fast-plus), and 3.4 MHz (high-speed). Common uses include temperature sensors, inertial measurement units (IMUs), power management ICs (PMICs), cameras, electrically erasable programmable read-only memory (EEPROM), and displays.
 
 ---
 
-## USB -- Universal Serial Bus
+## USB
 
-**USB** is the dominant PC-to-peripheral protocol, and is increasingly common on embedded SoCs. A complete USB implementation includes:
+**Universal Serial Bus (USB)** is the dominant PC-to-peripheral protocol, and is increasingly common on embedded SoCs. A complete USB implementation includes:
 
-- **USB PHY (Physical Layer)** -- analog front-end handling differential signalling
-- **USB Controller / IP** -- protocol stack implementation (USB 2.0 at 480 Mb/s, USB 3.x up to 20 Gb/s)
-- **USB Hub / Root Hub logic** -- in host-mode SoCs
+- **USB PHY (Physical Layer):** analog front-end handling differential signalling
+- **USB controller and IP stack:** protocol stack implementation (USB 2.0 at 480 Mb/s, USB 3.x up to 20 Gb/s)
+- **USB hub and root hub logic:** in host-mode SoCs
 
-USB 2.0 uses a tiered star topology with a single host, supporting 127 devices. USB communication is always **host-initiated** -- a device can never spontaneously send data; it must wait to be polled or for the host to grant a transfer.
+USB 2.0 uses a tiered star topology with a single host, supporting 127 devices. USB communication is always host-initiated: a device can never spontaneously send data. It must wait to be polled or for the host to grant a transfer.
 
 USB transfers are classified into four types:
 
@@ -237,10 +237,10 @@ USB transfers are classified into four types:
 |---------------|-------------|----------|
 | Control | Enumeration, configuration | Device setup |
 | Bulk | Large data, guaranteed delivery | Storage (USB flash) |
-| Interrupt | Small, time-bounded data | HID (mouse, keyboard) |
+| Interrupt | Small, time-bounded data | Human Interface Device (HID): mouse, keyboard |
 | Isochronous | Time-sensitive, no retry | Audio, video streaming |
 
-USB 3.x adds **SuperSpeed** lanes with completely different physical layer (8b/10b -> 128b/132b coding, separate TX and RX differential pairs) while maintaining backward compatibility with USB 2.0.
+USB 3.x adds **SuperSpeed** lanes with a completely different physical layer, using 128b/132b coding instead of 8b/10b and separate TX and RX differential pairs. It maintains backward compatibility with USB 2.0.
 
 ---
 
@@ -248,9 +248,9 @@ USB 3.x adds **SuperSpeed** lanes with completely different physical layer (8b/1
 
 **Ethernet** connectivity requires two hardware blocks:
 
-**MAC (Media Access Control)** -- implements the Ethernet frame format, collision detection (for legacy half-duplex), flow control, and FIFO management. The MAC lives on-chip.
+**MAC (Media Access Control):** implements the Ethernet frame format, collision detection (for legacy half-duplex), flow control, and first-in first-out (FIFO) buffer management. The MAC lives on-chip.
 
-**PHY (Physical Layer)** -- converts between the digital MAC signals and the analog signals on the twisted-pair cable. The PHY is usually a separate chip, connected to the MAC via the **RGMII** or **SGMII** interface.
+**PHY (Physical Layer):** converts between the digital MAC signals and the analog signals on the twisted-pair cable. The PHY is usually a separate chip, connected to the MAC via the Reduced Gigabit Media Independent Interface (RGMII) or Serial Gigabit Media Independent Interface (SGMII).
 
 ```dot
 digraph Ethernet {
@@ -272,13 +272,13 @@ digraph Ethernet {
 }
 ```
 
-The MAC operates as a **DMA master**: when a packet arrives, the MAC's DMA engine writes it to a pre-allocated buffer in DRAM and signals the CPU via interrupt. Outgoing packets are described by descriptors pointing to DRAM buffers, and the MAC fetches and transmits them independently.
+The MAC operates as a **DMA master**: when a packet arrives, the MAC's DMA engine writes it to a pre-allocated buffer in dynamic RAM (DRAM) and signals the CPU via interrupt. Outgoing packets are described by descriptors pointing to DRAM buffers, and the MAC fetches and transmits them independently.
 
 ---
 
-## DMA Controller
+## DMA controller
 
-Almost all high-bandwidth peripherals include or connect to a **Direct Memory Access (DMA)** engine. DMA allows peripherals to transfer large blocks of data to/from memory without the CPU being involved for every byte.
+Almost all high-bandwidth peripherals include or connect to a **Direct Memory Access (DMA)** engine. DMA enables peripherals to transfer large blocks of data to and from memory without the central processing unit (CPU) processing every byte.
 
 ```mermaid
 sequenceDiagram
@@ -302,9 +302,9 @@ DMA is essential for audio streaming, video capture, USB bulk transfers, UART hi
 
 ---
 
-## Interrupt Controller
+## Interrupt controller
 
-Peripherals signal the CPU when they need attention using **interrupts** -- electrical signals that cause the CPU to temporarily halt its current task, save state, run an **Interrupt Service Routine (ISR)**, and resume.
+Peripherals signal the CPU when they need attention using **interrupts**: electrical signals that cause the CPU to pause its current task and run an **Interrupt Service Routine (ISR)**. The CPU saves its state before the ISR runs and restores it afterwards.
 
 A SoC may have dozens of interrupt sources (UART received a byte, SPI transfer complete, GPIO edge, timer expired, DMA done). The **interrupt controller** collects these signals, prioritises them, and presents the highest-priority pending interrupt to the CPU.
 
@@ -336,15 +336,15 @@ digraph InterruptController {
 }
 ```
 
-ARM's **GIC (Generic Interrupt Controller)** is the standard interrupt controller for Cortex-A SoCs. It supports up to 1020 interrupt sources, 8 priority levels, and can target interrupts to specific CPU cores (useful for load balancing in multi-core systems).
+ARM's **GIC (Generic Interrupt Controller)** is the standard interrupt controller for Cortex-A SoCs. It supports up to 1020 interrupt sources and 8 priority levels. It can also target interrupts to specific CPU cores, which is useful for load balancing in multi-core systems.
 
 ---
 
-## Timer and Watchdog
+## Timer and watchdog
 
 **Timers** are counter circuits that count clock cycles and generate an interrupt when they reach a preset value. They are used for:
 
-- OS tick (e.g., 1 ms period for task scheduling)
+- Operating system (OS) tick (for example, 1 ms for task scheduling)
 - PWM generation (Pulse Width Modulation for motor control, LEDs)
 - Capture (measuring pulse widths on GPIO inputs)
 - Timeouts
@@ -362,7 +362,7 @@ ARM's **GIC (Generic Interrupt Controller)** is the standard interrupt controlle
 }
 ```
 
-A **watchdog timer** is a specific timer that must be periodically "kicked" (reset) by firmware. If the firmware crashes or hangs, the watchdog expires and resets the entire system -- essential for reliable embedded operation.
+A **watchdog timer** is a specific timer that firmware must periodically reset. If the firmware crashes or hangs, the watchdog expires and resets the entire system: essential for reliable embedded operation.
 
 ---
 
@@ -372,11 +372,11 @@ Peripherals are the interface between a SoC and the physical world. GPIO provide
 
 ---
 
-## Further Reading
+## Further reading
 
-- *DMA Controller Architecture* -- Descriptor chains, scatter-gather, channel arbitration
-- *Interrupt Controllers* -- Nested vectored interrupts, GIC architecture, priority grouping
-- *Memory-Mapped I/O and Linux Device Drivers* -- Writing kernel drivers for these peripherals
+- *DMA Controller Architecture:* Descriptor chains, scatter-gather, channel arbitration
+- *Interrupt Controllers:* Nested vectored interrupts, GIC architecture, priority grouping
+- *Memory-Mapped I/O and Linux Device Drivers:* Writing kernel drivers for these peripherals
 
 ---
 
