@@ -230,11 +230,11 @@ When EN = 0, GATED_CLK is held low (no switching). When EN = 1, GATED_CLK follow
 ```wavedrom
 {
   "signal": [
-    {"name": "CLK",        "wave": "lhlhlhlhlhlhlhlhlhlhlh"},
-    {"name": "EN",         "wave": "1......0..........1..."},
-    {"name": "EN_latched", "wave": "1.......0.........1..."},
+    {"name": "CLK",        "wave": "lhlhlhlhlhlh"},
+    {"name": "EN",         "wave": "1..0....1..."},
+    {"name": "EN_latched", "wave": "1...0...1..."},
     {},
-    {"name": "GATED_CLK",  "wave": "lhlhlhlh00000000lhlhlh"}
+    {"name": "GATED_CLK",  "wave": "lhlhl....hlh"}
   ],
   "head": {"text": "ICG timing: EN captured at CLK=low to prevent glitches on GATED_CLK"},
   "config": {"hscale": 1.5}
