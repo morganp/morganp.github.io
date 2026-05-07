@@ -46,11 +46,11 @@
 </footer><!-- /.post-info -->        <p><em>Series: Introduction to SoC Design | Article 6 of 11</em></p>
 <hr>
 <h2>Introduction</h2>
-<p>Every block on a SoC -- CPUs, DMA engines, memory controllers, peripherals -- must communicate with every other block. The internal communication fabric that makes this possible is called the <strong>interconnect</strong> or <strong>bus</strong>. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.</p>
+<p>Every SoC block, including CPUs, DMA engines, memory controllers, and peripherals, must communicate with every other block. The internal communication fabric that makes this possible is called the <strong>interconnect</strong> or <strong>bus</strong>. Choosing and designing the interconnect is one of the most consequential architectural decisions in SoC design: it determines bandwidth, latency, arbitration, and overall system throughput.</p>
 <p>This article introduces the major bus standards used in modern SoCs, with emphasis on <strong>ARM's AMBA (Advanced Microcontroller Bus Architecture)</strong> family, which is the dominant standard in the industry.</p>
 <hr>
 <h2>Why a Standard Bus Matters</h2>
-<p>Without a standard interface, every IP block would need a custom interface to every other block -- an impractical explosion of design effort. A standard bus protocol defines:</p>
+<p>Without a standard interface, every IP block would need a custom interface to every other block: an impractical explosion of design effort. A standard bus protocol defines:</p>
 <ul>
 <li><strong>Signal names and widths</strong> -- both sides know how to connect</li>
 <li><strong>Handshake mechanism</strong> -- how a master requests and a slave responds</li>
@@ -64,21 +64,21 @@
 <p><a href="./06-amba-family-HQ.png"><img alt="AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple" src="./06-amba-family-900w.png"></a></p>
 <p>The family spans from simple, low-power APB peripherals on the right through pipelined AHB, high-performance AXI4, all the way to cache-coherent ACE/CHI protocols used in multi-core processor clusters on the left.</p>
 <hr>
-<h2>APB -- Advanced Peripheral Bus</h2>
+<h2>APB: advanced peripheral bus</h2>
 <p><strong>APB</strong> is the simplest AMBA protocol, designed for low-bandwidth, low-power peripheral registers. It is a <strong>synchronous, non-pipelined</strong> bus with no burst mode -- every transfer takes a minimum of two clock cycles.</p>
 <h3>APB Signals</h3>
 <p>Key APB signals:</p>
 <ul>
-<li><code>PCLK</code> -- Clock</li>
-<li><code>PRESETn</code> -- Active-low reset</li>
-<li><code>PADDR</code> -- Address (12-32 bit)</li>
-<li><code>PSEL</code> -- Select: asserted to indicate target peripheral</li>
-<li><code>PENABLE</code> -- Enable: on second cycle of every transfer</li>
-<li><code>PWRITE</code> -- Direction: high = write, low = read</li>
-<li><code>PWDATA</code> -- Write data</li>
-<li><code>PRDATA</code> -- Read data (from slave)</li>
-<li><code>PREADY</code> -- Slave extends transfer if not ready</li>
-<li><code>PSLVERR</code> -- Slave error response</li>
+<li><code>PCLK</code>: clock</li>
+<li><code>PRESETn</code>: active-low reset</li>
+<li><code>PADDR</code>: address (12-32 bit)</li>
+<li><code>PSEL</code>: select, asserted to indicate target peripheral</li>
+<li><code>PENABLE</code>: enable, on second cycle of every transfer</li>
+<li><code>PWRITE</code>: direction, high = write, low = read</li>
+<li><code>PWDATA</code>: write data</li>
+<li><code>PRDATA</code>: read data (from slave)</li>
+<li><code>PREADY</code>: slave extends transfer if not ready</li>
+<li><code>PSLVERR</code>: slave error response</li>
 </ul>
 <h3>APB Write Timing</h3>
 <p>An APB write transaction takes place over two phases: <strong>Setup</strong> and <strong>Access</strong>:</p>
@@ -86,19 +86,19 @@
 <p>In the <strong>Setup</strong> phase, PSEL is asserted and the address and write data are presented. In the <strong>Access</strong> phase, PENABLE goes high confirming the transfer. PREADY allows a slow peripheral to extend the access phase by holding it low.</p>
 <p>APB is ideal for: UART, SPI, I2C, GPIO, timer, and watchdog registers -- anything that does not require high data throughput.</p>
 <hr>
-<h2>AHB -- Advanced High-performance Bus</h2>
+<h2>AHB: advanced high-performance bus</h2>
 <p><strong>AHB</strong> sits in the middle tier. It is a <strong>pipelined</strong>, higher-bandwidth protocol supporting burst transfers. AHB separates the <strong>address phase</strong> and <strong>data phase</strong>, allowing the next address to be issued while the current data transfer is in progress.</p>
 <h3>Key AHB Signals</h3>
 <ul>
-<li><code>HCLK</code>, <code>HRESETn</code> -- Clock and reset</li>
-<li><code>HADDR</code> -- Address (32-bit)</li>
-<li><code>HTRANS</code> -- Transfer type: IDLE / BUSY / NONSEQ / SEQ</li>
-<li><code>HWRITE</code> -- Direction</li>
-<li><code>HSIZE</code> -- Transfer size (8, 16, 32, 64... bit)</li>
-<li><code>HBURST</code> -- Burst type (SINGLE, INCR, WRAP4, INCR4...)</li>
-<li><code>HWDATA</code> / <code>HRDATA</code> -- Write and read data</li>
-<li><code>HREADY</code> -- Transfer complete / extend</li>
-<li><code>HRESP</code> -- Response (OKAY / ERROR)</li>
+<li><code>HCLK</code>, <code>HRESETn</code>: clock and reset</li>
+<li><code>HADDR</code>: address (32-bit)</li>
+<li><code>HTRANS</code>: transfer type, IDLE, BUSY, NONSEQ, or SEQ</li>
+<li><code>HWRITE</code>: direction</li>
+<li><code>HSIZE</code>: transfer size (8, 16, 32, 64... bit)</li>
+<li><code>HBURST</code>: burst type (SINGLE, INCR, WRAP4, INCR4...)</li>
+<li><code>HWDATA</code> and <code>HRDATA</code>: write and read data</li>
+<li><code>HREADY</code>: transfer complete or extend</li>
+<li><code>HRESP</code>: response (OKAY or ERROR)</li>
 </ul>
 <h3>AHB Pipelined Burst Read</h3>
 <p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_b0bc3916a3a9fe56242afe61c3f4ef2c.svg"></p>
@@ -106,24 +106,24 @@
 <h3>AHB Arbitration</h3>
 <p>When multiple masters (CPU, DMA) contend for the AHB, an <strong>arbiter</strong> decides who gets access using a bus grant / bus request protocol. Masters assert <code>HBUSREQx</code> when they want the bus; the arbiter asserts <code>HGRANTx</code> to indicate the winner. This round-robin or priority-based arbitration introduces a form of time-division multiplexing onto the shared bus.</p>
 <hr>
-<h2>AXI -- Advanced eXtensible Interface</h2>
+<h2>AXI: advanced eXtensible interface</h2>
 <p><strong>AXI4</strong> is the highest-performance AMBA protocol, used to connect CPUs, memory controllers, DMA engines, GPUs, and other high-bandwidth masters and slaves. It is the backbone of most modern SoCs.</p>
 <p>AXI4's key innovation is <strong>independent channels</strong>: read and write transactions are completely separate, and multiple transactions can be in flight simultaneously.</p>
-<h3>The Five AXI Channels</h3>
+<h3>The five AXI channels</h3>
 <p><a href="./06-axi-channels-HQ.png"><img alt="AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names" src="./06-axi-channels-900w.png"></a></p>
 <p>The five channels are:</p>
 <ul>
-<li><strong>AW (Write Address)</strong> -- master sends the address and burst parameters for a write</li>
-<li><strong>W (Write Data)</strong> -- master sends the data beats with byte strobes and WLAST flag</li>
-<li><strong>B (Write Response)</strong> -- slave confirms the write completed (or reports an error)</li>
-<li><strong>AR (Read Address)</strong> -- master sends the address and burst parameters for a read</li>
-<li><strong>R (Read Data)</strong> -- slave returns data beats with RLAST flag</li>
+<li><strong>AW (Write Address)</strong>: master sends the address and burst parameters for a write</li>
+<li><strong>W (Write Data)</strong>: master sends the data beats with byte strobes and WLAST flag</li>
+<li><strong>B (Write Response)</strong>: slave confirms the write completed (or reports an error)</li>
+<li><strong>AR (Read Address)</strong>: master sends the address and burst parameters for a read</li>
+<li><strong>R (Read Data)</strong>: slave returns data beats with RLAST flag</li>
 </ul>
 <h3>Valid/Ready Handshake</h3>
 <p>Every AXI channel uses the same <strong>valid/ready handshake</strong> protocol. The sender asserts <code>VALID</code> when it has data to transfer. The receiver asserts <code>READY</code> when it can accept data. The transfer completes on the rising clock edge when <strong>both</strong> are high:</p>
 <p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_6921d6179fd61809d2c1545f92cf2bfe.svg"></p>
 <p>This decoupled handshake is powerful: the master can issue addresses continuously; the slave can stall when its internal buffers are full, without requiring the master to back off.</p>
-<h3>AXI Burst Transfers</h3>
+<h3>AXI burst transfers</h3>
 <p>Rather than issuing many single transactions, AXI supports <strong>burst transfers</strong> -- a single address phase followed by multiple data beats. This dramatically improves efficiency for sequential memory access.</p>
 <p>Key burst parameters:</p>
 <ul>
@@ -134,10 +134,10 @@
 <li><code>INCR</code> -- address increments each beat (normal memory access)</li>
 <li><code>WRAP</code> -- like INCR but wraps at a boundary (useful for cache lines)</li>
 </ul>
-<h3>AXI IDs and Out-of-Order Transactions</h3>
+<h3>AXI IDs and out-of-order transactions</h3>
 <p>AXI assigns each transaction an <strong>ID</strong> (<code>AWID</code> / <code>ARID</code>). A slave may respond to transactions <strong>out of order</strong> as long as responses within the same ID are in order. This allows a memory controller to optimise DRAM access patterns rather than being forced to respond in the exact order of requests.</p>
 <hr>
-<h2>The Interconnect: From Bus to Crossbar</h2>
+<h2>The interconnect: from bus to crossbar</h2>
 <p>A simple shared bus forces all masters to share a single data path -- only one master can use it at a time. This creates a bottleneck in systems with multiple high-bandwidth masters.</p>
 <p>The solution is an <strong>AXI crossbar</strong> (also called a <strong>switch matrix</strong>): it provides dedicated paths between every master-slave pair, allowing multiple simultaneous transfers as long as they target different slaves.</p>
 <p><a href="./06-bus-vs-crossbar-HQ.png"><img alt="Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right" src="./06-bus-vs-crossbar-900w.png"></a></p>
@@ -147,7 +147,7 @@
 <p>Not all traffic is equal. A display engine reading pixel data must deliver frames at a guaranteed rate, or the screen will tear. A background DMA transfer moving log data is not time-critical. AXI4 supports <strong>QoS signalling</strong> (<code>ARQOS</code> / <code>AWQOS</code>) -- a 4-bit priority tag attached to every transaction.</p>
 <p>The interconnect uses these tags to arbitrate between competing masters, ensuring that time-sensitive traffic is served first without starvation of low-priority traffic.</p>
 <hr>
-<h2>AXI4-Lite: The Simplified Register Interface</h2>
+<h2>AXI4-Lite: the simplified register interface</h2>
 <p>Full AXI4 has substantial complexity -- burst management, ID tracking, out-of-order responses. For accessing peripheral register banks (where individual 32-bit reads and writes are all that is needed), <strong>AXI4-Lite</strong> offers a simplified subset:</p>
 <ul>
 <li>No burst support (single transfers only)</li>
@@ -157,7 +157,7 @@
 </ul>
 <p>AXI4-Lite is extremely common for connecting peripheral IP blocks to the system bus, where its simplicity makes it easy to implement correctly.</p>
 <hr>
-<h2>APB Bridge: Connecting the Bus Tiers</h2>
+<h2>APB bridge: connecting the bus tiers</h2>
 <p>Because APB is simpler and lower power, slow peripherals are typically attached to an <strong>APB bus</strong> rather than directly to the AXI/AHB backbone. An <strong>AXI-to-APB bridge</strong> converts between the protocols:</p>
 <p><a href="./06-soc-bus-hierarchy-HQ.png"><img alt="SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus" src="./06-soc-bus-hierarchy-900w.png"></a></p>
 <p>The bridge runs the APB at a lower, slower clock (e.g., 100 MHz) while the AXI backbone runs at 500 MHz or more, reducing dynamic power in the peripherals.</p>
@@ -178,9 +178,9 @@
 <hr>
 <h2>Further Reading</h2>
 <ul>
-<li><em>AXI4 Protocol Deep Dive</em> -- Burst types, transaction IDs, out-of-order response ordering</li>
-<li><em>DMA Controller Architecture</em> -- How a DMA engine uses AXI to move data autonomously</li>
-<li><em>Network-on-Chip Design (Advanced)</em> -- Topology, routing algorithms, virtual channels</li>
+<li><em>AXI4 Protocol Deep Dive</em>: burst types, transaction IDs, out-of-order response ordering</li>
+<li><em>DMA Controller Architecture</em>: how a DMA engine uses AXI to move data autonomously</li>
+<li><em>Network-on-Chip Design (Advanced)</em>: topology, routing algorithms, virtual channels</li>
 </ul>
 <hr>
 <p><em>Previous: <a href="./soc-article-05-memory-architecture.html">Article 05 -- Memory Architecture</a></em>

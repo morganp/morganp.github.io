@@ -62,7 +62,7 @@
 <h3>Pipeline Stages</h3>
 <p>A five-stage pipeline is the canonical teaching model:</p>
 <p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_9dbcb49039a3e254bc98df89b49e18d6.svg"></p>
-<h3>The Big-Little Concept</h3>
+<h3>The big.LITTLE concept</h3>
 <p>For power-sensitive SoCs (smartphones, wearables), ARM developed the <strong>big.LITTLE</strong> architecture, which pairs high-performance "big" cores with energy-efficient "little" cores on the same die:</p>
 <p><a href="./04-big-little-cluster-HQ.png"><img alt="ARM big.LITTLE DynamIQ cluster configuration showing the performance cluster with Cortex-A78 cores and the efficiency cluster with Cortex-A55 cores, sharing an L3 cache and system interconnect" src="./04-big-little-cluster-900w.png"></a></p>
 <p>The OS scheduler assigns heavy tasks (video decoding, gaming) to the big cores, and lightweight tasks (receiving notifications, idle polling) to the little cores. This can reduce energy consumption by 10x or more compared to running everything on the big cores.</p>
@@ -87,14 +87,14 @@
 <hr>
 <h2>Digital Signal Processors (DSPs)</h2>
 <p>A <strong>DSP</strong> is a processor specialised for signal processing algorithms. Its architecture is tuned for two operations that appear constantly in such algorithms: <strong>multiply-accumulate (MAC)</strong> and <strong>data movement</strong>.</p>
-<h3>The MAC Operation</h3>
+<h3>The MAC operation</h3>
 <p>The core of almost all digital signal processing is the <strong>dot product</strong>: multiply pairs of numbers and sum the results. This appears in:
 - <strong>FIR filters</strong>: y[n] = h[0]x[n] + h[1]x[n-1] + ... + h[N]x[n-N]
 - <strong>FFT</strong> (Fast Fourier Transform)
 - <strong>Convolution</strong> in image processing and neural networks</p>
 <p>A MAC operation computes: <strong>Accumulator += A x B</strong> in a single cycle.</p>
 <p><a href="./04-dsp-mac-unit-HQ.png"><img alt="DSP MAC Unit showing the single-cycle multiply-accumulate pipeline: A and B input registers feeding a multiplier, then an adder, then a 40-bit accumulator with feedback" src="./04-dsp-mac-unit-900w.png"></a></p>
-<h3>DSP Architecture Features</h3>
+<h3>DSP architecture features</h3>
 <p>DSPs include hardware features that a general-purpose CPU lacks:</p>
 <ul>
 <li><strong>Hardware loopers</strong> - zero-overhead loops without branch penalty</li>
@@ -118,26 +118,26 @@
 <hr>
 <h2>Hardware Accelerators</h2>
 <p>As compute-intensive AI workloads have become dominant, SoC vendors have added <strong>dedicated hardware accelerators</strong> - fixed-function silicon blocks that execute one type of computation extremely efficiently.</p>
-<h3>Neural Processing Unit (NPU / Neural Engine)</h3>
+<h3>Neural processing unit (NPU and neural engine)</h3>
 <p>An NPU accelerates neural network inference - the process of running a trained model on new input data. The core operation is matrix-vector multiplication (essentially a large MAC array).</p>
 <p><a href="./04-systolic-array-HQ.png"><img alt="Systolic array architecture used in NPU designs: a grid of Processing Elements (PEs) where weights flow downward and activations flow rightward, each PE computing one MAC per clock cycle, with partial sums accumulating downward" src="./04-systolic-array-900w.png"></a></p>
-<p>In a systolic array, data flows through the processing elements rhythmically (like blood through a heart - hence "systolic"). Weights are pre-loaded; activations and partial sums flow through, with each PE performing one MAC per cycle. This achieves very high utilisation of the multiplication hardware.</p>
-<h3>Video Codec Engine</h3>
+<p>In a systolic array, data flows through the processing elements rhythmically. Weights are pre-loaded; activations and partial sums flow through, with each PE performing one MAC per cycle. This achieves very high utilisation of the multiplication hardware.</p>
+<h3>Video codec engine</h3>
 <p>Encoding and decoding H.264/H.265/AV1 video in software is extremely CPU-intensive. A dedicated hardware codec can process 4K video at 30+ frames per second while drawing milliwatts, compared to watts for a software implementation. Modern SoCs include fixed-function codec blocks that implement the specific algorithms of each video standard.</p>
-<h3>Cryptographic Accelerator</h3>
+<h3>Cryptographic accelerator</h3>
 <p>AES encryption, SHA hashing, RSA/ECC public-key operations, and True Random Number Generation (TRNG) are all candidates for hardware acceleration. Performing AES-128 in hardware can be 50-100x more energy-efficient than software.</p>
-<h3>Image Signal Processor (ISP)</h3>
+<h3>Image signal processor (ISP)</h3>
 <p>The camera pipeline - demosaicing, noise reduction, white balance, tone mapping, HDR merging - runs in a dedicated ISP. This is a DSP-like block hardwired to the specific algorithms of computational photography.</p>
 <hr>
-<h2>The Processor Cluster: Putting It Together</h2>
+<h2>The processor cluster: putting it together</h2>
 <p>A high-end mobile SoC might contain the following processing elements:</p>
 <p><a href="./04-soc-processor-subsystem-HQ.png"><img alt="Modern mobile SoC processor subsystem showing the CPU cluster (prime, big and little cores), GPU, DSP, NPU, ISP and modem as distinct blocks on the die" src="./04-soc-processor-subsystem-900w.png"></a></p>
 <hr>
-<h2>Processor State Machine: A Simplified View</h2>
+<h2>Processor state machine: a simplified view</h2>
 <p>Every processor can be modelled as a state machine. Here is a simplified view of a CPU's states in a typical embedded SoC context:</p>
 <p><img alt="FSM diagram" src="./images/fsm/fsm_d3b3a56743e4c3f1c5d4b7c3e7a5609b.svg"></p>
 <hr>
-<h2>Choosing the Right Processor for Your SoC</h2>
+<h2>Choosing the right processor for your SoC</h2>
 <p>The processor choice depends critically on the application:</p>
 <table>
 <thead>
@@ -191,9 +191,9 @@
 <hr>
 <h2>Intermediate Articles This Topic Connects To</h2>
 <ul>
-<li><em>Pipeline Design and Hazards</em> - Data, structural, and control hazards; forwarding networks</li>
-<li><em>Cache Coherency Protocols</em> - How multiple CPU cores agree on the state of shared memory</li>
-<li><em>AI Accelerator Architecture (Advanced)</em> - Dataflow, weight stationarity, memory bandwidth</li>
+<li><em>Pipeline Design and Hazards</em>: data, structural, and control hazards; forwarding networks</li>
+<li><em>Cache Coherency Protocols</em>: how multiple CPU cores agree on the state of shared memory</li>
+<li><em>AI Accelerator Architecture (Advanced)</em>: dataflow, weight stationarity, memory bandwidth</li>
 </ul>
 <hr>
 <p><em>Previous: <a href="./soc-article-03-design-stack.html">Article 03 -- The SoC Design Stack</a></em>

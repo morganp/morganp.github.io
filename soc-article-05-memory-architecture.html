@@ -78,11 +78,11 @@
 <li><em>Write-back</em>: update only the cache, mark the line "dirty", and write to memory only when the line is evicted (more efficient)</li>
 </ul>
 <hr>
-<h2>Static RAM (SRAM): The Cache Technology</h2>
+<h2>Static RAM (SRAM): the cache technology</h2>
 <p>Caches are built from <strong>SRAM</strong> (Static RAM). Each bit is stored in a <strong>six-transistor cell</strong> (6T SRAM) - two cross-coupled inverters and two access transistors.</p>
 <p>SRAM retains data as long as power is applied (it is <em>volatile</em>). It is fast (sub-nanosecond access) but uses significant area - roughly 100-150 F per bit (where F is the minimum feature size). This is why caches are small relative to DRAM.</p>
 <hr>
-<h2>DRAM: The Main Memory Technology</h2>
+<h2>DRAM: the main memory technology</h2>
 <p>External DRAM uses a <strong>one-transistor, one-capacitor</strong> (1T1C) cell. The charge on a capacitor represents the bit value.</p>
 <p><a href="./05-sram-dram-cells-HQ.png"><img alt="SRAM 6T cell versus DRAM 1T1C cell comparison showing transistor and capacitor layout with wordline and bitline connections" src="./05-sram-dram-cells-900w.png"></a></p>
 <p>The 1T1C cell is much smaller than a 6T SRAM cell, enabling much higher density - today's DRAM stores tens of gigabits per die. However, the capacitor leaks charge over time, so each cell must be <strong>refreshed</strong> (read and rewritten) thousands of times per second. This refresh activity consumes power and introduces brief periods where the memory cannot be accessed.</p>
@@ -118,7 +118,7 @@
 <li>Schedules requests to maximise row-buffer hit rate and memory bandwidth</li>
 <li>Issues periodic <strong>refresh</strong> commands to prevent data loss</li>
 <li>Manages multiple banks and ranks for parallel access</li>
-<li>Implements <strong>QoS (Quality of Service)</strong> to ensure latency-sensitive initiators (e.g., display engines) get priority</li>
+<li>Implements <strong>QoS (Quality of Service)</strong> to ensure latency-sensitive initiators (for example, display engines) get priority</li>
 </ul>
 <p><a href="./05-dram-controller-HQ.png"><img alt="DRAM controller architecture block diagram showing AXI slave interface, command scheduler, refresh engine, and PHY interface connecting to LPDDR5 DRAM" src="./05-dram-controller-900w.png"></a></p>
 <hr>
@@ -130,12 +130,12 @@
 <p><strong>NAND Flash</strong> - high density, page/block-based access. Requires a flash translation layer (FTL) to manage wear levelling.</p>
 <p>The SoC connects to these through dedicated controller IP blocks: eMMC controller on AHB/APB, UFS controller on AXI, QSPI controller on APB for NOR flash, and NAND controller on AHB.</p>
 <hr>
-<h2>Memory Mapping: The Software View</h2>
+<h2>Memory mapping: the software view</h2>
 <p>From software's perspective, all memory - SRAM, DRAM, memory-mapped registers, flash - appears as a flat <strong>address space</strong>. The processor simply reads and writes to 32-bit or 64-bit addresses; the hardware decides which memory or peripheral handles each range.</p>
 <p><a href="./05-address-map-HQ.png"><img alt="32-bit SoC address space layout showing peripheral registers, private CPU peripherals, external DRAM, on-chip SRAM, and flash ROM regions" src="./05-address-map-900w.png"></a></p>
 <p>The <strong>memory map</strong> is one of the first things a firmware developer consults when writing code for a new SoC. It is typically documented in the SoC's <strong>Technical Reference Manual (TRM)</strong>.</p>
 <hr>
-<h2>Cache Coherency: The Multi-Core Problem</h2>
+<h2>Cache coherency: the multi-core problem</h2>
 <p>When multiple CPU cores share a memory system, a challenge arises: <strong>what happens if two cores have different cached copies of the same address?</strong></p>
 <p>This is the <strong>cache coherency problem</strong>. If Core 0 writes to address A and Core 1 has a stale cached copy of A, Core 1 will read incorrect data.</p>
 <p>Hardware cache coherency protocols solve this. The most common is <strong>MESI</strong> (Modified, Exclusive, Shared, Invalid):</p>
@@ -158,9 +158,9 @@
 <hr>
 <h2>Intermediate Articles This Topic Connects To</h2>
 <ul>
-<li><em>Cache Coherency Protocols</em> - MESI, MOESI, directory-based coherency in detail</li>
-<li><em>DRAM Subsystem Timing (Advanced)</em> - tRCD, tCL, CWL, refresh, power states, LPDDR5</li>
-<li><em>Memory-Mapped I/O and Linux Device Drivers</em> - How software talks to hardware registers</li>
+<li><em>Cache Coherency Protocols</em>: MESI, MOESI, directory-based coherency in detail</li>
+<li><em>DRAM Subsystem Timing (Advanced)</em>: tRCD, tCL, CWL, refresh, power states, LPDDR5</li>
+<li><em>Memory-Mapped I/O and Linux Device Drivers</em>: how software talks to hardware registers</li>
 </ul>
 <hr>
 <p><em>Previous: <a href="./soc-article-04-processor-cores.html">Article 04 -- Processor Cores</a></em>
