@@ -13,13 +13,13 @@ Status: published
 
 ## Introduction
 
-Hardware does not appear from nowhere. Before a single transistor is manufactured, a SoC's behaviour must be described in a language that both engineers and computers can process -- simulating it, verifying it, and ultimately synthesising it into real logic gates.
+Hardware does not appear from nowhere. Before manufacturing a single transistor, engineers must describe the behaviour of a System-on-Chip (SoC). They use a language that both humans and tools can process: simulating, verifying, and ultimately synthesising the design into real logic gates.
 
-**Hardware Description Languages (HDLs)** are that language. They look superficially like programming languages, but they describe hardware -- circuits that exist and operate in parallel, not sequential lists of instructions. Understanding this distinction is the single most important step in learning HDL design.
+**Hardware Description Languages (HDLs)** are that language. They look superficially like programming languages. In reality they describe hardware: circuits that exist and operate in parallel, not sequential lists of instructions. Understanding this distinction is the single most important step in learning HDL design.
 
 ---
 
-## The Fundamental Difference: Parallelism
+## The fundamental difference: parallelism
 
 In a software program, statements execute one after another:
 
@@ -30,7 +30,7 @@ b = process(a)
 c = output(b)      # c is calculated AFTER b is calculated
 ```
 
-In hardware, all blocks of logic are **always active simultaneously**. Every combinational logic path is constantly computing its output from its inputs, every clock edge triggers every flip-flop at once:
+In hardware, all blocks of logic are always active simultaneously. Every combinational logic path is constantly computing its output from its inputs, every clock edge triggers every flip-flop at once:
 
 ```verilog
 // Hardware: everything runs concurrently
@@ -43,25 +43,25 @@ end
 // All three updates happen simultaneously on every rising clock edge
 ```
 
-This parallel nature is what makes HDL difficult for software engineers at first: there is no "sequence of operations" -- there is a network of logic gates and registers, all computing simultaneously.
+This parallel nature is what makes hardware description language (HDL) design difficult for software engineers at first: there is no "sequence of operations". There is a network of logic gates and registers, all computing simultaneously.
 
 ---
 
-## The Two Major HDLs: Verilog and VHDL
+## The two major HDLs: Verilog and VHDL
 
-The industry is divided between two languages, both established in the 1980s and both IEEE-standardised:
+The industry is divided between two hardware description languages (HDLs), both established in the 1980s and both standardised by the Institute of Electrical and Electronics Engineers (IEEE):
 
-**Verilog** -- C-like syntax, concise, originally designed for simulation. Extended into **SystemVerilog** (IEEE 1800) which adds OOP features, assertions, and randomised verification constructs.
+**Verilog:** C-like syntax, concise, originally designed for simulation. Extended into **SystemVerilog** (IEEE 1800), which adds object-oriented programming (OOP) features, assertions, and randomised verification constructs.
 
-**VHDL** (VHSIC Hardware Description Language) -- Ada-like syntax, strongly typed, verbose. Historically dominant in Europe, aerospace, and defence.
+**VHDL** (VHSIC Hardware Description Language): Ada-like syntax, strongly typed, verbose. Historically dominant in Europe, aerospace, and defence.
 
 For this series, examples use **SystemVerilog** for hardware design and VHDL where instructive for comparison. The concepts are identical.
 
 ---
 
-## RTL vs Behavioural vs Structural
+## RTL vs behavioural vs structural
 
-HDL code can be written at different levels of abstraction:
+Hardware description language (HDL) code can be written at different levels of abstraction:
 
 ```dot
 digraph AbstractionLevels {
@@ -82,7 +82,7 @@ digraph AbstractionLevels {
 }
 ```
 
-**Structural** -- instantiate specific gates and connect them with wires:
+**Structural:** instantiate specific gates and connect them with wires:
 
 ```verilog
 // Structural: instantiate specific primitives
@@ -90,14 +90,14 @@ and_gate U0 (.a(in_a), .b(in_b), .y(wire_and));
 or_gate  U1 (.a(wire_and), .c(in_c), .y(out));
 ```
 
-**Behavioural** -- describe *what* the circuit does:
+**Behavioural:** describe *what* the circuit does:
 
 ```verilog
 // Behavioural: synthesis tool decides the gates
 assign out = (in_a & in_b) | in_c;
 ```
 
-**RTL** -- explicit registers and data paths:
+**Register transfer level (RTL):** explicit registers and data paths:
 
 ```verilog
 // RTL: explicit registers and data paths
@@ -110,11 +110,11 @@ assign data_out = data_reg + offset;
 
 ---
 
-## SystemVerilog Key Constructs
+## SystemVerilog key constructs
 
 ### Modules
 
-The **module** is the fundamental building block -- equivalent to a function or class in software, but representing a hardware block with defined ports:
+The **module** is the fundamental building block: equivalent to a function or class in software, but representing a hardware block with defined ports:
 
 ```verilog
 module adder #(
@@ -208,7 +208,7 @@ endmodule
 
 ### Combinational Logic: always_comb
 
-The `always_comb` block describes purely combinational logic -- it re-evaluates whenever any of its inputs change:
+The `always_comb` block describes purely combinational logic: it re-evaluates whenever any of its inputs change:
 
 ```verilog
 // Priority encoder: find the index of the highest-priority set bit
@@ -234,11 +234,13 @@ endmodule
 
 ---
 
-## Finite State Machines in RTL
+## Finite state machines in RTL
 
-The **Finite State Machine (FSM)** is one of the most important patterns in digital design. An FSM transitions between a finite set of states based on inputs and the current state, producing outputs based on state.
+The **Finite State Machine (FSM)** is one of the most important patterns in digital design. An FSM transitions between a finite set of states based on inputs and the current state. Each state produces outputs based on that state.
 
-### Example: Simple UART Receiver FSM
+### Example: simple UART receiver FSM
+
+A universal asynchronous receiver/transmitter (UART) receiver reads serial data one bit at a time. The FSM below controls the bit sampling and framing logic:
 
 ```verilog
 typedef enum logic [1:0] {
@@ -315,15 +317,15 @@ digraph UART_RX {
 
 ---
 
-## Simulation and Testbenches
+## Simulation and testbenches
 
-HDL code is verified by **simulation** -- running the design against a set of inputs (a **testbench**) and checking the outputs.
+Hardware description language (HDL) code is verified by **simulation**: running the design against a set of inputs (a **testbench**) and checking the outputs.
 
 A testbench is not synthesisable. Its job is to:
-1. Instantiate the **DUT (Device Under Test)**
-2. Generate stimulus (clock, inputs)
-3. Check outputs against expected values
-4. Report pass/fail
+1. Instantiate the **DUT (Device Under Test)**.
+2. Generate stimulus (clock, inputs).
+3. Check outputs against expected values.
+4. Report pass/fail.
 
 ```verilog
 `timescale 1ns/1ps
@@ -362,9 +364,9 @@ endmodule
 
 ---
 
-## SystemVerilog Assertions (SVA)
+## SystemVerilog assertions
 
-**Assertions** are formal, self-checking properties embedded directly in the design or testbench. They check that the hardware obeys its specification throughout simulation.
+**Assertions** are formal, self-checking properties embedded directly in the design or testbench using SystemVerilog Assertions (SVA). They check that the hardware obeys its specification throughout simulation.
 
 ```verilog
 // Assert: write enable must not be asserted when full
@@ -387,15 +389,15 @@ assert property (data_stable)
 cover property (@(posedge clk) full);
 ```
 
-Assertions serve as **executable specifications** -- they document intended behaviour and catch violations automatically during simulation.
+Assertions serve as **executable specifications**: they document intended behaviour and catch violations automatically during simulation.
 
 ---
 
-## Common RTL Pitfalls
+## Common RTL pitfalls
 
 ### Unintended Latches
 
-If a `case` or `if` statement in `always_comb` does not cover all possible input combinations, synthesis infers a **latch** -- level-sensitive storage that was not intended:
+If a `case` or `if` statement in `always_comb` does not cover all possible input combinations, synthesis infers a **latch**: level-sensitive storage that was not intended:
 
 ```verilog
 // BAD: missing default -> inferred latch on 'out'
@@ -423,9 +425,9 @@ Some SystemVerilog constructs simulate differently from how they synthesise. `in
 
 ---
 
-## The Synthesis Step
+## The synthesis step
 
-**Synthesis** transforms RTL into a **gate-level netlist** -- a description in terms of actual standard cells (AND, OR, flip-flop, multiplexer cells) from a technology library.
+**Synthesis** transforms register transfer level (RTL) code into a **gate-level netlist**: a description in terms of actual standard cells (AND, OR, flip-flop, multiplexer cells) from a technology library.
 
 ```dot
 digraph SynthesisFlow {
@@ -462,16 +464,16 @@ The synthesis tool reads the RTL plus a **constraints file** (`.sdc`) that speci
 
 ## Summary
 
-Hardware Description Languages are the foundation of SoC design. SystemVerilog (and VHDL) describe digital logic at the Register Transfer Level -- specifying registers and the combinational logic that transfers data between them. The key mental model shift from software is parallelism: all RTL executes simultaneously, not sequentially. Modules provide the structural hierarchy for building large designs from smaller, verifiable blocks. FSMs are a core design pattern for controlling sequential behaviour. Simulation and assertions verify correctness before committing to silicon. Synthesis transforms the RTL into gate-level hardware.
+Hardware description languages (HDLs) are the foundation of SoC design. SystemVerilog and VHDL describe digital logic at the register transfer level (RTL): specifying registers and the combinational logic that transfers data between them. The key mental model shift from software is parallelism: all RTL executes simultaneously, not sequentially. Modules provide the structural hierarchy for building large designs from smaller, verifiable blocks. Finite state machines (FSMs) are a core design pattern for controlling sequential behaviour. Simulation and assertions verify correctness before committing to silicon. Synthesis transforms RTL into gate-level hardware.
 
 ---
 
-## Further Reading
+## Further reading
 
-- *RTL Synthesis and Timing Closure* -- Constraint writing, static timing analysis, ECO flows
-- *SoC Verification with UVM* -- SystemVerilog class-based testbench architecture
-- *Formal Verification Methods* -- SVA property specification, model checking
+- *RTL Synthesis and Timing Closure:* Constraint writing, static timing analysis, ECO flows
+- *SoC Verification with UVM:* SystemVerilog class-based testbench architecture
+- *Formal Verification Methods:* SVA property specification, model checking
 
 ---
 
-*Previous: [Article 08 -- Peripherals and I/O]({filename}../2026-04-18_SoC_Article_08_Peripherals_and_IO/2026-04-18_SoC_Article_08_Peripherals_and_IO.md)*
+*Previous: [Article 08 -- Peripherals and I/O]({filename}../2026-04-18_SoC_Article_08_Peripherals_and_IO/2026-04-18_SoC_Article_08_Peripherals_and_IO.md)* | *Next: [Article 10 -- The SoC Design Flow]({filename}../2026-04-24_SoC_Article_10_Design_Flow/2026-04-24_SoC_Article_10_Design_Flow.md)*
