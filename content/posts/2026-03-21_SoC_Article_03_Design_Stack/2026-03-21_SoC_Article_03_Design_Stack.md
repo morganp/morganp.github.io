@@ -1,4 +1,4 @@
-Title: SoC Article 03: The SoC Design Stack - From Transistors to Software
+Title: SoC Article 03: The SoC design stack, from transistors to software
 Date: 2026-03-21
 Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems, RTL, Verilog, VHDL
@@ -13,7 +13,7 @@ Status: published
 
 ## Introduction
 
-In the previous article we looked at what a SoC *is*. Now we need to understand how it is *described, designed, and built*. The answer is not a single language or a single tool - it is a **stack of abstraction layers**, each hiding complexity from the layer above it.
+In the previous article we looked at what a SoC *is*. Now we need to understand how it is described, designed, and built. The answer is not a single language or a single tool - it is a **stack of abstraction layers**, each hiding complexity from the layer above it.
 
 This concept of layered abstraction is one of the most powerful ideas in all of engineering, and it is particularly rich in SoC design, where the stack spans from quantum mechanics at the silicon level all the way up to the C programs and operating systems that run on the finished chip.
 
@@ -142,7 +142,7 @@ The behaviour of this counter over time is shown in the timing diagram below:
 
 The **ISA** is the contract between hardware and software. It defines:
 
-- The **programmer-visible registers** (e.g., x0-x31 in RISC-V)
+- The **programmer-visible registers** (for example, x0–x31 in RISC-V)
 - The **instruction set** - the opcodes and their semantics
 - **Memory addressing modes** - how addresses are formed
 - **Exception and interrupt behaviour**
@@ -176,7 +176,7 @@ Multiple instructions are in-flight simultaneously, improving throughput. The ar
 
 ---
 
-## IP Cores: Pre-Built Design Blocks
+## IP cores: pre-built design blocks
 
 One of the most important concepts in SoC design is the **Intellectual Property (IP) core** - a pre-designed, pre-verified block that can be reused in a new design. IP reuse is what makes SoC development tractable: instead of designing every block from scratch, engineers assemble proven components.
 
@@ -204,11 +204,11 @@ Taking an SoC from concept to fabricated silicon follows a structured sequence o
 
 [![SoC design flow from Specification through Architecture, RTL Design, Synthesis, Place and Route, Sign-off to Tape-out, with RTL Simulation feeding into Synthesis and a feedback arrow showing iteration back to RTL Design.]({attach}/images/SoC/Article03/07-design-flow-900w.png)]({attach}/images/SoC/Article03/07-design-flow-HQ.png)
 
-Article 09 in this series covers the design flow in detail. For now, the important point is that design is not a linear process - it is iterative. Problems discovered during synthesis or place-and-route often require revisiting the RTL, and sometimes the architecture.
+Article 10 in this series covers the design flow in detail. For now, the important point is that design is not a linear process - it is iterative. Problems discovered during synthesis or place-and-route often require revisiting the RTL, and sometimes the architecture.
 
 ---
 
-## Modelling Languages: Choosing the Right Abstraction
+## Modelling languages: choosing the right abstraction
 
 Different languages are suited to different levels of the design stack:
 
@@ -231,9 +231,9 @@ SoC design is organised as a stack of abstraction layers, from quantum-mechanica
 
 ## Intermediate Articles This Topic Connects To
 
-- *RTL Synthesis and Timing Closure* - How EDA tools map RTL to gates and meet timing
-- *SoC Verification with UVM* - Proving the RTL is correct before committing to silicon
-- *Formal Verification Methods* - Using mathematics to prove hardware correctness
+- *RTL Synthesis and Timing Closure*: how EDA tools map RTL to gates and meet timing
+- *SoC Verification with UVM*: proving the RTL is correct before committing to silicon
+- *Formal Verification Methods*: using mathematics to prove hardware correctness
 
 ---
 
