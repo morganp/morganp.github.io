@@ -31,7 +31,7 @@ READERS = {'html': None}
 # inside the directory content/
 # The contents of img/ will be available at 
 # {{ SITEURL }}/img
-STATIC_PATHS = ['images', 'pdf', 'extra', 'drum_rudiments']
+STATIC_PATHS = ['images', 'pdf', 'extra', 'drum_rudiments', 'wavedrom-editor']
 EXTRA_PATH_METADATA = {'extra/custom.css': {'path': 'static/custom.css'}}
 STYLESHEET_URL = '/static/custom.css'
 
