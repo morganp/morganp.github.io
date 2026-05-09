@@ -228,7 +228,7 @@
 
   // ── wave string mutation helpers ─────────────────────────────────
   // toggle the value at a cycle index — produce next char in cycle
-  const TOGGLE_CYCLE = ['0', '1', 'x', 'z', '='];
+  const TOGGLE_CYCLE = ['0', '1', 'p', 'n', 'x', 'z', '='];
   function setCharAt(wave, idx, ch) {
     const arr = wave.split('');
     arr[idx] = ch;
