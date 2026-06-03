@@ -82,7 +82,9 @@ Fingers: - 2 3 1 - -
 <span class="sb">```</span>
 </code></pre></div>
 
-<p><img alt="fretboard diagram" src="./images/fretboard/fretboard_36611dd13a15531f56b07b2aa0e4769d.svg"></p>
+<div class="highlight"><pre><span></span><code>{ chord: { name: &quot;E Major&quot;, frets: &quot;022100&quot;, fingers: &quot;-231--&quot; } }
+</code></pre></div>
+
 <p>Open strings show a small circle above the nut; the first fret is drawn as a thicker nut line.</p>
 <h3>Intervals view</h3>
 <p>Supply an <code>intervals</code> array instead and each dot shows its interval relative to the root. When <code>intervals</code> is present the subtitle automatically shows <em>Intervals</em>:</p>
@@ -91,7 +93,9 @@ Fingers: - 2 3 1 - -
 <span class="sb">```</span>
 </code></pre></div>
 
-<p><img alt="fretboard diagram" src="./images/fretboard/fretboard_6cc42dc6e8d4e0b07349f93df350b5b0.svg"></p>
+<div class="highlight"><pre><span></span><code>{ chord: { name: &quot;E Major&quot;, frets: &quot;022100&quot;, intervals: [&quot;R&quot;, &quot;5&quot;, &quot;R&quot;, &quot;3&quot;, &quot;5&quot;, &quot;R&quot;] } }
+</code></pre></div>
+
 <p>Comparing fingers and intervals views of the same chord makes it easy to see which finger lands on which interval -- useful when discussing voicings or substitutions.</p>
 <hr>
 <h2>A seventh chord</h2>
@@ -101,14 +105,18 @@ Fingers: - 2 3 1 - -
 <span class="sb">```</span>
 </code></pre></div>
 
-<p><img alt="fretboard diagram" src="./images/fretboard/fretboard_406db6961d04f4b19af0d29b2b58208d.svg"></p>
+<div class="highlight"><pre><span></span><code>{ chord: { name: &quot;G7&quot;, frets: &quot;320001&quot;, intervals: [&quot;R&quot;, &quot;5&quot;, &quot;3&quot;, &quot;R&quot;, &quot;5&quot;, &quot;b7&quot;] } }
+</code></pre></div>
+
 <p>The same shape in fingers mode:</p>
 <div class="highlight"><pre><span></span><code><span class="sb">```fretdrom</span>
 <span class="s">{ chord: { name: &quot;G7&quot;, frets: &quot;320001&quot;, fingers: &quot;32---1&quot; } }</span>
 <span class="sb">```</span>
 </code></pre></div>
 
-<p><img alt="fretboard diagram" src="./images/fretboard/fretboard_7df802efced6dfe74e5de4eb549c7b34.svg"></p>
+<div class="highlight"><pre><span></span><code>{ chord: { name: &quot;G7&quot;, frets: &quot;320001&quot;, fingers: &quot;32---1&quot; } }
+</code></pre></div>
+
 <hr>
 <h2>Barre chords</h2>
 <p>The <code>barre</code> key draws the barre bar. <code>from_string</code> and <code>to_string</code> are 1-indexed, low string to high:</p>
@@ -123,7 +131,15 @@ Fingers: - 2 3 1 - -
 <span class="sb">```</span>
 </code></pre></div>
 
-<p><img alt="fretboard diagram" src="./images/fretboard/fretboard_ac772858bc3ad5ff71a128710127ee9a.svg"></p>
+<div class="highlight"><pre><span></span><code>{ chord: {
+  name: &quot;F Major (barre)&quot;,
+  frets: &quot;112331&quot;,
+  fingers: &quot;112341&quot;,
+  root_strings: [1, 6],
+  barre: { fret: 1, from_string: 1, to_string: 6 }
+}}
+</code></pre></div>
+
 <hr>
 <h2>Scale diagrams</h2>
 <p>The <code>scale</code> key renders a fretboard grid. <code>grid</code> is an array of rows, one per string (low E first), each row an array of cell values. <code>"R"</code> = root, <code>"x"</code> = scale note, <code>"."</code> = empty.</p>
@@ -144,7 +160,21 @@ Fingers: - 2 3 1 - -
 <span class="sb">```</span>
 </code></pre></div>
 
-<p><img alt="fretboard diagram" src="./images/fretboard/fretboard_b3f628020aefddb9249d782ef8973241.svg"></p>
+<div class="highlight"><pre><span></span><code>{ scale: {
+  name: &quot;A Minor Pentatonic&quot;,
+  start_fret: 5,
+  num_frets: 5,
+  grid: [
+    [&quot;R&quot;, &quot;.&quot;, &quot;.&quot;, &quot;x&quot;, &quot;.&quot;],
+    [&quot;x&quot;, &quot;.&quot;, &quot;x&quot;, &quot;.&quot;, &quot;.&quot;],
+    [&quot;x&quot;, &quot;.&quot;, &quot;R&quot;, &quot;.&quot;, &quot;.&quot;],
+    [&quot;x&quot;, &quot;.&quot;, &quot;x&quot;, &quot;.&quot;, &quot;.&quot;],
+    [&quot;x&quot;, &quot;.&quot;, &quot;.&quot;, &quot;x&quot;, &quot;.&quot;],
+    [&quot;R&quot;, &quot;.&quot;, &quot;.&quot;, &quot;x&quot;, &quot;.&quot;]
+  ]
+}}
+</code></pre></div>
+
 <p>Fret numbers are shown on the left so the position on the neck is always clear. Cell values other than <code>R</code>, <code>x</code>, and <code>.</code> are treated as interval labels and rendered inside the dot.</p>
 <hr>
 <h2>Tab</h2>
@@ -164,7 +194,19 @@ Fingers: - 2 3 1 - -
 <span class="sb">```</span>
 </code></pre></div>
 
-<p><img alt="fretboard diagram" src="./images/fretboard/fretboard_72daa9b6244bcdd76762dac597583d8b.svg"></p>
+<div class="highlight"><pre><span></span><code>{ name: &quot;E String Blues Riff&quot;,
+  tab: [
+    { name: &quot;e&quot;, wave: &quot;................&quot; },
+    { name: &quot;B&quot;, wave: &quot;................&quot; },
+    { name: &quot;G&quot;, wave: &quot;................&quot; },
+    { name: &quot;D&quot;, wave: &quot;................&quot; },
+    { name: &quot;A&quot;, wave: &quot;................&quot; },
+    { name: &quot;E&quot;, wave: &quot;0..3.5.3..0.....&quot; }
+  ],
+  config: { bar: 8 }
+}
+</code></pre></div>
+
 <hr>
 <h2>Any fretted instrument</h2>
 <p>Set <code>tuning</code> to match your instrument and the string count adjusts automatically:</p>
@@ -173,7 +215,9 @@ Fingers: - 2 3 1 - -
 <span class="sb">```</span>
 </code></pre></div>
 
-<p><img alt="fretboard diagram" src="./images/fretboard/fretboard_9e0255f4ac453785ef2404bbc9db44f9.svg"></p>
+<div class="highlight"><pre><span></span><code>{ chord: { name: &quot;E (bass)&quot;, tuning: &quot;EADG&quot;, frets: &quot;0221&quot;, fingers: &quot;-231&quot;, root_strings: [1] } }
+</code></pre></div>
+
 <p>The same syntax works for ukulele (<code>GCEA</code>), five-string bass (<code>BEADG</code>), mandola (<code>GDAE</code>), or any open tuning.</p>
 <hr>
 <h2>How it works</h2>

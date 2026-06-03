@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Music</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/music.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-25T00:00:00+01:00</updated><entry><title>Fretboard Diagrams in Pelican</title><link href="http://lizard-spock.co.uk/fretboard-diagrams-in-pelican.html" rel="alternate"></link><published>2026-04-25T00:00:00+01:00</published><updated>2026-04-25T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-25:/fretboard-diagrams-in-pelican.html</id><summary type="html">&lt;p&gt;A walkthrough of the pelican-fretboard plugin -- chord charts, scale boxes, and tab rendered as SVGs directly from fenced code blocks, with a comparison of finger-number and interval-label views.&lt;/p&gt;</summary><content type="html">&lt;p&gt;For a long time my guitar diagrams lived on paper -- annotated chord boxes and scale grids scribbled in notebooks. When it came to writing them up digitally I found the process time consuming and the results inconsistent: different posts would use different styles, sizes, or notation conventions with no easy way to keep them in sync. This post introduces &lt;a href="https://github.com/morganp/pelican-fretboard"&gt;pelican-fretboard&lt;/a&gt;, a plugin that renders chord charts, scale boxes, and tab directly from fenced code blocks in Markdown. Diagrams are generated as SVGs, cached on disk, and served as static files -- nothing to install on the reader's side.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Music</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/music.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-04-25T00:00:00+01:00</updated><entry><title>Fretboard Diagrams in Pelican</title><link href="http://lizard-spock.co.uk/fretboard-diagrams-in-pelican.html" rel="alternate"/><published>2026-04-25T00:00:00+01:00</published><updated>2026-04-25T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-25:/fretboard-diagrams-in-pelican.html</id><summary type="html">&lt;p&gt;A walkthrough of the pelican-fretboard plugin -- chord charts, scale boxes, and tab rendered as SVGs directly from fenced code blocks, with a comparison of finger-number and interval-label views.&lt;/p&gt;</summary><content type="html">&lt;p&gt;For a long time my guitar diagrams lived on paper -- annotated chord boxes and scale grids scribbled in notebooks. When it came to writing them up digitally I found the process time consuming and the results inconsistent: different posts would use different styles, sizes, or notation conventions with no easy way to keep them in sync. This post introduces &lt;a href="https://github.com/morganp/pelican-fretboard"&gt;pelican-fretboard&lt;/a&gt;, a plugin that renders chord charts, scale boxes, and tab directly from fenced code blocks in Markdown. Diagrams are generated as SVGs, cached on disk, and served as static files -- nothing to install on the reader's side.&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 
 &lt;p&gt;The plugin uses &lt;a href="https://github.com/morganp/fretdrom"&gt;fretdrom&lt;/a&gt; as its rendering engine. Fretdrom takes JSON5 input -- the same wavedrom-style philosophy of a single top-level key determining diagram type -- and emits clean SVG. Blocks use the &lt;code&gt;fretdrom&lt;/code&gt; language identifier in Markdown fences.&lt;/p&gt;
@@ -29,7 +29,9 @@ Fingers: - 2 3 1 - -
 &lt;span class="sb"&gt;```&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="fretboard diagram" src="http://lizard-spock.co.uk/images/fretboard/fretboard_36611dd13a15531f56b07b2aa0e4769d.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{ chord: { name: &amp;quot;E Major&amp;quot;, frets: &amp;quot;022100&amp;quot;, fingers: &amp;quot;-231--&amp;quot; } }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;p&gt;Open strings show a small circle above the nut; the first fret is drawn as a thicker nut line.&lt;/p&gt;
 &lt;h3&gt;Intervals view&lt;/h3&gt;
 &lt;p&gt;Supply an &lt;code&gt;intervals&lt;/code&gt; array instead and each dot shows its interval relative to the root. When &lt;code&gt;intervals&lt;/code&gt; is present the subtitle automatically shows &lt;em&gt;Intervals&lt;/em&gt;:&lt;/p&gt;
@@ -38,7 +40,9 @@ Fingers: - 2 3 1 - -
 &lt;span class="sb"&gt;```&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="fretboard diagram" src="http://lizard-spock.co.uk/images/fretboard/fretboard_6cc42dc6e8d4e0b07349f93df350b5b0.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{ chord: { name: &amp;quot;E Major&amp;quot;, frets: &amp;quot;022100&amp;quot;, intervals: [&amp;quot;R&amp;quot;, &amp;quot;5&amp;quot;, &amp;quot;R&amp;quot;, &amp;quot;3&amp;quot;, &amp;quot;5&amp;quot;, &amp;quot;R&amp;quot;] } }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;p&gt;Comparing fingers and intervals views of the same chord makes it easy to see which finger lands on which interval -- useful when discussing voicings or substitutions.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;A seventh chord&lt;/h2&gt;
@@ -48,14 +52,18 @@ Fingers: - 2 3 1 - -
 &lt;span class="sb"&gt;```&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="fretboard diagram" src="http://lizard-spock.co.uk/images/fretboard/fretboard_406db6961d04f4b19af0d29b2b58208d.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{ chord: { name: &amp;quot;G7&amp;quot;, frets: &amp;quot;320001&amp;quot;, intervals: [&amp;quot;R&amp;quot;, &amp;quot;5&amp;quot;, &amp;quot;3&amp;quot;, &amp;quot;R&amp;quot;, &amp;quot;5&amp;quot;, &amp;quot;b7&amp;quot;] } }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;p&gt;The same shape in fingers mode:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sb"&gt;```fretdrom&lt;/span&gt;
 &lt;span class="s"&gt;{ chord: { name: &amp;quot;G7&amp;quot;, frets: &amp;quot;320001&amp;quot;, fingers: &amp;quot;32---1&amp;quot; } }&lt;/span&gt;
 &lt;span class="sb"&gt;```&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="fretboard diagram" src="http://lizard-spock.co.uk/images/fretboard/fretboard_7df802efced6dfe74e5de4eb549c7b34.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{ chord: { name: &amp;quot;G7&amp;quot;, frets: &amp;quot;320001&amp;quot;, fingers: &amp;quot;32---1&amp;quot; } }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;hr&gt;
 &lt;h2&gt;Barre chords&lt;/h2&gt;
 &lt;p&gt;The &lt;code&gt;barre&lt;/code&gt; key draws the barre bar. &lt;code&gt;from_string&lt;/code&gt; and &lt;code&gt;to_string&lt;/code&gt; are 1-indexed, low string to high:&lt;/p&gt;
@@ -70,7 +78,15 @@ Fingers: - 2 3 1 - -
 &lt;span class="sb"&gt;```&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="fretboard diagram" src="http://lizard-spock.co.uk/images/fretboard/fretboard_ac772858bc3ad5ff71a128710127ee9a.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{ chord: {
+  name: &amp;quot;F Major (barre)&amp;quot;,
+  frets: &amp;quot;112331&amp;quot;,
+  fingers: &amp;quot;112341&amp;quot;,
+  root_strings: [1, 6],
+  barre: { fret: 1, from_string: 1, to_string: 6 }
+}}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;hr&gt;
 &lt;h2&gt;Scale diagrams&lt;/h2&gt;
 &lt;p&gt;The &lt;code&gt;scale&lt;/code&gt; key renders a fretboard grid. &lt;code&gt;grid&lt;/code&gt; is an array of rows, one per string (low E first), each row an array of cell values. &lt;code&gt;"R"&lt;/code&gt; = root, &lt;code&gt;"x"&lt;/code&gt; = scale note, &lt;code&gt;"."&lt;/code&gt; = empty.&lt;/p&gt;
@@ -91,7 +107,21 @@ Fingers: - 2 3 1 - -
 &lt;span class="sb"&gt;```&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="fretboard diagram" src="http://lizard-spock.co.uk/images/fretboard/fretboard_b3f628020aefddb9249d782ef8973241.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{ scale: {
+  name: &amp;quot;A Minor Pentatonic&amp;quot;,
+  start_fret: 5,
+  num_frets: 5,
+  grid: [
+    [&amp;quot;R&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;],
+    [&amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;.&amp;quot;],
+    [&amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;R&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;.&amp;quot;],
+    [&amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;.&amp;quot;],
+    [&amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;],
+    [&amp;quot;R&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;x&amp;quot;, &amp;quot;.&amp;quot;]
+  ]
+}}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;p&gt;Fret numbers are shown on the left so the position on the neck is always clear. Cell values other than &lt;code&gt;R&lt;/code&gt;, &lt;code&gt;x&lt;/code&gt;, and &lt;code&gt;.&lt;/code&gt; are treated as interval labels and rendered inside the dot.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Tab&lt;/h2&gt;
@@ -111,7 +141,19 @@ Fingers: - 2 3 1 - -
 &lt;span class="sb"&gt;```&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="fretboard diagram" src="http://lizard-spock.co.uk/images/fretboard/fretboard_72daa9b6244bcdd76762dac597583d8b.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{ name: &amp;quot;E String Blues Riff&amp;quot;,
+  tab: [
+    { name: &amp;quot;e&amp;quot;, wave: &amp;quot;................&amp;quot; },
+    { name: &amp;quot;B&amp;quot;, wave: &amp;quot;................&amp;quot; },
+    { name: &amp;quot;G&amp;quot;, wave: &amp;quot;................&amp;quot; },
+    { name: &amp;quot;D&amp;quot;, wave: &amp;quot;................&amp;quot; },
+    { name: &amp;quot;A&amp;quot;, wave: &amp;quot;................&amp;quot; },
+    { name: &amp;quot;E&amp;quot;, wave: &amp;quot;0..3.5.3..0.....&amp;quot; }
+  ],
+  config: { bar: 8 }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;hr&gt;
 &lt;h2&gt;Any fretted instrument&lt;/h2&gt;
 &lt;p&gt;Set &lt;code&gt;tuning&lt;/code&gt; to match your instrument and the string count adjusts automatically:&lt;/p&gt;
@@ -120,13 +162,15 @@ Fingers: - 2 3 1 - -
 &lt;span class="sb"&gt;```&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="fretboard diagram" src="http://lizard-spock.co.uk/images/fretboard/fretboard_9e0255f4ac453785ef2404bbc9db44f9.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{ chord: { name: &amp;quot;E (bass)&amp;quot;, tuning: &amp;quot;EADG&amp;quot;, frets: &amp;quot;0221&amp;quot;, fingers: &amp;quot;-231&amp;quot;, root_strings: [1] } }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;p&gt;The same syntax works for ukulele (&lt;code&gt;GCEA&lt;/code&gt;), five-string bass (&lt;code&gt;BEADG&lt;/code&gt;), mandola (&lt;code&gt;GDAE&lt;/code&gt;), or any open tuning.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;How it works&lt;/h2&gt;
 &lt;p&gt;The plugin registers a Markdown preprocessor that intercepts &lt;code&gt;fretdrom&lt;/code&gt; fenced blocks before they reach the syntax highlighter. Each block is parsed as JSON5 and passed to the &lt;a href="https://github.com/morganp/fretdrom"&gt;fretdrom&lt;/a&gt; CLI, which returns an SVG on stdout. The SVG is saved to &lt;code&gt;content/images/fretboard/&lt;/code&gt; using an MD5 hash of the block content as the filename. The fenced block is replaced inline with a Markdown image reference. The SVG cache persists across &lt;code&gt;make clean&lt;/code&gt; -- diagrams are only regenerated when their source content changes.&lt;/p&gt;
 &lt;p&gt;If the &lt;code&gt;fretdrom&lt;/code&gt; binary is not found the block falls back to a &lt;code&gt;json5&lt;/code&gt; code block so the build never fails.&lt;/p&gt;
-&lt;p&gt;Source and installation instructions are at &lt;a href="https://github.com/morganp/pelican-fretboard"&gt;github.com/morganp/pelican-fretboard&lt;/a&gt;.&lt;/p&gt;</content><category term="Music"></category><category term="Guitar"></category><category term="Pelican"></category><category term="Plugin"></category><category term="SVG"></category><category term="Chord"></category><category term="Tab"></category><category term="Music Theory"></category></entry><entry><title>Reduce Rack Drum Kit Size</title><link href="http://lizard-spock.co.uk/reduce-rack-drum-kit-size.html" rel="alternate"></link><published>2025-12-05T14:50:00+00:00</published><updated>2025-12-05T14:50:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/reduce-rack-drum-kit-size.html</id><summary type="html">&lt;p&gt;For the Yamaha DTX8 the cymbals mount on to the horizontal drum rack tubes. A more compact setup can be …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For the Yamaha DTX8 the cymbals mount on to the horizontal drum rack tubes. A more compact setup can be achieved if the cymbal mounts are onto of the vertical tubes. Some drum racks already have this setup, typically on the lower end as it requires less harder to be supplied. It seems like a great way to save space if trying to fit a drum kit into your home!  &lt;a href="https://www.musicstore.com/en_GB/GBP/Gibraltar-Rack-Tube-Attachment-SC-RMAA-/art-DRU0025312-000?campaign=GShopping/GB&amp;amp;ProgramUUID=fp4KAQMEqOEAAAGSjgtiaHEt&amp;amp;gad_source=1"&gt;Gibraltar have this clamp&lt;/a&gt;, to convert other drum racks with (1.5”) 38.1mm tubing.&lt;/p&gt;</content><category term="Music"></category><category term="Drum"></category></entry><entry><title>Expanding Yamaha DTX8 Drum Kit</title><link href="http://lizard-spock.co.uk/expanding-yamaha-dtx8-drum-kit.html" rel="alternate"></link><published>2025-12-05T14:43:00+00:00</published><updated>2025-12-05T14:43:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/expanding-yamaha-dtx8-drum-kit.html</id><summary type="html">&lt;h2&gt;TOM&lt;/h2&gt;
+&lt;p&gt;Source and installation instructions are at &lt;a href="https://github.com/morganp/pelican-fretboard"&gt;github.com/morganp/pelican-fretboard&lt;/a&gt;.&lt;/p&gt;</content><category term="Music"/><category term="Guitar"/><category term="Pelican"/><category term="Plugin"/><category term="SVG"/><category term="Chord"/><category term="Tab"/><category term="Music Theory"/></entry><entry><title>Reduce Rack Drum Kit Size</title><link href="http://lizard-spock.co.uk/reduce-rack-drum-kit-size.html" rel="alternate"/><published>2025-12-05T14:50:00+00:00</published><updated>2025-12-05T14:50:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/reduce-rack-drum-kit-size.html</id><summary type="html">&lt;p&gt;For the Yamaha DTX8 the cymbals mount on to the horizontal drum rack tubes. A more compact setup can be …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For the Yamaha DTX8 the cymbals mount on to the horizontal drum rack tubes. A more compact setup can be achieved if the cymbal mounts are onto of the vertical tubes. Some drum racks already have this setup, typically on the lower end as it requires less harder to be supplied. It seems like a great way to save space if trying to fit a drum kit into your home!  &lt;a href="https://www.musicstore.com/en_GB/GBP/Gibraltar-Rack-Tube-Attachment-SC-RMAA-/art-DRU0025312-000?campaign=GShopping/GB&amp;amp;ProgramUUID=fp4KAQMEqOEAAAGSjgtiaHEt&amp;amp;gad_source=1"&gt;Gibraltar have this clamp&lt;/a&gt;, to convert other drum racks with (1.5”) 38.1mm tubing.&lt;/p&gt;</content><category term="Music"/><category term="Drum"/></entry><entry><title>Expanding Yamaha DTX8 Drum Kit</title><link href="http://lizard-spock.co.uk/expanding-yamaha-dtx8-drum-kit.html" rel="alternate"/><published>2025-12-05T14:43:00+00:00</published><updated>2025-12-05T14:43:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/expanding-yamaha-dtx8-drum-kit.html</id><summary type="html">&lt;h2&gt;TOM&lt;/h2&gt;
 &lt;p&gt;Parts Required for adding 4th Tom (second floor tom) to a Yamaha DTX8 kit.&lt;/p&gt;
 &lt;p&gt;Mounting bracket for rack: Yamaha …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;TOM&lt;/h2&gt;
 &lt;p&gt;Parts Required for adding 4th Tom (second floor tom) to a Yamaha DTX8 kit.&lt;/p&gt;
@@ -142,4 +186,4 @@ Note are the Mesh heads(M), not the (X) heads.   &lt;a href="https://www.yamah
 &lt;li&gt;Yamaha CYAT500 Cymbal Attachment  &lt;a href="https://www.yamahamusiclondon.com/DTX6-and-8-Splash-Pack/pidDTX68-SPLASHPACK"&gt;Splash £180 UK Supplier&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Alternatively for another crash or simply larger 13” pad a Yamaha PCY135A pad could be used.&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://www.yamahamusiclondon.com/DTX6-Crash-Pack/pidDTX6-CRASHPACK"&gt;Crash £200 UK Supplier&lt;/a&gt;.&lt;/p&gt;</content><category term="Music"></category><category term="Drum"></category></entry><entry><title>Yamaha Drum App</title><link href="http://lizard-spock.co.uk/yamaha-drum-app.html" rel="alternate"></link><published>2025-12-05T14:38:00+00:00</published><updated>2025-12-05T14:38:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/yamaha-drum-app.html</id><summary type="html">&lt;p&gt;For Yamaha electronic drum kits (DTX) there is a &lt;a href="https://uk.yamaha.com/en/products/musical_instruments/drums/el_drums/apps/index.html"&gt;‘DTX Touch app’&lt;/a&gt; for iPhone, iPad, Android that lets you more …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For Yamaha electronic drum kits (DTX) there is a &lt;a href="https://uk.yamaha.com/en/products/musical_instruments/drums/el_drums/apps/index.html"&gt;‘DTX Touch app’&lt;/a&gt; for iPhone, iPad, Android that lets you more easily manage the kit sounds.&lt;/p&gt;</content><category term="Music"></category><category term="Drum"></category></entry></feed>
+&lt;p&gt;&lt;a href="https://www.yamahamusiclondon.com/DTX6-Crash-Pack/pidDTX6-CRASHPACK"&gt;Crash £200 UK Supplier&lt;/a&gt;.&lt;/p&gt;</content><category term="Music"/><category term="Drum"/></entry><entry><title>Yamaha Drum App</title><link href="http://lizard-spock.co.uk/yamaha-drum-app.html" rel="alternate"/><published>2025-12-05T14:38:00+00:00</published><updated>2025-12-05T14:38:00+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2025-12-05:/yamaha-drum-app.html</id><summary type="html">&lt;p&gt;For Yamaha electronic drum kits (DTX) there is a &lt;a href="https://uk.yamaha.com/en/products/musical_instruments/drums/el_drums/apps/index.html"&gt;‘DTX Touch app’&lt;/a&gt; for iPhone, iPad, Android that lets you more …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For Yamaha electronic drum kits (DTX) there is a &lt;a href="https://uk.yamaha.com/en/products/musical_instruments/drums/el_drums/apps/index.html"&gt;‘DTX Touch app’&lt;/a&gt; for iPhone, iPad, Android that lets you more easily manage the kit sounds.&lt;/p&gt;</content><category term="Music"/><category term="Drum"/></entry></feed>
