@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Building a Personal MCP Server for Your Second Brain</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="How to build a self-hosted MCP server that exposes a markdown vault as Claude tools — list projects, search notes, write entries, and commit..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li><a href="./category/engineering.html">Engineering</a></li>
+                                                <li class="active"><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/programming.html">Programming</a></li>
+                                                <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./building-a-personal-mcp-server.html" rel="bookmark"
+             title="Permalink to Building a Personal MCP Server for Your Second Brain">Building a Personal MCP Server for Your Second Brain</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-06-03T00:00:00+01:00">
+                Published: Wed 03 June 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="./tag/mcp.html">MCP</a> <a href="./tag/nodejs.html">Node.js</a> <a href="./tag/homelab.html">homelab</a> <a href="./tag/claude.html">Claude</a> <a href="./tag/supergateway.html">supergateway</a> <a href="./tag/git.html">git</a> </p>        
+</footer><!-- /.post-info -->        <p>Claude can do more than answer questions — it can read and write files on a server you control. A <a href="https://modelcontextprotocol.io">Model Context Protocol</a> (MCP) server is the bridge. This post covers building a personal MCP server that exposes a markdown vault as tools: list projects, search notes, create entries, and commit changes — all from a Claude conversation.</p>
+<hr>
+<h2>What It Is</h2>
+<p>The vault is a git repository of markdown files organised around the PARA method (Projects, Areas, Resources, Archive). The MCP server is a Node.js process that reads and writes those files in response to tool calls. Claude never sees the raw filesystem — it sees a curated set of typed tools with well-defined behaviour.</p>
+<p>The key design principle: <strong>progressive disclosure</strong>. Don't give Claude a raw file API. Give it typed tools that encode domain knowledge — what a project file looks like, where the frontmatter ends, which fields are indexable.</p>
+<hr>
+<h2>The File Structure</h2>
+<div class="highlight"><pre><span></span><code><span class="n">vault</span><span class="o">/</span>
+<span class="w">  </span><span class="n">projects</span><span class="o">/</span><span class="w">       </span><span class="err">←</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="n">work</span><span class="p">,</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">project</span>
+<span class="w">  </span><span class="n">actions</span><span class="o">/</span><span class="w">        </span><span class="err">←</span><span class="w"> </span><span class="n">GTD</span><span class="w"> </span><span class="n">next</span><span class="o">-</span><span class="n">actions</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">stage</span><span class="o">/</span><span class="n">due</span>
+<span class="w">  </span><span class="n">areas</span><span class="o">/</span><span class="w">          </span><span class="err">←</span><span class="w"> </span><span class="n">ongoing</span><span class="w"> </span><span class="n">responsibilities</span>
+<span class="w">  </span><span class="n">reference</span><span class="o">/</span><span class="w">      </span><span class="err">←</span><span class="w"> </span><span class="n">stable</span><span class="w"> </span><span class="n">reference</span><span class="w"> </span><span class="n">material</span>
+<span class="w">  </span><span class="n">archive</span><span class="o">/</span>
+<span class="w">    </span><span class="n">projects</span><span class="o">/</span>
+<span class="w">    </span><span class="n">actions</span><span class="o">/</span>
+<span class="w">    </span><span class="n">area</span><span class="o">/</span>
+<span class="w">  </span><span class="n">glossary</span><span class="o">.</span><span class="n">md</span><span class="w">     </span><span class="err">←</span><span class="w"> </span><span class="n">grep</span><span class="o">-</span><span class="n">only</span><span class="p">,</span><span class="w"> </span><span class="n">grows</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="o">~</span><span class="mi">1500</span><span class="o">+</span><span class="w"> </span><span class="n">lines</span>
+<span class="w">  </span><span class="n">journal</span><span class="o">/</span>
+<span class="w">    </span><span class="mf">2026.</span><span class="n">md</span>
+<span class="w">  </span><span class="n">memory</span><span class="o">/</span><span class="w">         </span><span class="err">←</span><span class="w"> </span><span class="n">always</span><span class="o">-</span><span class="n">on</span><span class="w"> </span><span class="n">agent</span><span class="w"> </span><span class="n">brief</span><span class="p">,</span><span class="w"> </span><span class="n">loaded</span><span class="w"> </span><span class="n">every</span><span class="w"> </span><span class="n">session</span>
+<span class="w">  </span><span class="n">mcp</span><span class="o">/</span><span class="w">            </span><span class="err">←</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">MCP</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="n">lives</span><span class="w"> </span><span class="n">here</span>
+</code></pre></div>
+
+<p>Each <code>projects/&lt;id&gt;.md</code> has frontmatter: <code>domain</code>, <code>status</code>, <code>started</code>, <code>last_touched</code>, <code>next_action</code>. These are the indexed fields — the tools scan frontmatter without reading bodies.</p>
+<hr>
+<h2>The Tools</h2>
+<h3>Index tools (frontmatter-only scans)</h3>
+<div class="highlight"><pre><span></span><code>list_projects(status?, domain?, include_archive?)
+list_actions(stage?, domain?, due_before?, include_archive?)
+list_areas(domain?, include_archive?)
+</code></pre></div>
+
+<p>These walk their directory, parse only the frontmatter block from each file, and return one summary line per entry. The LLM starts here every session — it gets an overview without reading thousands of lines of content.</p>
+<p><code>include_archive</code> defaults to <code>false</code>. Archive-excluded-by-default keeps lists fast and focused on active material. Pass <code>include_archive: true</code> only when you need historical entries.</p>
+<h3>Read and search</h3>
+<div class="highlight"><pre><span></span><code><span class="n">read_text</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="w">                          </span><span class="err">←</span><span class="w"> </span><span class="n">full</span><span class="w"> </span><span class="n">file</span>
+<span class="n">grep</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="o">?</span><span class="p">,</span><span class="w"> </span><span class="n">include_archive</span><span class="o">?</span><span class="p">)</span><span class="w">   </span><span class="err">←</span><span class="w"> </span><span class="n">regex</span><span class="w"> </span><span class="n">search</span><span class="w"> </span><span class="n">across</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">vault</span>
+</code></pre></div>
+
+<p><code>grep</code> is the backbone of reference and fact lookup. The glossary file grows to thousands of lines — never bulk-read it; always grep it.</p>
+<h3>Write tools</h3>
+<div class="highlight"><pre><span></span><code>write_text(path, content)
+append(path, content)
+edit(path, old_string, new_string)
+</code></pre></div>
+
+<p><code>edit</code> does an exact find/replace of the first match. The server never rewrites a whole file when you're changing one line — it's faster and produces cleaner diffs in git history.</p>
+<h3>Archive tools</h3>
+<div class="highlight"><pre><span></span><code>archive_project(id)
+archive_action(id)
+archive_area(id)
+</code></pre></div>
+
+<p>Move the file to <code>archive/&lt;type&gt;/</code>, flip <code>status</code> to <code>done</code>. No manual file moves or editor needed.</p>
+<hr>
+<h2>Auto-Commit on Write</h2>
+<p>Every write tool ends with a git commit and push:</p>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">git</span><span class="p">([</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">BRAIN_ROOT</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-A&quot;</span><span class="p">]);</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">git</span><span class="p">([</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">BRAIN_ROOT</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;commit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="sb">`mcp: </span><span class="si">${</span><span class="nx">summary</span><span class="si">}</span><span class="sb">`</span><span class="p">]);</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">git</span><span class="p">([</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">BRAIN_ROOT</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;push&quot;</span><span class="p">]);</span>
+</code></pre></div>
+
+<p>This gives you a full history of every change Claude made, browsable in any git client. It also means the vault stays in sync with the remote backup — no separate sync step needed.</p>
+<p><strong>Gotcha: systemd doesn't set HOME.</strong> When the service runs as root, <code>git push</code> fails with <code>fatal: unable to set up default path</code> because <code>/root/.gitconfig</code> and <code>.git-credentials</code> aren't found. Fix this with a systemd drop-in:</p>
+<p><code>/etc/systemd/system/vault-mcp.service.d/home.conf</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[Service]</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">HOME=/root</span>
+</code></pre></div>
+
+<p>Without this, writes succeed locally but the push silently fails — the vault appears to work but isn't backing up.</p>
+<hr>
+<h2>The Sync Timer</h2>
+<p>A <code>brain-sync.timer</code> runs every 10 minutes as a backstop:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>-C<span class="w"> </span><span class="nv">$BRAIN_ROOT</span><span class="w"> </span>pull<span class="w"> </span>--rebase<span class="w"> </span>--autostash
+git<span class="w"> </span>-C<span class="w"> </span><span class="nv">$BRAIN_ROOT</span><span class="w"> </span>push
+</code></pre></div>
+
+<p>This handles the case where a push failed mid-session. The remote git repo is the source of truth for backup; the server is the source of truth for content.</p>
+<hr>
+<h2>supergateway</h2>
+<p>The MCP server is a Node.js stdio process. <a href="https://github.com/supercorp-ai/supergateway">supergateway</a> bridges it to a Streamable HTTP endpoint so it can be reached over the network:</p>
+<div class="highlight"><pre><span></span><code>supergateway<span class="w"> </span>--stdio<span class="w"> </span><span class="s1">&#39;node /opt/brain/mcp/server.js&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">3001</span><span class="w"> </span>--outputTransport<span class="w"> </span>streamableHttp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--streamableHttpPath<span class="w"> </span>/mcp
+</code></pre></div>
+
+<p>Claude Code connects via <code>~/.mcp.json</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;brain&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://your-server:3001/mcp&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr>
+<h2>The systemd Service</h2>
+<p><code>/etc/systemd/system/vault-mcp.service</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[Unit]</span>
+<span class="na">Description</span><span class="o">=</span><span class="s">Vault MCP Server</span>
+<span class="na">After</span><span class="o">=</span><span class="s">network.target</span>
+
+<span class="k">[Service]</span>
+<span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
+<span class="na">ExecStartPre</span><span class="o">=</span><span class="s">/bin/bash -c &#39;cd /opt/brain/mcp &amp;&amp; npm install --silent&#39;</span>
+<span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/bin/supergateway </span>\
+<span class="w">  </span><span class="s">--stdio &#39;node /opt/brain/mcp/server.js&#39; </span>\
+<span class="w">  </span><span class="s">--port 3001 </span>\
+<span class="w">  </span><span class="s">--outputTransport streamableHttp </span>\
+<span class="w">  </span><span class="s">--streamableHttpPath /mcp</span>
+<span class="na">Restart</span><span class="o">=</span><span class="s">always</span>
+<span class="na">RestartSec</span><span class="o">=</span><span class="s">5</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">NODE_ENV=production</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">BRAIN_ROOT=/opt/brain</span>
+
+<span class="k">[Install]</span>
+<span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>systemctl<span class="w"> </span>daemon-reload
+systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>vault-mcp
+</code></pre></div>
+
+<p><code>ExecStartPre</code> runs <code>npm install</code> on every start — no manual dependency management after updates. Intentionally <strong>no</strong> <code>git pull</code> here: the service might start during a write, and a pull could clobber in-flight changes.</p>
+<hr>
+<h2>What You Get</h2>
+<p>Once running, a session looks like:</p>
+<div class="highlight"><pre><span></span><code>list_projects(status=&quot;active&quot;, domain=&quot;code&quot;)
+→ 12 projects, one line each
+
+read_text(&quot;projects/my-project.md&quot;)
+→ full file contents
+
+edit(&quot;projects/my-project.md&quot;,
+     old_string=&quot;next_action: review&quot;,
+     new_string=&quot;next_action: ship v1&quot;)
+→ committed and pushed
+</code></pre></div>
+
+<p>No file paths to remember, no git commands to run, no editor to open. The vault stays in sync and the history tells you exactly what changed and when.</p>
+<p>The next post covers adding OAuth authentication to this server so it can be safely exposed over the internet and connected to Claude.ai on mobile.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
