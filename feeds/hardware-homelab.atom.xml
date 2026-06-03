@@ -956,8 +956,8 @@ edit(&amp;quot;projects/my-project.md&amp;quot;,
 
 
 
-&lt;/details&gt;</content><category term="Hardware &amp; Homelab"/><category term="MCP"/><category term="Node.js"/><category term="homelab"/><category term="Claude"/><category term="supergateway"/><category term="git"/></entry><entry><title>Adding OAuth Authentication to a Self-Hosted MCP Server</title><link href="http://lizard-spock.co.uk/mcp-server-oauth-authentication.html" rel="alternate"/><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/mcp-server-oauth-authentication.html</id><summary type="html">&lt;p&gt;How to add OAuth 2.1 authentication to a self-hosted MCP server using nginx as a reverse proxy and a minimal Node.js OAuth server — covering four failure modes and what actually works with Claude.ai.&lt;/p&gt;</summary><content type="html">&lt;p&gt;If you're running a self-hosted MCP server and exposing it over HTTP, you need authentication. Without it, anyone who can reach your port can invoke your tools.&lt;/p&gt;
-&lt;p&gt;This is the story of how I added OAuth 2.1 auth to the vault MCP server from the previous post. It took longer than expected, involved four distinct failures, and produced a setup I'm happy with. Here's what I learned.&lt;/p&gt;
+&lt;/details&gt;</content><category term="Hardware &amp; Homelab"/><category term="MCP"/><category term="Node.js"/><category term="homelab"/><category term="Claude"/><category term="supergateway"/><category term="git"/></entry><entry><title>Adding OAuth Authentication to a Self-Hosted MCP Server</title><link href="http://lizard-spock.co.uk/mcp-server-oauth-authentication.html" rel="alternate"/><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/mcp-server-oauth-authentication.html</id><summary type="html">&lt;p&gt;How to add OAuth 2.1 authentication to a self-hosted MCP server: nginx as an authenticating reverse proxy, a minimal Node.js OAuth server, and the key gotchas that will trip you up.&lt;/p&gt;</summary><content type="html">&lt;p&gt;If you're running a self-hosted MCP server and exposing it over HTTP, you need authentication. Without it, anyone who can reach your port can invoke your tools.&lt;/p&gt;
+&lt;p&gt;This post covers adding OAuth 2.1 auth to the vault MCP server from the previous post. Claude.ai's MCP connector implements the full &lt;a href="https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/authorization/"&gt;OAuth 2.1 authorization code + PKCE flow&lt;/a&gt; — it expects an OAuth Client ID and Secret, not a pre-shared bearer token. So that's what we build.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;The Starting Point&lt;/h2&gt;
 &lt;p&gt;The server runs on a Debian container on Proxmox. The stack before this work:&lt;/p&gt;
@@ -971,6 +971,13 @@ edit(&amp;quot;projects/my-project.md&amp;quot;,
 &lt;h2&gt;Step 1: nginx as an Authenticating Reverse Proxy&lt;/h2&gt;
 &lt;p&gt;supergateway has no built-in support for validating incoming authentication — &lt;code&gt;--oauth2Bearer&lt;/code&gt; is outbound-only, adding headers to requests supergateway makes upstream, not checking headers on requests coming in.&lt;/p&gt;
 &lt;p&gt;The solution is to place nginx in front: move supergateway to an internal port, and let nginx handle bearer token validation before any request reaches the MCP server.&lt;/p&gt;
+&lt;p&gt;Claude.ai's MCP connector requires three things from an OAuth server:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A &lt;code&gt;/.well-known/oauth-authorization-server&lt;/code&gt; discovery endpoint (RFC 8414)&lt;/li&gt;
+&lt;li&gt;An &lt;code&gt;/authorize&lt;/code&gt; endpoint it can redirect the user's browser to&lt;/li&gt;
+&lt;li&gt;A &lt;code&gt;/token&lt;/code&gt; endpoint where it exchanges the authorization code for an access token&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;nginx serves the discovery endpoints statically and proxies &lt;code&gt;/authorize&lt;/code&gt; and &lt;code&gt;/token&lt;/code&gt; to a small Node.js OAuth server running on localhost.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Step 2: The Architecture&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;MCP client (Claude.ai)
@@ -1006,54 +1013,7 @@ systemctl&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/s
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;hr&gt;
-&lt;h2&gt;Step 4: The First nginx Config — Static Bearer Token&lt;/h2&gt;
-&lt;p&gt;Initial plan: generate a strong bearer token, put it in nginx's &lt;code&gt;map {}&lt;/code&gt; block, return 401 if it's missing or wrong.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;openssl&lt;span class="w"&gt; &lt;/span&gt;rand&lt;span class="w"&gt; &lt;/span&gt;-base64&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;48&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;map_hash_bucket_size&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-
-&lt;span class="k"&gt;map&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$http_authorization&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$mcp_auth_ok&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;default&lt;/span&gt;&lt;span class="w"&gt;                      &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;Bearer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;lt;your-token-here&amp;gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-
-&lt;span class="k"&gt;server&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;listen&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3001&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/mcp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$mcp_auth_ok&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="s"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="kn"&gt;add_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;WWW-Authenticate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Bearer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;realm=&amp;quot;mcp&amp;quot;&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="kn"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;401&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;error&amp;quot;:&amp;quot;unauthorized&amp;quot;}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;http://127.0.0.1:3002&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_buffering&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;off&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Connection&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_read_timeout&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;300s&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h3&gt;Failure 1: map_hash_bucket_size&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;nginx -t&lt;/code&gt; immediately failed:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;emerg&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;could&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;not&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;build&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;map_hash&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;you&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;should&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;increase&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nl"&gt;map_hash_bucket_size&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;64&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;nginx's &lt;code&gt;map {}&lt;/code&gt; stores keys in a hash table. The default bucket size is 64 bytes. The full &lt;code&gt;Authorization&lt;/code&gt; header value (&lt;code&gt;Bearer&lt;/code&gt; prefix + a 64-character token) is ~71 bytes. Fix: add &lt;code&gt;map_hash_bucket_size 128;&lt;/code&gt; at the top of the file.&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2&gt;Step 5: Claude.ai Doesn't Accept a Pre-Shared Bearer Token&lt;/h2&gt;
-&lt;p&gt;The static bearer approach worked in curl. Then I tried to configure it in Claude.ai's remote MCP settings — and hit the second failure.&lt;/p&gt;
-&lt;h3&gt;Failure 2: Claude.ai Requires Real OAuth&lt;/h3&gt;
-&lt;p&gt;The Claude.ai web interface doesn't ask "what's your bearer token?" It asks for &lt;strong&gt;OAuth Client ID&lt;/strong&gt; and &lt;strong&gt;OAuth Client Secret&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;Claude.ai implements the MCP auth spec's full &lt;a href="https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/authorization/"&gt;OAuth 2.1 authorization code + PKCE flow&lt;/a&gt;. It needs:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;A &lt;code&gt;/.well-known/oauth-authorization-server&lt;/code&gt; discovery endpoint (RFC 8414)&lt;/li&gt;
-&lt;li&gt;An &lt;code&gt;/authorize&lt;/code&gt; endpoint it can redirect the user's browser to&lt;/li&gt;
-&lt;li&gt;A &lt;code&gt;/token&lt;/code&gt; endpoint where it exchanges the code for an access token&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;A static pre-shared bearer token isn't surfaced in the UI at all. You need to run an actual OAuth authorization server.&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2&gt;Step 6: A Minimal OAuth Server in ~150 Lines of Node.js&lt;/h2&gt;
+&lt;h2&gt;Step 4: A Minimal OAuth Server in ~150 Lines of Node.js&lt;/h2&gt;
 &lt;p&gt;For a single-user personal server, a "real" OAuth AS doesn't need to be complex. The key insight: &lt;strong&gt;auto-approve all authorization requests&lt;/strong&gt; — there's only one trusted client — and &lt;strong&gt;always issue the same static access token&lt;/strong&gt; so nginx validation stays simple and restarts don't force re-authentication.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// oauth-server.js (abridged)&lt;/span&gt;
 &lt;span class="k"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;node:http&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -1111,7 +1071,7 @@ systemctl&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/s
 
 &lt;p&gt;Without the guard, a wrong-length secret becomes a denial-of-service vector — the crash causes a 502 from nginx.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2&gt;Step 7: Wire nginx to the OAuth Server&lt;/h2&gt;
+&lt;h2&gt;Step 5: Wire nginx to the OAuth Server&lt;/h2&gt;
 &lt;p&gt;Updated nginx config — the key additions are proxying &lt;code&gt;/authorize&lt;/code&gt; and &lt;code&gt;/token&lt;/code&gt;, and adding the OAuth discovery metadata:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;server&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;listen&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3001&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -1156,7 +1116,7 @@ systemctl&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/s
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;hr&gt;
-&lt;h2&gt;Step 8: The Token Exchange Never Happened&lt;/h2&gt;
+&lt;h2&gt;Step 6: The Token Exchange Never Happened&lt;/h2&gt;
 &lt;p&gt;OAuth flow in Claude.ai: browser hits &lt;code&gt;/authorize&lt;/code&gt; → gets a 302 with a code → follows it to Claude.ai's callback URL. Then Claude.ai's connector should call &lt;code&gt;POST /token&lt;/code&gt; to exchange the code.&lt;/p&gt;
 &lt;p&gt;It never did. The nginx access log showed the browser hitting &lt;code&gt;/authorize&lt;/code&gt; (302 ✓), then Claude.ai's connector immediately hitting &lt;code&gt;/mcp&lt;/code&gt; again with 401 — no &lt;code&gt;/token&lt;/code&gt; call in between.&lt;/p&gt;
 &lt;h3&gt;Failure 4: Hardcoded Private IP in OAuth Metadata&lt;/h3&gt;
@@ -1207,37 +1167,22 @@ systemctl&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/s
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td&gt;1&lt;/td&gt;
-&lt;td&gt;&lt;code&gt;supergateway --oauth2Bearer&lt;/code&gt; is outbound-only — it does not validate incoming requests&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;2&lt;/td&gt;
-&lt;td&gt;Claude.ai's MCP UI requires OAuth Client ID + Secret — a pre-shared bearer header isn't an option&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3&lt;/td&gt;
-&lt;td&gt;&lt;code&gt;map_hash_bucket_size 128&lt;/code&gt; is needed for tokens longer than ~55 characters&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;4&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;proxy_buffering off&lt;/code&gt; is essential for MCP streaming — without it clients hang&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;crypto.timingSafeEqual&lt;/code&gt; throws on mismatched buffer lengths — always check lengths first&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;3&lt;/td&gt;
 &lt;td&gt;Never hardcode IPs in OAuth metadata — use &lt;code&gt;$http_host&lt;/code&gt; so the issuer always matches the discovery URL&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;nftables iif != "lo" tcp dport XXXX drop&lt;/code&gt; is the cleanest way to lock an internal service to loopback&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;hr&gt;
-&lt;h2&gt;What I'd Do Differently&lt;/h2&gt;
-&lt;p&gt;Skip the static-bearer-token phase and go straight to the OAuth server. The MCP auth spec is clear that OAuth 2.1 is the mechanism — "just use a header" is wishful thinking once you're integrating with a spec-compliant client like Claude.ai.&lt;/p&gt;
 &lt;p&gt;The minimal OAuth server approach (auto-approve + static token) is a good fit for a personal server. It's not a security shortcut — the actual secret is the client credentials, PKCE is enforced, and the issued token is what nginx validates. The "simplification" is just removing the login page that makes no sense for a single trusted client.&lt;/p&gt;
 &lt;p&gt;The next post covers adding a second MCP server to the same host — reusing all of this OAuth infrastructure for a blog-management server on a different URL path.&lt;/p&gt;</content><category term="Hardware &amp; Homelab"/><category term="MCP"/><category term="OAuth"/><category term="nginx"/><category term="Node.js"/><category term="homelab"/><category term="security"/><category term="Claude"/></entry><entry><title>Proxmox: Disable root@pam Login and Create a Sudo User</title><link href="http://lizard-spock.co.uk/proxmox-disable-root-login-sudo-user.html" rel="alternate"/><published>2026-04-17T00:00:00+01:00</published><updated>2026-04-17T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-17:/proxmox-disable-root-login-sudo-user.html</id><summary type="html">&lt;p&gt;How to harden a Proxmox VE host by disabling direct root@pam login, creating a named admin user dave@pam, and granting it passwordless sudo access.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Out of the box, Proxmox VE only has the &lt;code&gt;root@pam&lt;/code&gt; account. Logging in directly as root is convenient during initial setup, but it is a bad habit to keep. This post walks through creating a named PAM user, granting it sudo access, and then disabling root login via both SSH and the web UI.&lt;/p&gt;
 &lt;h2&gt;Authentication Realms: @pam vs @pve&lt;/h2&gt;
