@@ -212,18 +212,16 @@ systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> 
 </code></pre></div>
 
 <hr>
-<h2>Step 6: The Token Exchange Never Happened</h2>
-<p>OAuth flow in Claude.ai: browser hits <code>/authorize</code> → gets a 302 with a code → follows it to Claude.ai's callback URL. Then Claude.ai's connector should call <code>POST /token</code> to exchange the code.</p>
-<p>It never did. The nginx access log showed the browser hitting <code>/authorize</code> (302 ✓), then Claude.ai's connector immediately hitting <code>/mcp</code> again with 401 — no <code>/token</code> call in between.</p>
-<h3>Failure 4: Hardcoded Private IP in OAuth Metadata</h3>
-<p>The <code>/.well-known/oauth-authorization-server</code> response contained:</p>
+<h2>Step 6: The $http_host Gotcha</h2>
+<p>Per RFC 8414, the <code>issuer</code> in OAuth metadata must match the URL used to discover it. A mismatch is a valid reason for a client to reject the metadata entirely. Even if the connector didn't strictly validate the issuer, a private LAN IP is unreachable from Claude.ai's infrastructure if the token exchange happens server-side.</p>
+<p>This surfaces as the OAuth flow appearing to start but never completing — the nginx access log shows the browser hitting <code>/authorize</code> (302 ✓), then Claude.ai's connector hitting <code>/mcp</code> again with 401, with no <code>/token</code> call in between.</p>
+<p>If you're seeing this, check your <code>/.well-known/oauth-authorization-server</code> response. A hardcoded private IP or a hostname that doesn't match the public domain the client is connecting through is almost certainly the cause:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;issuer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://192.168.x.x:3001&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;token_endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://192.168.x.x:3001/token&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
 
-<p>Per RFC 8414, the <code>issuer</code> in OAuth metadata must match the URL used to discover it. A mismatch is a valid reason for a client to reject the metadata entirely. Even if the connector didn't strictly validate the issuer, a private LAN IP is unreachable from Claude.ai's infrastructure if the token exchange happens server-side.</p>
 <p><strong>Fix:</strong> Use nginx's <code>$http_host</code> variable in the metadata JSON so the URLs always reflect whatever hostname the request arrived on:</p>
 <div class="highlight"><pre><span></span><code><span class="k">return</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="s">&#39;</span><span class="p">{</span><span class="kn">&quot;issuer&quot;:&quot;http://$http_host&quot;,&quot;token_endpoint&quot;:&quot;http://$http_host/token&quot;,...}&#39;</span><span class="p">;</span>
 </code></pre></div>
