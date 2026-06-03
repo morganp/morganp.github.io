@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>A Second MCP Server: Managing a Pelican Blog from Claude</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="How to add a second self-hosted MCP server alongside an existing one — a blog-management MCP that lets Claude create posts, add images, and..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li><a href="./category/engineering.html">Engineering</a></li>
+                                                <li class="active"><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/programming.html">Programming</a></li>
+                                                <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./a-second-mcp-server-managing-a-pelican-blog-from-claude.html" rel="bookmark"
+             title="Permalink to A Second MCP Server: Managing a Pelican Blog from Claude">A Second MCP Server: Managing a Pelican Blog from Claude</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-06-03T00:00:00+01:00">
+                Published: Wed 03 June 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="./tag/mcp.html">MCP</a> <a href="./tag/pelican.html">Pelican</a> <a href="./tag/homelab.html">homelab</a> <a href="./tag/nodejs.html">Node.js</a> <a href="./tag/nginx.html">nginx</a> <a href="./tag/claude.html">Claude</a> </p>        
+</footer><!-- /.post-info -->        <p>Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same LXC container as an existing MCP server — so the OAuth service, nginx, and nftables rules carry over, and the new server is a matter of writing the tools and wiring up a new port.</p>
+<p>The target: a <code>blog-mcp</code> server that lets Claude pull the repo, create and edit posts, add images, run <code>make github</code> to build and publish, and push the source — all without leaving the conversation.</p>
+<hr>
+<h2>What's Already in Place</h2>
+<p>This guide assumes the SecondBrain MCP setup from the previous post is done:</p>
+<ul>
+<li>LXC 117 running on Proxmox, Node.js 22, supergateway at <code>/bin/supergateway</code></li>
+<li>nginx on port 3001 with OAuth bearer token validation (the <code>map {}</code> block and <code>brain_mcp_auth_ok</code> variable)</li>
+<li><code>brain-oauth</code> service on port 3003 handling the OAuth authorization code + PKCE flow</li>
+<li>nftables blocking direct access to internal supergateway ports</li>
+</ul>
+<p>If you're starting fresh, read that post first. The OAuth setup is the hard part; it isn't repeated here.</p>
+<hr>
+<h2>The Blog Repo Structure</h2>
+<p>The blog is a <a href="https://getpelican.com">Pelican</a> static site. Two branches:</p>
+<ul>
+<li><strong><code>main</code></strong> — Pelican source: <code>content/</code>, <code>Makefile</code>, <code>pelicanconf.py</code>, <code>requirements.txt</code></li>
+<li><strong><code>gh-pages</code></strong> — built HTML output; GitHub Pages serves this branch</li>
+</ul>
+<p><code>make github</code> does three things: runs Pelican to build, runs <code>ghp-import</code> to stage the output onto <code>gh-pages</code>, then pushes that branch to GitHub.</p>
+<p>When you clone a GitHub Pages repo, <code>git</code> defaults to the <code>gh-pages</code> branch (it's the GitHub default). The source is on <code>main</code>:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:yourname/yourname.github.io.git<span class="w"> </span>/opt/blog
+<span class="nb">cd</span><span class="w"> </span>/opt/blog
+git<span class="w"> </span>checkout<span class="w"> </span>main
+</code></pre></div>
+
+<hr>
+<h2>Pelican Metadata Format</h2>
+<p>Pelican does not use YAML frontmatter. It uses a colon-separated block at the top of the file, ending at the first blank line:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Title</span><span class="o">:</span><span class="w"> </span><span class="n">My</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">Title</span>
+<span class="n">Date</span><span class="o">:</span><span class="w"> </span><span class="mi">2026</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">03</span>
+<span class="n">Category</span><span class="o">:</span><span class="w"> </span><span class="n">Programming</span>
+<span class="n">Tags</span><span class="o">:</span><span class="w"> </span><span class="n">Python</span><span class="o">,</span><span class="w"> </span><span class="n">MCP</span>
+<span class="n">Author</span><span class="o">:</span><span class="w"> </span><span class="n">yourname</span>
+<span class="n">Status</span><span class="o">:</span><span class="w"> </span><span class="n">published</span>
+<span class="n">Slug</span><span class="o">:</span><span class="w"> </span><span class="n">my</span><span class="o">-</span><span class="n">post</span><span class="o">-</span><span class="n">title</span>
+
+<span class="n">Body</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="n">starts</span><span class="w"> </span><span class="n">here</span><span class="o">.</span>
+</code></pre></div>
+
+<p><code>Status: draft</code> keeps the post out of the built output. <code>Status: published</code> includes it. The server defaults all new posts to <code>draft</code> — you have to explicitly flip it before running <code>make github</code>.</p>
+<p>The metadata parser is straightforward:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">parsePelicanMeta</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">lines</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">line</span><span class="p">.</span><span class="nx">trim</span><span class="p">()</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^([A-Za-z][A-Za-z0-9_-]*):\s*(.*)$/</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">m</span><span class="p">)</span><span class="w"> </span><span class="nx">meta</span><span class="p">[</span><span class="nx">m</span><span class="p">[</span><span class="mf">1</span><span class="p">]]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">m</span><span class="p">[</span><span class="mf">2</span><span class="p">].</span><span class="nx">trim</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">meta</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr>
+<h2>Port Allocation</h2>
+<p>The new server slots alongside the existing ones:</p>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3001</td>
+<td>nginx — brain-mcp (public)</td>
+</tr>
+<tr>
+<td>3002</td>
+<td>supergateway — brain-mcp (localhost)</td>
+</tr>
+<tr>
+<td>3003</td>
+<td>brain-oauth (localhost)</td>
+</tr>
+<tr>
+<td>3004</td>
+<td>supergateway — blog-mcp (localhost) ← new</td>
+</tr>
+<tr>
+<td>3011</td>
+<td>nginx — blog-mcp (public) ← new</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Setting Up the Pelican Environment</h2>
+<p>Debian Trixie blocks <code>pip install</code> at the system level (<code>externally-managed-environment</code>). Use a virtual environment:</p>
+<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>install<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>make
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>/opt/blog-venv
+/opt/blog-venv/bin/pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>/opt/blog/requirements.txt
+</code></pre></div>
+
+<p>The Makefile references <code>pelican</code> and <code>ghp-import</code> by bare name. Point it at the venv by adding two variables at the top:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">PELICAN</span><span class="o">?=</span>/opt/blog-venv/bin/pelican
+<span class="nv">GHPIMPORT</span><span class="o">?=</span>/opt/blog-venv/bin/ghp-import
+</code></pre></div>
+
+<p>And update the <code>github</code> target to use <code>$(GHPIMPORT)</code> instead of <code>ghp-import</code>.</p>
+<p>Test manually before wiring anything into MCP:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/opt/blog<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>make<span class="w"> </span>github
+</code></pre></div>
+
+<p>GitHub will reject commits from a private email address. Use the GitHub noreply address (find yours at github.com/settings/emails):</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;12345+username@users.noreply.github.com&quot;</span>
+</code></pre></div>
+
+<hr>
+<h2>The MCP Server</h2>
+<p><code>/opt/blog-mcp/server.js</code> — a Node.js ES module MCP server. The tools:</p>
+<h3><code>blog_pull</code></h3>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">execFileAsync</span><span class="p">(</span><span class="s2">&quot;git&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">BLOG_ROOT</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;pull&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--rebase&quot;</span><span class="p">],</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">timeout</span><span class="o">:</span><span class="w"> </span><span class="mf">30000</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+
+<p>Always call at the start of a session. Returns the git output.</p>
+<h3><code>blog_list_posts</code></h3>
+<p>Walks <code>content/posts/</code> recursively (posts with images live in subdirectories), parses Pelican metadata from each <code>.md</code>/<code>.markdown</code> file, returns one summary line per post sorted by date descending.</p>
+<p>Supports filtering by <code>status</code> (<code>published</code>, <code>draft</code>, <code>all</code>) and <code>category</code>.</p>
+<p><strong>JS footgun to avoid:</strong> In an async <code>for...of</code> loop, <code>return</code> exits the entire function — not just the current iteration. Use <code>continue</code> to skip. This caused <code>blog_list_posts</code> to return nothing on the first run because a post without a <code>Title</code> triggered an early <code>return</code> from the walk function.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Wrong:</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">meta</span><span class="p">.</span><span class="nx">Title</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w">   </span><span class="c1">// exits walk(), finds nothing</span>
+
+<span class="c1">// Right:</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">meta</span><span class="p">.</span><span class="nx">Title</span><span class="p">)</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span><span class="w"> </span><span class="c1">// skips this file, keeps walking</span>
+</code></pre></div>
+
+<h3><code>blog_new_post</code></h3>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">today</span><span class="si">}</span><span class="sb">_</span><span class="si">${</span><span class="nx">slug</span><span class="si">}</span><span class="sb">.md`</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">abs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">POSTS_DIR</span><span class="p">,</span><span class="w"> </span><span class="nx">filename</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Writes a correctly-formatted Pelican metadata block. Hard-codes <code>Author: morganp</code> and <code>Status: draft</code>. The LLM supplies title, category, tags, and body.</p>
+<h3><code>blog_edit_post</code></h3>
+<p>Find/replace in a post file, identified by slug, filename, or relative path. Used to flip status:</p>
+<div class="highlight"><pre><span></span><code>blog_edit_post(slug=&quot;my-post&quot;, old_string=&quot;Status: draft&quot;, new_string=&quot;Status: published&quot;)
+</code></pre></div>
+
+<h3><code>blog_make</code></h3>
+<p>Runs an allowlisted make target. The allowlist is <code>{ "html", "publish", "github" }</code>. <code>clean</code> is deliberately excluded — losing your output directory mid-session is annoying.</p>
+<p>The key detail: pass the venv <code>bin/</code> to the make subprocess via <code>PATH</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">execFileAsync</span><span class="p">(</span><span class="nx">MAKE</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nx">target</span><span class="p">],</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">cwd</span><span class="o">:</span><span class="w"> </span><span class="nx">BLOG_ROOT</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">timeout</span><span class="o">:</span><span class="w"> </span><span class="mf">120000</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">env</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">,</span><span class="w"> </span><span class="nx">PATH</span><span class="o">:</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">VENV_BIN</span><span class="si">}</span><span class="sb">:</span><span class="si">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PATH</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>Without this, make can't find <code>pelican</code> or <code>ghp-import</code>.</p>
+<p><code>make github</code> takes 10–30 seconds depending on site size. Set <code>proxy_read_timeout 120s</code> in nginx — the default 60s is marginal.</p>
+<h3><code>blog_commit</code> and <code>blog_push</code></h3>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">execFileAsync</span><span class="p">(</span><span class="s2">&quot;git&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">BLOG_ROOT</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-A&quot;</span><span class="p">]);</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">execFileAsync</span><span class="p">(</span><span class="s2">&quot;git&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">BLOG_ROOT</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;commit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">message</span><span class="p">]);</span>
+<span class="c1">// ...</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">execFileAsync</span><span class="p">(</span><span class="s2">&quot;git&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">BLOG_ROOT</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;push&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;origin&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">]);</span>
+</code></pre></div>
+
+<p>Separated intentionally — commit first, review <code>blog_status</code>, then push.</p>
+<h3><code>blog_add_image</code></h3>
+<p>Node 22 has <code>fetch</code> built in. Saves to <code>content/images/{subdir}/{filename}</code> and returns the <code>{attach}</code> path for use in post markdown:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">arrayBuffer</span><span class="p">();</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">dest</span><span class="p">,</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">buffer</span><span class="p">));</span>
+</code></pre></div>
+
+<hr>
+<h2>The Systemd Service</h2>
+<p><code>/etc/systemd/system/blog-mcp.service</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[Unit]</span>
+<span class="na">Description</span><span class="o">=</span><span class="s">Blog MCP Server</span>
+<span class="na">After</span><span class="o">=</span><span class="s">network.target</span>
+
+<span class="k">[Service]</span>
+<span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
+<span class="na">ExecStartPre</span><span class="o">=</span><span class="s">/bin/bash -c &#39;cd /opt/blog-mcp &amp;&amp; npm install --silent&#39;</span>
+<span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/bin/supergateway --stdio &#39;node /opt/blog-mcp/server.js&#39; </span>\
+<span class="w">  </span><span class="s">--port 3004 --outputTransport streamableHttp</span>
+<span class="na">Restart</span><span class="o">=</span><span class="s">always</span>
+<span class="na">RestartSec</span><span class="o">=</span><span class="s">5</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">NODE_ENV=production</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">BLOG_ROOT=/opt/blog</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">VENV_BIN=/opt/blog-venv/bin</span>
+
+<span class="k">[Install]</span>
+<span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>systemctl<span class="w"> </span>daemon-reload
+systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>blog-mcp
+</code></pre></div>
+
+<p>Block port 3004 from external access:</p>
+<div class="highlight"><pre><span></span><code>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>filter<span class="w"> </span>input<span class="w"> </span>iif<span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s1">&#39;lo&#39;</span><span class="w"> </span>tcp<span class="w"> </span>dport<span class="w"> </span><span class="m">3004</span><span class="w"> </span>drop
+nft<span class="w"> </span>list<span class="w"> </span>ruleset<span class="w"> </span>&gt;<span class="w"> </span>/etc/nftables.conf
+</code></pre></div>
+
+<hr>
+<h2>The nginx Block</h2>
+<p><code>/etc/nginx/sites-available/blog-mcp</code> — new server block on port 3011. Because the <code>map {}</code> for bearer token validation was defined at the <code>http {}</code> level in the brain-mcp site file, <code>$brain_mcp_auth_ok</code> is already available here.</p>
+<div class="highlight"><pre><span></span><code><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">3011</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">_</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/.well-known/oauth-protected-resource</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kn">default_type</span><span class="w"> </span><span class="s">application/json</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">add_header</span><span class="w"> </span><span class="s">Access-Control-Allow-Origin</span><span class="w"> </span><span class="s">*</span><span class="w"> </span><span class="s">always</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">return</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="s">&#39;</span><span class="p">{</span><span class="kn">&quot;resource&quot;:&quot;http://$http_host&quot;,&quot;authorization_servers&quot;:[&quot;http://$http_host&quot;]}&#39;</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/.well-known/oauth-authorization-server</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kn">default_type</span><span class="w"> </span><span class="s">application/json</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">add_header</span><span class="w"> </span><span class="s">Access-Control-Allow-Origin</span><span class="w"> </span><span class="s">*</span><span class="w"> </span><span class="s">always</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">return</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="s">&#39;</span><span class="p">{</span><span class="kn">&quot;issuer&quot;:&quot;http://$http_host&quot;,&quot;authorization_endpoint&quot;:&quot;http://$http_host/authorize&quot;,&quot;token_endpoint&quot;:&quot;http://$http_host/token&quot;,&quot;response_types_supported&quot;:[&quot;code&quot;],&quot;grant_types_supported&quot;:[&quot;authorization_code&quot;],&quot;code_challenge_methods_supported&quot;:[&quot;S256&quot;,&quot;plain&quot;],&quot;token_endpoint_auth_methods_supported&quot;:[&quot;client_secret_post&quot;]}&#39;</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/authorize</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:3003</span><span class="p">;</span><span class="w"> </span><span class="kn">proxy_http_version</span><span class="w"> </span><span class="mi">1</span><span class="s">.1</span><span class="p">;</span><span class="w"> </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/token</span><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:3003</span><span class="p">;</span><span class="w"> </span><span class="kn">proxy_http_version</span><span class="w"> </span><span class="mi">1</span><span class="s">.1</span><span class="p">;</span><span class="w"> </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/mcp</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kn">if</span><span class="w"> </span><span class="s">(</span><span class="nv">$brain_mcp_auth_ok</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="s">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kn">add_header</span><span class="w"> </span><span class="s">WWW-Authenticate</span><span class="w"> </span><span class="s">&#39;Bearer</span><span class="w"> </span><span class="s">realm=&quot;blog-mcp&quot;,</span><span class="w"> </span><span class="s">resource_metadata=&quot;http://</span><span class="nv">$http_host/.well-known/oauth-protected-resource&quot;&#39;</span><span class="w"> </span><span class="s">always</span><span class="p">;</span>
+<span class="w">            </span><span class="kn">return</span><span class="w"> </span><span class="mi">401</span><span class="w"> </span><span class="s">&#39;</span><span class="p">{</span><span class="kn">&quot;error&quot;:&quot;unauthorized&quot;}&#39;</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:3004</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_http_version</span><span class="w"> </span><span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_buffering</span><span class="w"> </span><span class="no">off</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_read_timeout</span><span class="w"> </span><span class="s">120s</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Connection</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">chunked_transfer_encoding</span><span class="w"> </span><span class="no">on</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>ln<span class="w"> </span>-sf<span class="w"> </span>/etc/nginx/sites-available/blog-mcp<span class="w"> </span>/etc/nginx/sites-enabled/blog-mcp
+nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
+</code></pre></div>
+
+<hr>
+<h2>A Session in Practice</h2>
+<div class="highlight"><pre><span></span><code><span class="n">blog_pull</span><span class="p">()</span>
+<span class="err">→</span><span class="w"> </span><span class="s">&quot;Already up to date.&quot;</span>
+
+<span class="n">blog_new_post</span><span class="p">(</span><span class="n">slug</span><span class="o">=</span><span class="s">&quot;my-topic&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;My Topic&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">category</span><span class="o">=</span><span class="s">&quot;Programming&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;Python&quot;</span><span class="p">])</span>
+<span class="err">→</span><span class="w"> </span><span class="s">&quot;Created content/posts/2026-06-03_my-topic.md (Status: draft)&quot;</span>
+
+<span class="n">blog_edit_post</span><span class="p">(</span><span class="n">slug</span><span class="o">=</span><span class="s">&quot;my-topic&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">old_string</span><span class="o">=</span><span class="s">&quot;Status: draft&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">new_string</span><span class="o">=</span><span class="s">&quot;Status: published&quot;</span><span class="p">)</span>
+<span class="err">→</span><span class="w"> </span><span class="s">&quot;Edited content/posts/2026-06-03_my-topic.md&quot;</span>
+
+<span class="n">blog_commit</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s">&quot;add: my-topic post&quot;</span><span class="p">)</span>
+<span class="err">→</span><span class="w"> </span><span class="s">&quot;[main abc1234] add: my-topic post&quot;</span>
+
+<span class="n">blog_make</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s">&quot;github&quot;</span><span class="p">)</span>
+<span class="err">→</span><span class="w"> </span><span class="s">&quot;Done: Processed 432 articles... git push origin gh-pages&quot;</span>
+
+<span class="n">blog_push</span><span class="p">()</span>
+<span class="err">→</span><span class="w"> </span><span class="s">&quot;main -&gt; main&quot;</span>
+</code></pre></div>
+
+<p>Seven tool calls, one published post.</p>
+<hr>
+<h2>Why Not Just Use the SecondBrain MCP?</h2>
+<p>The SecondBrain MCP already has <code>write_text</code> and <code>edit</code>. In theory you could manage a blog repo with those. In practice, it's the wrong tool — you'd be reading files to learn the Pelican metadata format, manually constructing filenames, running shell commands out of band, and hoping nothing breaks in the <code>make</code> step.</p>
+<p>A purpose-built MCP server encodes the domain knowledge: where posts live, what the metadata block looks like, which <code>make</code> targets are safe to run, how to handle collateral like images and PDFs. The LLM just supplies the content.</p>
+<p>Having built the SecondBrain MCP first, a few things carry over directly:</p>
+<p><strong>Domain-specific tools beat generic ones.</strong> <code>blog_new_post</code> is worth writing because it encodes the Pelican metadata format, the file naming convention, and the draft-by-default behaviour. The alternative — <code>write_text</code> with a format the LLM has to reconstruct every time — is slower and more fragile.</p>
+<p><strong>Server-side computation is free tokens.</strong> Alphabetical sorting, date stamping, filename construction — anything the server can do deterministically, it should. Don't ask the LLM to reason about things it doesn't need to.</p>
+<p><strong>Keep the allowlist tight.</strong> The <code>make</code> target allowlist exists for the same reason the brain-mcp protects <code>glossary.md</code> and <code>CLAUDE.md</code> from deletion: mistakes are much easier to prevent than to fix.</p>
+<p><strong><code>proxy_buffering off</code> is not optional.</strong> Pelican builds can produce a lot of output. Without it, the nginx buffer fills, the connection stalls, and the tool times out without explanation.
+Slug: second-mcp-pelican-blog</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

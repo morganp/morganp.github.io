@@ -1,5 +1,275 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-05-01T00:00:00+01:00</updated><entry><title>SoC Article 09: Hardware Description Languages and RTL Design</title><link href="http://lizard-spock.co.uk/soc-article-09-hardware-description-languages-rtl-design.html" rel="alternate"/><published>2026-05-01T00:00:00+01:00</published><updated>2026-05-01T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-05-01:/soc-article-09-hardware-description-languages-rtl-design.html</id><summary type="html">&lt;p&gt;How SoC hardware is described in code: the fundamental difference between sequential software and parallel hardware, RTL vs behavioural vs structural design, SystemVerilog key constructs, FSMs, testbenches, assertions, and the synthesis step that turns RTL into gates.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 9 of 11&lt;/em&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-06-03T00:00:00+01:00</updated><entry><title>A Second MCP Server: Managing a Pelican Blog from Claude</title><link href="http://lizard-spock.co.uk/a-second-mcp-server-managing-a-pelican-blog-from-claude.html" rel="alternate"/><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/a-second-mcp-server-managing-a-pelican-blog-from-claude.html</id><summary type="html">&lt;p&gt;How to add a second self-hosted MCP server alongside an existing one — a blog-management MCP that lets Claude create posts, add images, and publish a Pelican site without leaving the conversation.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same LXC container as an existing MCP server — so the OAuth service, nginx, and nftables rules carry over, and the new server is a matter of writing the tools and wiring up a new port.&lt;/p&gt;
+&lt;p&gt;The target: a &lt;code&gt;blog-mcp&lt;/code&gt; server that lets Claude pull the repo, create and edit posts, add images, run &lt;code&gt;make github&lt;/code&gt; to build and publish, and push the source — all without leaving the conversation.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;What's Already in Place&lt;/h2&gt;
+&lt;p&gt;This guide assumes the SecondBrain MCP setup from the previous post is done:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;LXC 117 running on Proxmox, Node.js 22, supergateway at &lt;code&gt;/bin/supergateway&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;nginx on port 3001 with OAuth bearer token validation (the &lt;code&gt;map {}&lt;/code&gt; block and &lt;code&gt;brain_mcp_auth_ok&lt;/code&gt; variable)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;brain-oauth&lt;/code&gt; service on port 3003 handling the OAuth authorization code + PKCE flow&lt;/li&gt;
+&lt;li&gt;nftables blocking direct access to internal supergateway ports&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you're starting fresh, read that post first. The OAuth setup is the hard part; it isn't repeated here.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The Blog Repo Structure&lt;/h2&gt;
+&lt;p&gt;The blog is a &lt;a href="https://getpelican.com"&gt;Pelican&lt;/a&gt; static site. Two branches:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;main&lt;/code&gt;&lt;/strong&gt; — Pelican source: &lt;code&gt;content/&lt;/code&gt;, &lt;code&gt;Makefile&lt;/code&gt;, &lt;code&gt;pelicanconf.py&lt;/code&gt;, &lt;code&gt;requirements.txt&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;gh-pages&lt;/code&gt;&lt;/strong&gt; — built HTML output; GitHub Pages serves this branch&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;make github&lt;/code&gt; does three things: runs Pelican to build, runs &lt;code&gt;ghp-import&lt;/code&gt; to stage the output onto &lt;code&gt;gh-pages&lt;/code&gt;, then pushes that branch to GitHub.&lt;/p&gt;
+&lt;p&gt;When you clone a GitHub Pages repo, &lt;code&gt;git&lt;/code&gt; defaults to the &lt;code&gt;gh-pages&lt;/code&gt; branch (it's the GitHub default). The source is on &lt;code&gt;main&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;git@github.com:yourname/yourname.github.io.git&lt;span class="w"&gt; &lt;/span&gt;/opt/blog
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/opt/blog
+git&lt;span class="w"&gt; &lt;/span&gt;checkout&lt;span class="w"&gt; &lt;/span&gt;main
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;Pelican Metadata Format&lt;/h2&gt;
+&lt;p&gt;Pelican does not use YAML frontmatter. It uses a colon-separated block at the top of the file, ending at the first blank line:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;Title&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;My&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Post&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Title&lt;/span&gt;
+&lt;span class="n"&gt;Date&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2026&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;06&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;03&lt;/span&gt;
+&lt;span class="n"&gt;Category&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Programming&lt;/span&gt;
+&lt;span class="n"&gt;Tags&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Python&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MCP&lt;/span&gt;
+&lt;span class="n"&gt;Author&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;yourname&lt;/span&gt;
+&lt;span class="n"&gt;Status&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;published&lt;/span&gt;
+&lt;span class="n"&gt;Slug&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;my&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;post&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;title&lt;/span&gt;
+
+&lt;span class="n"&gt;Body&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;starts&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;here&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Status: draft&lt;/code&gt; keeps the post out of the built output. &lt;code&gt;Status: published&lt;/code&gt; includes it. The server defaults all new posts to &lt;code&gt;draft&lt;/code&gt; — you have to explicitly flip it before running &lt;code&gt;make github&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The metadata parser is straightforward:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;parsePelicanMeta&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;text&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;lines&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;text&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;split&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;meta&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{};&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;line&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;lines&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;line&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;trim&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;===&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;line&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;match&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sr"&gt;/^([A-Za-z][A-Za-z0-9_-]*):\s*(.*)$/&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;meta&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mf"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="p"&gt;].&lt;/span&gt;&lt;span class="nx"&gt;trim&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;meta&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;Port Allocation&lt;/h2&gt;
+&lt;p&gt;The new server slots alongside the existing ones:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Port&lt;/th&gt;
+&lt;th&gt;Service&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;3001&lt;/td&gt;
+&lt;td&gt;nginx — brain-mcp (public)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3002&lt;/td&gt;
+&lt;td&gt;supergateway — brain-mcp (localhost)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3003&lt;/td&gt;
+&lt;td&gt;brain-oauth (localhost)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3004&lt;/td&gt;
+&lt;td&gt;supergateway — blog-mcp (localhost) ← new&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3011&lt;/td&gt;
+&lt;td&gt;nginx — blog-mcp (public) ← new&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2&gt;Setting Up the Pelican Environment&lt;/h2&gt;
+&lt;p&gt;Debian Trixie blocks &lt;code&gt;pip install&lt;/code&gt; at the system level (&lt;code&gt;externally-managed-environment&lt;/code&gt;). Use a virtual environment:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;python3-pip&lt;span class="w"&gt; &lt;/span&gt;python3-venv&lt;span class="w"&gt; &lt;/span&gt;make
+python3&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt;venv&lt;span class="w"&gt; &lt;/span&gt;/opt/blog-venv
+/opt/blog-venv/bin/pip&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-r&lt;span class="w"&gt; &lt;/span&gt;/opt/blog/requirements.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The Makefile references &lt;code&gt;pelican&lt;/code&gt; and &lt;code&gt;ghp-import&lt;/code&gt; by bare name. Point it at the venv by adding two variables at the top:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;PELICAN&lt;/span&gt;&lt;span class="o"&gt;?=&lt;/span&gt;/opt/blog-venv/bin/pelican
+&lt;span class="nv"&gt;GHPIMPORT&lt;/span&gt;&lt;span class="o"&gt;?=&lt;/span&gt;/opt/blog-venv/bin/ghp-import
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;And update the &lt;code&gt;github&lt;/code&gt; target to use &lt;code&gt;$(GHPIMPORT)&lt;/code&gt; instead of &lt;code&gt;ghp-import&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Test manually before wiring anything into MCP:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/opt/blog&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;make&lt;span class="w"&gt; &lt;/span&gt;github
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;GitHub will reject commits from a private email address. Use the GitHub noreply address (find yours at github.com/settings/emails):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;config&lt;span class="w"&gt; &lt;/span&gt;--global&lt;span class="w"&gt; &lt;/span&gt;user.email&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;12345+username@users.noreply.github.com&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The MCP Server&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;/opt/blog-mcp/server.js&lt;/code&gt; — a Node.js ES module MCP server. The tools:&lt;/p&gt;
+&lt;h3&gt;&lt;code&gt;blog_pull&lt;/code&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;execFileAsync&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;git&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-C&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;BLOG_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;pull&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;--rebase&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;timeout&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;30000&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Always call at the start of a session. Returns the git output.&lt;/p&gt;
+&lt;h3&gt;&lt;code&gt;blog_list_posts&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;Walks &lt;code&gt;content/posts/&lt;/code&gt; recursively (posts with images live in subdirectories), parses Pelican metadata from each &lt;code&gt;.md&lt;/code&gt;/&lt;code&gt;.markdown&lt;/code&gt; file, returns one summary line per post sorted by date descending.&lt;/p&gt;
+&lt;p&gt;Supports filtering by &lt;code&gt;status&lt;/code&gt; (&lt;code&gt;published&lt;/code&gt;, &lt;code&gt;draft&lt;/code&gt;, &lt;code&gt;all&lt;/code&gt;) and &lt;code&gt;category&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;JS footgun to avoid:&lt;/strong&gt; In an async &lt;code&gt;for...of&lt;/code&gt; loop, &lt;code&gt;return&lt;/code&gt; exits the entire function — not just the current iteration. Use &lt;code&gt;continue&lt;/code&gt; to skip. This caused &lt;code&gt;blog_list_posts&lt;/code&gt; to return nothing on the first run because a post without a &lt;code&gt;Title&lt;/code&gt; triggered an early &lt;code&gt;return&lt;/code&gt; from the walk function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// Wrong:&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;meta&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Title&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="c1"&gt;// exits walk(), finds nothing&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Right:&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;meta&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Title&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;continue&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// skips this file, keeps walking&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;&lt;code&gt;blog_new_post&lt;/code&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;filename&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;today&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt;_&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;slug&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt;.md`&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;abs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;path&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;POSTS_DIR&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Writes a correctly-formatted Pelican metadata block. Hard-codes &lt;code&gt;Author: morganp&lt;/code&gt; and &lt;code&gt;Status: draft&lt;/code&gt;. The LLM supplies title, category, tags, and body.&lt;/p&gt;
+&lt;h3&gt;&lt;code&gt;blog_edit_post&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;Find/replace in a post file, identified by slug, filename, or relative path. Used to flip status:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;blog_edit_post(slug=&amp;quot;my-post&amp;quot;, old_string=&amp;quot;Status: draft&amp;quot;, new_string=&amp;quot;Status: published&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;&lt;code&gt;blog_make&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;Runs an allowlisted make target. The allowlist is &lt;code&gt;{ "html", "publish", "github" }&lt;/code&gt;. &lt;code&gt;clean&lt;/code&gt; is deliberately excluded — losing your output directory mid-session is annoying.&lt;/p&gt;
+&lt;p&gt;The key detail: pass the venv &lt;code&gt;bin/&lt;/code&gt; to the make subprocess via &lt;code&gt;PATH&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;execFileAsync&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;MAKE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;target&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;cwd&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;BLOG_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;timeout&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;120000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;env&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="nx"&gt;process&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;env&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;VENV_BIN&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt;:&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;process&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;env&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;PATH&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Without this, make can't find &lt;code&gt;pelican&lt;/code&gt; or &lt;code&gt;ghp-import&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;make github&lt;/code&gt; takes 10–30 seconds depending on site size. Set &lt;code&gt;proxy_read_timeout 120s&lt;/code&gt; in nginx — the default 60s is marginal.&lt;/p&gt;
+&lt;h3&gt;&lt;code&gt;blog_commit&lt;/code&gt; and &lt;code&gt;blog_push&lt;/code&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;execFileAsync&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;git&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-C&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;BLOG_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;add&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-A&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;execFileAsync&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;git&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-C&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;BLOG_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;commit&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-m&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;message&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;span class="c1"&gt;// ...&lt;/span&gt;
+&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;execFileAsync&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;git&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-C&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;BLOG_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;push&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;origin&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;main&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Separated intentionally — commit first, review &lt;code&gt;blog_status&lt;/code&gt;, then push.&lt;/p&gt;
+&lt;h3&gt;&lt;code&gt;blog_add_image&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;Node 22 has &lt;code&gt;fetch&lt;/code&gt; built in. Saves to &lt;code&gt;content/images/{subdir}/{filename}&lt;/code&gt; and returns the &lt;code&gt;{attach}&lt;/code&gt; path for use in post markdown:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;fetch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;buffer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;arrayBuffer&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;fs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;writeFile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;dest&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Buffer&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="kr"&gt;from&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The Systemd Service&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;/etc/systemd/system/blog-mcp.service&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[Unit]&lt;/span&gt;
+&lt;span class="na"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;Blog MCP Server&lt;/span&gt;
+&lt;span class="na"&gt;After&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;network.target&lt;/span&gt;
+
+&lt;span class="k"&gt;[Service]&lt;/span&gt;
+&lt;span class="na"&gt;Type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;simple&lt;/span&gt;
+&lt;span class="na"&gt;ExecStartPre&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;/bin/bash -c &amp;#39;cd /opt/blog-mcp &amp;amp;&amp;amp; npm install --silent&amp;#39;&lt;/span&gt;
+&lt;span class="na"&gt;ExecStart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;/usr/bin/supergateway --stdio &amp;#39;node /opt/blog-mcp/server.js&amp;#39; &lt;/span&gt;\
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s"&gt;--port 3004 --outputTransport streamableHttp&lt;/span&gt;
+&lt;span class="na"&gt;Restart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;
+&lt;span class="na"&gt;RestartSec&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;5&lt;/span&gt;
+&lt;span class="na"&gt;Environment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;NODE_ENV=production&lt;/span&gt;
+&lt;span class="na"&gt;Environment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;BLOG_ROOT=/opt/blog&lt;/span&gt;
+&lt;span class="na"&gt;Environment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;VENV_BIN=/opt/blog-venv/bin&lt;/span&gt;
+
+&lt;span class="k"&gt;[Install]&lt;/span&gt;
+&lt;span class="na"&gt;WantedBy&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;multi-user.target&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;systemctl&lt;span class="w"&gt; &lt;/span&gt;daemon-reload
+systemctl&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--now&lt;span class="w"&gt; &lt;/span&gt;blog-mcp
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Block port 3004 from external access:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;nft&lt;span class="w"&gt; &lt;/span&gt;add&lt;span class="w"&gt; &lt;/span&gt;rule&lt;span class="w"&gt; &lt;/span&gt;inet&lt;span class="w"&gt; &lt;/span&gt;filter&lt;span class="w"&gt; &lt;/span&gt;input&lt;span class="w"&gt; &lt;/span&gt;iif&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;lo&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;tcp&lt;span class="w"&gt; &lt;/span&gt;dport&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3004&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;drop
+nft&lt;span class="w"&gt; &lt;/span&gt;list&lt;span class="w"&gt; &lt;/span&gt;ruleset&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/etc/nftables.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The nginx Block&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;/etc/nginx/sites-available/blog-mcp&lt;/code&gt; — new server block on port 3011. Because the &lt;code&gt;map {}&lt;/code&gt; for bearer token validation was defined at the &lt;code&gt;http {}&lt;/code&gt; level in the brain-mcp site file, &lt;code&gt;$brain_mcp_auth_ok&lt;/code&gt; is already available here.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;server&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;listen&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3011&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;server_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/.well-known/oauth-protected-resource&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;default_type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;application/json&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;add_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Access-Control-Allow-Origin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;resource&amp;quot;:&amp;quot;http://$http_host&amp;quot;,&amp;quot;authorization_servers&amp;quot;:[&amp;quot;http://$http_host&amp;quot;]}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/.well-known/oauth-authorization-server&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;default_type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;application/json&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;add_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Access-Control-Allow-Origin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;issuer&amp;quot;:&amp;quot;http://$http_host&amp;quot;,&amp;quot;authorization_endpoint&amp;quot;:&amp;quot;http://$http_host/authorize&amp;quot;,&amp;quot;token_endpoint&amp;quot;:&amp;quot;http://$http_host/token&amp;quot;,&amp;quot;response_types_supported&amp;quot;:[&amp;quot;code&amp;quot;],&amp;quot;grant_types_supported&amp;quot;:[&amp;quot;authorization_code&amp;quot;],&amp;quot;code_challenge_methods_supported&amp;quot;:[&amp;quot;S256&amp;quot;,&amp;quot;plain&amp;quot;],&amp;quot;token_endpoint_auth_methods_supported&amp;quot;:[&amp;quot;client_secret_post&amp;quot;]}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/authorize&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;http://127.0.0.1:3003&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_http_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="s"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/token&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;http://127.0.0.1:3003&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_http_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="s"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/mcp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$brain_mcp_auth_ok&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="s"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="kn"&gt;add_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;WWW-Authenticate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Bearer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;realm=&amp;quot;blog-mcp&amp;quot;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;resource_metadata=&amp;quot;http://&lt;/span&gt;&lt;span class="nv"&gt;$http_host/.well-known/oauth-protected-resource&amp;quot;&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="kn"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;401&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;error&amp;quot;:&amp;quot;unauthorized&amp;quot;}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;http://127.0.0.1:3004&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_http_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="s"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_buffering&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;off&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_read_timeout&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;120s&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Connection&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;chunked_transfer_encoding&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;on&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ln&lt;span class="w"&gt; &lt;/span&gt;-sf&lt;span class="w"&gt; &lt;/span&gt;/etc/nginx/sites-available/blog-mcp&lt;span class="w"&gt; &lt;/span&gt;/etc/nginx/sites-enabled/blog-mcp
+nginx&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;systemctl&lt;span class="w"&gt; &lt;/span&gt;reload&lt;span class="w"&gt; &lt;/span&gt;nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;A Session in Practice&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;blog_pull&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="err"&gt;→&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Already up to date.&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;blog_new_post&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;slug&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;my-topic&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;title&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;My Topic&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;category&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Programming&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Python&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="err"&gt;→&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Created content/posts/2026-06-03_my-topic.md (Status: draft)&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;blog_edit_post&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;slug&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;my-topic&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;old_string&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Status: draft&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_string&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Status: published&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="err"&gt;→&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Edited content/posts/2026-06-03_my-topic.md&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;blog_commit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;message&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;add: my-topic post&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="err"&gt;→&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;[main abc1234] add: my-topic post&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;blog_make&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;target&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;github&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="err"&gt;→&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Done: Processed 432 articles... git push origin gh-pages&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;blog_push&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="err"&gt;→&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;main -&amp;gt; main&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Seven tool calls, one published post.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Why Not Just Use the SecondBrain MCP?&lt;/h2&gt;
+&lt;p&gt;The SecondBrain MCP already has &lt;code&gt;write_text&lt;/code&gt; and &lt;code&gt;edit&lt;/code&gt;. In theory you could manage a blog repo with those. In practice, it's the wrong tool — you'd be reading files to learn the Pelican metadata format, manually constructing filenames, running shell commands out of band, and hoping nothing breaks in the &lt;code&gt;make&lt;/code&gt; step.&lt;/p&gt;
+&lt;p&gt;A purpose-built MCP server encodes the domain knowledge: where posts live, what the metadata block looks like, which &lt;code&gt;make&lt;/code&gt; targets are safe to run, how to handle collateral like images and PDFs. The LLM just supplies the content.&lt;/p&gt;
+&lt;p&gt;Having built the SecondBrain MCP first, a few things carry over directly:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Domain-specific tools beat generic ones.&lt;/strong&gt; &lt;code&gt;blog_new_post&lt;/code&gt; is worth writing because it encodes the Pelican metadata format, the file naming convention, and the draft-by-default behaviour. The alternative — &lt;code&gt;write_text&lt;/code&gt; with a format the LLM has to reconstruct every time — is slower and more fragile.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Server-side computation is free tokens.&lt;/strong&gt; Alphabetical sorting, date stamping, filename construction — anything the server can do deterministically, it should. Don't ask the LLM to reason about things it doesn't need to.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Keep the allowlist tight.&lt;/strong&gt; The &lt;code&gt;make&lt;/code&gt; target allowlist exists for the same reason the brain-mcp protects &lt;code&gt;glossary.md&lt;/code&gt; and &lt;code&gt;CLAUDE.md&lt;/code&gt; from deletion: mistakes are much easier to prevent than to fix.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;proxy_buffering off&lt;/code&gt; is not optional.&lt;/strong&gt; Pelican builds can produce a lot of output. Without it, the nginx buffer fills, the connection stalls, and the tool times out without explanation.
+Slug: second-mcp-pelican-blog&lt;/p&gt;</content><category term="Hardware &amp; Homelab"/><category term="MCP"/><category term="Pelican"/><category term="homelab"/><category term="Node.js"/><category term="nginx"/><category term="Claude"/></entry><entry><title>SoC Article 09: Hardware Description Languages and RTL Design</title><link href="http://lizard-spock.co.uk/soc-article-09-hardware-description-languages-rtl-design.html" rel="alternate"/><published>2026-05-01T00:00:00+01:00</published><updated>2026-05-01T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-05-01:/soc-article-09-hardware-description-languages-rtl-design.html</id><summary type="html">&lt;p&gt;How SoC hardware is described in code: the fundamental difference between sequential software and parallel hardware, RTL vs behavioural vs structural design, SystemVerilog key constructs, FSMs, testbenches, assertions, and the synthesis step that turns RTL into gates.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 9 of 11&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Hardware does not appear from nowhere. Before manufacturing a single transistor, engineers must describe the behaviour of a System-on-Chip (SoC). They use a language that both humans and tools can process: simulating, verifying, and ultimately synthesising the design into real logic gates.&lt;/p&gt;
@@ -6200,20 +6470,4 @@ ans =
 
 &lt;p&gt;By default gcc will not rearrange equations for optimal performance as this would change the accuracy.
 The GCC flag &lt;code&gt;-ffast-math&lt;/code&gt; optimizes equations as if they were associative.&lt;/p&gt;
-&lt;p&gt;The examples shown here were found on &lt;a href="https://news.ycombinator.com/item?id=7479550"&gt;Hacker News&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"/><category term="Matlab"/></entry><entry><title>"Adobe Creative Cloud is ..."</title><link href="http://lizard-spock.co.uk/adobe-creative-cloud-is.html" rel="alternate"/><published>2014-06-19T18:15:59+01:00</published><updated>2014-06-19T18:15:59+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-06-19:/adobe-creative-cloud-is.html</id><summary type="html">&lt;p&gt;Inconsistent, annoying, &lt;strong&gt;cheap&lt;/strong&gt;?&lt;/p&gt;
-&lt;!-- more --&gt;
-
-&lt;p&gt;My main bugbear with the creative cloud application is the way it updates applications.
-Photoshop CC and …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Inconsistent, annoying, &lt;strong&gt;cheap&lt;/strong&gt;?&lt;/p&gt;
-&lt;!-- more --&gt;
-
-&lt;p&gt;My main bugbear with the creative cloud application is the way it updates applications.
-Photoshop CC and Lightroom are handled differently.&lt;/p&gt;
-&lt;p&gt;Photoshop switches from installed to update. Which is great it will pull in the update on my command.&lt;/p&gt;
-&lt;p&gt;Lightroom switches from Installed to &lt;strong&gt;Try&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;Not only that but I have now have 2 version of Photoshop CC and CC (2014) ready
-for updates, one of which has not already been installed.&lt;/p&gt;
-&lt;p&gt;SO I have 2 applications with updates ready, one wants an update the other refuses
-to acknowledge it has been installed and wants a new install. A new program,
-Photoshop CC (2014), which only requires an update.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Adobe Creative Cloud update inconsistency" src="/images/Photography/CC_update.png" title="Adobe Creative Cloud is Inconsistent"&gt;&lt;/p&gt;</content><category term="Photography"/><category term="Creative Cloud"/><category term="Lightroom"/></entry></feed>
+&lt;p&gt;The examples shown here were found on &lt;a href="https://news.ycombinator.com/item?id=7479550"&gt;Hacker News&lt;/a&gt;.&lt;/p&gt;</content><category term="Engineering"/><category term="Matlab"/></entry></feed>
