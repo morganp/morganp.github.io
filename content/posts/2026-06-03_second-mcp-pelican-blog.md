@@ -44,41 +44,6 @@ git checkout main
 
 ---
 
-## Pelican Metadata Format
-
-Pelican does not use YAML frontmatter. It uses a colon-separated block at the top of the file, ending at the first blank line:
-
-```
-Title: My Post Title
-Date: 2026-06-03
-Category: Programming
-Tags: Python, MCP
-Author: yourname
-Status: published
-Slug: my-post-title
-
-Body text starts here.
-```
-
-`Status: draft` keeps the post out of the built output. `Status: published` includes it. The server defaults all new posts to `draft` — you have to explicitly flip it before running `make github`.
-
-The metadata parser is straightforward:
-
-```javascript
-function parsePelicanMeta(text) {
-  const lines = text.split("\n");
-  const meta = {};
-  for (const line of lines) {
-    if (line.trim() === "") break;
-    const m = line.match(/^([A-Za-z][A-Za-z0-9_-]*):\s*(.*)$/);
-    if (m) meta[m[1]] = m[2].trim();
-  }
-  return meta;
-}
-```
-
----
-
 ## Adding the Second Server
 
 The blog MCP runs on the same nginx port as the first MCP — no new public port needed. The difference is the URL path: the existing MCP server is reachable at `/mcp`, and the blog MCP is exposed at `/blog-mcp`. Internally, each path reverse-proxies to its own supergateway instance on a fixed localhost port.
@@ -317,7 +282,7 @@ Having built the first MCP server already, a few things carry over directly:
 
 **Server-side computation is free tokens.** Alphabetical sorting, date stamping, filename construction — anything the server can do deterministically, it should. Don't ask the LLM to reason about things it doesn't need to.
 
-**Keep the allowlist tight.** The `make` target allowlist exists for the same reason the brain-mcp protects `glossary.md` and `CLAUDE.md` from deletion: mistakes are much easier to prevent than to fix.
+**Keep the allowlist tight.** The `make` target allowlist exists because mistakes are much easier to prevent than to fix — `make clean` is not something you want an LLM calling by accident.
 
 **`proxy_buffering off` is not optional.** Pelican builds can produce a lot of output. Without it, the nginx buffer fills, the connection stalls, and the tool times out without explanation.
 Slug: second-mcp-pelican-blog
