@@ -52,16 +52,16 @@
                 </address>
         <p>In <a href="./category/hardware-homelab.html">Hardware & Homelab</a>.</p>
 <p>tags: <a href="./tag/mcp.html">MCP</a> <a href="./tag/pelican.html">Pelican</a> <a href="./tag/homelab.html">homelab</a> <a href="./tag/nodejs.html">Node.js</a> <a href="./tag/nginx.html">nginx</a> <a href="./tag/claude.html">Claude</a> </p>        
-</footer><!-- /.post-info -->        <p>Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same LXC container as an existing MCP server — so the OAuth service, nginx, and nftables rules carry over, and the new server is a matter of writing the tools and wiring up a new port.</p>
+</footer><!-- /.post-info -->        <p>Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same host as an existing MCP server — so the OAuth service, nginx, and firewall rules carry over, and the new server is a matter of writing the tools and adding a new location block to nginx.</p>
 <p>The target: a <code>blog-mcp</code> server that lets Claude pull the repo, create and edit posts, add images, run <code>make github</code> to build and publish, and push the source — all without leaving the conversation.</p>
 <hr>
 <h2>What's Already in Place</h2>
-<p>This guide assumes the SecondBrain MCP setup from the previous post is done:</p>
+<p>This guide assumes the first MCP server setup from the previous post is done:</p>
 <ul>
-<li>LXC 117 running on Proxmox, Node.js 22, supergateway at <code>/bin/supergateway</code></li>
-<li>nginx on port 3001 with OAuth bearer token validation (the <code>map {}</code> block and <code>brain_mcp_auth_ok</code> variable)</li>
-<li><code>brain-oauth</code> service on port 3003 handling the OAuth authorization code + PKCE flow</li>
-<li>nftables blocking direct access to internal supergateway ports</li>
+<li>Node.js 22 and supergateway installed on the host</li>
+<li>nginx with OAuth bearer token validation (the <code>map {}</code> block and auth variable defined at the <code>http {}</code> level)</li>
+<li>The OAuth server handling the OAuth authorization code + PKCE flow</li>
+<li>Firewall rules blocking direct access to internal supergateway ports</li>
 </ul>
 <p>If you're starting fresh, read that post first. The OAuth setup is the hard part; it isn't repeated here.</p>
 <hr>
@@ -107,38 +107,13 @@ git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div>
 
 <hr>
-<h2>Port Allocation</h2>
-<p>The new server slots alongside the existing ones:</p>
-<table>
-<thead>
-<tr>
-<th>Port</th>
-<th>Service</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3001</td>
-<td>nginx — brain-mcp (public)</td>
-</tr>
-<tr>
-<td>3002</td>
-<td>supergateway — brain-mcp (localhost)</td>
-</tr>
-<tr>
-<td>3003</td>
-<td>brain-oauth (localhost)</td>
-</tr>
-<tr>
-<td>3004</td>
-<td>supergateway — blog-mcp (localhost) ← new</td>
-</tr>
-<tr>
-<td>3011</td>
-<td>nginx — blog-mcp (public) ← new</td>
-</tr>
-</tbody>
-</table>
+<h2>Adding the Second Server</h2>
+<p>The blog MCP runs on the same nginx port as the first MCP — no new public port needed. The difference is the URL path: the existing MCP server is reachable at <code>/mcp</code>, and the blog MCP is exposed at <code>/blog-mcp</code>. Internally, each path reverse-proxies to its own supergateway instance on a fixed localhost port.</p>
+<div class="highlight"><pre><span></span><code>https://your-mcp-host/mcp       → supergateway (first MCP)   [localhost:XXXX]
+https://your-mcp-host/blog-mcp  → supergateway (blog MCP)    [localhost:YYYY]  ← new
+</code></pre></div>
+
+<p>The OAuth server, bearer token validation, and <code>/.well-known/</code> discovery endpoints are shared — they're defined once and apply to all location blocks on the same server.</p>
 <hr>
 <h2>Setting Up the Pelican Environment</h2>
 <p>Debian Trixie blocks <code>pip install</code> at the system level (<code>externally-managed-environment</code>). Use a virtual environment:</p>
@@ -185,7 +160,7 @@ python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </
 <span class="kd">const</span><span class="w"> </span><span class="nx">abs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">POSTS_DIR</span><span class="p">,</span><span class="w"> </span><span class="nx">filename</span><span class="p">);</span>
 </code></pre></div>
 
-<p>Writes a correctly-formatted Pelican metadata block. Hard-codes <code>Author: morganp</code> and <code>Status: draft</code>. The LLM supplies title, category, tags, and body.</p>
+<p>Writes a correctly-formatted Pelican metadata block. Hard-codes the author name and <code>Status: draft</code>. The LLM supplies title, category, tags, and body.</p>
 <h3><code>blog_edit_post</code></h3>
 <p>Find/replace in a post file, identified by slug, filename, or relative path. Used to flip status:</p>
 <div class="highlight"><pre><span></span><code>blog_edit_post(slug=&quot;my-post&quot;, old_string=&quot;Status: draft&quot;, new_string=&quot;Status: published&quot;)
@@ -229,7 +204,7 @@ python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </
 <span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
 <span class="na">ExecStartPre</span><span class="o">=</span><span class="s">/bin/bash -c &#39;cd /opt/blog-mcp &amp;&amp; npm install --silent&#39;</span>
 <span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/bin/supergateway --stdio &#39;node /opt/blog-mcp/server.js&#39; </span>\
-<span class="w">  </span><span class="s">--port 3004 --outputTransport streamableHttp</span>
+<span class="w">  </span><span class="s">--port &lt;internal-port&gt; --outputTransport streamableHttp</span>
 <span class="na">Restart</span><span class="o">=</span><span class="s">always</span>
 <span class="na">RestartSec</span><span class="o">=</span><span class="s">5</span>
 <span class="na">Environment</span><span class="o">=</span><span class="s">NODE_ENV=production</span>
@@ -244,53 +219,34 @@ python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </
 systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>blog-mcp
 </code></pre></div>
 
-<p>Block port 3004 from external access:</p>
-<div class="highlight"><pre><span></span><code>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>filter<span class="w"> </span>input<span class="w"> </span>iif<span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s1">&#39;lo&#39;</span><span class="w"> </span>tcp<span class="w"> </span>dport<span class="w"> </span><span class="m">3004</span><span class="w"> </span>drop
+<p>Block the internal supergateway port from external access:</p>
+<div class="highlight"><pre><span></span><code>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>filter<span class="w"> </span>input<span class="w"> </span>iif<span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s1">&#39;lo&#39;</span><span class="w"> </span>tcp<span class="w"> </span>dport<span class="w"> </span>&lt;internal-port&gt;<span class="w"> </span>drop
 nft<span class="w"> </span>list<span class="w"> </span>ruleset<span class="w"> </span>&gt;<span class="w"> </span>/etc/nftables.conf
 </code></pre></div>
 
 <hr>
 <h2>The nginx Block</h2>
-<p><code>/etc/nginx/sites-available/blog-mcp</code> — new server block on port 3011. Because the <code>map {}</code> for bearer token validation was defined at the <code>http {}</code> level in the brain-mcp site file, <code>$brain_mcp_auth_ok</code> is already available here.</p>
-<div class="highlight"><pre><span></span><code><span class="k">server</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">3011</span><span class="p">;</span>
-<span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">_</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/.well-known/oauth-protected-resource</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kn">default_type</span><span class="w"> </span><span class="s">application/json</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">add_header</span><span class="w"> </span><span class="s">Access-Control-Allow-Origin</span><span class="w"> </span><span class="s">*</span><span class="w"> </span><span class="s">always</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">return</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="s">&#39;</span><span class="p">{</span><span class="kn">&quot;resource&quot;:&quot;http://$http_host&quot;,&quot;authorization_servers&quot;:[&quot;http://$http_host&quot;]}&#39;</span><span class="p">;</span>
+<p>Rather than a new server block, the blog MCP gets a new <code>location</code> block inside the existing server. The <code>map {}</code> for bearer token validation was already defined at the <code>http {}</code> level, so the auth variable is available here automatically.</p>
+<p>Add this location to the existing MCP server block:</p>
+<div class="highlight"><pre><span></span><code><span class="k">location</span><span class="w"> </span><span class="s">/blog-mcp</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kn">if</span><span class="w"> </span><span class="s">(</span><span class="nv">$mcp_auth_ok</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="s">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kn">add_header</span><span class="w"> </span><span class="s">WWW-Authenticate</span><span class="w"> </span><span class="s">&#39;Bearer</span><span class="w"> </span><span class="s">realm=&quot;blog-mcp&quot;,</span><span class="w"> </span><span class="s">resource_metadata=&quot;http://</span><span class="nv">$http_host/.well-known/oauth-protected-resource&quot;&#39;</span><span class="w"> </span><span class="s">always</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">return</span><span class="w"> </span><span class="mi">401</span><span class="w"> </span><span class="s">&#39;</span><span class="p">{</span><span class="kn">&quot;error&quot;:&quot;unauthorized&quot;}&#39;</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/.well-known/oauth-authorization-server</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kn">default_type</span><span class="w"> </span><span class="s">application/json</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">add_header</span><span class="w"> </span><span class="s">Access-Control-Allow-Origin</span><span class="w"> </span><span class="s">*</span><span class="w"> </span><span class="s">always</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">return</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="s">&#39;</span><span class="p">{</span><span class="kn">&quot;issuer&quot;:&quot;http://$http_host&quot;,&quot;authorization_endpoint&quot;:&quot;http://$http_host/authorize&quot;,&quot;token_endpoint&quot;:&quot;http://$http_host/token&quot;,&quot;response_types_supported&quot;:[&quot;code&quot;],&quot;grant_types_supported&quot;:[&quot;authorization_code&quot;],&quot;code_challenge_methods_supported&quot;:[&quot;S256&quot;,&quot;plain&quot;],&quot;token_endpoint_auth_methods_supported&quot;:[&quot;client_secret_post&quot;]}&#39;</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/authorize</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:3003</span><span class="p">;</span><span class="w"> </span><span class="kn">proxy_http_version</span><span class="w"> </span><span class="mi">1</span><span class="s">.1</span><span class="p">;</span><span class="w"> </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/token</span><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:3003</span><span class="p">;</span><span class="w"> </span><span class="kn">proxy_http_version</span><span class="w"> </span><span class="mi">1</span><span class="s">.1</span><span class="p">;</span><span class="w"> </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/mcp</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kn">if</span><span class="w"> </span><span class="s">(</span><span class="nv">$brain_mcp_auth_ok</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="s">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="kn">add_header</span><span class="w"> </span><span class="s">WWW-Authenticate</span><span class="w"> </span><span class="s">&#39;Bearer</span><span class="w"> </span><span class="s">realm=&quot;blog-mcp&quot;,</span><span class="w"> </span><span class="s">resource_metadata=&quot;http://</span><span class="nv">$http_host/.well-known/oauth-protected-resource&quot;&#39;</span><span class="w"> </span><span class="s">always</span><span class="p">;</span>
-<span class="w">            </span><span class="kn">return</span><span class="w"> </span><span class="mi">401</span><span class="w"> </span><span class="s">&#39;</span><span class="p">{</span><span class="kn">&quot;error&quot;:&quot;unauthorized&quot;}&#39;</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:3004</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_http_version</span><span class="w"> </span><span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_buffering</span><span class="w"> </span><span class="no">off</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_read_timeout</span><span class="w"> </span><span class="s">120s</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Connection</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">chunked_transfer_encoding</span><span class="w"> </span><span class="no">on</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:&lt;internal-port&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">proxy_http_version</span><span class="w"> </span><span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">proxy_buffering</span><span class="w"> </span><span class="no">off</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">proxy_read_timeout</span><span class="w"> </span><span class="s">120s</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Connection</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">chunked_transfer_encoding</span><span class="w"> </span><span class="no">on</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code>ln<span class="w"> </span>-sf<span class="w"> </span>/etc/nginx/sites-available/blog-mcp<span class="w"> </span>/etc/nginx/sites-enabled/blog-mcp
-nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
+<div class="highlight"><pre><span></span><code>nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
 </code></pre></div>
 
+<p>The <code>/.well-known/</code> discovery endpoints, <code>/authorize</code>, and <code>/token</code> locations are already present in the existing server block and serve both MCPs without any changes.</p>
 <hr>
 <h2>A Session in Practice</h2>
 <div class="highlight"><pre><span></span><code><span class="n">blog_pull</span><span class="p">()</span>
@@ -314,10 +270,10 @@ nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp
 
 <p>Seven tool calls, one published post.</p>
 <hr>
-<h2>Why Not Just Use the SecondBrain MCP?</h2>
-<p>The SecondBrain MCP already has <code>write_text</code> and <code>edit</code>. In theory you could manage a blog repo with those. In practice, it's the wrong tool — you'd be reading files to learn the Pelican metadata format, manually constructing filenames, running shell commands out of band, and hoping nothing breaks in the <code>make</code> step.</p>
+<h2>Why Not Just Use the Existing MCP?</h2>
+<p>The first MCP server already has <code>write_text</code> and <code>edit</code> tools. In theory you could manage a blog repo with those. In practice, it's the wrong tool — you'd be reading files to learn the Pelican metadata format, manually constructing filenames, running shell commands out of band, and hoping nothing breaks in the <code>make</code> step.</p>
 <p>A purpose-built MCP server encodes the domain knowledge: where posts live, what the metadata block looks like, which <code>make</code> targets are safe to run, how to handle collateral like images and PDFs. The LLM just supplies the content.</p>
-<p>Having built the SecondBrain MCP first, a few things carry over directly:</p>
+<p>Having built the first MCP server already, a few things carry over directly:</p>
 <p><strong>Domain-specific tools beat generic ones.</strong> <code>blog_new_post</code> is worth writing because it encodes the Pelican metadata format, the file naming convention, and the draft-by-default behaviour. The alternative — <code>write_text</code> with a format the LLM has to reconstruct every time — is slower and more fragile.</p>
 <p><strong>Server-side computation is free tokens.</strong> Alphabetical sorting, date stamping, filename construction — anything the server can do deterministically, it should. Don't ask the LLM to reason about things it doesn't need to.</p>
 <p><strong>Keep the allowlist tight.</strong> The <code>make</code> target allowlist exists for the same reason the brain-mcp protects <code>glossary.md</code> and <code>CLAUDE.md</code> from deletion: mistakes are much easier to prevent than to fix.</p>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Hardware &amp; Homelab</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/hardware-homelab.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-06-03T00:00:00+01:00</updated><entry><title>A Second MCP Server: Managing a Pelican Blog from Claude</title><link href="http://lizard-spock.co.uk/a-second-mcp-server-managing-a-pelican-blog-from-claude.html" rel="alternate"/><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/a-second-mcp-server-managing-a-pelican-blog-from-claude.html</id><summary type="html">&lt;p&gt;How to add a second self-hosted MCP server alongside an existing one — a blog-management MCP that lets Claude create posts, add images, and publish a Pelican site without leaving the conversation.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same LXC container as an existing MCP server — so the OAuth service, nginx, and nftables rules carry over, and the new server is a matter of writing the tools and wiring up a new port.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Hardware &amp; Homelab</title><link href="http://lizard-spock.co.uk/" rel="alternate"/><link href="http://lizard-spock.co.uk/feeds/hardware-homelab.atom.xml" rel="self"/><id>http://lizard-spock.co.uk/</id><updated>2026-06-03T00:00:00+01:00</updated><entry><title>A Second MCP Server: Managing a Pelican Blog from Claude</title><link href="http://lizard-spock.co.uk/a-second-mcp-server-managing-a-pelican-blog-from-claude.html" rel="alternate"/><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/a-second-mcp-server-managing-a-pelican-blog-from-claude.html</id><summary type="html">&lt;p&gt;How to add a second self-hosted MCP server alongside an existing one — a blog-management MCP that lets Claude create posts, add images, and publish a Pelican site without leaving the conversation.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same host as an existing MCP server — so the OAuth service, nginx, and firewall rules carry over, and the new server is a matter of writing the tools and adding a new location block to nginx.&lt;/p&gt;
 &lt;p&gt;The target: a &lt;code&gt;blog-mcp&lt;/code&gt; server that lets Claude pull the repo, create and edit posts, add images, run &lt;code&gt;make github&lt;/code&gt; to build and publish, and push the source — all without leaving the conversation.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;What's Already in Place&lt;/h2&gt;
-&lt;p&gt;This guide assumes the SecondBrain MCP setup from the previous post is done:&lt;/p&gt;
+&lt;p&gt;This guide assumes the first MCP server setup from the previous post is done:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;LXC 117 running on Proxmox, Node.js 22, supergateway at &lt;code&gt;/bin/supergateway&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;nginx on port 3001 with OAuth bearer token validation (the &lt;code&gt;map {}&lt;/code&gt; block and &lt;code&gt;brain_mcp_auth_ok&lt;/code&gt; variable)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;brain-oauth&lt;/code&gt; service on port 3003 handling the OAuth authorization code + PKCE flow&lt;/li&gt;
-&lt;li&gt;nftables blocking direct access to internal supergateway ports&lt;/li&gt;
+&lt;li&gt;Node.js 22 and supergateway installed on the host&lt;/li&gt;
+&lt;li&gt;nginx with OAuth bearer token validation (the &lt;code&gt;map {}&lt;/code&gt; block and auth variable defined at the &lt;code&gt;http {}&lt;/code&gt; level)&lt;/li&gt;
+&lt;li&gt;The OAuth server handling the OAuth authorization code + PKCE flow&lt;/li&gt;
+&lt;li&gt;Firewall rules blocking direct access to internal supergateway ports&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;If you're starting fresh, read that post first. The OAuth setup is the hard part; it isn't repeated here.&lt;/p&gt;
 &lt;hr&gt;
@@ -54,38 +54,13 @@ git&lt;span class="w"&gt; &lt;/span&gt;checkout&lt;span class="w"&gt; &lt;/span&
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;hr&gt;
-&lt;h2&gt;Port Allocation&lt;/h2&gt;
-&lt;p&gt;The new server slots alongside the existing ones:&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Port&lt;/th&gt;
-&lt;th&gt;Service&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;3001&lt;/td&gt;
-&lt;td&gt;nginx — brain-mcp (public)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3002&lt;/td&gt;
-&lt;td&gt;supergateway — brain-mcp (localhost)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3003&lt;/td&gt;
-&lt;td&gt;brain-oauth (localhost)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3004&lt;/td&gt;
-&lt;td&gt;supergateway — blog-mcp (localhost) ← new&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3011&lt;/td&gt;
-&lt;td&gt;nginx — blog-mcp (public) ← new&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;h2&gt;Adding the Second Server&lt;/h2&gt;
+&lt;p&gt;The blog MCP runs on the same nginx port as the first MCP — no new public port needed. The difference is the URL path: the existing MCP server is reachable at &lt;code&gt;/mcp&lt;/code&gt;, and the blog MCP is exposed at &lt;code&gt;/blog-mcp&lt;/code&gt;. Internally, each path reverse-proxies to its own supergateway instance on a fixed localhost port.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;https://your-mcp-host/mcp       → supergateway (first MCP)   [localhost:XXXX]
+https://your-mcp-host/blog-mcp  → supergateway (blog MCP)    [localhost:YYYY]  ← new
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The OAuth server, bearer token validation, and &lt;code&gt;/.well-known/&lt;/code&gt; discovery endpoints are shared — they're defined once and apply to all location blocks on the same server.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Setting Up the Pelican Environment&lt;/h2&gt;
 &lt;p&gt;Debian Trixie blocks &lt;code&gt;pip install&lt;/code&gt; at the system level (&lt;code&gt;externally-managed-environment&lt;/code&gt;). Use a virtual environment:&lt;/p&gt;
@@ -132,7 +107,7 @@ python3&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt
 &lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;abs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;path&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;POSTS_DIR&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;Writes a correctly-formatted Pelican metadata block. Hard-codes &lt;code&gt;Author: morganp&lt;/code&gt; and &lt;code&gt;Status: draft&lt;/code&gt;. The LLM supplies title, category, tags, and body.&lt;/p&gt;
+&lt;p&gt;Writes a correctly-formatted Pelican metadata block. Hard-codes the author name and &lt;code&gt;Status: draft&lt;/code&gt;. The LLM supplies title, category, tags, and body.&lt;/p&gt;
 &lt;h3&gt;&lt;code&gt;blog_edit_post&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;Find/replace in a post file, identified by slug, filename, or relative path. Used to flip status:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;blog_edit_post(slug=&amp;quot;my-post&amp;quot;, old_string=&amp;quot;Status: draft&amp;quot;, new_string=&amp;quot;Status: published&amp;quot;)
@@ -176,7 +151,7 @@ python3&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt
 &lt;span class="na"&gt;Type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;simple&lt;/span&gt;
 &lt;span class="na"&gt;ExecStartPre&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;/bin/bash -c &amp;#39;cd /opt/blog-mcp &amp;amp;&amp;amp; npm install --silent&amp;#39;&lt;/span&gt;
 &lt;span class="na"&gt;ExecStart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;/usr/bin/supergateway --stdio &amp;#39;node /opt/blog-mcp/server.js&amp;#39; &lt;/span&gt;\
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s"&gt;--port 3004 --outputTransport streamableHttp&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s"&gt;--port &amp;lt;internal-port&amp;gt; --outputTransport streamableHttp&lt;/span&gt;
 &lt;span class="na"&gt;Restart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;
 &lt;span class="na"&gt;RestartSec&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;5&lt;/span&gt;
 &lt;span class="na"&gt;Environment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;NODE_ENV=production&lt;/span&gt;
@@ -191,53 +166,34 @@ python3&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt
 systemctl&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--now&lt;span class="w"&gt; &lt;/span&gt;blog-mcp
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;Block port 3004 from external access:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;nft&lt;span class="w"&gt; &lt;/span&gt;add&lt;span class="w"&gt; &lt;/span&gt;rule&lt;span class="w"&gt; &lt;/span&gt;inet&lt;span class="w"&gt; &lt;/span&gt;filter&lt;span class="w"&gt; &lt;/span&gt;input&lt;span class="w"&gt; &lt;/span&gt;iif&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;lo&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;tcp&lt;span class="w"&gt; &lt;/span&gt;dport&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3004&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;drop
+&lt;p&gt;Block the internal supergateway port from external access:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;nft&lt;span class="w"&gt; &lt;/span&gt;add&lt;span class="w"&gt; &lt;/span&gt;rule&lt;span class="w"&gt; &lt;/span&gt;inet&lt;span class="w"&gt; &lt;/span&gt;filter&lt;span class="w"&gt; &lt;/span&gt;input&lt;span class="w"&gt; &lt;/span&gt;iif&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;lo&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;tcp&lt;span class="w"&gt; &lt;/span&gt;dport&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;internal-port&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;drop
 nft&lt;span class="w"&gt; &lt;/span&gt;list&lt;span class="w"&gt; &lt;/span&gt;ruleset&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/etc/nftables.conf
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;hr&gt;
 &lt;h2&gt;The nginx Block&lt;/h2&gt;
-&lt;p&gt;&lt;code&gt;/etc/nginx/sites-available/blog-mcp&lt;/code&gt; — new server block on port 3011. Because the &lt;code&gt;map {}&lt;/code&gt; for bearer token validation was defined at the &lt;code&gt;http {}&lt;/code&gt; level in the brain-mcp site file, &lt;code&gt;$brain_mcp_auth_ok&lt;/code&gt; is already available here.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;server&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;listen&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3011&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;server_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/.well-known/oauth-protected-resource&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;default_type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;application/json&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;add_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Access-Control-Allow-Origin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;resource&amp;quot;:&amp;quot;http://$http_host&amp;quot;,&amp;quot;authorization_servers&amp;quot;:[&amp;quot;http://$http_host&amp;quot;]}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;p&gt;Rather than a new server block, the blog MCP gets a new &lt;code&gt;location&lt;/code&gt; block inside the existing server. The &lt;code&gt;map {}&lt;/code&gt; for bearer token validation was already defined at the &lt;code&gt;http {}&lt;/code&gt; level, so the auth variable is available here automatically.&lt;/p&gt;
+&lt;p&gt;Add this location to the existing MCP server block:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/blog-mcp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$mcp_auth_ok&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="s"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;add_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;WWW-Authenticate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Bearer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;realm=&amp;quot;blog-mcp&amp;quot;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;resource_metadata=&amp;quot;http://&lt;/span&gt;&lt;span class="nv"&gt;$http_host/.well-known/oauth-protected-resource&amp;quot;&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;401&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;error&amp;quot;:&amp;quot;unauthorized&amp;quot;}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/.well-known/oauth-authorization-server&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;default_type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;application/json&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;add_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Access-Control-Allow-Origin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;issuer&amp;quot;:&amp;quot;http://$http_host&amp;quot;,&amp;quot;authorization_endpoint&amp;quot;:&amp;quot;http://$http_host/authorize&amp;quot;,&amp;quot;token_endpoint&amp;quot;:&amp;quot;http://$http_host/token&amp;quot;,&amp;quot;response_types_supported&amp;quot;:[&amp;quot;code&amp;quot;],&amp;quot;grant_types_supported&amp;quot;:[&amp;quot;authorization_code&amp;quot;],&amp;quot;code_challenge_methods_supported&amp;quot;:[&amp;quot;S256&amp;quot;,&amp;quot;plain&amp;quot;],&amp;quot;token_endpoint_auth_methods_supported&amp;quot;:[&amp;quot;client_secret_post&amp;quot;]}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/authorize&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;http://127.0.0.1:3003&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_http_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="s"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/token&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;http://127.0.0.1:3003&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_http_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="s"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;/mcp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$brain_mcp_auth_ok&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="s"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="kn"&gt;add_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;WWW-Authenticate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Bearer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;realm=&amp;quot;blog-mcp&amp;quot;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;resource_metadata=&amp;quot;http://&lt;/span&gt;&lt;span class="nv"&gt;$http_host/.well-known/oauth-protected-resource&amp;quot;&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;always&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="kn"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;401&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kn"&gt;&amp;quot;error&amp;quot;:&amp;quot;unauthorized&amp;quot;}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;http://127.0.0.1:3004&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_http_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="s"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_buffering&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;off&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_read_timeout&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;120s&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Connection&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kn"&gt;chunked_transfer_encoding&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;on&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;proxy_pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;http://127.0.0.1:&amp;lt;internal-port&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;proxy_http_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="s"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;proxy_buffering&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;off&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;proxy_read_timeout&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;120s&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;proxy_set_header&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;Connection&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kn"&gt;chunked_transfer_encoding&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;on&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ln&lt;span class="w"&gt; &lt;/span&gt;-sf&lt;span class="w"&gt; &lt;/span&gt;/etc/nginx/sites-available/blog-mcp&lt;span class="w"&gt; &lt;/span&gt;/etc/nginx/sites-enabled/blog-mcp
-nginx&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;systemctl&lt;span class="w"&gt; &lt;/span&gt;reload&lt;span class="w"&gt; &lt;/span&gt;nginx
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;nginx&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;systemctl&lt;span class="w"&gt; &lt;/span&gt;reload&lt;span class="w"&gt; &lt;/span&gt;nginx
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
+&lt;p&gt;The &lt;code&gt;/.well-known/&lt;/code&gt; discovery endpoints, &lt;code&gt;/authorize&lt;/code&gt;, and &lt;code&gt;/token&lt;/code&gt; locations are already present in the existing server block and serve both MCPs without any changes.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;A Session in Practice&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;blog_pull&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
@@ -261,10 +217,10 @@ nginx&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&
 
 &lt;p&gt;Seven tool calls, one published post.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2&gt;Why Not Just Use the SecondBrain MCP?&lt;/h2&gt;
-&lt;p&gt;The SecondBrain MCP already has &lt;code&gt;write_text&lt;/code&gt; and &lt;code&gt;edit&lt;/code&gt;. In theory you could manage a blog repo with those. In practice, it's the wrong tool — you'd be reading files to learn the Pelican metadata format, manually constructing filenames, running shell commands out of band, and hoping nothing breaks in the &lt;code&gt;make&lt;/code&gt; step.&lt;/p&gt;
+&lt;h2&gt;Why Not Just Use the Existing MCP?&lt;/h2&gt;
+&lt;p&gt;The first MCP server already has &lt;code&gt;write_text&lt;/code&gt; and &lt;code&gt;edit&lt;/code&gt; tools. In theory you could manage a blog repo with those. In practice, it's the wrong tool — you'd be reading files to learn the Pelican metadata format, manually constructing filenames, running shell commands out of band, and hoping nothing breaks in the &lt;code&gt;make&lt;/code&gt; step.&lt;/p&gt;
 &lt;p&gt;A purpose-built MCP server encodes the domain knowledge: where posts live, what the metadata block looks like, which &lt;code&gt;make&lt;/code&gt; targets are safe to run, how to handle collateral like images and PDFs. The LLM just supplies the content.&lt;/p&gt;
-&lt;p&gt;Having built the SecondBrain MCP first, a few things carry over directly:&lt;/p&gt;
+&lt;p&gt;Having built the first MCP server already, a few things carry over directly:&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Domain-specific tools beat generic ones.&lt;/strong&gt; &lt;code&gt;blog_new_post&lt;/code&gt; is worth writing because it encodes the Pelican metadata format, the file naming convention, and the draft-by-default behaviour. The alternative — &lt;code&gt;write_text&lt;/code&gt; with a format the LLM has to reconstruct every time — is slower and more fragile.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Server-side computation is free tokens.&lt;/strong&gt; Alphabetical sorting, date stamping, filename construction — anything the server can do deterministically, it should. Don't ask the LLM to reason about things it doesn't need to.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Keep the allowlist tight.&lt;/strong&gt; The &lt;code&gt;make&lt;/code&gt; target allowlist exists for the same reason the brain-mcp protects &lt;code&gt;glossary.md&lt;/code&gt; and &lt;code&gt;CLAUDE.md&lt;/code&gt; from deletion: mistakes are much easier to prevent than to fix.&lt;/p&gt;
