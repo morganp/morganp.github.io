@@ -87,7 +87,24 @@
 <hr>
 <h2>RTL vs behavioural vs structural</h2>
 <p>Hardware description language (HDL) code can be written at different levels of abstraction:</p>
-<p><img alt="FSM diagram" src="./images/fsm/fsm_be4b1b73ee5d6b84122a2e2376ba9d43.svg"></p>
+<div class="highlight"><pre><span></span><code><span class="k">digraph</span><span class="w"> </span><span class="nt">AbstractionLevels</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">rankdir</span><span class="p">=</span><span class="s">TB</span><span class="p">;</span>
+<span class="w">    </span><span class="k">graph</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;HDL Abstraction Levels&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">13</span><span class="p">,</span><span class="w"> </span><span class="na">labelloc</span><span class="p">=</span><span class="s">t</span><span class="p">];</span>
+<span class="w">    </span><span class="k">node</span><span class="w"> </span><span class="p">[</span><span class="na">shape</span><span class="p">=</span><span class="s">box</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="na">style</span><span class="p">=</span><span class="s">filled</span><span class="p">];</span>
+
+<span class="w">    </span><span class="nt">structural</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Structural\nInstantiate specific gates and wires.\nLike drawing a schematic in code.\nUsed for top-level integration and cell libraries.&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="na">fillcolor</span><span class="p">=</span><span class="s2">&quot;#4472C4&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fontcolor</span><span class="p">=</span><span class="s">white</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">behavioural</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Behavioural\nDescribe WHAT the circuit does, not HOW.\nSynthesis tool infers the gates.\nHigh abstraction, less control.&quot;</span><span class="p">,</span>
+<span class="w">                 </span><span class="na">fillcolor</span><span class="p">=</span><span class="s2">&quot;#70AD47&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">rtl</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;RTL (Register Transfer Level)\nDescribe data movements between registers\nwith explicit clock edges.\nSweet spot for SoC design -- what teams write.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="na">fillcolor</span><span class="p">=</span><span class="s2">&quot;#FFD966&quot;</span><span class="p">];</span>
+
+<span class="w">    </span><span class="nt">structural</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">behavioural</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;increasing abstraction&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">style</span><span class="p">=</span><span class="s">dashed</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">behavioural</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">rtl</span><span class="w"> </span><span class="p">[</span><span class="na">style</span><span class="p">=</span><span class="s">invis</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">rtl</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">behavioural</span><span class="w"> </span><span class="p">[</span><span class="na">style</span><span class="p">=</span><span class="s">invis</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>
+
 <p><strong>Structural:</strong> instantiate specific gates and connect them with wires:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// Structural: instantiate specific primitives</span>
 <span class="n">and_gate</span><span class="w"> </span><span class="n">U0</span><span class="w"> </span><span class="p">(.</span><span class="n">a</span><span class="p">(</span><span class="n">in_a</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">b</span><span class="p">(</span><span class="n">in_b</span><span class="p">),</span><span class="w"> </span><span class="p">.</span><span class="n">y</span><span class="p">(</span><span class="n">wire_and</span><span class="p">));</span>
@@ -274,7 +291,26 @@
 </code></pre></div>
 
 <p>The corresponding state diagram:</p>
-<p><img alt="FSM diagram" src="./images/fsm/fsm_4a564833658ab6fd609f49b340607e27.svg"></p>
+<div class="highlight"><pre><span></span><code><span class="k">digraph</span><span class="w"> </span><span class="nt">UART_RX</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">rankdir</span><span class="p">=</span><span class="s">LR</span><span class="p">;</span>
+<span class="w">    </span><span class="k">node</span><span class="w"> </span><span class="p">[</span><span class="na">shape</span><span class="p">=</span><span class="s">circle</span><span class="p">,</span><span class="w"> </span><span class="na">fontname</span><span class="p">=</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">11</span><span class="p">];</span>
+<span class="w">    </span><span class="k">edge</span><span class="w"> </span><span class="p">[</span><span class="na">fontname</span><span class="p">=</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">9</span><span class="p">];</span>
+
+<span class="w">    </span><span class="nt">IDLE</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;IDLE&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">START</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;START&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">DATA</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;DATA\n(8 bits)&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">STOP</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;STOP&quot;</span><span class="p">];</span>
+
+<span class="w">    </span><span class="nt">IDLE</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">IDLE</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;rx=1&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">IDLE</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">START</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;rx=0\n(start bit)&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">START</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">DATA</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;always&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">DATA</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">DATA</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;bit_cnt &lt; 7\n(shift in bit)&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">DATA</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">STOP</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;bit_cnt = 7&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">STOP</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">IDLE</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;rx=0\n(framing error)&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">STOP</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">IDLE</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;rx=1\n(valid=1, data out)&quot;</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>
+
 <hr>
 <h2>Simulation and testbenches</h2>
 <p>Hardware description language (HDL) code is verified by <strong>simulation</strong>: running the design against a set of inputs (a <strong>testbench</strong>) and checking the outputs.</p>
@@ -369,7 +405,34 @@
 <hr>
 <h2>The synthesis step</h2>
 <p><strong>Synthesis</strong> transforms register transfer level (RTL) code into a <strong>gate-level netlist</strong>: a description in terms of actual standard cells (AND, OR, flip-flop, multiplexer cells) from a technology library.</p>
-<p><img alt="FSM diagram" src="./images/fsm/fsm_b7885858d1b92706e35cc05075ab3aa8.svg"></p>
+<div class="highlight"><pre><span></span><code><span class="k">digraph</span><span class="w"> </span><span class="nt">SynthesisFlow</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">rankdir</span><span class="p">=</span><span class="s">TB</span><span class="p">;</span>
+<span class="w">    </span><span class="k">graph</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;RTL Synthesis Flow&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">13</span><span class="p">,</span><span class="w"> </span><span class="na">labelloc</span><span class="p">=</span><span class="s">t</span><span class="p">];</span>
+<span class="w">    </span><span class="k">node</span><span class="w"> </span><span class="p">[</span><span class="na">shape</span><span class="p">=</span><span class="s">box</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="na">style</span><span class="p">=</span><span class="s">filled</span><span class="p">];</span>
+
+<span class="w">    </span><span class="nt">rtl</span><span class="w">    </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;RTL Source\n(SystemVerilog / VHDL)&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">lightblue</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">sdc</span><span class="w">    </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Constraints\n(.sdc file)\nclock period, I/O delays&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">lightyellow</span><span class="p">];</span>
+
+<span class="w">    </span><span class="k">subgraph</span><span class="w"> </span><span class="nt">cluster_tool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Synthesis Tool\n(Synopsys DC / Cadence Genus / Yosys)&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="na">style</span><span class="p">=</span><span class="s">filled</span><span class="p">;</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s2">&quot;#F2F2F2&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="nt">elab</span><span class="w">   </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;1. Elaborate\nbuild design hierarchy&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">white</span><span class="p">];</span>
+<span class="w">        </span><span class="nt">generic</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;2. Generic Synthesis\ntechnology-independent optimisation&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">white</span><span class="p">];</span>
+<span class="w">        </span><span class="nt">map</span><span class="w">    </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;3. Technology Mapping\nmap to cell library&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">white</span><span class="p">];</span>
+<span class="w">        </span><span class="nt">opt</span><span class="w">    </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;4. Optimise\ntiming, area, power&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">white</span><span class="p">];</span>
+<span class="w">        </span><span class="nt">elab</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">generic</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">map</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">opt</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nt">netlist</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Gate-Level Netlist\n(.v / .sv)&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s2">&quot;#70AD47&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">sdf</span><span class="w">     </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Standard Delay Format\n(.sdf)\nfor back-annotated simulation&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s2">&quot;#A9D18E&quot;</span><span class="p">];</span>
+
+<span class="w">    </span><span class="nt">rtl</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">elab</span><span class="p">;</span>
+<span class="w">    </span><span class="nt">sdc</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">elab</span><span class="p">;</span>
+<span class="w">    </span><span class="nt">opt</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">netlist</span><span class="p">;</span>
+<span class="w">    </span><span class="nt">opt</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">sdf</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
 <p>The synthesis tool reads the RTL plus a <strong>constraints file</strong> (<code>.sdc</code>) that specifies the target clock frequency and I/O timing budgets, then maps to whatever cell library the target process provides.</p>
 <hr>
 <h2>Summary</h2>
@@ -382,7 +445,7 @@
 <li><em>Formal Verification Methods:</em> SVA property specification, model checking</li>
 </ul>
 <hr>
-<p><em>Previous: <a href="./soc-article-08-peripherals-and-io.html">Article 08 -- Peripherals and I/O</a></em> | <em>Next: <a href="./drafts/soc-article-10-design-flow.html">Article 10 -- The SoC Design Flow</a></em></p>
+<p><em>Previous: <a href="./soc-article-08-peripherals-and-io.html">Article 08 -- Peripherals and I/O</a></em> | <em>Next: <a href="./soc-article-10-design-flow.html">Article 10 -- The SoC Design Flow</a></em></p>
       </div><!-- /.entry-content -->
 
     </article>

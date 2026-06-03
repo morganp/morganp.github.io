@@ -91,10 +91,41 @@
 <hr>
 <h2>The Boot Process</h2>
 <p>Bringing a SoC from cold power-up to a running operating system is a multi-stage process, each stage loading and executing the next:</p>
-<p><img alt="FSM diagram" src="../images/fsm/fsm_819c53f62250209c99e94d71fd94ad95.svg"></p>
+<div class="highlight"><pre><span></span><code><span class="k">digraph</span><span class="w"> </span><span class="nt">BootProcess</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">rankdir</span><span class="p">=</span><span class="s">TB</span><span class="p">;</span>
+<span class="w">    </span><span class="k">node</span><span class="w"> </span><span class="p">[</span><span class="na">shape</span><span class="p">=</span><span class="s">box</span><span class="p">,</span><span class="w"> </span><span class="na">style</span><span class="p">=</span><span class="s">rounded</span><span class="p">,</span><span class="w"> </span><span class="na">fontname</span><span class="p">=</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">11</span><span class="p">];</span>
+<span class="w">    </span><span class="k">edge</span><span class="w"> </span><span class="p">[</span><span class="na">fontname</span><span class="p">=</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">9</span><span class="p">];</span>
+
+<span class="w">    </span><span class="nt">POR</span><span class="w">    </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Power-On Reset\n(hardware event)&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">BROM</span><span class="w">   </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Boot ROM\n(on-chip, immutable)\n\nCPU executes from ROM\nMinimal init (stack, caches)\nDetermines boot source\n(NAND, eMMC, USB, JTAG)\nLoads First-Stage Bootloader&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">FSBL</span><span class="w">   </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;First-Stage Bootloader\n(FSBL, e.g. SPL)\n\nInitialises DRAM\n(DDR training sequences)\nInitialises clocks to full speed\nLoads second-stage bootloader\nfrom eMMC/NAND to DRAM&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">UBOOT</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Second-Stage Bootloader\n(U-Boot / UEFI)\n\nFull command-line environment\nEthernet, USB, filesystem support\nDevice Tree configuration\nLoads kernel image from storage\nPasses device tree to kernel&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">KERNEL</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Linux Kernel\n\nMemory management init (MMU)\nCore subsystems start\nProbe drivers from Device Tree\nStart init process (PID 1)&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">INIT</span><span class="w">   </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Init System\n(systemd / BusyBox init)\n\nMount filesystems\nStart system services\nLaunch user applications&quot;</span><span class="p">];</span>
+<span class="w">    </span><span class="nt">APP</span><span class="w">    </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Application Running&quot;</span><span class="p">];</span>
+
+<span class="w">    </span><span class="nt">POR</span><span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">BROM</span><span class="p">;</span>
+<span class="w">    </span><span class="nt">BROM</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">FSBL</span><span class="p">;</span>
+<span class="w">    </span><span class="nt">FSBL</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">UBOOT</span><span class="p">;</span>
+<span class="w">    </span><span class="nt">UBOOT</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">KERNEL</span><span class="p">;</span>
+<span class="w">    </span><span class="nt">KERNEL</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">INIT</span><span class="p">;</span>
+<span class="w">    </span><span class="nt">INIT</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">APP</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
 <h3>DDR initialisation: a hardware-SW co-design example</h3>
 <p>One of the most hardware-specific firmware tasks is <strong>DDR initialisation</strong>. Modern LPDDR5 DRAM requires a training sequence: a complex set of calibration steps that establishes the optimal timing relationships between the SoC and the DRAM:</p>
-<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_1fad7251bc2bc79150338cd35f537451.svg"></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="s2">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DRAM_CLK&quot;</span><span class="p">,</span><span class="w">    </span><span class="s2">&quot;wave&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;N..........&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DRAM_CMD&quot;</span><span class="p">,</span><span class="w">    </span><span class="s2">&quot;wave&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x2.2.2.2.2x&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;MR_WRITE&quot;</span><span class="p">,</span><span class="s2">&quot;ZQ_CAL&quot;</span><span class="p">,</span><span class="s2">&quot;WR_LEV&quot;</span><span class="p">,</span><span class="s2">&quot;RD_TRAIN&quot;</span><span class="p">,</span><span class="s2">&quot;DONE&quot;</span><span class="p">]},</span>
+<span class="w">    </span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DRAM_DATA&quot;</span><span class="p">,</span><span class="w">   </span><span class="s2">&quot;wave&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x....2.2.2x&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;DQ_cal&quot;</span><span class="p">,</span><span class="s2">&quot;DQS_cal&quot;</span><span class="p">,</span><span class="s2">&quot;Valid&quot;</span><span class="p">]},</span>
+<span class="w">    </span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BOOT_STATE&quot;</span><span class="p">,</span><span class="w">  </span><span class="s2">&quot;wave&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x2.2.2.2.2x&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;PwrUp&quot;</span><span class="p">,</span><span class="s2">&quot;Init&quot;</span><span class="p">,</span><span class="s2">&quot;Train&quot;</span><span class="p">,</span><span class="s2">&quot;Verify&quot;</span><span class="p">,</span><span class="s2">&quot;Ready&quot;</span><span class="p">]}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="s2">&quot;head&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DDR Initialisation Sequence (simplified)&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
 <p>The FSBL writes a sequence of magic values to the DDR controller and DRAM mode registers, then reads test patterns back to calibrate write and read timing. Only after this sequence completes successfully can the rest of the software stack use DRAM.</p>
 <hr>
 <h2>Device Drivers</h2>
@@ -229,7 +260,7 @@
 <li><a href="../soc-article-07-clocking-reset-and-power-domains.html">Article 07: Clocking, reset, and power domains</a>: PLL, CDC, DVFS, power gating</li>
 <li><a href="../soc-article-08-peripherals-and-io.html">Article 08: Peripherals and I/O</a>: UART, SPI, I2C, USB, DMA, IRQ</li>
 <li><a href="../soc-article-09-hardware-description-languages-rtl-design.html">Article 09: HDL and RTL design</a>: SystemVerilog, FSM, simulation</li>
-<li><a href="../drafts/soc-article-10-design-flow.html">Article 10: The SoC design flow</a>: spec to RTL to synthesis to P&amp;R to tape-out</li>
+<li><a href="../soc-article-10-design-flow.html">Article 10: The SoC design flow</a>: spec to RTL to synthesis to P&amp;R to tape-out</li>
 </ol>
 <hr>
 <h2>Where to Go Next</h2>
@@ -264,7 +295,7 @@
 <h2>Summary</h2>
 <p>HW/SW co-design recognises that hardware and software are two facets of the same system: neither is meaningful without the other. The boot process takes a SoC from silicon power-on to a running application through several carefully orchestrated stages. Device drivers form the critical interface between the operating system and hardware registers. The partitioning of function between hardware and software is the most impactful architectural decision. Virtual platforms, FPGA prototypes, and emulators allow software development to proceed before silicon is available. Mastering co-design is what separates SoC systems engineers from specialists who know only one half of the system.</p>
 <hr>
-<p><em>Previous: <a href="../drafts/soc-article-10-design-flow.html">Article 10: The SoC design flow</a></em></p>
+<p><em>Previous: <a href="../soc-article-10-design-flow.html">Article 10: The SoC design flow</a></em></p>
       </div><!-- /.entry-content -->
 
     </article>

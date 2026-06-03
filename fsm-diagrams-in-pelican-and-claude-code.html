@@ -100,9 +100,32 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </code></pre></div>
 
 <p>At build time this becomes an SVG embedded in the page:</p>
-<p><img alt="FSM diagram" src="./images/fsm/fsm_ea7d29ca092a08571aa2cfe0ccc1600b.svg"></p>
+<div class="highlight"><pre><span></span><code><span class="n">stateDiagram</span><span class="o">-</span><span class="n">v2</span>
+<span class="w">    </span><span class="p">[</span><span class="o">*</span><span class="p">]</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">Idle</span>
+<span class="w">    </span><span class="n">Idle</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">Running</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">start</span>
+<span class="w">    </span><span class="n">Running</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">Idle</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">stop</span>
+<span class="w">    </span><span class="n">Running</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="nf">Error</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fault</span>
+<span class="w">    </span><span class="nf">Error</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">Idle</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">reset</span>
+</code></pre></div>
+
 <p>Graphviz DOT works the same way, and is a better fit for hardware and RTL documentation where the compact box-and-arrow style is conventional:</p>
-<p><img alt="FSM diagram" src="./images/fsm/fsm_d33619e8d6e9ae49f343c57a8f6db1e1.svg"></p>
+<div class="highlight"><pre><span></span><code><span class="k">digraph</span><span class="w"> </span><span class="nt">FSM</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">rankdir</span><span class="p">=</span><span class="s">LR</span>
+<span class="w">    </span><span class="k">node</span><span class="w"> </span><span class="p">[</span><span class="na">shape</span><span class="p">=</span><span class="s">circle</span><span class="w"> </span><span class="na">fontname</span><span class="p">=</span><span class="s2">&quot;monospace&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="k">edge</span><span class="w"> </span><span class="p">[</span><span class="na">fontname</span><span class="p">=</span><span class="s2">&quot;monospace&quot;</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">10</span><span class="p">]</span>
+
+<span class="w">    </span><span class="nt">__start</span><span class="w"> </span><span class="p">[</span><span class="na">shape</span><span class="p">=</span><span class="s">point</span><span class="w"> </span><span class="na">width</span><span class="p">=</span><span class="m">0.2</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">__start</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">IDLE</span>
+
+<span class="w">    </span><span class="nt">IDLE</span><span class="w"> </span><span class="p">[</span><span class="na">shape</span><span class="p">=</span><span class="s">doublecircle</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">IDLE</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">FETCH</span><span class="w">   </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;start&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">FETCH</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">DECODE</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;mem_ready&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">DECODE</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">EXECUTE</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;decoded&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">EXECUTE</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">IDLE</span><span class="w">   </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;done&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">EXECUTE</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">FETCH</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;!done / pc++&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
 <p>If the CLI is not found or rendering fails, the block falls back to fenced <code>text</code> — the post still builds, you just see the raw source instead of a diagram.</p>
 <h2>The Claude Code skill</h2>
 <p>The skill lives at <a href="https://github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm">github.com/morganp/dotfiles/tree/main/config/claude/skills/fsm</a>. Claude Code auto-discovers skills from <code>~/.claude/skills/</code> and loads them on demand.</p>
@@ -119,7 +142,24 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <p>"Draw the states for a TCP connection"</p>
 </blockquote>
 <p>Claude produces:</p>
-<p><img alt="FSM diagram" src="./images/fsm/fsm_03bf39c43e71e98bd12e737558c3f9e3.svg"></p>
+<div class="highlight"><pre><span></span><code>stateDiagram-v2
+    direction LR
+    [*] --&gt; CLOSED
+
+    CLOSED --&gt; LISTEN : passive open
+    CLOSED --&gt; SYN_SENT : active open / send SYN
+    LISTEN --&gt; SYN_RCVD : receive SYN / send SYN+ACK
+    SYN_SENT --&gt; ESTABLISHED : receive SYN+ACK / send ACK
+    SYN_RCVD --&gt; ESTABLISHED : receive ACK
+    ESTABLISHED --&gt; FIN_WAIT_1 : close / send FIN
+    ESTABLISHED --&gt; CLOSE_WAIT : receive FIN / send ACK
+    CLOSE_WAIT --&gt; LAST_ACK : close / send FIN
+    LAST_ACK --&gt; CLOSED : receive ACK
+    FIN_WAIT_1 --&gt; FIN_WAIT_2 : receive ACK
+    FIN_WAIT_2 --&gt; TIME_WAIT : receive FIN / send ACK
+    TIME_WAIT --&gt; CLOSED : timeout
+</code></pre></div>
+
 <p>Because the skill outputs a <code>mermaid</code> fenced block, you can paste it directly into a blog post and the Pelican plugin renders it automatically.</p>
 <h3>Installing the skill</h3>
 <div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.claude/skills/fsm
