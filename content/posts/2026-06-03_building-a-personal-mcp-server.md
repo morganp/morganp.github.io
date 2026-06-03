@@ -232,13 +232,13 @@ This is also the URL you'd add as a remote MCP connector in Claude.ai on mobile.
 
 The tunnel exposes the MCP server to the public internet with no authentication. Anyone who discovers the URL can read and write every file in the vault. This is an accepted short-term risk for initial setup and testing, but should not be left in production.
 
-There are two ways to close this gap:
+There are two options, but with an important caveat:
 
-**Cloudflare Zero Trust Access** — gate the tunnel at the edge before traffic reaches your server. In the Zero Trust dashboard: Access → Applications → Add an application → Self-hosted, point it at your tunnel hostname. You can restrict by email, IP, or issue service tokens to specific clients. This works today and requires no changes to the MCP server itself.
+**Cloudflare Zero Trust Access** — gates the tunnel at the edge before traffic reaches your server. You can restrict by email, IP, or issue service tokens. This works for Claude Code on the command line (where you can inject custom headers or use a service token), but **does not work with Claude.ai's web MCP connector**. Claude.ai's connector follows the MCP auth spec and expects OAuth — it has no mechanism to supply a Cloudflare Access service token.
 
-**OAuth on the MCP server** — the approach covered in the next post. A minimal Node.js OAuth server sits behind nginx; nginx validates the bearer token on every `/mcp` request. This is the right long-term solution and is what Claude.ai's MCP connector expects when you add a remote server in the UI.
+**OAuth on the MCP server** — the approach covered in the next post. A minimal Node.js OAuth server sits behind nginx; nginx validates the bearer token on every `/mcp` request. This is what Claude.ai's connector expects when you add a remote server in the UI, and it works across all clients — Claude Code, Claude.ai web, and Claude.ai on mobile.
 
-The two are complementary — Cloudflare Access as a coarse outer gate, OAuth as the fine-grained inner check — but for a personal single-user server, either one alone is sufficient.
+If you only need Claude Code access (local or on a trusted network), Cloudflare Access alone is sufficient. If you need Claude.ai web or mobile, OAuth is the only option.
 
 ---
 
