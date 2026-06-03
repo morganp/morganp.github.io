@@ -6,7 +6,7 @@ Author: morganp
 Status: published
 Summary: How to add a second self-hosted MCP server alongside an existing one — a blog-management MCP that lets Claude create posts, add images, and publish a Pelican site without leaving the conversation.
 
-Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same LXC container as an existing MCP server — so the OAuth service, nginx, and nftables rules carry over, and the new server is a matter of writing the tools and wiring up a new port.
+Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same host as an existing MCP server — so the OAuth service, nginx, and firewall rules carry over, and the new server is a matter of writing the tools and adding a new location block to nginx.
 
 The target: a `blog-mcp` server that lets Claude pull the repo, create and edit posts, add images, run `make github` to build and publish, and push the source — all without leaving the conversation.
 
@@ -14,12 +14,12 @@ The target: a `blog-mcp` server that lets Claude pull the repo, create and edit 
 
 ## What's Already in Place
 
-This guide assumes the SecondBrain MCP setup from the previous post is done:
+This guide assumes the first MCP server setup from the previous post is done:
 
-- LXC 117 running on Proxmox, Node.js 22, supergateway at `/bin/supergateway`
-- nginx on port 3001 with OAuth bearer token validation (the `map {}` block and `brain_mcp_auth_ok` variable)
-- `brain-oauth` service on port 3003 handling the OAuth authorization code + PKCE flow
-- nftables blocking direct access to internal supergateway ports
+- Node.js 22 and supergateway installed on the host
+- nginx with OAuth bearer token validation (the `map {}` block and auth variable defined at the `http {}` level)
+- The OAuth server handling the OAuth authorization code + PKCE flow
+- Firewall rules blocking direct access to internal supergateway ports
 
 If you're starting fresh, read that post first. The OAuth setup is the hard part; it isn't repeated here.
 
@@ -79,17 +79,16 @@ function parsePelicanMeta(text) {
 
 ---
 
-## Port Allocation
+## Adding the Second Server
 
-The new server slots alongside the existing ones:
+The blog MCP runs on the same nginx port as the first MCP — no new public port needed. The difference is the URL path: the existing MCP server is reachable at `/mcp`, and the blog MCP is exposed at `/blog-mcp`. Internally, each path reverse-proxies to its own supergateway instance on a fixed localhost port.
 
-| Port | Service |
-|------|---------|
-| 3001 | nginx — brain-mcp (public) |
-| 3002 | supergateway — brain-mcp (localhost) |
-| 3003 | brain-oauth (localhost) |
-| 3004 | supergateway — blog-mcp (localhost) ← new |
-| 3011 | nginx — blog-mcp (public) ← new |
+```
+https://your-mcp-host/mcp       → supergateway (first MCP)   [localhost:XXXX]
+https://your-mcp-host/blog-mcp  → supergateway (blog MCP)    [localhost:YYYY]  ← new
+```
+
+The OAuth server, bearer token validation, and `/.well-known/` discovery endpoints are shared — they're defined once and apply to all location blocks on the same server.
 
 ---
 
@@ -161,7 +160,7 @@ const filename = `${today}_${slug}.md`;
 const abs = path.join(POSTS_DIR, filename);
 ```
 
-Writes a correctly-formatted Pelican metadata block. Hard-codes `Author: morganp` and `Status: draft`. The LLM supplies title, category, tags, and body.
+Writes a correctly-formatted Pelican metadata block. Hard-codes the author name and `Status: draft`. The LLM supplies title, category, tags, and body.
 
 ### `blog_edit_post`
 
@@ -225,7 +224,7 @@ After=network.target
 Type=simple
 ExecStartPre=/bin/bash -c 'cd /opt/blog-mcp && npm install --silent'
 ExecStart=/usr/bin/supergateway --stdio 'node /opt/blog-mcp/server.js' \
-  --port 3004 --outputTransport streamableHttp
+  --port <internal-port> --outputTransport streamableHttp
 Restart=always
 RestartSec=5
 Environment=NODE_ENV=production
@@ -241,10 +240,10 @@ systemctl daemon-reload
 systemctl enable --now blog-mcp
 ```
 
-Block port 3004 from external access:
+Block the internal supergateway port from external access:
 
 ```bash
-nft add rule inet filter input iif != 'lo' tcp dport 3004 drop
+nft add rule inet filter input iif != 'lo' tcp dport <internal-port> drop
 nft list ruleset > /etc/nftables.conf
 ```
 
@@ -252,48 +251,31 @@ nft list ruleset > /etc/nftables.conf
 
 ## The nginx Block
 
-`/etc/nginx/sites-available/blog-mcp` — new server block on port 3011. Because the `map {}` for bearer token validation was defined at the `http {}` level in the brain-mcp site file, `$brain_mcp_auth_ok` is already available here.
+Rather than a new server block, the blog MCP gets a new `location` block inside the existing server. The `map {}` for bearer token validation was already defined at the `http {}` level, so the auth variable is available here automatically.
+
+Add this location to the existing MCP server block:
 
 ```nginx
-server {
-    listen 3011;
-    server_name _;
-
-    location = /.well-known/oauth-protected-resource {
-        default_type application/json;
-        add_header Access-Control-Allow-Origin * always;
-        return 200 '{"resource":"http://$http_host","authorization_servers":["http://$http_host"]}';
+location /blog-mcp {
+    if ($mcp_auth_ok = 0) {
+        add_header WWW-Authenticate 'Bearer realm="blog-mcp", resource_metadata="http://$http_host/.well-known/oauth-protected-resource"' always;
+        return 401 '{"error":"unauthorized"}';
     }
-
-    location = /.well-known/oauth-authorization-server {
-        default_type application/json;
-        add_header Access-Control-Allow-Origin * always;
-        return 200 '{"issuer":"http://$http_host","authorization_endpoint":"http://$http_host/authorize","token_endpoint":"http://$http_host/token","response_types_supported":["code"],"grant_types_supported":["authorization_code"],"code_challenge_methods_supported":["S256","plain"],"token_endpoint_auth_methods_supported":["client_secret_post"]}';
-    }
-
-    location = /authorize { proxy_pass http://127.0.0.1:3003; proxy_http_version 1.1; proxy_set_header Host $host; }
-    location = /token    { proxy_pass http://127.0.0.1:3003; proxy_http_version 1.1; proxy_set_header Host $host; }
-
-    location /mcp {
-        if ($brain_mcp_auth_ok = 0) {
-            add_header WWW-Authenticate 'Bearer realm="blog-mcp", resource_metadata="http://$http_host/.well-known/oauth-protected-resource"' always;
-            return 401 '{"error":"unauthorized"}';
-        }
-        proxy_pass http://127.0.0.1:3004;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_buffering off;
-        proxy_read_timeout 120s;
-        proxy_set_header Connection '';
-        chunked_transfer_encoding on;
-    }
+    proxy_pass http://127.0.0.1:<internal-port>;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_buffering off;
+    proxy_read_timeout 120s;
+    proxy_set_header Connection '';
+    chunked_transfer_encoding on;
 }
 ```
 
 ```bash
-ln -sf /etc/nginx/sites-available/blog-mcp /etc/nginx/sites-enabled/blog-mcp
 nginx -t && systemctl reload nginx
 ```
+
+The `/.well-known/` discovery endpoints, `/authorize`, and `/token` locations are already present in the existing server block and serve both MCPs without any changes.
 
 ---
 
@@ -323,13 +305,13 @@ Seven tool calls, one published post.
 
 ---
 
-## Why Not Just Use the SecondBrain MCP?
+## Why Not Just Use the Existing MCP?
 
-The SecondBrain MCP already has `write_text` and `edit`. In theory you could manage a blog repo with those. In practice, it's the wrong tool — you'd be reading files to learn the Pelican metadata format, manually constructing filenames, running shell commands out of band, and hoping nothing breaks in the `make` step.
+The first MCP server already has `write_text` and `edit` tools. In theory you could manage a blog repo with those. In practice, it's the wrong tool — you'd be reading files to learn the Pelican metadata format, manually constructing filenames, running shell commands out of band, and hoping nothing breaks in the `make` step.
 
 A purpose-built MCP server encodes the domain knowledge: where posts live, what the metadata block looks like, which `make` targets are safe to run, how to handle collateral like images and PDFs. The LLM just supplies the content.
 
-Having built the SecondBrain MCP first, a few things carry over directly:
+Having built the first MCP server already, a few things carry over directly:
 
 **Domain-specific tools beat generic ones.** `blog_new_post` is worth writing because it encodes the Pelican metadata format, the file naming convention, and the draft-by-default behaviour. The alternative — `write_text` with a format the LLM has to reconstruct every time — is slower and more fragile.
 
