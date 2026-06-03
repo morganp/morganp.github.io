@@ -358,10 +358,10 @@ systemctl&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/s
 &lt;p&gt;This is also the URL you'd add as a remote MCP connector in Claude.ai on mobile.&lt;/p&gt;
 &lt;h3&gt;Security Warning: the Server is Unauthenticated at This Point&lt;/h3&gt;
 &lt;p&gt;The tunnel exposes the MCP server to the public internet with no authentication. Anyone who discovers the URL can read and write every file in the vault. This is an accepted short-term risk for initial setup and testing, but should not be left in production.&lt;/p&gt;
-&lt;p&gt;There are two ways to close this gap:&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Cloudflare Zero Trust Access&lt;/strong&gt; — gate the tunnel at the edge before traffic reaches your server. In the Zero Trust dashboard: Access → Applications → Add an application → Self-hosted, point it at your tunnel hostname. You can restrict by email, IP, or issue service tokens to specific clients. This works today and requires no changes to the MCP server itself.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;OAuth on the MCP server&lt;/strong&gt; — the approach covered in the next post. A minimal Node.js OAuth server sits behind nginx; nginx validates the bearer token on every &lt;code&gt;/mcp&lt;/code&gt; request. This is the right long-term solution and is what Claude.ai's MCP connector expects when you add a remote server in the UI.&lt;/p&gt;
-&lt;p&gt;The two are complementary — Cloudflare Access as a coarse outer gate, OAuth as the fine-grained inner check — but for a personal single-user server, either one alone is sufficient.&lt;/p&gt;
+&lt;p&gt;There are two options, but with an important caveat:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Cloudflare Zero Trust Access&lt;/strong&gt; — gates the tunnel at the edge before traffic reaches your server. You can restrict by email, IP, or issue service tokens. This works for Claude Code on the command line (where you can inject custom headers or use a service token), but &lt;strong&gt;does not work with Claude.ai's web MCP connector&lt;/strong&gt;. Claude.ai's connector follows the MCP auth spec and expects OAuth — it has no mechanism to supply a Cloudflare Access service token.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;OAuth on the MCP server&lt;/strong&gt; — the approach covered in the next post. A minimal Node.js OAuth server sits behind nginx; nginx validates the bearer token on every &lt;code&gt;/mcp&lt;/code&gt; request. This is what Claude.ai's connector expects when you add a remote server in the UI, and it works across all clients — Claude Code, Claude.ai web, and Claude.ai on mobile.&lt;/p&gt;
+&lt;p&gt;If you only need Claude Code access (local or on a trusted network), Cloudflare Access alone is sufficient. If you need Claude.ai web or mobile, OAuth is the only option.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;The systemd Service&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;/etc/systemd/system/vault-mcp.service&lt;/code&gt;:&lt;/p&gt;
