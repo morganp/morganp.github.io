@@ -79,34 +79,6 @@ git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div>
 
 <hr>
-<h2>Pelican Metadata Format</h2>
-<p>Pelican does not use YAML frontmatter. It uses a colon-separated block at the top of the file, ending at the first blank line:</p>
-<div class="highlight"><pre><span></span><code><span class="n">Title</span><span class="o">:</span><span class="w"> </span><span class="n">My</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">Title</span>
-<span class="n">Date</span><span class="o">:</span><span class="w"> </span><span class="mi">2026</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">Category</span><span class="o">:</span><span class="w"> </span><span class="n">Programming</span>
-<span class="n">Tags</span><span class="o">:</span><span class="w"> </span><span class="n">Python</span><span class="o">,</span><span class="w"> </span><span class="n">MCP</span>
-<span class="n">Author</span><span class="o">:</span><span class="w"> </span><span class="n">yourname</span>
-<span class="n">Status</span><span class="o">:</span><span class="w"> </span><span class="n">published</span>
-<span class="n">Slug</span><span class="o">:</span><span class="w"> </span><span class="n">my</span><span class="o">-</span><span class="n">post</span><span class="o">-</span><span class="n">title</span>
-
-<span class="n">Body</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="n">starts</span><span class="w"> </span><span class="n">here</span><span class="o">.</span>
-</code></pre></div>
-
-<p><code>Status: draft</code> keeps the post out of the built output. <code>Status: published</code> includes it. The server defaults all new posts to <code>draft</code> — you have to explicitly flip it before running <code>make github</code>.</p>
-<p>The metadata parser is straightforward:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">parsePelicanMeta</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">);</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
-<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">lines</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">line</span><span class="p">.</span><span class="nx">trim</span><span class="p">()</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^([A-Za-z][A-Za-z0-9_-]*):\s*(.*)$/</span><span class="p">);</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">m</span><span class="p">)</span><span class="w"> </span><span class="nx">meta</span><span class="p">[</span><span class="nx">m</span><span class="p">[</span><span class="mf">1</span><span class="p">]]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">m</span><span class="p">[</span><span class="mf">2</span><span class="p">].</span><span class="nx">trim</span><span class="p">();</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">meta</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<hr>
 <h2>Adding the Second Server</h2>
 <p>The blog MCP runs on the same nginx port as the first MCP — no new public port needed. The difference is the URL path: the existing MCP server is reachable at <code>/mcp</code>, and the blog MCP is exposed at <code>/blog-mcp</code>. Internally, each path reverse-proxies to its own supergateway instance on a fixed localhost port.</p>
 <div class="highlight"><pre><span></span><code>https://your-mcp-host/mcp       → supergateway (first MCP)   [localhost:XXXX]
@@ -276,7 +248,7 @@ nft<span class="w"> </span>list<span class="w"> </span>ruleset<span class="w"> <
 <p>Having built the first MCP server already, a few things carry over directly:</p>
 <p><strong>Domain-specific tools beat generic ones.</strong> <code>blog_new_post</code> is worth writing because it encodes the Pelican metadata format, the file naming convention, and the draft-by-default behaviour. The alternative — <code>write_text</code> with a format the LLM has to reconstruct every time — is slower and more fragile.</p>
 <p><strong>Server-side computation is free tokens.</strong> Alphabetical sorting, date stamping, filename construction — anything the server can do deterministically, it should. Don't ask the LLM to reason about things it doesn't need to.</p>
-<p><strong>Keep the allowlist tight.</strong> The <code>make</code> target allowlist exists for the same reason the brain-mcp protects <code>glossary.md</code> and <code>CLAUDE.md</code> from deletion: mistakes are much easier to prevent than to fix.</p>
+<p><strong>Keep the allowlist tight.</strong> The <code>make</code> target allowlist exists because mistakes are much easier to prevent than to fix — <code>make clean</code> is not something you want an LLM calling by accident.</p>
 <p><strong><code>proxy_buffering off</code> is not optional.</strong> Pelican builds can produce a lot of output. Without it, the nginx buffer fills, the connection stalls, and the tool times out without explanation.
 Slug: second-mcp-pelican-blog</p>
       </div><!-- /.entry-content -->
