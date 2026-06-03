@@ -4,12 +4,12 @@ Category: Hardware & Homelab
 Tags: MCP, OAuth, nginx, Node.js, homelab, security, Claude
 Author: morganp
 Status: published
-Summary: How to add OAuth 2.1 authentication to a self-hosted MCP server using nginx as a reverse proxy and a minimal Node.js OAuth server — covering four failure modes and what actually works with Claude.ai.
+Summary: How to add OAuth 2.1 authentication to a self-hosted MCP server: nginx as an authenticating reverse proxy, a minimal Node.js OAuth server, and the key gotchas that will trip you up.
 Slug: mcp-server-oauth-authentication
 
 If you're running a self-hosted MCP server and exposing it over HTTP, you need authentication. Without it, anyone who can reach your port can invoke your tools.
 
-This is the story of how I added OAuth 2.1 auth to the vault MCP server from the previous post. It took longer than expected, involved four distinct failures, and produced a setup I'm happy with. Here's what I learned.
+This post covers adding OAuth 2.1 auth to the vault MCP server from the previous post. Claude.ai's MCP connector implements the full [OAuth 2.1 authorization code + PKCE flow](https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/authorization/) — it expects an OAuth Client ID and Secret, not a pre-shared bearer token. So that's what we build.
 
 ---
 
@@ -29,6 +29,14 @@ The server runs on a Debian container on Proxmox. The stack before this work:
 supergateway has no built-in support for validating incoming authentication — `--oauth2Bearer` is outbound-only, adding headers to requests supergateway makes upstream, not checking headers on requests coming in.
 
 The solution is to place nginx in front: move supergateway to an internal port, and let nginx handle bearer token validation before any request reaches the MCP server.
+
+Claude.ai's MCP connector requires three things from an OAuth server:
+
+1. A `/.well-known/oauth-authorization-server` discovery endpoint (RFC 8414)
+2. An `/authorize` endpoint it can redirect the user's browser to
+3. A `/token` endpoint where it exchanges the authorization code for an access token
+
+nginx serves the discovery endpoints statically and proxies `/authorize` and `/token` to a small Node.js OAuth server running on localhost.
 
 ---
 
@@ -72,69 +80,7 @@ systemctl enable nftables
 
 ---
 
-## Step 4: The First nginx Config — Static Bearer Token
-
-Initial plan: generate a strong bearer token, put it in nginx's `map {}` block, return 401 if it's missing or wrong.
-
-```bash
-openssl rand -base64 48
-```
-
-```nginx
-map_hash_bucket_size 128;
-
-map $http_authorization $mcp_auth_ok {
-    default                      0;
-    "Bearer <your-token-here>"   1;
-}
-
-server {
-    listen 3001;
-
-    location /mcp {
-        if ($mcp_auth_ok = 0) {
-            add_header WWW-Authenticate 'Bearer realm="mcp"' always;
-            return 401 '{"error":"unauthorized"}';
-        }
-        proxy_pass http://127.0.0.1:3002;
-        proxy_buffering off;
-        proxy_set_header Connection '';
-        proxy_read_timeout 300s;
-    }
-}
-```
-
-### Failure 1: map_hash_bucket_size
-
-`nginx -t` immediately failed:
-
-```
-[emerg] could not build map_hash, you should increase map_hash_bucket_size: 64
-```
-
-nginx's `map {}` stores keys in a hash table. The default bucket size is 64 bytes. The full `Authorization` header value (`Bearer ` prefix + a 64-character token) is ~71 bytes. Fix: add `map_hash_bucket_size 128;` at the top of the file.
-
----
-
-## Step 5: Claude.ai Doesn't Accept a Pre-Shared Bearer Token
-
-The static bearer approach worked in curl. Then I tried to configure it in Claude.ai's remote MCP settings — and hit the second failure.
-
-### Failure 2: Claude.ai Requires Real OAuth
-
-The Claude.ai web interface doesn't ask "what's your bearer token?" It asks for **OAuth Client ID** and **OAuth Client Secret**.
-
-Claude.ai implements the MCP auth spec's full [OAuth 2.1 authorization code + PKCE flow](https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/authorization/). It needs:
-
-1. A `/.well-known/oauth-authorization-server` discovery endpoint (RFC 8414)
-2. An `/authorize` endpoint it can redirect the user's browser to
-3. A `/token` endpoint where it exchanges the code for an access token
-
-A static pre-shared bearer token isn't surfaced in the UI at all. You need to run an actual OAuth authorization server.
-
----
-
-## Step 6: A Minimal OAuth Server in ~150 Lines of Node.js
+## Step 4: A Minimal OAuth Server in ~150 Lines of Node.js
 
 For a single-user personal server, a "real" OAuth AS doesn't need to be complex. The key insight: **auto-approve all authorization requests** — there's only one trusted client — and **always issue the same static access token** so nginx validation stays simple and restarts don't force re-authentication.
 
@@ -202,7 +148,7 @@ Without the guard, a wrong-length secret becomes a denial-of-service vector — 
 
 ---
 
-## Step 7: Wire nginx to the OAuth Server
+## Step 5: Wire nginx to the OAuth Server
 
 Updated nginx config — the key additions are proxying `/authorize` and `/token`, and adding the OAuth discovery metadata:
 
@@ -251,7 +197,7 @@ server {
 
 ---
 
-## Step 8: The Token Exchange Never Happened
+## Step 6: The Token Exchange Never Happened
 
 OAuth flow in Claude.ai: browser hits `/authorize` → gets a 302 with a code → follows it to Claude.ai's callback URL. Then Claude.ai's connector should call `POST /token` to exchange the code.
 
@@ -311,19 +257,10 @@ The static `OAUTH_ACCESS_TOKEN` is the value in nginx's `map {}` block. Generate
 
 | # | Lesson |
 |---|---|
-| 1 | `supergateway --oauth2Bearer` is outbound-only — it does not validate incoming requests |
-| 2 | Claude.ai's MCP UI requires OAuth Client ID + Secret — a pre-shared bearer header isn't an option |
-| 3 | `map_hash_bucket_size 128` is needed for tokens longer than ~55 characters |
-| 4 | `proxy_buffering off` is essential for MCP streaming — without it clients hang |
-| 5 | `crypto.timingSafeEqual` throws on mismatched buffer lengths — always check lengths first |
-| 6 | Never hardcode IPs in OAuth metadata — use `$http_host` so the issuer always matches the discovery URL |
-| 7 | `nftables iif != "lo" tcp dport XXXX drop` is the cleanest way to lock an internal service to loopback |
-
----
-
-## What I'd Do Differently
-
-Skip the static-bearer-token phase and go straight to the OAuth server. The MCP auth spec is clear that OAuth 2.1 is the mechanism — "just use a header" is wishful thinking once you're integrating with a spec-compliant client like Claude.ai.
+| 1 | `proxy_buffering off` is essential for MCP streaming — without it clients hang |
+| 2 | `crypto.timingSafeEqual` throws on mismatched buffer lengths — always check lengths first |
+| 3 | Never hardcode IPs in OAuth metadata — use `$http_host` so the issuer always matches the discovery URL |
+| 4 | `nftables iif != "lo" tcp dport XXXX drop` is the cleanest way to lock an internal service to loopback |
 
 The minimal OAuth server approach (auto-approve + static token) is a good fit for a personal server. It's not a security shortcut — the actual secret is the client credentials, PKCE is enforced, and the issued token is what nginx validates. The "simplification" is just removing the login page that makes no sense for a single trusted client.
 
