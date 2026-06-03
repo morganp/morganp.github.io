@@ -213,11 +213,32 @@ systemctl enable --now cloudflared
 
 The MCP server is now reachable at `https://your-mcp-host.example.com/mcp` without any firewall changes.
 
-### Cloudflare Zero Trust Access (optional)
+### Connecting Claude Code via the Public URL
 
-For an additional layer of protection before OAuth, Cloudflare Zero Trust can gate the tunnel with its own access policy — IP allowlists, email-based login, or service tokens. For a single-user personal server this is optional if OAuth is already in place (covered in the next post), but useful as defence-in-depth or if you want access control that doesn't depend on your MCP server being up.
+Once the tunnel is running, update `~/.mcp.json` to use the public HTTPS URL instead of the local port:
 
-In the Zero Trust dashboard: Access → Applications → Add an application → Self-hosted, point it at your tunnel hostname.
+```json
+{
+  "brain": {
+    "type": "http",
+    "url": "https://your-mcp-host.example.com/mcp"
+  }
+}
+```
+
+This is also the URL you'd add as a remote MCP connector in Claude.ai on mobile.
+
+### Security Warning: the Server is Unauthenticated at This Point
+
+The tunnel exposes the MCP server to the public internet with no authentication. Anyone who discovers the URL can read and write every file in the vault. This is an accepted short-term risk for initial setup and testing, but should not be left in production.
+
+There are two ways to close this gap:
+
+**Cloudflare Zero Trust Access** — gate the tunnel at the edge before traffic reaches your server. In the Zero Trust dashboard: Access → Applications → Add an application → Self-hosted, point it at your tunnel hostname. You can restrict by email, IP, or issue service tokens to specific clients. This works today and requires no changes to the MCP server itself.
+
+**OAuth on the MCP server** — the approach covered in the next post. A minimal Node.js OAuth server sits behind nginx; nginx validates the bearer token on every `/mcp` request. This is the right long-term solution and is what Claude.ai's MCP connector expects when you add a remote server in the UI.
+
+The two are complementary — Cloudflare Access as a coarse outer gate, OAuth as the fine-grained inner check — but for a personal single-user server, either one alone is sufficient.
 
 ---
 
