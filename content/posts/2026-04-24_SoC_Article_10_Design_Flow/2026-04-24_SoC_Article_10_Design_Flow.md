@@ -1,11 +1,11 @@
 Title: SoC Article 10: The SoC design flow - From specification to silicon
-Date: 2026-04-24
+Date: 2026-06-03
 Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems, RTL, Verification, Synthesis, Physical Design, Tape-out, VLSI
 Slug: soc-article-10-design-flow
 Author: morganp
 Summary: A complete walkthrough of the SoC design flow, from specification and architecture through RTL coding, functional verification, synthesis, physical design, and sign-off to tape-out and fabrication.
-Status: draft
+Status: published
 
 *Series: Introduction to SoC Design | Article 10 of 11*
 
