@@ -24,11 +24,11 @@ The server runs on a Debian container on Proxmox. The stack before this work:
 
 ---
 
-## Step 1: Check supergateway for Built-in Auth
+## Step 1: nginx as an Authenticating Reverse Proxy
 
-Before reaching for nginx, I checked whether supergateway had any inbound auth flags. It does have `--oauth2Bearer` — but that's for *outbound* requests (adding an Authorization header to requests supergateway makes upstream). There's no `--require-bearer` or equivalent for validating *incoming* requests.
+supergateway has no built-in support for validating incoming authentication — `--oauth2Bearer` is outbound-only, adding headers to requests supergateway makes upstream, not checking headers on requests coming in.
 
-**Decision:** Use nginx as an authenticating reverse proxy. Move supergateway to an internal port, put nginx in front.
+The solution is to place nginx in front: move supergateway to an internal port, and let nginx handle bearer token validation before any request reaches the MCP server.
 
 ---
 
