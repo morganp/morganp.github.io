@@ -1,5 +1,6 @@
 PY?=
-PELICAN?=pelican
+PELICAN?=/opt/blog-venv/bin/pelican
+GHPIMPORT?=/opt/blog-venv/bin/ghp-import
 PELICANOPTS=
 
 BASEDIR=$(CURDIR)
@@ -73,7 +74,7 @@ publish:
 	"$(PELICAN)" "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(PUBLISHCONF)" $(PELICANOPTS)
 
 github: publish
-	ghp-import -m "$(GITHUB_PAGES_COMMIT_MESSAGE)" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUTDIR)" --no-jekyll
+	$(GHPIMPORT) -m "$(GITHUB_PAGES_COMMIT_MESSAGE)" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUTDIR)" --no-jekyll
 	git push origin $(GITHUB_PAGES_BRANCH)
 
 
