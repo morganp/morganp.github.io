@@ -200,9 +200,23 @@ systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> 
 </code></pre></div>
 
 <p>The MCP server is now reachable at <code>https://your-mcp-host.example.com/mcp</code> without any firewall changes.</p>
-<h3>Cloudflare Zero Trust Access (optional)</h3>
-<p>For an additional layer of protection before OAuth, Cloudflare Zero Trust can gate the tunnel with its own access policy — IP allowlists, email-based login, or service tokens. For a single-user personal server this is optional if OAuth is already in place (covered in the next post), but useful as defence-in-depth or if you want access control that doesn't depend on your MCP server being up.</p>
-<p>In the Zero Trust dashboard: Access → Applications → Add an application → Self-hosted, point it at your tunnel hostname.</p>
+<h3>Connecting Claude Code via the Public URL</h3>
+<p>Once the tunnel is running, update <code>~/.mcp.json</code> to use the public HTTPS URL instead of the local port:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;brain&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://your-mcp-host.example.com/mcp&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This is also the URL you'd add as a remote MCP connector in Claude.ai on mobile.</p>
+<h3>Security Warning: the Server is Unauthenticated at This Point</h3>
+<p>The tunnel exposes the MCP server to the public internet with no authentication. Anyone who discovers the URL can read and write every file in the vault. This is an accepted short-term risk for initial setup and testing, but should not be left in production.</p>
+<p>There are two ways to close this gap:</p>
+<p><strong>Cloudflare Zero Trust Access</strong> — gate the tunnel at the edge before traffic reaches your server. In the Zero Trust dashboard: Access → Applications → Add an application → Self-hosted, point it at your tunnel hostname. You can restrict by email, IP, or issue service tokens to specific clients. This works today and requires no changes to the MCP server itself.</p>
+<p><strong>OAuth on the MCP server</strong> — the approach covered in the next post. A minimal Node.js OAuth server sits behind nginx; nginx validates the bearer token on every <code>/mcp</code> request. This is the right long-term solution and is what Claude.ai's MCP connector expects when you add a remote server in the UI.</p>
+<p>The two are complementary — Cloudflare Access as a coarse outer gate, OAuth as the fine-grained inner check — but for a personal single-user server, either one alone is sufficient.</p>
 <hr>
 <h2>The systemd Service</h2>
 <p><code>/etc/systemd/system/vault-mcp.service</code>:</p>
