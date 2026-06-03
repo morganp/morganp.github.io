@@ -197,15 +197,13 @@ server {
 
 ---
 
-## Step 6: The Token Exchange Never Happened
+## Step 6: The $http_host Gotcha
 
-OAuth flow in Claude.ai: browser hits `/authorize` → gets a 302 with a code → follows it to Claude.ai's callback URL. Then Claude.ai's connector should call `POST /token` to exchange the code.
+Per RFC 8414, the `issuer` in OAuth metadata must match the URL used to discover it. A mismatch is a valid reason for a client to reject the metadata entirely. Even if the connector didn't strictly validate the issuer, a private LAN IP is unreachable from Claude.ai's infrastructure if the token exchange happens server-side.
 
-It never did. The nginx access log showed the browser hitting `/authorize` (302 ✓), then Claude.ai's connector immediately hitting `/mcp` again with 401 — no `/token` call in between.
+This surfaces as the OAuth flow appearing to start but never completing — the nginx access log shows the browser hitting `/authorize` (302 ✓), then Claude.ai's connector hitting `/mcp` again with 401, with no `/token` call in between.
 
-### Failure 4: Hardcoded Private IP in OAuth Metadata
-
-The `/.well-known/oauth-authorization-server` response contained:
+If you're seeing this, check your `/.well-known/oauth-authorization-server` response. A hardcoded private IP or a hostname that doesn't match the public domain the client is connecting through is almost certainly the cause:
 
 ```json
 {
@@ -213,8 +211,6 @@ The `/.well-known/oauth-authorization-server` response contained:
   "token_endpoint": "http://192.168.x.x:3001/token"
 }
 ```
-
-Per RFC 8414, the `issuer` in OAuth metadata must match the URL used to discover it. A mismatch is a valid reason for a client to reject the metadata entirely. Even if the connector didn't strictly validate the issuer, a private LAN IP is unreachable from Claude.ai's infrastructure if the token exchange happens server-side.
 
 **Fix:** Use nginx's `$http_host` variable in the metadata JSON so the URLs always reflect whatever hostname the request arrived on:
 
