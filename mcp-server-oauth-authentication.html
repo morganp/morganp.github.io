@@ -64,9 +64,9 @@
 <li>No authentication — port 3001 open, any client could read and write vault files</li>
 </ul>
 <hr>
-<h2>Step 1: Check supergateway for Built-in Auth</h2>
-<p>Before reaching for nginx, I checked whether supergateway had any inbound auth flags. It does have <code>--oauth2Bearer</code> — but that's for <em>outbound</em> requests (adding an Authorization header to requests supergateway makes upstream). There's no <code>--require-bearer</code> or equivalent for validating <em>incoming</em> requests.</p>
-<p><strong>Decision:</strong> Use nginx as an authenticating reverse proxy. Move supergateway to an internal port, put nginx in front.</p>
+<h2>Step 1: nginx as an Authenticating Reverse Proxy</h2>
+<p>supergateway has no built-in support for validating incoming authentication — <code>--oauth2Bearer</code> is outbound-only, adding headers to requests supergateway makes upstream, not checking headers on requests coming in.</p>
+<p>The solution is to place nginx in front: move supergateway to an internal port, and let nginx handle bearer token validation before any request reaches the MCP server.</p>
 <hr>
 <h2>Step 2: The Architecture</h2>
 <div class="highlight"><pre><span></span><code>MCP client (Claude.ai)
