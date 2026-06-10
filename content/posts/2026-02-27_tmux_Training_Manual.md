@@ -213,6 +213,32 @@ tmux attach -t training
 
 You are back inside the session. `top` is still running. Press `q` to quit `top`.
 
+### Quick Reconnect: Attach or Start in One Command
+
+`tmux attach` has the short form `tmux a`. With no target it attaches to the most
+recently used session, which is exactly what you want when only one session exists:
+
+```bash
+tmux a
+```
+
+To attach if a session exists, or start a fresh one if none does, chain the two:
+
+```bash
+tmux a || tmux
+```
+
+A cleaner built-in alternative is `new-session -A`, which means "attach to this named
+session, creating it first if needed". It is idempotent, so it is safe as a login
+one-liner or shell alias:
+
+```bash
+tmux new -A -s main
+```
+
+Both patterns make reconnecting to a headless LXC a single muscle-memory command: SSH
+in, type it, and you are either back where you left off or in a fresh session.
+
 ### Recovery Notes for Exercise 1
 
 If you lose track of session names, `tmux ls` always shows what is running. If `tmux ls` shows nothing, there are no sessions and you start fresh with `tmux new -s <name>`.
