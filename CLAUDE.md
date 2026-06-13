@@ -52,6 +52,7 @@ Run `make` with no args to see all targets.
    - If no HQ version, use a plain image embed: `![alt]({attach}/images/Sub/img-900w.png)`
 6. **Themes**: Do not modify files inside `themes/` unless explicitly told to.
 7. **Configuration**: When updating settings, prefer modifying `pelicanconf.py` over `publishconf.py`.
+8. **Art / Image Generation**: Always apply the lizard-spock site aesthetic when using the `/art` skill or generating any image for this blog. The style guide is at `~/.claude/skills/art/aesthetics/lizard-spock.md` — read it before constructing any image prompt.
 
 ## Architecture
 
@@ -92,6 +93,49 @@ Images go in `content/images/` and are configured as a static path.
 ## Deployment Flow
 
 `make github` runs: `pelican content -s publishconf.py` → `ghp-import output -b gh-pages` → `git push origin gh-pages`
+
+## Web Apps (Tools Dropdown)
+
+Web apps appear in the Tools dropdown nav, configured in `pelicanconf.py` as `WEBAPPS` and `STATIC_PATHS`. Each app is a git submodule under `content/`.
+
+| App | Submodule | Source repo | Branch/ref |
+|-----|-----------|-------------|------------|
+| AMBA Explorer | `content/amba-explorer` | `github.com/morganp/amba-explorer` | `main` (ready-to-serve HTML) |
+| Wavedrom Editor | `content/wavedrom-editor` | `github.com/morganp/wavedrom-editor` | `dist` (CI-built standalone) |
+| Drum Rudiments | `content/drum_rudiments` | — | static files, no upstream repo yet |
+| Fretdrom Editor | `content/fretdrom-editor` | — | static files, no upstream repo yet |
+
+### Updating a webapp submodule
+
+```bash
+cd content/<app-name>
+git pull origin <branch>   # e.g. main or dist
+cd ../..
+git add content/<app-name>
+git commit -m "Update <app-name> submodule"
+```
+
+### Adding a new webapp
+
+1. Add submodule: `git submodule add <repo-url> content/<name>`
+2. Add `'<name>'` to `STATIC_PATHS` in `pelicanconf.py`
+3. Add `('<Title>', '/<name>/')` to `WEBAPPS` in `pelicanconf.py`
+4. Commit `.gitmodules`, `content/<name>`, and `pelicanconf.py`
+
+### Cloning the repo (submodule init)
+
+```bash
+git clone --recurse-submodules <repo>
+# or after a plain clone:
+git submodule update --init --recursive
+```
+
+### CI note (Wavedrom Editor)
+
+`morganp/wavedrom-editor` needs a build step. The GitHub Actions workflow
+`.github/workflows/deploy-dist.yml` builds `dist/standalone/` and force-pushes
+it to the `dist` branch on every push to `main` or version tag. The blog
+submodule tracks the `dist` branch.
 
 ## Utility Scripts
 
