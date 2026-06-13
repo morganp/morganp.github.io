@@ -102,6 +102,7 @@ Web apps appear in the Tools dropdown nav, configured in `pelicanconf.py` as `WE
 |-----|-----------|-------------|------------|
 | AMBA Explorer | `content/amba-explorer` | `github.com/morganp/amba-explorer` | `main` (ready-to-serve HTML) |
 | Wavedrom Editor | `content/wavedrom-editor` | `github.com/morganp/wavedrom-editor` | `dist` (CI-built standalone) |
+| OpenSCAD GUI | `content/openscad-gui` | `github.com/morganp/OpenSCAD-GUI` | `main` (ready-to-serve HTML) |
 | Drum Rudiments | `content/drum_rudiments` | — | static files, no upstream repo yet |
 | Fretdrom Editor | `content/fretdrom-editor` | — | static files, no upstream repo yet |
 
