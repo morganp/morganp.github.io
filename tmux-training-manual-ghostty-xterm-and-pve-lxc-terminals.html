@@ -206,6 +206,24 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 </code></pre></div>
 
 <p>You are back inside the session. <code>top</code> is still running. Press <code>q</code> to quit <code>top</code>.</p>
+<h3>Quick Reconnect: Attach or Start in One Command</h3>
+<p><code>tmux attach</code> has the short form <code>tmux a</code>. With no target it attaches to the most
+recently used session, which is exactly what you want when only one session exists:</p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>a
+</code></pre></div>
+
+<p>To attach if a session exists, or start a fresh one if none does, chain the two:</p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>a<span class="w"> </span><span class="o">||</span><span class="w"> </span>tmux
+</code></pre></div>
+
+<p>A cleaner built-in alternative is <code>new-session -A</code>, which means "attach to this named
+session, creating it first if needed". It is idempotent, so it is safe as a login
+one-liner or shell alias:</p>
+<div class="highlight"><pre><span></span><code>tmux<span class="w"> </span>new<span class="w"> </span>-A<span class="w"> </span>-s<span class="w"> </span>main
+</code></pre></div>
+
+<p>Both patterns make reconnecting to a headless LXC a single muscle-memory command: SSH
+in, type it, and you are either back where you left off or in a fresh session.</p>
 <h3>Recovery Notes for Exercise 1</h3>
 <p>If you lose track of session names, <code>tmux ls</code> always shows what is running. If <code>tmux ls</code> shows nothing, there are no sessions and you start fresh with <code>tmux new -s &lt;name&gt;</code>.</p>
 <hr>

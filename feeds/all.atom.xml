@@ -5870,6 +5870,24 @@ sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;i
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;You are back inside the session. &lt;code&gt;top&lt;/code&gt; is still running. Press &lt;code&gt;q&lt;/code&gt; to quit &lt;code&gt;top&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Quick Reconnect: Attach or Start in One Command&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;tmux attach&lt;/code&gt; has the short form &lt;code&gt;tmux a&lt;/code&gt;. With no target it attaches to the most
+recently used session, which is exactly what you want when only one session exists:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;a
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To attach if a session exists, or start a fresh one if none does, chain the two:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;a&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;tmux
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A cleaner built-in alternative is &lt;code&gt;new-session -A&lt;/code&gt;, which means "attach to this named
+session, creating it first if needed". It is idempotent, so it is safe as a login
+one-liner or shell alias:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;new&lt;span class="w"&gt; &lt;/span&gt;-A&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;main
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Both patterns make reconnecting to a headless LXC a single muscle-memory command: SSH
+in, type it, and you are either back where you left off or in a fresh session.&lt;/p&gt;
 &lt;h3&gt;Recovery Notes for Exercise 1&lt;/h3&gt;
 &lt;p&gt;If you lose track of session names, &lt;code&gt;tmux ls&lt;/code&gt; always shows what is running. If &lt;code&gt;tmux ls&lt;/code&gt; shows nothing, there are no sessions and you start fresh with &lt;code&gt;tmux new -s &amp;lt;name&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 &lt;hr&gt;
