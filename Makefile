@@ -75,8 +75,9 @@ publish:
 	"$(PELICAN)" "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(PUBLISHCONF)" $(PELICANOPTS)
 
 github: publish
+	find "$(OUTPUTDIR)" -name ".git" -delete
 	"$(GHPIMPORT)" -m "$(GITHUB_PAGES_COMMIT_MESSAGE)" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUTDIR)" --no-jekyll
-	git push origin $(GITHUB_PAGES_BRANCH)
+	git push origin $(GITHUB_PAGES_BRANCH) --force
 
 
 .PHONY: html help clean regenerate serve serve-global devserver devserver-global publish github
