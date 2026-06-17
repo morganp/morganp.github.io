@@ -96,15 +96,17 @@ Images go in `content/images/` and are configured as a static path.
 
 ## Web Apps (Tools Dropdown)
 
-Web apps appear in the Tools dropdown nav, configured in `pelicanconf.py` as `WEBAPPS` and `STATIC_PATHS`. Each app is a git submodule under `content/`.
+Web apps appear in the Tools dropdown nav, configured in `pelicanconf.py` as `WEBAPPS`. Each app is a git submodule under `content/`.
 
-| App | Submodule | Source repo | Branch/ref |
-|-----|-----------|-------------|------------|
-| AMBA Explorer | `content/amba-explorer` | `github.com/morganp/amba-explorer` | `main` (ready-to-serve HTML) |
-| Wavedrom Editor | `content/wavedrom-editor` | `github.com/morganp/wavedrom-editor` | `dist` (CI-built standalone) |
-| OpenSCAD GUI | `content/openscad-gui` | `github.com/morganp/OpenSCAD-GUI` | `main` (ready-to-serve HTML) |
-| Drum Rudiments | `content/drum_rudiments` | — | static files, no upstream repo yet |
-| Fretdrom Editor | `content/fretdrom-editor` | — | static files, no upstream repo yet |
+**Serving convention:** Submodule repos with a `public/` subfolder are served via `make copy-webapps`, which rsyncs only `public/` into `output/<name>/`. This keeps `CLAUDE.md`, `HANDOFF.md`, and other repo metadata off the public site. Submodules without `public/` (Wavedrom Editor, Drum Rudiments, Fretdrom Editor) are listed in `STATIC_PATHS` and copied by Pelican directly.
+
+| App | Submodule | Source repo | Branch/ref | Served via |
+|-----|-----------|-------------|------------|------------|
+| AMBA Explorer | `content/amba-explorer` | `github.com/morganp/amba-explorer` | `main` | `copy-webapps` (has `public/`) |
+| OpenSCAD GUI | `content/openscad-gui` | `github.com/morganp/OpenSCAD-GUI` | `main` | `copy-webapps` (has `public/`) |
+| Wavedrom Editor | `content/wavedrom-editor` | `github.com/morganp/wavedrom-editor` | `dist` (CI-built standalone) | `STATIC_PATHS` |
+| Drum Rudiments | `content/drum_rudiments` | — | static files, no upstream repo yet | `STATIC_PATHS` |
+| Fretdrom Editor | `content/fretdrom-editor` | — | static files, no upstream repo yet | `STATIC_PATHS` |
 
 ### Updating a webapp submodule
 
@@ -117,6 +119,15 @@ git commit -m "Update <app-name> submodule"
 ```
 
 ### Adding a new webapp
+
+**If submodule has a `public/` folder** (preferred -- keeps repo metadata off the web):
+
+1. Add submodule: `git submodule add <repo-url> content/<name>`
+2. Add rsync line to `copy-webapps` target in `Makefile`
+3. Add `('<Title>', '/<name>/')` to `WEBAPPS` in `pelicanconf.py`
+4. Commit `.gitmodules`, `content/<name>`, `Makefile`, and `pelicanconf.py`
+
+**If submodule is a flat ready-to-serve directory** (no `public/` subfolder):
 
 1. Add submodule: `git submodule add <repo-url> content/<name>`
 2. Add `'<name>'` to `STATIC_PATHS` in `pelicanconf.py`
