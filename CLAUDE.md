@@ -98,15 +98,15 @@ Images go in `content/images/` and are configured as a static path.
 
 Web apps appear in the Tools dropdown nav, configured in `pelicanconf.py` as `WEBAPPS`. Each app is a git submodule under `content/`.
 
-**Serving convention:** Submodule repos with a `public/` subfolder are served via `make copy-webapps`, which rsyncs only `public/` into `output/<name>/`. This keeps `CLAUDE.md`, `HANDOFF.md`, and other repo metadata off the public site. Submodules without `public/` (Wavedrom Editor, Drum Rudiments, Fretdrom Editor) are listed in `STATIC_PATHS` and copied by Pelican directly.
+**Serving convention:** Submodule repos with a `public/` subfolder are served via `make copy-webapps`, which rsyncs only `public/` into `output/<name>/`. This keeps `CLAUDE.md`, `HANDOFF.md`, and other repo metadata off the public site. Submodules without `public/` (Wavedrom Editor, Drum Rudiments) are listed in `STATIC_PATHS` and copied by Pelican directly.
 
 | App | Submodule | Source repo | Branch/ref | Served via |
 |-----|-----------|-------------|------------|------------|
 | AMBA Explorer | `content/amba-explorer` | `github.com/morganp/amba-explorer` | `main` | `copy-webapps` (has `public/`) |
 | OpenSCAD GUI | `content/openscad-gui` | `github.com/morganp/OpenSCAD-GUI` | `main` | `copy-webapps` (has `public/`) |
+| Fretdrom Editor | `content/fretdrom-editor` | `github.com/morganp/fretdrom-editor` | `main` | `copy-webapps` (has `public/`) |
 | Wavedrom Editor | `content/wavedrom-editor` | `github.com/morganp/wavedrom-editor` | `dist` (CI-built standalone) | `STATIC_PATHS` |
 | Drum Rudiments | `content/drum_rudiments` | — | static files, no upstream repo yet | `STATIC_PATHS` |
-| Fretdrom Editor | `content/fretdrom-editor` | `github.com/morganp/fretdrom` | `dist` (CI-built standalone) | `STATIC_PATHS` |
 
 ### Updating a webapp submodule
 

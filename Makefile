@@ -53,6 +53,7 @@ help:
 copy-webapps:
 	rsync -a --delete "$(BASEDIR)/content/amba-explorer/public/" "$(OUTPUTDIR)/amba-explorer/"
 	rsync -a --delete "$(BASEDIR)/content/openscad-gui/public/" "$(OUTPUTDIR)/openscad-gui/"
+	rsync -a --delete "$(BASEDIR)/content/fretdrom-editor/public/" "$(OUTPUTDIR)/fretdrom-editor/"
 
 html:
 	"$(PELICAN)" "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" $(PELICANOPTS)
