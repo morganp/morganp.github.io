@@ -106,7 +106,7 @@ Web apps appear in the Tools dropdown nav, configured in `pelicanconf.py` as `WE
 | OpenSCAD GUI | `content/openscad-gui` | `github.com/morganp/OpenSCAD-GUI` | `main` | `copy-webapps` (has `public/`) |
 | Wavedrom Editor | `content/wavedrom-editor` | `github.com/morganp/wavedrom-editor` | `dist` (CI-built standalone) | `STATIC_PATHS` |
 | Drum Rudiments | `content/drum_rudiments` | — | static files, no upstream repo yet | `STATIC_PATHS` |
-| Fretdrom Editor | `content/fretdrom-editor` | — | static files, no upstream repo yet | `STATIC_PATHS` |
+| Fretdrom Editor | `content/fretdrom-editor` | `github.com/morganp/fretdrom` | `dist` (CI-built standalone) | `STATIC_PATHS` |
 
 ### Updating a webapp submodule
 
