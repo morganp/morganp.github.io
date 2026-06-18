@@ -361,11 +361,55 @@
     child() { return new Scope(this); }
   }
 
+  /* ---- include/use resolution: splice referenced .scad files into the AST ----
+     include <f>: inline ALL of f's statements (vars, defs, geometry) at that point.
+     use <f>:    import ONLY f's module + function definitions (no vars/geometry).
+     Files come from opts.files = { "basename.scad" (lowercased): sourceText }. */
+  function basenameKey(p) {
+    if (!p) return '';
+    const parts = String(p).split(/[\\/]/);
+    return (parts[parts.length - 1] || '').toLowerCase();
+  }
+  function resolveImports(stmts, files, ctx, stack) {
+    const out = [];
+    for (const s of stmts) {
+      if (s && (s.t === 'include' || s.t === 'use')) {
+        const key = basenameKey(s.path);
+        if (!key) continue;
+        const src = files[key];
+        if (src == null) {
+          const tag = 'inc:' + key;
+          if (!ctx.warnedSet.has(tag)) { ctx.warnedSet.add(tag); ctx.warnings.push({ msg: s.t + ' <' + s.path + '>: file not loaded \u2014 drag the .scad file onto the viewport' }); }
+          continue;
+        }
+        if (stack.indexOf(key) !== -1) {
+          const tag = 'cyc:' + key;
+          if (!ctx.warnedSet.has(tag)) { ctx.warnedSet.add(tag); ctx.warnings.push({ msg: s.t + ' <' + s.path + '>: circular reference skipped' }); }
+          continue;
+        }
+        const sub = window.ScadEngine.parse(src);
+        for (const e of (sub.errors || [])) ctx.errors.push({ msg: '(' + key + ') ' + e.msg, line: e.line || 0 });
+        const subStmts = resolveImports((sub.ast && sub.ast.stmts) || [], files, ctx, stack.concat(key));
+        if (s.t === 'include') { for (const x of subStmts) out.push(x); }
+        else { for (const x of subStmts) if (x && (x.t === 'moduledef' || x.t === 'functiondef')) out.push(x); }
+      } else {
+        out.push(s);
+      }
+    }
+    return out;
+  }
+
   function run(src, opts) {
     opts = opts || {};
     const parsed = window.ScadEngine.parse(src);
     const echos = [], warnings = [], errors = parsed.errors.slice();
     const ctx = { echos, warnings, errors, ops: 0, maxOps: opts.maxOps || 4000000, warnedSet: new Set() };
+    // resolve include/use against provided files (warns if any referenced file is missing)
+    let topStmts = (parsed.ast && parsed.ast.stmts) || [];
+    if (topStmts.some(s => s && (s.t === 'include' || s.t === 'use'))) {
+      topStmts = resolveImports(topStmts, opts.files || {}, ctx, []);
+      parsed.ast = { stmts: topStmts };
+    }
     const root = new Scope(null);
     // special variable defaults
     root.vars.set('$fn', opts.$fn != null ? opts.$fn : 0);
@@ -588,8 +632,19 @@
         // rings are shaped by the editor (font loading is async + THREE-side); engine just carries params
         return { kind:'primitive2d', shape:'text', rings: [], params:{ text:tv, size, font, halign, valign, spacing, direction }, matrix: Mat.identity(), dim:2 };
       }
-      case 'import': case 'surface':
-        warn(ctx, name + '() not yet supported — Phase 10 (import/surface)'); return null;
+      case 'import': {
+        const file = arg(0, 'file', named['file']);
+        const fn = (typeof file === 'string') ? file : '';
+        const center = truthy(named['center']);
+        const convexity = named['convexity'];
+        const ext = (fn.split('.').pop() || '').toLowerCase();
+        const is2d = ext === 'svg' || ext === 'dxf';
+        if (!fn) { warn(ctx, 'import(): missing file name'); return null; }
+        // geometry is supplied editor-side from the uploaded-file store (sync at realize)
+        return { kind:'import', params:{ file: fn, center, ext, convexity }, matrix: Mat.identity(), dim: is2d ? 2 : 3 };
+      }
+      case 'surface':
+        warn(ctx, 'surface() not yet supported — Phase 10 (heightmap import)'); return null;
       case 'echo': { ctx.echos.push({ msg: s.args.map(a => echoStr(evalExpr(a.expr, scope, ctx))).join(', ') }); return null; }
       case 'assert': { const cond = truthy(arg(0)); if (!cond) { const m = s.args[1] ? echoStr(arg(1)) : 'assertion failed'; ctx.errors.push({ msg:'assert: '+m }); } return null; }
       case 'children': {
