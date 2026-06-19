@@ -94,23 +94,7 @@
 <p>If you are using ZHA the entity name follows the same pattern.</p>
 <hr>
 <h2>How the Automation Works</h2>
-<div class="highlight"><pre><span></span><code><span class="k">digraph</span><span class="w"> </span><span class="nt">DoorbellFlow</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="na">rankdir</span><span class="p">=</span><span class="s">LR</span><span class="p">;</span>
-<span class="w">    </span><span class="k">node</span><span class="w"> </span><span class="p">[</span><span class="na">shape</span><span class="p">=</span><span class="s">box</span><span class="p">,</span><span class="w"> </span><span class="na">fontsize</span><span class="p">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="na">style</span><span class="p">=</span><span class="s">filled</span><span class="p">];</span>
-
-<span class="w">    </span><span class="nt">ring</span><span class="w">   </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Doorbell\nPressed&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">lightblue</span><span class="p">];</span>
-<span class="w">    </span><span class="nt">notify</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Send Push\nNotification\n+ snapshot&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">lightyellow</span><span class="p">];</span>
-<span class="w">    </span><span class="nt">wait</span><span class="w">   </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Wait for\ndoor open\n(2 min timeout)&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">shape</span><span class="p">=</span><span class="s">diamond</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s2">&quot;#FFF2CC&quot;</span><span class="p">];</span>
-<span class="w">    </span><span class="nt">clear</span><span class="w">  </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Clear\nNotification&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s2">&quot;#E2EFDA&quot;</span><span class="p">];</span>
-<span class="w">    </span><span class="nt">expire</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;Notification\nExpires Naturally&quot;</span><span class="p">,</span><span class="w"> </span><span class="na">fillcolor</span><span class="p">=</span><span class="s">lightgrey</span><span class="p">];</span>
-
-<span class="w">    </span><span class="nt">ring</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">notify</span><span class="p">;</span>
-<span class="w">    </span><span class="nt">notify</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">wait</span><span class="p">;</span>
-<span class="w">    </span><span class="nt">wait</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">clear</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;door opened&quot;</span><span class="p">];</span>
-<span class="w">    </span><span class="nt">wait</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nt">expire</span><span class="w"> </span><span class="p">[</span><span class="na">label</span><span class="p">=</span><span class="s2">&quot;timeout&quot;</span><span class="p">];</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<p><img alt="FSM diagram" src="../images/fsm/fsm_92e1cd5233df7fe258a7c64d03f8988b.svg"></p>
 <ol>
 <li>Doorbell button pressed -- triggers the automation</li>
 <li>Push notification sent immediately with a camera snapshot attached</li>
