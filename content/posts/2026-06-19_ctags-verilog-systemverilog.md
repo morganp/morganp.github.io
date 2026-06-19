@@ -3,7 +3,7 @@ Date: 2026-06-19
 Category: Unix & Tools
 Tags: verilog, systemverilog, ctags, vim, neovim, vscode, tools, rtl
 Author: morganp
-Status: draft
+Status: published
 Summary: How to generate and use ctags for Verilog/SystemVerilog projects, covering design.vc file lists, editor setup for Vim, Neovim, Emacs, and VS Code, and keeping tags up to date automatically.
 Slug: ctags-verilog-systemverilog
 
@@ -22,10 +22,11 @@ Install on macOS:
 brew install universal-ctags
 ```
 
-On Linux, load from your site toolchain if available, e.g.:
+On Linux:
 
 ```bash
-module load swdev universal-ctags/ctags
+sudo apt install universal-ctags   # Debian/Ubuntu
+brew install universal-ctags       # Homebrew on Linux
 ```
 
 Check your version:
