@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Using ctags with Verilog and SystemVerilog</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="How to generate and use ctags for Verilog/SystemVerilog projects, covering design.vc file lists, editor setup for Vim, Neovim, Emacs, and VS Code,..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/programming.html">Programming</a></li>
+                                                <li class="active"><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./ctags-verilog-systemverilog.html" rel="bookmark"
+             title="Permalink to Using ctags with Verilog and SystemVerilog">Using ctags with Verilog and SystemVerilog</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-06-19T00:00:00+01:00">
+                Published: Fri 19 June 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="./tag/verilog.html">verilog</a> <a href="./tag/systemverilog.html">systemverilog</a> <a href="./tag/ctags.html">ctags</a> <a href="./tag/vim.html">vim</a> <a href="./tag/neovim.html">neovim</a> <a href="./tag/vscode.html">vscode</a> <a href="./tag/tools.html">tools</a> <a href="./tag/rtl.html">rtl</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="./ctags-verilog-hero-HQ.png"><img alt="Ctags for Verilog navigation" src="./ctags-verilog-hero-900w.png"></a></p>
+<p>Navigating a large Verilog or SystemVerilog codebase without tag-based Go to Definition is painful. This tutorial shows how to generate and use <code>ctags</code> for projects that use a <code>design.vc</code> file list — common in simulators like Verilator, VCS, and xrun.</p>
+<h2>Prerequisites</h2>
+<ul>
+<li><strong>Universal Ctags</strong> (preferred over Exuberant Ctags — it has better SystemVerilog support)</li>
+</ul>
+<p>Install on macOS:</p>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>universal-ctags
+</code></pre></div>
+
+<p>On Linux:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>universal-ctags<span class="w">   </span><span class="c1"># Debian/Ubuntu</span>
+brew<span class="w"> </span>install<span class="w"> </span>universal-ctags<span class="w">       </span><span class="c1"># Homebrew on Linux</span>
+</code></pre></div>
+
+<p>Check your version:</p>
+<div class="highlight"><pre><span></span><code>ctags<span class="w"> </span>--version
+</code></pre></div>
+
+<h2>1. Understand the <code>design.vc</code> format</h2>
+<p>A typical <code>design.vc</code> looks like this:</p>
+<div class="highlight"><pre><span></span><code>+incdir+./rtl
++incdir+./ip
+./rtl/top.sv
+./rtl/subsystem.sv
+./ip/uart/uart.sv
+</code></pre></div>
+
+<ul>
+<li>Lines beginning with <code>+incdir+</code> define include paths.</li>
+<li>Remaining lines are source files (usually <code>.v</code> / <code>.sv</code>).</li>
+<li>Relative paths are normally relative to the <code>design.vc</code> location.</li>
+</ul>
+<h2>2. Create a file list for ctags</h2>
+<p><code>ctags</code> expects plain file paths. Strip the <code>+incdir+</code> lines and any comments with <code>awk</code>:</p>
+<div class="highlight"><pre><span></span><code>awk<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">  /^\+incdir\+/ {next}</span>
+<span class="s1">  /^\s*#/ {next}</span>
+<span class="s1">  /^\s*$/ {next}</span>
+<span class="s1">  {print}</span>
+<span class="s1">&#39;</span><span class="w"> </span>design.vc<span class="w"> </span>&gt;<span class="w"> </span>design.files
+</code></pre></div>
+
+<p>If you want the include paths separately for other tools:</p>
+<div class="highlight"><pre><span></span><code>grep<span class="w"> </span><span class="s1">&#39;^\+incdir\+&#39;</span><span class="w"> </span>design.vc<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/^\+incdir\+//&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>design.incdirs
+</code></pre></div>
+
+<p>Note: <code>ctags</code> does not use include paths for preprocessing; it parses files directly. Make sure all files that define symbols are listed in <code>design.files</code>.</p>
+<h2>3. Generate the tags file</h2>
+<div class="highlight"><pre><span></span><code>ctags<span class="w"> </span>-R<span class="w"> </span>--languages<span class="o">=</span>SystemVerilog<span class="w"> </span>--fields<span class="o">=</span>+nKz<span class="w"> </span>-f<span class="w"> </span>tags<span class="w"> </span>-L<span class="w"> </span>design.files
+</code></pre></div>
+
+<p>Flags:</p>
+<ul>
+<li><code>-L design.files</code> — read source paths from the file list</li>
+<li><code>--languages=SystemVerilog</code> — enables SV/Verilog parsing</li>
+<li><code>--fields=+nKz</code> — includes line number, kind, and scope in each tag</li>
+<li><code>-f tags</code> — write to <code>tags</code></li>
+</ul>
+<h2>4. Configure your editor</h2>
+<h3>Vim / Neovim</h3>
+<p>Tell Vim to search upward from the current file for a <code>tags</code> file:</p>
+<div class="highlight"><pre><span></span><code><span class="k">set</span> <span class="k">tags</span><span class="p">=</span>./<span class="k">tags</span>;
+</code></pre></div>
+
+<p>Navigate with:</p>
+<ul>
+<li><code>Ctrl-]</code> — jump to definition</li>
+<li><code>Ctrl-t</code> — jump back</li>
+</ul>
+<h3>Emacs</h3>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">tags-file-name</span><span class="w"> </span><span class="s">&quot;~/path/to/project/tags&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Navigate with <code>M-.</code> (jump) and <code>M-*</code> (back).</p>
+<h3>VS Code — ctags-companion extension</h3>
+<p>Install the <strong>Ctags Companion</strong> extension (<code>gediminaszlatkus.ctags-companion</code>).</p>
+<p>Default settings that work well for SystemVerilog:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;ctags-companion.command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ctags -R --fields=+nKz&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ctags-companion.readtagsGoToDefinitionCommand&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;readtags -en&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Once a <code>tags</code> file exists at the project root, <code>Go to Definition</code> (<code>F12</code> / Cmd-click / right-click) will use it.</p>
+<p>To make Go to Definition open in the current editor group rather than a split pane, add to your user settings:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;workbench.editor.enablePreviewFromCodeNavigation&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;workbench.editor.revealIfOpen&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>If split-pane behaviour persists, check that your keybinding is mapped to <code>editor.action.revealDefinition</code> and not <code>editor.action.revealDefinitionAside</code>.</p>
+<h2>5. Keep tags up to date</h2>
+<p>Regenerate after RTL changes:</p>
+<div class="highlight"><pre><span></span><code>ctags<span class="w"> </span>-R<span class="w"> </span>--languages<span class="o">=</span>SystemVerilog<span class="w"> </span>--fields<span class="o">=</span>+nKz<span class="w"> </span>-f<span class="w"> </span>tags<span class="w"> </span>-L<span class="w"> </span>design.files
+</code></pre></div>
+
+<p>Add a <code>make</code> target for convenience:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">.PHONY</span><span class="o">:</span><span class="w"> </span><span class="n">tags</span>
+<span class="nf">tags</span><span class="o">:</span>
+<span class="w">    </span>awk<span class="w"> </span><span class="s1">&#39;/^\+incdir\+/ {next} /^\s*#/ {next} /^\s*$$/ {next} {print}&#39;</span><span class="w"> </span>design.vc<span class="w"> </span>&gt;<span class="w"> </span>design.files
+<span class="w">    </span>ctags<span class="w"> </span>-R<span class="w"> </span>--languages<span class="o">=</span>SystemVerilog<span class="w"> </span>--fields<span class="o">=</span>+nKz<span class="w"> </span>-f<span class="w"> </span>tags<span class="w"> </span>-L<span class="w"> </span>design.files
+</code></pre></div>
+
+<h2>6. Auto-build on save</h2>
+<h3>Vim: rebuild on BufWritePost</h3>
+<div class="highlight"><pre><span></span><code><span class="k">function</span><span class="p">!</span> s:FindRoot<span class="p">()</span> abort
+  <span class="k">let</span> <span class="k">l</span>:vc <span class="p">=</span> findfile<span class="p">(</span><span class="s1">&#39;design.vc&#39;</span><span class="p">,</span> expand<span class="p">(</span><span class="s1">&#39;%:p:h&#39;</span><span class="p">)</span>.<span class="s1">&#39;;&#39;</span><span class="p">)</span>
+  <span class="k">if</span> <span class="p">!</span>empty<span class="p">(</span><span class="k">l</span>:vc<span class="p">)</span>
+    <span class="k">return</span> fnamemodify<span class="p">(</span><span class="k">l</span>:vc<span class="p">,</span> <span class="s1">&#39;:h&#39;</span><span class="p">)</span>
+  <span class="k">endif</span>
+  <span class="k">let</span> <span class="k">l</span>:root <span class="p">=</span> finddir<span class="p">(</span><span class="s1">&#39;.git&#39;</span><span class="p">,</span> expand<span class="p">(</span><span class="s1">&#39;%:p:h&#39;</span><span class="p">)</span>.<span class="s1">&#39;;&#39;</span><span class="p">)</span>
+  <span class="k">return</span> empty<span class="p">(</span><span class="k">l</span>:root<span class="p">)</span> ? <span class="s1">&#39;&#39;</span> : fnamemodify<span class="p">(</span><span class="k">l</span>:root<span class="p">,</span> <span class="s1">&#39;:h&#39;</span><span class="p">)</span>
+<span class="k">endfunction</span>
+
+<span class="k">function</span><span class="p">!</span> s:BuildTags<span class="p">()</span> abort
+  <span class="k">let</span> <span class="k">l</span>:root <span class="p">=</span> s:FindRoot<span class="p">()</span>
+  <span class="k">if</span> empty<span class="p">(</span><span class="k">l</span>:root<span class="p">)</span> <span class="p">|</span> <span class="k">return</span> <span class="p">|</span> <span class="k">endif</span>
+  <span class="k">if</span> filereadable<span class="p">(</span><span class="k">l</span>:root . <span class="s1">&#39;/design.vc&#39;</span><span class="p">)</span>
+    execute <span class="s1">&#39;silent !cd &#39;</span> . shellescape<span class="p">(</span><span class="k">l</span>:root<span class="p">)</span> .
+          \ <span class="s1">&#39; &amp;&amp; awk &#39;&#39;/^\+incdir\+/ {next} /^\s*#/ {next} /^\s*$/ {next} {print}&#39;&#39; design.vc &gt; design.files&#39;</span> .
+          \ <span class="s1">&#39; &amp;&amp; ctags -R --languages=SystemVerilog --fields=+nKz -f tags -L design.files&#39;</span>
+  <span class="k">else</span>
+    execute <span class="s1">&#39;silent !cd &#39;</span> . shellescape<span class="p">(</span><span class="k">l</span>:root<span class="p">)</span> .
+          \ <span class="s1">&#39; &amp;&amp; ctags -R --languages=SystemVerilog --fields=+nKz -f tags .&#39;</span>
+  <span class="k">endif</span>
+<span class="k">endfunction</span>
+
+augroup verilog_tags
+  autocmd<span class="p">!</span>
+  autocmd <span class="nb">BufWritePost</span> *.<span class="k">v</span><span class="p">,</span>*.<span class="k">sv</span> <span class="k">call</span> s:BuildTags<span class="p">()</span>
+augroup END
+</code></pre></div>
+
+<h3>Neovim: async job (non-blocking)</h3>
+<div class="highlight"><pre><span></span><code><span class="n">vim</span><span class="p">.</span><span class="n">opt</span><span class="p">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;./tags;&quot;</span> <span class="p">}</span>
+
+<span class="kd">local</span> <span class="kr">function</span> <span class="nf">find_root</span><span class="p">()</span>
+  <span class="kd">local</span> <span class="n">vc</span> <span class="o">=</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">findfile</span><span class="p">(</span><span class="s2">&quot;design.vc&quot;</span><span class="p">,</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;%:p:h&quot;</span><span class="p">)</span> <span class="o">..</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span>
+  <span class="kr">if</span> <span class="n">vc</span> <span class="o">~=</span> <span class="s2">&quot;&quot;</span> <span class="kr">then</span> <span class="kr">return</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">fnamemodify</span><span class="p">(</span><span class="n">vc</span><span class="p">,</span> <span class="s2">&quot;:h&quot;</span><span class="p">)</span> <span class="kr">end</span>
+  <span class="kd">local</span> <span class="n">git</span> <span class="o">=</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">finddir</span><span class="p">(</span><span class="s2">&quot;.git&quot;</span><span class="p">,</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;%:p:h&quot;</span><span class="p">)</span> <span class="o">..</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span>
+  <span class="kr">return</span> <span class="n">git</span> <span class="o">~=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">fnamemodify</span><span class="p">(</span><span class="n">git</span><span class="p">,</span> <span class="s2">&quot;:h&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span> <span class="kr">function</span> <span class="nf">build_tags</span><span class="p">()</span>
+  <span class="kd">local</span> <span class="n">root</span> <span class="o">=</span> <span class="n">find_root</span><span class="p">()</span>
+  <span class="kr">if</span> <span class="n">root</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="kr">then</span> <span class="kr">return</span> <span class="kr">end</span>
+  <span class="kd">local</span> <span class="n">cmd</span>
+  <span class="kr">if</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">filereadable</span><span class="p">(</span><span class="n">root</span> <span class="o">..</span> <span class="s2">&quot;/design.vc&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="kr">then</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;cd &quot;</span> <span class="o">..</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">shellescape</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">..</span>
+      <span class="s2">&quot; &amp;&amp; awk &#39;/^</span><span class="se">\\</span><span class="s2">+incdir</span><span class="se">\\</span><span class="s2">+/ {next} /^</span><span class="se">\\</span><span class="s2">s*#/ {next} /^</span><span class="se">\\</span><span class="s2">s*$/ {next} {print}&#39; design.vc &gt; design.files&quot;</span> <span class="o">..</span>
+      <span class="s2">&quot; &amp;&amp; ctags -R --languages=SystemVerilog --fields=+nKz -f tags -L design.files&quot;</span>
+  <span class="kr">else</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;cd &quot;</span> <span class="o">..</span> <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">shellescape</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">..</span>
+      <span class="s2">&quot; &amp;&amp; ctags -R --languages=SystemVerilog --fields=+nKz -f tags .&quot;</span>
+  <span class="kr">end</span>
+  <span class="n">vim</span><span class="p">.</span><span class="n">fn</span><span class="p">.</span><span class="n">jobstart</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="p">{</span> <span class="n">detach</span> <span class="o">=</span> <span class="kc">true</span> <span class="p">})</span>
+<span class="kr">end</span>
+
+<span class="n">vim</span><span class="p">.</span><span class="n">api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">(</span><span class="s2">&quot;BufWritePost&quot;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="n">pattern</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;*.v&quot;</span><span class="p">,</span> <span class="s2">&quot;*.sv&quot;</span> <span class="p">},</span>
+  <span class="n">callback</span> <span class="o">=</span> <span class="n">build_tags</span><span class="p">,</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<h3>gutentags plugin</h3>
+<p>If you prefer a plugin, <code>gutentags</code> can manage tag generation automatically. Use a small wrapper script so it handles <code>design.vc</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env bash</span>
+<span class="c1"># ctags_from_design_vc.sh — place in PATH</span>
+<span class="nb">set</span><span class="w"> </span>-euo<span class="w"> </span>pipefail
+
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span>design.vc<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>awk<span class="w"> </span><span class="s1">&#39;/^\+incdir\+/ {next} /^\s*#/ {next} /^\s*$/ {next} {print}&#39;</span><span class="w"> </span>design.vc<span class="w"> </span>&gt;<span class="w"> </span>design.files
+<span class="w">  </span><span class="nb">exec</span><span class="w"> </span>ctags<span class="w"> </span>-R<span class="w"> </span>--languages<span class="o">=</span>SystemVerilog<span class="w"> </span>--fields<span class="o">=</span>+nKz<span class="w"> </span>-f<span class="w"> </span>tags<span class="w"> </span>-L<span class="w"> </span>design.files
+<span class="k">else</span>
+<span class="w">  </span><span class="nb">exec</span><span class="w"> </span>ctags<span class="w"> </span>-R<span class="w"> </span>--languages<span class="o">=</span>SystemVerilog<span class="w"> </span>--fields<span class="o">=</span>+nKz<span class="w"> </span>-f<span class="w"> </span>tags<span class="w"> </span>.
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>Then configure <code>gutentags</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">let</span> <span class="k">g</span>:gutentags_project_root <span class="p">=</span> [<span class="s1">&#39;design.vc&#39;</span><span class="p">,</span> <span class="s1">&#39;.git&#39;</span>]
+<span class="k">let</span> <span class="k">g</span>:gutentags_ctags_executable <span class="p">=</span> <span class="s1">&#39;ctags_from_design_vc.sh&#39;</span>
+</code></pre></div>
+
+<h2>7. Troubleshooting</h2>
+<p><strong>No tags generated</strong> — check that <code>design.files</code> has correct, accessible paths. Switch to absolute paths if relative ones fail.</p>
+<p><strong>Missing modules or interfaces</strong> — confirm your <code>ctags</code> supports SystemVerilog. Universal Ctags handles it; Exuberant Ctags does not.</p>
+<p><strong>Include paths not respected</strong> — <code>ctags</code> does not preprocess; it parses files directly. Ensure every file that defines a symbol is in <code>design.files</code>.</p>
+<h2>Summary</h2>
+<ol>
+<li>Strip <code>+incdir+</code> from <code>design.vc</code> to create <code>design.files</code>.</li>
+<li>Run <code>ctags -R --languages=SystemVerilog --fields=+nKz -f tags -L design.files</code>.</li>
+<li>Configure your editor (Vim / Neovim / Emacs / VS Code) to use the <code>tags</code> file.</li>
+<li>Automate regeneration on save so tags stay current.</li>
+</ol>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

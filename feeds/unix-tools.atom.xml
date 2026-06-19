@@ -1,5 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-04-15T00:00:00+01:00</updated><entry><title>Copy and Paste in a Multi-OS System</title><link href="http://lizard-spock.co.uk/copy-paste-multi-os.html" rel="alternate"></link><published>2026-04-15T00:00:00+01:00</published><updated>2026-04-15T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-15:/copy-paste-multi-os.html</id><summary type="html">&lt;p&gt;Unifying copy and paste shortcuts when working across macOS locally and RHEL remotely via OpenText Exceed. Covers terminal emulator behaviour, gVim clipboard mapping, and Karabiner-Elements rules to make Ctrl-Shift-C/V and Cmd-C/V work consistently in both directions.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Working across macOS locally and a remote RHEL system through &lt;a href="https://www.opentext.com/products/exceed-turbo-x"&gt;OpenText Exceed TurboX&lt;/a&gt; creates a clipboard shortcut mismatch. Linux applications expect &lt;code&gt;Ctrl-Shift-C&lt;/code&gt; / &lt;code&gt;Ctrl-Shift-V&lt;/code&gt; for copy and paste; macOS expects &lt;code&gt;Cmd-C&lt;/code&gt; / &lt;code&gt;Cmd-V&lt;/code&gt;. Switching mental models every time the active window changes is error-prone and slow. This post covers a setup that makes both shortcut conventions work regardless of which application is in focus.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-06-19T00:00:00+01:00</updated><entry><title>Using ctags with Verilog and SystemVerilog</title><link href="http://lizard-spock.co.uk/ctags-verilog-systemverilog.html" rel="alternate"></link><published>2026-06-19T00:00:00+01:00</published><updated>2026-06-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-19:/ctags-verilog-systemverilog.html</id><summary type="html">&lt;p&gt;How to generate and use ctags for Verilog/SystemVerilog projects, covering design.vc file lists, editor setup for Vim, Neovim, Emacs, and VS Code, and keeping tags up to date automatically.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/ctags-verilog-hero-HQ.png"&gt;&lt;img alt="Ctags for Verilog navigation" src="http://lizard-spock.co.uk/ctags-verilog-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Navigating a large Verilog or SystemVerilog codebase without tag-based Go to Definition is painful. This tutorial shows how to generate and use &lt;code&gt;ctags&lt;/code&gt; for projects that use a &lt;code&gt;design.vc&lt;/code&gt; file list — common in simulators like Verilator, VCS, and xrun.&lt;/p&gt;
+&lt;h2&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Universal Ctags&lt;/strong&gt; (preferred over Exuberant Ctags — it has better SystemVerilog support)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Install on macOS:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;brew&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;universal-ctags
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On Linux:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;universal-ctags&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="c1"&gt;# Debian/Ubuntu&lt;/span&gt;
+brew&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;universal-ctags&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="c1"&gt;# Homebrew on Linux&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Check your version:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ctags&lt;span class="w"&gt; &lt;/span&gt;--version
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;1. Understand the &lt;code&gt;design.vc&lt;/code&gt; format&lt;/h2&gt;
+&lt;p&gt;A typical &lt;code&gt;design.vc&lt;/code&gt; looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;+incdir+./rtl
++incdir+./ip
+./rtl/top.sv
+./rtl/subsystem.sv
+./ip/uart/uart.sv
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Lines beginning with &lt;code&gt;+incdir+&lt;/code&gt; define include paths.&lt;/li&gt;
+&lt;li&gt;Remaining lines are source files (usually &lt;code&gt;.v&lt;/code&gt; / &lt;code&gt;.sv&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;Relative paths are normally relative to the &lt;code&gt;design.vc&lt;/code&gt; location.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;2. Create a file list for ctags&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;ctags&lt;/code&gt; expects plain file paths. Strip the &lt;code&gt;+incdir+&lt;/code&gt; lines and any comments with &lt;code&gt;awk&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;awk&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="s1"&gt;  /^\+incdir\+/ {next}&lt;/span&gt;
+&lt;span class="s1"&gt;  /^\s*#/ {next}&lt;/span&gt;
+&lt;span class="s1"&gt;  /^\s*$/ {next}&lt;/span&gt;
+&lt;span class="s1"&gt;  {print}&lt;/span&gt;
+&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;design.vc&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;design.files
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If you want the include paths separately for other tools:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;grep&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^\+incdir\+&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;design.vc&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sed&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;s/^\+incdir\+//&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;design.incdirs
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Note: &lt;code&gt;ctags&lt;/code&gt; does not use include paths for preprocessing; it parses files directly. Make sure all files that define symbols are listed in &lt;code&gt;design.files&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;3. Generate the tags file&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ctags&lt;span class="w"&gt; &lt;/span&gt;-R&lt;span class="w"&gt; &lt;/span&gt;--languages&lt;span class="o"&gt;=&lt;/span&gt;SystemVerilog&lt;span class="w"&gt; &lt;/span&gt;--fields&lt;span class="o"&gt;=&lt;/span&gt;+nKz&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;tags&lt;span class="w"&gt; &lt;/span&gt;-L&lt;span class="w"&gt; &lt;/span&gt;design.files
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Flags:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-L design.files&lt;/code&gt; — read source paths from the file list&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--languages=SystemVerilog&lt;/code&gt; — enables SV/Verilog parsing&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--fields=+nKz&lt;/code&gt; — includes line number, kind, and scope in each tag&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f tags&lt;/code&gt; — write to &lt;code&gt;tags&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;4. Configure your editor&lt;/h2&gt;
+&lt;h3&gt;Vim / Neovim&lt;/h3&gt;
+&lt;p&gt;Tell Vim to search upward from the current file for a &lt;code&gt;tags&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;set&lt;/span&gt; &lt;span class="k"&gt;tags&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;./&lt;span class="k"&gt;tags&lt;/span&gt;;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Navigate with:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Ctrl-]&lt;/code&gt; — jump to definition&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Ctrl-t&lt;/code&gt; — jump back&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Emacs&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;setq&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;tags-file-name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;~/path/to/project/tags&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Navigate with &lt;code&gt;M-.&lt;/code&gt; (jump) and &lt;code&gt;M-*&lt;/code&gt; (back).&lt;/p&gt;
+&lt;h3&gt;VS Code — ctags-companion extension&lt;/h3&gt;
+&lt;p&gt;Install the &lt;strong&gt;Ctags Companion&lt;/strong&gt; extension (&lt;code&gt;gediminaszlatkus.ctags-companion&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Default settings that work well for SystemVerilog:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;ctags-companion.command&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ctags -R --fields=+nKz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;ctags-companion.readtagsGoToDefinitionCommand&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;readtags -en&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Once a &lt;code&gt;tags&lt;/code&gt; file exists at the project root, &lt;code&gt;Go to Definition&lt;/code&gt; (&lt;code&gt;F12&lt;/code&gt; / Cmd-click / right-click) will use it.&lt;/p&gt;
+&lt;p&gt;To make Go to Definition open in the current editor group rather than a split pane, add to your user settings:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;workbench.editor.enablePreviewFromCodeNavigation&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;workbench.editor.revealIfOpen&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If split-pane behaviour persists, check that your keybinding is mapped to &lt;code&gt;editor.action.revealDefinition&lt;/code&gt; and not &lt;code&gt;editor.action.revealDefinitionAside&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;5. Keep tags up to date&lt;/h2&gt;
+&lt;p&gt;Regenerate after RTL changes:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ctags&lt;span class="w"&gt; &lt;/span&gt;-R&lt;span class="w"&gt; &lt;/span&gt;--languages&lt;span class="o"&gt;=&lt;/span&gt;SystemVerilog&lt;span class="w"&gt; &lt;/span&gt;--fields&lt;span class="o"&gt;=&lt;/span&gt;+nKz&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;tags&lt;span class="w"&gt; &lt;/span&gt;-L&lt;span class="w"&gt; &lt;/span&gt;design.files
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Add a &lt;code&gt;make&lt;/code&gt; target for convenience:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;.PHONY&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tags&lt;/span&gt;
+&lt;span class="nf"&gt;tags&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;awk&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/^\+incdir\+/ {next} /^\s*#/ {next} /^\s*$$/ {next} {print}&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;design.vc&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;design.files
+&lt;span class="w"&gt;    &lt;/span&gt;ctags&lt;span class="w"&gt; &lt;/span&gt;-R&lt;span class="w"&gt; &lt;/span&gt;--languages&lt;span class="o"&gt;=&lt;/span&gt;SystemVerilog&lt;span class="w"&gt; &lt;/span&gt;--fields&lt;span class="o"&gt;=&lt;/span&gt;+nKz&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;tags&lt;span class="w"&gt; &lt;/span&gt;-L&lt;span class="w"&gt; &lt;/span&gt;design.files
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;6. Auto-build on save&lt;/h2&gt;
+&lt;h3&gt;Vim: rebuild on BufWritePost&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="p"&gt;!&lt;/span&gt; s:FindRoot&lt;span class="p"&gt;()&lt;/span&gt; abort
+  &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="k"&gt;l&lt;/span&gt;:vc &lt;span class="p"&gt;=&lt;/span&gt; findfile&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;design.vc&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; expand&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;%:p:h&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;.&lt;span class="s1"&gt;&amp;#39;;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;!&lt;/span&gt;empty&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;l&lt;/span&gt;:vc&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; fnamemodify&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;l&lt;/span&gt;:vc&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;:h&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;endif&lt;/span&gt;
+  &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="k"&gt;l&lt;/span&gt;:root &lt;span class="p"&gt;=&lt;/span&gt; finddir&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;.git&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; expand&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;%:p:h&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;.&lt;span class="s1"&gt;&amp;#39;;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt; empty&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;l&lt;/span&gt;:root&lt;span class="p"&gt;)&lt;/span&gt; ? &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt; : fnamemodify&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;l&lt;/span&gt;:root&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;:h&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;endfunction&lt;/span&gt;
+
+&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="p"&gt;!&lt;/span&gt; s:BuildTags&lt;span class="p"&gt;()&lt;/span&gt; abort
+  &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="k"&gt;l&lt;/span&gt;:root &lt;span class="p"&gt;=&lt;/span&gt; s:FindRoot&lt;span class="p"&gt;()&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; empty&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;l&lt;/span&gt;:root&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;endif&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; filereadable&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;l&lt;/span&gt;:root . &lt;span class="s1"&gt;&amp;#39;/design.vc&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    execute &lt;span class="s1"&gt;&amp;#39;silent !cd &amp;#39;&lt;/span&gt; . shellescape&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;l&lt;/span&gt;:root&lt;span class="p"&gt;)&lt;/span&gt; .
+          \ &lt;span class="s1"&gt;&amp;#39; &amp;amp;&amp;amp; awk &amp;#39;&amp;#39;/^\+incdir\+/ {next} /^\s*#/ {next} /^\s*$/ {next} {print}&amp;#39;&amp;#39; design.vc &amp;gt; design.files&amp;#39;&lt;/span&gt; .
+          \ &lt;span class="s1"&gt;&amp;#39; &amp;amp;&amp;amp; ctags -R --languages=SystemVerilog --fields=+nKz -f tags -L design.files&amp;#39;&lt;/span&gt;
+  &lt;span class="k"&gt;else&lt;/span&gt;
+    execute &lt;span class="s1"&gt;&amp;#39;silent !cd &amp;#39;&lt;/span&gt; . shellescape&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;l&lt;/span&gt;:root&lt;span class="p"&gt;)&lt;/span&gt; .
+          \ &lt;span class="s1"&gt;&amp;#39; &amp;amp;&amp;amp; ctags -R --languages=SystemVerilog --fields=+nKz -f tags .&amp;#39;&lt;/span&gt;
+  &lt;span class="k"&gt;endif&lt;/span&gt;
+&lt;span class="k"&gt;endfunction&lt;/span&gt;
+
+augroup verilog_tags
+  autocmd&lt;span class="p"&gt;!&lt;/span&gt;
+  autocmd &lt;span class="nb"&gt;BufWritePost&lt;/span&gt; *.&lt;span class="k"&gt;v&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;*.&lt;span class="k"&gt;sv&lt;/span&gt; &lt;span class="k"&gt;call&lt;/span&gt; s:BuildTags&lt;span class="p"&gt;()&lt;/span&gt;
+augroup END
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Neovim: async job (non-blocking)&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;opt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;tags&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;./tags;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;local&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt; &lt;span class="nf"&gt;find_root&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+  &lt;span class="kd"&gt;local&lt;/span&gt; &lt;span class="n"&gt;vc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;findfile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;design.vc&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%:p:h&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="kr"&gt;if&lt;/span&gt; &lt;span class="n"&gt;vc&lt;/span&gt; &lt;span class="o"&gt;~=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt; &lt;span class="kr"&gt;then&lt;/span&gt; &lt;span class="kr"&gt;return&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fnamemodify&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;:h&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="kr"&gt;end&lt;/span&gt;
+  &lt;span class="kd"&gt;local&lt;/span&gt; &lt;span class="n"&gt;git&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;finddir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.git&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%:p:h&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="kr"&gt;return&lt;/span&gt; &lt;span class="n"&gt;git&lt;/span&gt; &lt;span class="o"&gt;~=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fnamemodify&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;git&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;:h&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="kr"&gt;end&lt;/span&gt;
+
+&lt;span class="kd"&gt;local&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt; &lt;span class="nf"&gt;build_tags&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+  &lt;span class="kd"&gt;local&lt;/span&gt; &lt;span class="n"&gt;root&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;find_root&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+  &lt;span class="kr"&gt;if&lt;/span&gt; &lt;span class="n"&gt;root&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt; &lt;span class="kr"&gt;then&lt;/span&gt; &lt;span class="kr"&gt;return&lt;/span&gt; &lt;span class="kr"&gt;end&lt;/span&gt;
+  &lt;span class="kd"&gt;local&lt;/span&gt; &lt;span class="n"&gt;cmd&lt;/span&gt;
+  &lt;span class="kr"&gt;if&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filereadable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/design.vc&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="kr"&gt;then&lt;/span&gt;
+    &lt;span class="n"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;cd &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;shellescape&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt;
+      &lt;span class="s2"&gt;&amp;quot; &amp;amp;&amp;amp; awk &amp;#39;/^&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s2"&gt;+incdir&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s2"&gt;+/ {next} /^&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s2"&gt;s*#/ {next} /^&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s2"&gt;s*$/ {next} {print}&amp;#39; design.vc &amp;gt; design.files&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt;
+      &lt;span class="s2"&gt;&amp;quot; &amp;amp;&amp;amp; ctags -R --languages=SystemVerilog --fields=+nKz -f tags -L design.files&amp;quot;&lt;/span&gt;
+  &lt;span class="kr"&gt;else&lt;/span&gt;
+    &lt;span class="n"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;cd &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt; &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;shellescape&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt;
+      &lt;span class="s2"&gt;&amp;quot; &amp;amp;&amp;amp; ctags -R --languages=SystemVerilog --fields=+nKz -f tags .&amp;quot;&lt;/span&gt;
+  &lt;span class="kr"&gt;end&lt;/span&gt;
+  &lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jobstart&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;detach&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt; &lt;span class="p"&gt;})&lt;/span&gt;
+&lt;span class="kr"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;api&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nvim_create_autocmd&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;BufWritePost&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;*.v&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;*.sv&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+  &lt;span class="n"&gt;callback&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;build_tags&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;gutentags plugin&lt;/h3&gt;
+&lt;p&gt;If you prefer a plugin, &lt;code&gt;gutentags&lt;/code&gt; can manage tag generation automatically. Use a small wrapper script so it handles &lt;code&gt;design.vc&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="ch"&gt;#!/usr/bin/env bash&lt;/span&gt;
+&lt;span class="c1"&gt;# ctags_from_design_vc.sh — place in PATH&lt;/span&gt;
+&lt;span class="nb"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-euo&lt;span class="w"&gt; &lt;/span&gt;pipefail
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;design.vc&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;awk&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/^\+incdir\+/ {next} /^\s*#/ {next} /^\s*$/ {next} {print}&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;design.vc&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;design.files
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exec&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;ctags&lt;span class="w"&gt; &lt;/span&gt;-R&lt;span class="w"&gt; &lt;/span&gt;--languages&lt;span class="o"&gt;=&lt;/span&gt;SystemVerilog&lt;span class="w"&gt; &lt;/span&gt;--fields&lt;span class="o"&gt;=&lt;/span&gt;+nKz&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;tags&lt;span class="w"&gt; &lt;/span&gt;-L&lt;span class="w"&gt; &lt;/span&gt;design.files
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exec&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;ctags&lt;span class="w"&gt; &lt;/span&gt;-R&lt;span class="w"&gt; &lt;/span&gt;--languages&lt;span class="o"&gt;=&lt;/span&gt;SystemVerilog&lt;span class="w"&gt; &lt;/span&gt;--fields&lt;span class="o"&gt;=&lt;/span&gt;+nKz&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;tags&lt;span class="w"&gt; &lt;/span&gt;.
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then configure &lt;code&gt;gutentags&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="k"&gt;g&lt;/span&gt;:gutentags_project_root &lt;span class="p"&gt;=&lt;/span&gt; [&lt;span class="s1"&gt;&amp;#39;design.vc&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;.git&amp;#39;&lt;/span&gt;]
+&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="k"&gt;g&lt;/span&gt;:gutentags_ctags_executable &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;ctags_from_design_vc.sh&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;7. Troubleshooting&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;No tags generated&lt;/strong&gt; — check that &lt;code&gt;design.files&lt;/code&gt; has correct, accessible paths. Switch to absolute paths if relative ones fail.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Missing modules or interfaces&lt;/strong&gt; — confirm your &lt;code&gt;ctags&lt;/code&gt; supports SystemVerilog. Universal Ctags handles it; Exuberant Ctags does not.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Include paths not respected&lt;/strong&gt; — &lt;code&gt;ctags&lt;/code&gt; does not preprocess; it parses files directly. Ensure every file that defines a symbol is in &lt;code&gt;design.files&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Strip &lt;code&gt;+incdir+&lt;/code&gt; from &lt;code&gt;design.vc&lt;/code&gt; to create &lt;code&gt;design.files&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;ctags -R --languages=SystemVerilog --fields=+nKz -f tags -L design.files&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Configure your editor (Vim / Neovim / Emacs / VS Code) to use the &lt;code&gt;tags&lt;/code&gt; file.&lt;/li&gt;
+&lt;li&gt;Automate regeneration on save so tags stay current.&lt;/li&gt;
+&lt;/ol&gt;</content><category term="Unix &amp; Tools"></category><category term="verilog"></category><category term="systemverilog"></category><category term="ctags"></category><category term="vim"></category><category term="neovim"></category><category term="vscode"></category><category term="tools"></category><category term="rtl"></category></entry><entry><title>Copy and Paste in a Multi-OS System</title><link href="http://lizard-spock.co.uk/copy-paste-multi-os.html" rel="alternate"></link><published>2026-04-15T00:00:00+01:00</published><updated>2026-04-15T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-04-15:/copy-paste-multi-os.html</id><summary type="html">&lt;p&gt;Unifying copy and paste shortcuts when working across macOS locally and RHEL remotely via OpenText Exceed. Covers terminal emulator behaviour, gVim clipboard mapping, and Karabiner-Elements rules to make Ctrl-Shift-C/V and Cmd-C/V work consistently in both directions.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Working across macOS locally and a remote RHEL system through &lt;a href="https://www.opentext.com/products/exceed-turbo-x"&gt;OpenText Exceed TurboX&lt;/a&gt; creates a clipboard shortcut mismatch. Linux applications expect &lt;code&gt;Ctrl-Shift-C&lt;/code&gt; / &lt;code&gt;Ctrl-Shift-V&lt;/code&gt; for copy and paste; macOS expects &lt;code&gt;Cmd-C&lt;/code&gt; / &lt;code&gt;Cmd-V&lt;/code&gt;. Switching mental models every time the active window changes is error-prone and slow. This post covers a setup that makes both shortcut conventions work regardless of which application is in focus.&lt;/p&gt;
 &lt;h2&gt;The Problem&lt;/h2&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -2868,20 +3063,4 @@ $&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;wge
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;update_dyld_shared_cache&lt;span class="w"&gt; &lt;/span&gt;-force
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="OS X"></category></entry><entry><title>"OS X open finder from command line"</title><link href="http://lizard-spock.co.uk/os-x-open-finder-from-command-line.html" rel="alternate"></link><published>2010-10-13T11:08:40+01:00</published><updated>2010-10-13T11:08:40+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-10-13:/os-x-open-finder-from-command-line.html</id><content type="html">&lt;p&gt;Just discovered this: from &lt;a href="http://grx.no/kb/2009/01/09/open-finder-for-current-directory-from-command-line/"&gt;source&lt;/a&gt;.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;open&lt;span class="w"&gt; &lt;/span&gt;.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="OS X"></category></entry><entry><title>"Remove sensitive data from git"</title><link href="http://lizard-spock.co.uk/remove-sensitive-data-from-git.html" rel="alternate"></link><published>2010-09-10T04:16:56+01:00</published><updated>2010-09-10T04:16:56+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-09-10:/remove-sensitive-data-from-git.html</id><content type="html">&lt;p&gt;&lt;a href="http://help.github.com/removing-sensitive-data/"&gt;Removing Sensitive data from git and eliminate history&lt;/a&gt;&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="Git"></category></entry><entry><title>"Amazon Drops EC2 Web Service Prices"</title><link href="http://lizard-spock.co.uk/amazon-drops-ec2-web-service-prices.html" rel="alternate"></link><published>2010-09-09T02:24:49+01:00</published><updated>2010-09-09T02:24:49+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-09-09:/amazon-drops-ec2-web-service-prices.html</id><summary type="html">&lt;p&gt;The new &lt;a href="http://aws.amazon.com/ec2/#pricing"&gt;EC2-Pricing&lt;/a&gt; also includes a new Micro service. This micro service is intended for small apps servicing tens of …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The new &lt;a href="http://aws.amazon.com/ec2/#pricing"&gt;EC2-Pricing&lt;/a&gt; also includes a new Micro service. This micro service is intended for small apps servicing tens of requests per second.&lt;/p&gt;
-&lt;p&gt;The standard price (EU) is $0.025 so if it was running 24/7/365 that would be:  &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;(24*365*0.025) = $219 or $18.25/month
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;a href="http://www.webfaction.com/?affiliate=morgy"&gt;Webfaction&lt;/a&gt; can run the same thing for $9.50 a month, limited to fair use of 80MB memory.&lt;/p&gt;
-&lt;p&gt;With a 1 year Reserved instance, $54 + $0.01 hourly charge this drops to $11.8/month.  &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;((24*365*0.01)+54)/12 = 11.8
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;This could be dropped further with a 3 year Reserved instance.  &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;((24*365*0.01*3)+82)/36 = $9.58/month
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;If the web then stays deactivated for half this time (site is country specific or only popular around new article posts) then this could drop the monthly cost down to $5.92  &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;((12*365*0.01*3)+82)/36
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Heroku"></category><category term="Memory"></category><category term="Performance"></category><category term="Web"></category><category term="WebFaction"></category></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="OS X"></category></entry><entry><title>"Remove sensitive data from git"</title><link href="http://lizard-spock.co.uk/remove-sensitive-data-from-git.html" rel="alternate"></link><published>2010-09-10T04:16:56+01:00</published><updated>2010-09-10T04:16:56+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-09-10:/remove-sensitive-data-from-git.html</id><content type="html">&lt;p&gt;&lt;a href="http://help.github.com/removing-sensitive-data/"&gt;Removing Sensitive data from git and eliminate history&lt;/a&gt;&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="Git"></category></entry></feed>
