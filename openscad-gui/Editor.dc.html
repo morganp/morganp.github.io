@@ -61,7 +61,7 @@
     <div style="display:flex;align-items:center;gap:9px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:8px 13px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <div style="width:17px;height:17px;border-radius:5px;background:linear-gradient(135deg,#3B82F6,#2563EB);box-shadow:0 0 0 1px #2C3037, inset 0 1px 0 rgba(255,255,255,.25);"></div>
       <span style="font-weight:600;letter-spacing:.01em;color:#E6E9EE;">SCAD Studio</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.23.0</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.25.1</span>
     </div>
     <div style="display:flex;align-items:center;gap:5px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:6px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <button onClick="{{ openFile }}" style="display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;" style-hover="background:#262A30;">
@@ -148,6 +148,9 @@
     <div style="height:1px;background:#2C3037;margin:2px 4px;"></div>
     <button onClick="{{ pickMove }}" title="Move selected (M)" style="{{ btnMove }}">
       <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M3 10h14M10 3 8 5.4m2-2.4 2 2.4M10 17l-2-2.4m2 2.4 2-2.4M3 10l2.4-2M3 10l2.4 2M17 10l-2.4-2m2.4 2-2.4 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button onClick="{{ pickPush }}" title="Push/pull a face (E) \u2014 drag out to add, in to cut" style="{{ btnPush }}">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3.5 7.5 8 5l4.5 2.5v5L8 15l-4.5-2.5v-5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M3.6 7.5 8 10l4.4-2.5M8 10v5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" opacity=".5"/><path d="M14.5 10h3.5m0 0-1.6-1.5M18 10l-1.6 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <button onClick="{{ deleteSelected }}" title="Delete selected (\u232b)" style="{{ btnDelete }}">
       <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M4.5 5.5h11M8 5.5V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5m2 0-.6 9a1.5 1.5 0 0 1-1.5 1.4H6.6a1.5 1.5 0 0 1-1.5-1.4l-.6-9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -391,8 +394,8 @@
     </div>
   </sc-if>
 
-  <div style="position:absolute;left:16px;bottom:16px;z-index:30;width:226px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);overflow:hidden;">
-    <div style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid #2C3037;">
+  <div style="{{ treePanelStyle }}">
+    <div onMouseDown="{{ dragTree }}" style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid #2C3037;cursor:grab;">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2.5 4h11M2.5 8h11M2.5 12h7" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round"/></svg>
       <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8A9099;font-weight:500;">Model Tree</span>
       <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5B616B;">{{ shapeCount }}</span>
@@ -437,10 +440,11 @@
       <sc-if value="{{ hasMultiSel }}" hint-placeholder-val="{{ false }}">
         <div style="margin-top:5px;padding:7px 8px;border-radius:8px;background:#14161A;border:1px solid #23272E;display:flex;flex-direction:column;gap:6px;">
           <span style="font-size:10px;color:#6B7280;line-height:1.4;">{{ multiSelHint }}</span>
-          <div style="display:flex;gap:5px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
             <button onClick="{{ groupUnion }}" title="Union" style="{{ comboBtn }}">∪ Union</button>
             <button onClick="{{ groupDifference }}" title="Difference (first = base)" style="{{ comboBtn }}">− Diff</button>
             <button onClick="{{ groupIntersection }}" title="Intersection" style="{{ comboBtn }}">∩ Int</button>
+            <button onClick="{{ groupHull }}" title="Hull (convex wrap)" style="{{ comboBtn }}">⬢ Hull</button>
           </div>
         </div>
       </sc-if>
@@ -1184,6 +1188,11 @@ class Component extends DCLogic {
       for (let i = 1; i < kids.length; i++) acc = this._ev.evaluate(acc, kids[i], mode);
     }
     if (!acc) return null;
+    // Slice 5: stash the raw boolean geometry (for stable edge picking) then apply edge treatments
+    node._rawGeo = acc.geometry;
+    if (node.edgeTreatments && Object.keys(node.edgeTreatments).length) {
+      try { acc = this.applyEdgeTreatBrush(acc, node); } catch (e) { console.warn('edge treatment failed', e); }
+    }
     // a nested group's own translate/rotate (baked when this brush feeds a parent boolean)
     const gp = node.pos || [0, 0, 0], gr = node.rot || [0, 0, 0];
     if (gp[0] || gp[1] || gp[2] || gr[0] || gr[1] || gr[2]) {
@@ -1219,8 +1228,53 @@ class Component extends DCLogic {
     g.add(mesh);
     g.userData.shapeId = node.id;
     node.group = g; node.solid = mesh;
+    this.buildGroupEdges(node, g);
     this.scene.add(g);
     return g;
+  }
+
+  // Slice 5: detect the raw boolean result's feature edges + lay down invisible pick proxies
+  buildGroupEdges(node, g) {
+    node._edges = []; node._edgeProxies = [];
+    if (!node._rawGeo) return;
+    let edges;
+    try { edges = this.detectGroupEdges(node._rawGeo); } catch (e) { return; }
+    node._edges = edges;
+    for (const edge of edges) {
+      for (const seg of edge.segs) {
+        const p = this.makeGroupEdgeProxy(node, edge, seg);
+        if (p) { g.add(p); node._edgeProxies.push(p); }
+      }
+    }
+  }
+  makeGroupEdgeProxy(node, edge, seg) {
+    const THREE = this.THREE;
+    const a = new THREE.Vector3().fromArray(seg.a), b = new THREE.Vector3().fromArray(seg.b);
+    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, seg.len, 6), this.proxyMat());
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+    mesh.position.copy(a).add(b).multiplyScalar(0.5);
+    mesh.userData = { kind: 'groupEdgeProxy', shapeId: node.id, edgeId: edge.id };
+    mesh.renderOrder = 2;
+    return mesh;
+  }
+  makeGroupEdgeHighlight(node, edgeId, color, opacity) {
+    const THREE = this.THREE;
+    const edge = (node._edges || []).find(e => e.id === edgeId);
+    if (!edge || !node.group) return null;
+    const geos = [];
+    for (const seg of edge.segs) {
+      const a = new THREE.Vector3().fromArray(seg.a), b = new THREE.Vector3().fromArray(seg.b);
+      const g = new THREE.CylinderGeometry(0.85, 0.85, seg.len, 8);
+      const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+      g.applyQuaternion(q); g.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+      geos.push(g);
+    }
+    const merged = this.mergeGeos(geos);
+    node.group.updateMatrixWorld(true);
+    merged.applyMatrix4(node.group.matrixWorld);
+    const mesh = new THREE.Mesh(merged, new THREE.MeshBasicMaterial({ color, transparent: true, opacity }));
+    mesh.renderOrder = 4;
+    return mesh;
   }
 
   // ===== FACE DETECTION (Slice 6: face push/pull) =====
@@ -1301,12 +1355,277 @@ class Component extends DCLogic {
     return data ? { ...data, triCount: f.tris.length } : null;
   }
 
+  // ===== SLICE 6: FACE PUSH/PULL =====
+  // every pickable result mesh: simple-GUI solids + the advanced evaluated group
+  ppMeshes() {
+    const a = this.allSolids();
+    if (this._engineGroup) this._engineGroup.traverse(o => { if (o.isMesh) a.push(o); });
+    return a;
+  }
+  // world-space face under the pointer (rings/frame baked into world coords), or null
+  pickFaceAtPointer() {
+    if (!this.raycaster || !this.cam) return null;
+    this.scene.updateMatrixWorld(true);
+    this.raycaster.setFromCamera(this.pointer, this.cam);
+    const hit = this.raycaster.intersectObjects(this.ppMeshes(), false)[0];
+    if (!hit || hit.faceIndex == null || !hit.object.geometry) return null;
+    const wg = hit.object.geometry.clone();
+    wg.applyMatrix4(hit.object.matrixWorld);
+    let face = null;
+    try { face = this.pickFace(wg, hit.faceIndex); } catch (_) {}
+    wg.dispose();
+    if (face) face.hit = hit.point.toArray();
+    return face;
+  }
+  // face frame as a Matrix4; for an inward (cut) pull the +Z (extrude) axis is flipped to point in
+  frameMat(face, inward) {
+    const m = new this.THREE.Matrix4().fromArray(face.frame);
+    if (inward) { const e = m.elements; e[8] = -e[8]; e[9] = -e[9]; e[10] = -e[10]; }
+    return m;
+  }
+  // translucent flat overlay on the hovered face
+  showFaceOverlay(face) {
+    this.clearPPHover();
+    const THREE = this.THREE;
+    const shapes = this.ringsToShapes(face.rings2D);
+    if (!shapes.length) return;
+    const geo = new THREE.ShapeGeometry(shapes);
+    geo.applyMatrix4(this.frameMat(face, false));
+    const n = new THREE.Vector3().fromArray(face.normal).multiplyScalar(0.08); // beat z-fighting
+    geo.translate(n.x, n.y, n.z);
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x46c6ff, transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false }));
+    mesh.renderOrder = 5;
+    this.ppHover = mesh; this.scene.add(mesh);
+  }
+  clearPPHover() { if (this.ppHover) { this.scene.remove(this.ppHover); this.disposeGroup(this.ppHover); this.ppHover = null; } }
+  clearPPGhost() { if (this.ppGhost) { this.scene.remove(this.ppGhost); this.disposeGroup(this.ppGhost); this.ppGhost = null; } }
+  // translucent extruded preview prism while dragging (green = add / outward, red = cut / inward)
+  updatePPGhost(face, dist) {
+    this.clearPPGhost();
+    const h = Math.abs(dist);
+    if (h < 0.05) return;
+    const THREE = this.THREE, inward = dist < 0;
+    const geo = this.linearSolid(face.rings2D, { height: h, center: false });
+    if (!geo) return;
+    geo.applyMatrix4(this.frameMat(face, inward));
+    const col = inward ? 0xe0734f : 0x46d39a;
+    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: col, transparent: true, opacity: 0.45, roughness: 0.6, metalness: 0, depthWrite: false, side: THREE.DoubleSide }));
+    mesh.renderOrder = 4;
+    this.ppGhost = mesh; this.scene.add(mesh);
+  }
+  // signed distance along the face normal: project the pointer ray onto the normal axis (closest pt)
+  ppDistance(face) {
+    const THREE = this.THREE;
+    this.raycaster.setFromCamera(this.pointer, this.cam);
+    const ray = this.raycaster.ray;
+    const C = new THREE.Vector3().fromArray(face.center);
+    const N = new THREE.Vector3().fromArray(face.normal).normalize();
+    const w0 = C.clone().sub(ray.origin);
+    const b = N.dot(ray.direction), d = N.dot(w0), e = ray.direction.dot(w0);
+    const denom = 1 - b * b;
+    return Math.abs(denom) > 1e-6 ? (b * e - d) / denom : 0;
+  }
+  startPushPull(face) {
+    this.pp = { face, t0: this.ppDistance(face), dist: 0 };
+    if (this.controls) this.controls.enabled = false;
+    this.clearPPHover();
+    this.setState({ ppDragging: true, ppDist: 0 });
+  }
+  movePushPull() {
+    if (!this.pp) return;
+    let dist = Math.round((this.ppDistance(this.pp.face) - this.pp.t0) * 10) / 10;
+    this.pp.dist = dist;
+    this.updatePPGhost(this.pp.face, dist);
+    this.setState({ ppDist: dist });
+  }
+  endPushPull() {
+    const pp = this.pp; this.pp = null;
+    if (this.controls) this.controls.enabled = true;
+    this.clearPPGhost();
+    this.setState({ ppDragging: false });
+    if (pp && Math.abs(pp.dist) >= 0.1) this.applyPushPull(pp.face, pp.dist);
+    else this.flashStatus('Push/pull cancelled');
+  }
+  // emit the picked face as a polygon on its plane, extruded |dist| along the (maybe flipped) normal
+  buildPrismScad(face, dist, inward) {
+    const F = (n) => this.fmt(n);
+    const m = this.frameMat(face, inward).elements;
+    const rows = [0, 1, 2, 3].map(r => '[' + [m[r], m[r + 4], m[r + 8], m[r + 12]].map(F).join(', ') + ']');
+    let pts = [], paths = [], k = 0;
+    for (const ring of face.rings2D) {
+      const idxs = [];
+      for (const p of ring) { pts.push('[' + F(p[0]) + ', ' + F(p[1]) + ']'); idxs.push(k++); }
+      paths.push('[' + idxs.join(', ') + ']');
+    }
+    return `multmatrix([${rows.join(', ')}])\n  linear_extrude(height = ${F(Math.abs(dist))})\n  polygon(points = [${pts.join(', ')}], paths = [${paths.join(', ')}]);`;
+  }
+  applyPushPull(face, dist) {
+    const inward = dist < 0;
+    const prism = this.buildPrismScad(face, dist, inward);
+    const code = ((this._codeArea ? this._codeArea.value : this.state.code) || '').replace(/\s+$/, '');
+    let next;
+    if (inward) {
+      const body = code.split('\n').map(l => '  ' + l).join('\n');
+      next = 'difference() {\n' + body + '\n  // push/pull cut (' + this.fmt(Math.abs(dist)) + 'mm)\n  ' + prism.replace(/\n/g, '\n  ') + '\n}\n';
+    } else {
+      next = code + '\n\n// push/pull add (' + this.fmt(dist) + 'mm)\n' + prism + '\n';
+    }
+    if (this._codeArea) this._codeArea.value = next;
+    this.setState({ code: next }, () => this.runCode());
+    this.flashStatus((inward ? 'Cut ' : 'Added ') + this.fmt(Math.abs(dist)) + 'mm \u2014 read-only');
+  }
+
+  // ===== SLICE 5: BOOLEAN-EDGE FILLET / CHAMFER =====
+  // Detect sharp feature edges of a CSG result mesh (group-local coords), chained into pickable
+  // polylines, each tagged convex/concave with per-segment face frames (U=nA, V=nB outward normals).
+  detectGroupEdges(geo) {
+    if (!geo || !geo.attributes || !geo.attributes.position) return [];
+    const pos = geo.attributes.position, idx = geo.index;
+    const triN = (idx ? idx.count : pos.count) / 3;
+    const Q = 1e3;
+    const key = (x, y, z) => Math.round(x * Q) + ',' + Math.round(y * Q) + ',' + Math.round(z * Q);
+    const vAt = (t, c) => { const i = idx ? idx.getX(3 * t + c) : 3 * t + c; return [pos.getX(i), pos.getY(i), pos.getZ(i)]; };
+    const norm = (A, B, C) => {
+      const ux = B[0] - A[0], uy = B[1] - A[1], uz = B[2] - A[2];
+      const vx = C[0] - A[0], vy = C[1] - A[1], vz = C[2] - A[2];
+      let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+      const L = Math.hypot(nx, ny, nz) || 1; return [nx / L, ny / L, nz / L];
+    };
+    const emap = new Map();
+    for (let t = 0; t < triN; t++) {
+      const A = vAt(t, 0), B = vAt(t, 1), C = vAt(t, 2);
+      const N = norm(A, B, C), verts = [A, B, C], keys = [key(...A), key(...B), key(...C)];
+      for (let e = 0; e < 3; e++) {
+        const i0 = e, i1 = (e + 1) % 3, i2 = (e + 2) % 3;
+        const ek = keys[i0] < keys[i1] ? keys[i0] + '|' + keys[i1] : keys[i1] + '|' + keys[i0];
+        let rec = emap.get(ek); if (!rec) { rec = []; emap.set(ek, rec); }
+        rec.push({ a: verts[i0], b: verts[i1], apex: verts[i2], n: N });
+      }
+    }
+    const COS_FLAT = Math.cos(8 * Math.PI / 180);
+    const segs = [];
+    for (const rec of emap.values()) {
+      if (rec.length < 2) continue;
+      const fA = rec[0], fB = rec[1];
+      const dot = fA.n[0] * fB.n[0] + fA.n[1] * fB.n[1] + fA.n[2] * fB.n[2];
+      if (dot > COS_FLAT) continue;
+      const dA = fA.n[0] * (fB.apex[0] - fA.a[0]) + fA.n[1] * (fB.apex[1] - fA.a[1]) + fA.n[2] * (fB.apex[2] - fA.a[2]);
+      const convex = dA < 0;
+      const a = fA.a, b = fA.b, E = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+      const len = Math.hypot(E[0], E[1], E[2]); if (len < 1e-4) continue;
+      segs.push({ a, b, mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2], U: fA.n.slice(), V: fB.n.slice(), len, convex });
+    }
+    return this.chainEdgeSegs(segs);
+  }
+  chainEdgeSegs(segs) {
+    const Q = 1e3;
+    const pk = (p) => Math.round(p[0] * Q) + ',' + Math.round(p[1] * Q) + ',' + Math.round(p[2] * Q);
+    const tan = (s, fromKey) => {
+      const d = pk(s.a) === fromKey ? [s.b[0] - s.a[0], s.b[1] - s.a[1], s.b[2] - s.a[2]] : [s.a[0] - s.b[0], s.a[1] - s.b[1], s.a[2] - s.b[2]];
+      const L = Math.hypot(d[0], d[1], d[2]) || 1; return [d[0] / L, d[1] / L, d[2] / L];
+    };
+    const epMap = new Map();
+    segs.forEach((s, i) => { for (const p of [s.a, s.b]) { const k = pk(p); if (!epMap.has(k)) epMap.set(k, []); epMap.get(k).push(i); } });
+    const used = new Array(segs.length).fill(false);
+    const COS_CONT = Math.cos(35 * Math.PI / 180);
+    const chains = [];
+    const walk = (chain, fromSeg, fromKey) => {
+      let cur = fromSeg, ck = fromKey;
+      while (true) {
+        const s = segs[cur];
+        const farKey = pk(pk(s.a) === ck ? s.b : s.a);
+        const inT = tan(s, ck);
+        let best = -1, bestDot = COS_CONT;
+        for (const j of (epMap.get(farKey) || [])) {
+          if (used[j] || j === cur || segs[j].convex !== s.convex) continue;
+          const ct = tan(segs[j], farKey), d = inT[0] * ct[0] + inT[1] * ct[1] + inT[2] * ct[2];
+          if (d > bestDot) { bestDot = d; best = j; }
+        }
+        if (best < 0) break;
+        used[best] = true; chain.push(best); cur = best; ck = farKey;
+      }
+    };
+    for (let i = 0; i < segs.length; i++) {
+      if (used[i]) continue;
+      used[i] = true; const chain = [i];
+      walk(chain, i, pk(segs[i].a)); walk(chain, i, pk(segs[i].b));
+      const cs = chain.map(k => segs[k]);
+      const convex = cs[0].convex;
+      let minLen = Infinity, sx = 0, sy = 0, sz = 0;
+      for (const s of cs) { if (s.len < minLen) minLen = s.len; sx += s.mid[0]; sy += s.mid[1]; sz += s.mid[2]; }
+      const mid = [sx / cs.length, sy / cs.length, sz / cs.length];
+      const id = 'GE' + Math.round(mid[0] * 4) + '_' + Math.round(mid[1] * 4) + '_' + Math.round(mid[2] * 4) + '_' + (convex ? 'x' : 'v');
+      chains.push({ id, convex, segs: cs, mid, minLen });
+    }
+    return chains;
+  }
+  groupEdgeMaxR(edge) { return Math.max(0.5, Math.min(20, (edge ? edge.minLen : 40) / 2 - 0.2)); }
+
+  // ---- tool geometry: corner-removal/-fill profile extruded along one edge segment ----
+  edgeToolSegGeom(seg, type, convex, r) {
+    const THREE = this.THREE;
+    const shp = new THREE.Shape();
+    const cseg = Math.max(6, Math.round(this.state.fn / 3));
+    if (convex) {
+      if (type === 'fillet') { shp.moveTo(r, 0); shp.lineTo(r, r); shp.lineTo(0, r); shp.absarc(0, 0, r, Math.PI / 2, 0, true); }
+      else { shp.moveTo(r, 0); shp.lineTo(r, r); shp.lineTo(0, r); shp.closePath(); }
+    } else {
+      if (type === 'fillet') { shp.moveTo(0, 0); shp.lineTo(r, 0); shp.absarc(r, r, r, -Math.PI / 2, Math.PI, true); shp.lineTo(0, 0); }
+      else { shp.moveTo(0, 0); shp.lineTo(r, 0); shp.lineTo(0, r); shp.closePath(); }
+    }
+    const depth = seg.len + 0.04;
+    const geom = new THREE.ExtrudeGeometry(shp, { depth, bevelEnabled: false, curveSegments: cseg });
+    geom.translate(0, 0, -depth / 2);
+    geom.applyMatrix4(this.groupEdgeMatrix(seg, r, convex));
+    return geom.toNonIndexed();
+  }
+  groupEdgeMatrix(seg, r, convex) {
+    const THREE = this.THREE;
+    const U = new THREE.Vector3().fromArray(seg.U);
+    const V = new THREE.Vector3().fromArray(seg.V);
+    const E = new THREE.Vector3().crossVectors(U, V).normalize();
+    const mid = new THREE.Vector3().fromArray(seg.mid);
+    const p = convex ? mid.clone().addScaledVector(U, -r).addScaledVector(V, -r) : mid.clone();
+    return new THREE.Matrix4().makeBasis(U, V, E).setPosition(p);
+  }
+  buildEdgeToolBrush(t) {
+    const THREE = this.THREE;
+    const geos = [];
+    for (const seg of t.segs) { const g = this.edgeToolSegGeom(seg, t.type, t.convex, t.size); if (g) geos.push(g); }
+    if (!geos.length) return null;
+    const merged = this.mergeGeos(geos);
+    merged.computeVertexNormals();
+    const n = merged.attributes.position.count;
+    merged.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(n * 2), 2));
+    const b = new this.CSG.Brush(merged); b.updateMatrixWorld(true);
+    return b;
+  }
+  // subtract convex tools / union concave tools from a group's raw boolean brush
+  applyEdgeTreatBrush(brush, node) {
+    if (!this.CSG || !node.edgeTreatments) return brush;
+    const { Evaluator, ADDITION, SUBTRACTION } = this.CSG;
+    if (!this._ev) this._ev = new Evaluator();
+    let acc = brush;
+    const treats = Object.values(node.edgeTreatments);
+    for (const t of treats.filter(x => x.convex)) { const tool = this.buildEdgeToolBrush(t); if (tool) acc = this._ev.evaluate(acc, tool, SUBTRACTION); }
+    for (const t of treats.filter(x => !x.convex)) { const tool = this.buildEdgeToolBrush(t); if (tool) acc = this._ev.evaluate(acc, tool, ADDITION); }
+    acc.updateMatrixWorld(true);
+    return acc;
+  }
+
   // ============ POINTER / PICK ============
   ndc(e) {
     const r = this.renderer.domElement.getBoundingClientRect();
     this.pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   }
-  allProxies() { const a = []; for (const n of this.tree) if (!this.isGroup(n)) for (const p of (n.proxies || [])) a.push(p); return a; }
+  allProxies() {
+    const a = [];
+    for (const n of this.tree) {
+      if (this.isGroup(n)) { for (const p of (n._edgeProxies || [])) a.push(p); }
+      else { for (const p of (n.proxies || [])) a.push(p); }
+    }
+    return a;
+  }
   allSolids() {
     const a = [];
     for (const n of this.tree) {
@@ -1321,6 +1640,15 @@ class Component extends DCLogic {
     if (!this.raycaster) return;
     if (this.tc && this.tc.dragging) return;
     this.ndc(e);
+    if (this.state.tool === 'pushpull') {
+      if (this.pp) { this.movePushPull(); }
+      else {
+        const face = this.pickFaceAtPointer();
+        if (face) { this.showFaceOverlay(face); this.renderer.domElement.style.cursor = 'crosshair'; }
+        else { this.clearPPHover(); this.renderer.domElement.style.cursor = 'default'; }
+      }
+      return;
+    }
     this.raycaster.setFromCamera(this.pointer, this.cam);
     const hit = this.raycaster.intersectObjects(this.allProxies(), false)[0];
     if (this.state.tool === 'select' && hit) {
@@ -1336,6 +1664,11 @@ class Component extends DCLogic {
     if (e.button !== 0 || !this.raycaster) return;
     if (this.tc && (this.tc.dragging || this.tc.axis)) return; // grabbing the gizmo
     this.ndc(e);
+    if (this.state.tool === 'pushpull') {
+      const face = this.pickFaceAtPointer();
+      if (face) { try { this.renderer.domElement.setPointerCapture(e.pointerId); } catch (_) {} this.startPushPull(face); }
+      return;
+    }
     this.raycaster.setFromCamera(this.pointer, this.cam);
 
     // select tool: edges first, then shapes
@@ -1349,7 +1682,9 @@ class Component extends DCLogic {
     this.clearEdge(); this.selectShape(null);
   }
 
-  onPointerUp() {}
+  onPointerUp(e) {
+    if (this.pp) { try { this.renderer.domElement.releasePointerCapture(e.pointerId); } catch (_) {} this.endPushPull(); }
+  }
 
   shapeIdFromObject(o) {
     let cur = o;
@@ -1359,13 +1694,13 @@ class Component extends DCLogic {
 
   // ============ HOVER / SELECT EDGE ============
   setHoverEdge(ud) {
-    const key = ud ? ud.shapeId + '|' + ud.edgeName : null;
+    const key = ud ? ud.shapeId + '|' + (ud.edgeName || ud.edgeId) : null;
     if (key === this._hoverKey) return;
     this._hoverKey = key;
     if (this.hoverTube) { this.scene.remove(this.hoverTube); this.disposeGroup(this.hoverTube); this.hoverTube = null; }
     if (ud) {
       const sel = this.state.selectedEdge;
-      if (sel && sel.shapeId === ud.shapeId && sel.edgeName === ud.edgeName) return;
+      if (sel && sel.shapeId === ud.shapeId && (sel.edgeName === ud.edgeName || sel.edgeId === ud.edgeId)) return;
       this.hoverTube = this.makeHighlight(ud, 0x6aa0ee, 0.55);
       if (this.hoverTube) this.scene.add(this.hoverTube);
     }
@@ -1373,6 +1708,10 @@ class Component extends DCLogic {
 
   makeHighlight(ud, color, opacity) {
     const THREE = this.THREE;
+    if (ud.kind === 'groupEdgeProxy') {
+      const node = this.findNode(ud.shapeId);
+      return node ? this.makeGroupEdgeHighlight(node, ud.edgeId, color, opacity) : null;
+    }
     const shape = this.shapes.find(s => s.id === ud.shapeId);
     if (!shape) return null;
     const e = shape.edges.find(x => x.name === ud.edgeName);
@@ -1397,6 +1736,7 @@ class Component extends DCLogic {
   }
 
   selectEdge(ud) {
+    if (ud.kind === 'groupEdgeProxy') { this.selectGroupEdge(ud); return; }
     const shape = this.shapes.find(s => s.id === ud.shapeId);
     const e = shape && shape.edges.find(x => x.name === ud.edgeName);
     if (!e) return;
@@ -1418,6 +1758,51 @@ class Component extends DCLogic {
     if (this.selTube) { this.scene.remove(this.selTube); this.disposeGroup(this.selTube); this.selTube = null; }
     if (this.state.selectedEdge) this.setState({ selectedEdge: null }, () => this.updateGizmo());
     else this.updateGizmo();
+  }
+
+  // ---- Slice 5: group (boolean) edge selection + treatment ----
+  selectGroupEdge(ud) {
+    const node = this.findNode(ud.shapeId);
+    const edge = node && (node._edges || []).find(e => e.id === ud.edgeId);
+    if (!edge) return;
+    if (this.hoverTube) { this.scene.remove(this.hoverTube); this.disposeGroup(this.hoverTube); this.hoverTube = null; this._hoverKey = null; }
+    if (this.selTube) { this.scene.remove(this.selTube); this.disposeGroup(this.selTube); this.selTube = null; }
+    this.selTube = this.makeGroupEdgeHighlight(node, edge.id, 0x3b82f6, 0.95);
+    if (this.selTube) this.scene.add(this.selTube);
+    const existing = (node.edgeTreatments || {})[edge.id];
+    this.setState({
+      selectedEdge: { shapeId: ud.shapeId, edgeId: edge.id, isGroupEdge: true, label: (edge.convex ? 'convex' : 'concave') + ' edge' },
+      selectedShapeId: ud.shapeId, selectedIds: [ud.shapeId],
+      treatType: existing ? existing.type : this.state.treatType,
+      radius: existing ? existing.size : Math.min(this.state.radius, this.groupEdgeMaxR(edge)),
+    }, () => { this.refreshSelectionMat(); this.updateGizmo(); });
+  }
+  applyGroupTreatment() {
+    const se = this.state.selectedEdge; if (!se || !se.isGroupEdge) return;
+    const g = this.findNode(se.shapeId); if (!g || !this.isGroup(g)) return;
+    const edge = (g._edges || []).find(e => e.id === se.edgeId); if (!edge) return;
+    g.edgeTreatments = g.edgeTreatments || {};
+    const size = Math.min(this.state.radius, this.groupEdgeMaxR(edge));
+    g.edgeTreatments[se.edgeId] = {
+      type: this.state.treatType, size, convex: edge.convex,
+      segs: edge.segs.map(s => ({ mid: s.mid.slice(), U: s.U.slice(), V: s.V.slice(), len: s.len })),
+    };
+    this.rebuildTopGroup(g, se);
+  }
+  removeGroupTreatment() {
+    const se = this.state.selectedEdge; if (!se || !se.isGroupEdge) return;
+    const g = this.findNode(se.shapeId); if (!g) return;
+    if (g.edgeTreatments) { delete g.edgeTreatments[se.edgeId]; if (!Object.keys(g.edgeTreatments).length) delete g.edgeTreatments; }
+    this.rebuildTopGroup(g, se);
+  }
+  rebuildTopGroup(g, se) {
+    if (g.group) { this.scene.remove(g.group); this.disposeGroup(g.group); g.group = null; g.solid = null; }
+    this.buildGroupRender(g);
+    if (this.selTube) { this.scene.remove(this.selTube); this.disposeGroup(this.selTube); this.selTube = null; }
+    this.selTube = this.makeGroupEdgeHighlight(g, se.edgeId, 0x3b82f6, 0.95);
+    if (this.selTube) this.scene.add(this.selTube);
+    this.refreshSelectionMat();
+    this.syncShapesState(); this.regenCode(); this.forceUpdate();
   }
 
   // ============ TRANSFORM GIZMO ============
@@ -1599,6 +1984,7 @@ class Component extends DCLogic {
   // ============ TREATMENTS ============
   applyTreatment() {
     const se = this.state.selectedEdge; if (!se) return;
+    if (se.isGroupEdge) { this.applyGroupTreatment(); return; }
     const shape = this.shapes.find(s => s.id === se.shapeId); if (!shape) return;
     shape.treatments = shape.treatments || {};
     const maxR = this.edgeMaxRadius(shape, se.edgeName);
@@ -1622,6 +2008,7 @@ class Component extends DCLogic {
   }
   removeTreatmentBtn = () => {
     const se = this.state.selectedEdge; if (!se) return;
+    if (se.isGroupEdge) { this.removeGroupTreatment(); return; }
     const shape = this.shapes.find(s => s.id === se.shapeId); if (!shape) return;
     if (shape.treatments) delete shape.treatments[se.edgeName];
     this.buildGroup(shape);
@@ -1630,12 +2017,13 @@ class Component extends DCLogic {
   };
   appliedType() {
     const se = this.state.selectedEdge; if (!se) return null;
+    if (se.isGroupEdge) { const g = this.findNode(se.shapeId); return (g && g.edgeTreatments && g.edgeTreatments[se.edgeId]) ? g.edgeTreatments[se.edgeId].type : null; }
     const s = this.shapes.find(x => x.id === se.shapeId);
     return (s && s.treatments && s.treatments[se.edgeName]) ? s.treatments[se.edgeName].type : null;
   }
   setFillet = () => { if (this.appliedType() === 'fillet') { this.removeTreatmentBtn(); return; } this.setState({ treatType: 'fillet' }, () => this.applyTreatment()); };
   setChamfer = () => { if (this.appliedType() === 'chamfer') { this.removeTreatmentBtn(); return; } this.setState({ treatType: 'chamfer' }, () => this.applyTreatment()); };
-  shapeHasTreatment(se) { const s = this.shapes.find(x => x.id === se.shapeId); return !!(s && s.treatments && s.treatments[se.edgeName]); }
+  shapeHasTreatment(se) { if (se.isGroupEdge) { const g = this.findNode(se.shapeId); return !!(g && g.edgeTreatments && g.edgeTreatments[se.edgeId]); } const s = this.shapes.find(x => x.id === se.shapeId); return !!(s && s.treatments && s.treatments[se.edgeName]); }
   onRadiusSlide = (e) => { const v = Math.max(0.5, parseFloat(e.target.value) || 0.5); const se = this.state.selectedEdge; const has = se && this.shapeHasTreatment(se); this.setState({ radius: v }, () => { if (has) this.applyTreatment(); }); };
   onRadiusInput = (e) => { const v = Math.max(0.5, parseFloat(e.target.value) || 0.5); const se = this.state.selectedEdge; const has = se && this.shapeHasTreatment(se); this.setState({ radius: v }, () => { if (has) this.applyTreatment(); }); };
 
@@ -2177,7 +2565,7 @@ class Component extends DCLogic {
     const firstIdx = Math.min(...nodes.map(n => arr.indexOf(n)));
     for (const n of nodes) { const k = arr.indexOf(n); if (k >= 0) arr.splice(k, 1); }
     this.seq.group++;
-    const label = (op === 'union' ? 'Union ' : op === 'difference' ? 'Difference ' : 'Intersection ') + this.seq.group;
+    const label = (op === 'union' ? 'Union ' : op === 'difference' ? 'Difference ' : op === 'hull' ? 'Hull ' : 'Intersection ') + this.seq.group;
     const gnode = { id: 'gp' + Date.now() + this.seq.group, op, label, children: nodes };
     arr.splice(Math.min(firstIdx, arr.length), 0, gnode);
     this.reindex();
@@ -2223,6 +2611,7 @@ class Component extends DCLogic {
     if (this.isGroup(n)) {
       const f = { id: nid, op: n.op, label: (n.label || 'Group') + ' copy', children: (n.children || []).map(c => this._cloneForDup(c, ctr)) };
       if (n.dims) f.dims = JSON.parse(JSON.stringify(n.dims));
+      if (n.edgeTreatments) f.edgeTreatments = JSON.parse(JSON.stringify(n.edgeTreatments));
       f.pos = (n.pos || [0, 0, 0]).slice(); if (n.rot) f.rot = n.rot.slice();
       return f;
     }
@@ -2323,6 +2712,7 @@ class Component extends DCLogic {
       if (this.isGroup(n)) return {
         id: n.id, kind: 'group', op: n.op, label: n.label, depth,
         count: this.collectPrimitives([n]).length,
+        edgeTreated: Object.keys(n.edgeTreatments || {}).length,
         children: n.children.map(c => ser(c, depth + 1)),
       };
       return {
@@ -2367,10 +2757,19 @@ class Component extends DCLogic {
     }
     let usesMask = false;
     for (const s of this.shapes) if (Object.keys(s.treatments || {}).length && s.type === 'cuboid') usesMask = true;
-    if (usesMask) {
+    let usesConvex = false, usesConcave = false;
+    const scanET = (arr) => { for (const n of arr) { if (this.isGroup(n)) { for (const t of Object.values(n.edgeTreatments || {})) { if (t.convex) usesConvex = true; else usesConcave = true; } scanET(n.children); } } };
+    scanET(this.tree);
+    if (usesMask || usesConvex) {
       out.push('// --- edge treatment masks (subtracted along a computed edge frame) ---');
       out.push('module edge_fillet(L, r)  { linear_extrude(height = L, center = true) difference() { square([r, r]); circle(r); } }');
       out.push('module edge_chamfer(L, r) { linear_extrude(height = L, center = true) polygon([[r,0],[r,r],[0,r]]); }');
+      out.push('');
+    }
+    if (usesConcave) {
+      out.push('// --- concave edge fillets (unioned into the boolean result) ---');
+      out.push('module edge_round_in(L, r)   { linear_extrude(height = L, center = true) difference() { square([r, r]); translate([r, r]) circle(r); } }');
+      out.push('module edge_chamfer_in(L, r) { linear_extrude(height = L, center = true) polygon([[0,0],[r,0],[0,r]]); }');
       out.push('');
     }
     for (const node of this.tree) { this.emitNode(node, 0, out); out.push(''); }
@@ -2392,12 +2791,52 @@ class Component extends DCLogic {
         if (node.op === 'rotate_extrude') header = `rotate_extrude(angle = ${this.fmt(d.angle == null ? 360 : d.angle)}, $fn = ${this.gfn()})`;
         else { const tw = d.twist || 0, esc = (d.escale == null ? 1 : d.escale), dyn = (tw !== 0 || esc !== 1); header = `linear_extrude(height = ${this.fmt(d.height == null ? 30 : d.height)}${tw ? `, twist = ${this.fmt(tw)}` : ''}${esc !== 1 ? `, scale = ${this.fmt(esc)}` : ''}${dyn ? `, slices = ${Math.max(8, Math.ceil(Math.abs(tw) / 6))}` : ''})`; }
       } else header = node.op + '()';
-      out.push(pad + header + ' {');
-      for (const c of node.children) this.emitNode(c, level + 1, out);
-      out.push(pad + '}');
+      const ets = this.isExtrude(node) ? [] : Object.values(node.edgeTreatments || {});
+      if (!ets.length) {
+        out.push(pad + header + ' {');
+        for (const c of node.children) this.emitNode(c, level + 1, out);
+        out.push(pad + '}');
+        return;
+      }
+      this.emitGroupWithEdges(node, header, ets, level, out);
       return;
     }
     this.emitPrimitive(node, level, out);
+  }
+  // Slice 5: wrap a group's op-block with convex (difference) / concave (union) edge tools
+  emitGroupWithEdges(node, header, ets, level, out) {
+    const F = (n) => this.fmt(n);
+    const convex = ets.filter(t => t.convex), concave = ets.filter(t => !t.convex);
+    const emitOp = (lvl) => {
+      const p = this.ind(lvl);
+      out.push(p + header + ' {');
+      for (const c of node.children) this.emitNode(c, lvl + 1, out);
+      out.push(p + '}');
+    };
+    const emitTool = (t, lvl) => {
+      const p = this.ind(lvl);
+      const mod = t.convex ? (t.type === 'fillet' ? 'edge_fillet' : 'edge_chamfer') : (t.type === 'fillet' ? 'edge_round_in' : 'edge_chamfer_in');
+      out.push(p + `// ${t.convex ? 'convex' : 'concave'} ${t.type} r=${F(t.size)}`);
+      for (const seg of t.segs) {
+        const M = this.groupEdgeMatrix(seg, t.size, t.convex);
+        out.push(p + `multmatrix(${this.matStr(M)})`);
+        out.push(p + `  ${mod}(${F(seg.len + 0.04)}, ${F(t.size)});`);
+      }
+    };
+    const diffBlock = (lvl) => {
+      if (!convex.length) { emitOp(lvl); return; }
+      const p = this.ind(lvl);
+      out.push(p + 'difference() {');
+      emitOp(lvl + 1);
+      for (const t of convex) emitTool(t, lvl + 1);
+      out.push(p + '}');
+    };
+    if (!concave.length) { diffBlock(level); return; }
+    const p = this.ind(level);
+    out.push(p + 'union() {');
+    diffBlock(level + 1);
+    for (const t of concave) emitTool(t, level + 1);
+    out.push(p + '}');
   }
   rotLine(node, pad) {
     const r = node.rot || [0, 0, 0];
@@ -4277,8 +4716,9 @@ class Component extends DCLogic {
   }
 
   // ============ TOOLS / UI ============
-  pickSelect = () => this.setState({ tool: 'select' });
-  pickMove = () => this.setState({ gizmoMode: 'translate', tool: 'select' }, () => this.updateGizmo());
+  pickSelect = () => this.setState({ tool: 'select' }, () => { this.clearPPHover(); this.clearPPGhost(); });
+  pickMove = () => this.setState({ gizmoMode: 'translate', tool: 'select' }, () => { this.clearPPHover(); this.clearPPGhost(); this.updateGizmo(); });
+  pickPush = () => { this.clearEdge(); this.selectShape(null); this.setState({ tool: 'pushpull' }); };
   toggleDrawer = () => this.setState({ drawerOpen: !this.state.drawerOpen });
 
   // ---- global $fn picker (status bar) ----
@@ -4302,6 +4742,7 @@ class Component extends DCLogic {
     else if (k === 'c') this.addCylinder();
     else if (k === 's') this.addSphere();
     else if (k === 'm') this.pickMove();
+    else if (k === 'e') this.pickPush();
     else if (k === 'delete' || k === 'backspace') this.deleteSelected();
     else if (k === 'escape') { this.clearEdge(); this.selectShape(null); }
   }
@@ -4373,7 +4814,7 @@ class Component extends DCLogic {
       });
       const sep = { isItem: false, isSep: true };
       const items = [];
-      if (canG) { items.push(mk('\u222a', 'Group as Union', () => this.groupSelection('union'))); items.push(mk('\u2212', 'Group as Difference', () => this.groupSelection('difference'))); items.push(mk('\u2229', 'Group as Intersection', () => this.groupSelection('intersection'))); }
+      if (canG) { items.push(mk('\u222a', 'Group as Union', () => this.groupSelection('union'))); items.push(mk('\u2212', 'Group as Difference', () => this.groupSelection('difference'))); items.push(mk('\u2229', 'Group as Intersection', () => this.groupSelection('intersection'))); items.push(mk('\u2b22', 'Group as Hull', () => this.groupSelection('hull'))); }
       if (nIsGroup) {
         if (items.length) items.push(sep);
         items.push(mk('\u222a', 'Union', () => this.changeOp(ctx.id, 'union'), { checked: node.op === 'union' }));
@@ -4407,8 +4848,15 @@ class Component extends DCLogic {
 
     let radiusMax = 20;
     const selShapeObj = sel ? this.findNode(sel.shapeId) : null;
-    if (selShapeObj) radiusMax = this.edgeMaxRadius(selShapeObj, sel.edgeName);
-    const applied = (sel && selShapeObj && selShapeObj.treatments) ? selShapeObj.treatments[sel.edgeName] : null;
+    let applied = null;
+    if (sel && sel.isGroupEdge && selShapeObj) {
+      const ed = (selShapeObj._edges || []).find(e => e.id === sel.edgeId);
+      radiusMax = this.groupEdgeMaxR(ed);
+      applied = (selShapeObj.edgeTreatments || {})[sel.edgeId] || null;
+    } else if (selShapeObj) {
+      radiusMax = this.edgeMaxRadius(selShapeObj, sel.edgeName);
+      applied = (selShapeObj.treatments || {})[sel.edgeName] || null;
+    }
     const ssh = st.selectedShapeId ? this.findNode(st.selectedShapeId) : null;
     const sshIsGroup = this.isGroup(ssh);
     const sshIsExtrude = this.isExtrude(ssh);
@@ -4490,6 +4938,8 @@ class Component extends DCLogic {
       btnCylinder: this.toolBtn(false),
       btnSphere: this.toolBtn(false),
       btnMove: this.toolBtn(st.gizmoMode === 'translate' && !!st.selectedShapeId && !sel),
+      btnPush: this.toolBtn(st.tool === 'pushpull'),
+      pickPush: this.pickPush,
       btnDelete: this.toolBtn(false),
       btnParams: this.toolBtn(st.paramsOpen),
       pickSelect: this.pickSelect, addCuboid: this.addCuboid, addCylinder: this.addCylinder, addSphere: this.addSphere,
@@ -4504,6 +4954,8 @@ class Component extends DCLogic {
 
       paramsOpen: st.paramsOpen,
       dragParams: this.startPanelDrag('params'),
+      dragTree: this.startPanelDrag('tree'),
+      treePanelStyle: this.panelStyle('tree', 'position:absolute;left:16px;bottom:16px;z-index:30;width:226px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);overflow:hidden;'),
       dragEdge: this.startPanelDrag('edge'),
       dragShape: this.startPanelDrag('shape'),
       dragGroup: this.startPanelDrag('group'),
@@ -4552,7 +5004,7 @@ class Component extends DCLogic {
       setGizmoRotate: this.setGizmoRotate,
       setGizmoScale: this.setGizmoScale,
 
-      hasGroupPanel: sshIsGroup,
+      hasGroupPanel: sshIsGroup && !sel,
       sshIsExtrude,
       sshIsBool: sshIsGroup && !sshIsExtrude,
       extrudeSections,
@@ -4595,9 +5047,10 @@ class Component extends DCLogic {
       groupUnion: () => this.groupSelection('union'),
       groupDifference: () => this.groupSelection('difference'),
       groupIntersection: () => this.groupSelection('intersection'),
+      groupHull: () => this.groupSelection('hull'),
       ctxOpen: !!ctx, ctxItems, ctxStyle, closeCtx: this.closeCtx,
 
-      statusHint: st.statusMsg || (sel ? 'Edge selected \u2014 click fillet or chamfer (again to remove)' : (st.selectedShapeId ? 'Drag the gizmo to ' + (st.gizmoMode === 'scale' ? 'resize' : 'move') + ' \u00b7 or type exact values' : 'Hover an edge \u00b7 click to treat it')),
+      statusHint: st.statusMsg || (st.tool === 'pushpull' ? (st.ppDragging ? ((st.ppDist >= 0 ? 'Pulling +' : 'Pushing ') + this.fmt(st.ppDist) + 'mm \u2014 ' + (st.ppDist >= 0 ? 'add' : 'cut') + ', release to apply') : 'Push/pull \u2014 drag a face out to add material, in to cut') : (sel ? 'Edge selected \u2014 click fillet or chamfer (again to remove)' : (st.selectedShapeId ? 'Drag the gizmo to ' + (st.gizmoMode === 'scale' ? 'resize' : 'move') + ' \u00b7 or type exact values' : 'Hover an edge \u00b7 click to treat it'))),
       fnVal: st.fn > 0 ? st.fn : 'auto',
       fnMenuOpen: st.fnMenuOpen,
       toggleFnMenu: this.toggleFnMenu,
