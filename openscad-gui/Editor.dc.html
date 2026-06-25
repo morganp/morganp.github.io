@@ -61,7 +61,11 @@
     <div style="display:flex;align-items:center;gap:9px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:8px 13px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <div style="width:17px;height:17px;border-radius:5px;background:linear-gradient(135deg,#3B82F6,#2563EB);box-shadow:0 0 0 1px #2C3037, inset 0 1px 0 rgba(255,255,255,.25);"></div>
       <span style="font-weight:600;letter-spacing:.01em;color:#E6E9EE;">SCAD Studio</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.35.0</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.39.0</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:2px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:4px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
+      <button onClick="{{ setBasic }}" title="Basic — solids only (hides parameters, 2D shapes & extrudes)" style="{{ basicTabStyle }}">Basic</button>
+      <button onClick="{{ setAdvanced }}" title="Advanced — parameters, 2D shapes & extrudes" style="{{ advTabStyle }}">Advanced</button>
     </div>
     <div style="display:flex;align-items:center;gap:5px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:6px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <button onClick="{{ openFile }}" style="display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;" style-hover="background:#262A30;">
@@ -134,6 +138,7 @@
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M3.5 15.4 16.4 15.4 3.5 4.6 3.5 15.4Z" stroke="#9AA3AE" stroke-width="1.3" stroke-linejoin="round"/></svg>
           Wedge
         </button>
+        <sc-if value="{{ advancedMode }}" hint-placeholder-val="{{ false }}">
         <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:8px 8px 5px;border-top:1px solid #23272E;margin-top:4px;">2D · for extrude</div>
         <button onClick="{{ miCircle }}" style="display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12.5px;padding:7px 8px;border-radius:8px;cursor:pointer;text-align:left;" style-hover="background:#23272E;">
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#9AA3AE" stroke-width="1.3" stroke-dasharray="2.2 1.8"/></svg>
@@ -147,6 +152,7 @@
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M4 4 12 4 12 9 16 9 16 16 4 16Z" stroke="#9AA3AE" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="2.2 1.8"/></svg>
           Polygon
         </button>
+        </sc-if>
       </div>
     </sc-if>
     <div style="height:1px;background:#2C3037;margin:2px 4px;"></div>
@@ -160,14 +166,16 @@
       <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M4.5 5.5h11M8 5.5V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5m2 0-.6 9a1.5 1.5 0 0 1-1.5 1.4H6.6a1.5 1.5 0 0 1-1.5-1.4l-.6-9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div style="height:1px;background:#2C3037;margin:2px 4px;"></div>
-    <button onClick="{{ toggleParams }}" title="Parameters / variables" style="{{ btnParams }}">
-      <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6 4C4 4 5 10 3 10c2 0 1 6 3 6M14 4c2 0 1 6 3 6-2 0-1 6-3 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+    <sc-if value="{{ showParamsBtn }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ toggleParams }}" title="Parameters / variables" style="{{ btnParams }}">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6 4C4 4 5 10 3 10c2 0 1 6 3 6M14 4c2 0 1 6 3 6-2 0-1 6-3 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </sc-if>
   </div>
 
   <sc-if value="{{ paramsOpen }}" hint-placeholder-val="{{ false }}">
     <div style="{{ paramsPanelStyle }}">
-      <div onMouseDown="{{ dragParams }}" style="display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid #2C3037;cursor:grab;">
+      <div onPointerDown="{{ dragParams }}" style="display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid #2C3037;cursor:grab;touch-action:none;">
         <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 4C4 4 5 10 3 10c2 0 1 6 3 6M14 4c2 0 1 6 3 6-2 0-1 6-3 6" stroke="#9CC2F5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8A9099;font-weight:500;">Parameters</span>
         <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5B616B;">{{ varCount }}</span>
@@ -197,7 +205,7 @@
 
   <sc-if value="{{ hasEdge }}" hint-placeholder-val="{{ false }}">
     <div style="{{ edgePanelStyle }}">
-      <div onMouseDown="{{ dragEdge }}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;cursor:grab;">
+      <div onPointerDown="{{ dragEdge }}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;cursor:grab;touch-action:none;">
         <div style="display:flex;align-items:center;gap:9px;">
           <span style="width:9px;height:9px;border-radius:50%;background:#3B82F6;box-shadow:0 0 10px #3B82F6;"></span>
           <span style="font-size:12px;color:#9AA3AE;">Edge</span>
@@ -233,7 +241,7 @@
 
   <sc-if value="{{ hasShapePanel }}" hint-placeholder-val="{{ false }}">
     <div style="{{ shapePanelStyle }}">
-      <div onMouseDown="{{ dragShape }}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;cursor:grab;">
+      <div onPointerDown="{{ dragShape }}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;cursor:grab;touch-action:none;">
         <div style="display:flex;align-items:center;gap:9px;">
           <span style="{{ shapeDotStyle }}"></span>
           <span style="font-size:13px;color:#E6E9EE;font-weight:500;">{{ shapePanelLabel }}</span>
@@ -308,7 +316,7 @@
         </div>
         <button onClick="{{ addPolyPt }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;background:#23272E;border:1px solid #34393F;color:#C7CCD4;font:inherit;font-size:11.5px;padding:6px;border-radius:8px;cursor:pointer;margin-bottom:10px;" style-hover="background:#2B3036;">+ Add point</button>
       </sc-if>
-      <sc-if value="{{ sshIs2D }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ sshShowExtrude }}" hint-placeholder-val="{{ false }}">
         <div style="font-size:10px;color:#8A9099;letter-spacing:.05em;text-transform:uppercase;margin:4px 0 7px;">Extrude to 3D</div>
         <div style="display:flex;gap:6px;margin-bottom:10px;">
           <button onClick="{{ doLinearExtrude }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#23272E;border:1px solid #34393F;color:#C7CCD4;font:inherit;font-size:11.5px;padding:7px;border-radius:8px;cursor:pointer;" style-hover="background:#2B3036;">↥ Linear</button>
@@ -321,7 +329,7 @@
 
   <sc-if value="{{ hasGroupPanel }}" hint-placeholder-val="{{ false }}">
     <div style="{{ groupPanelStyle }}">
-      <div onMouseDown="{{ dragGroup }}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;cursor:grab;">
+      <div onPointerDown="{{ dragGroup }}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;cursor:grab;touch-action:none;">
         <div style="display:flex;align-items:center;gap:9px;">
           <span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;background:#1C2530;color:#9CC2F5;font-family:'IBM Plex Mono',monospace;font-size:13px;">{{ groupGlyph }}</span>
           <span style="font-size:13px;color:#E6E9EE;font-weight:500;">{{ groupPanelLabel }}</span>
@@ -399,7 +407,7 @@
   </sc-if>
 
   <div style="{{ treePanelStyle }}">
-    <div onMouseDown="{{ dragTree }}" style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid #2C3037;cursor:grab;">
+    <div onPointerDown="{{ dragTree }}" style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid #2C3037;cursor:grab;touch-action:none;">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2.5 4h11M2.5 8h11M2.5 12h7" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round"/></svg>
       <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8A9099;font-weight:500;">Model Tree</span>
       <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5B616B;">{{ shapeCount }}</span>
@@ -409,7 +417,14 @@
         <div style="padding:14px 10px;text-align:center;color:#5B616B;font-size:11.5px;line-height:1.5;">No solids yet.<br/>Add a cuboid to begin.</div>
       </sc-if>
       <sc-for list="{{ treeRows }}" as="s" hint-placeholder-count="0">
-        <div onClick="{{ s.onSelect }}" onContextMenu="{{ s.onCtx }}" draggable="{{ s.draggable }}" onDragStart="{{ s.onDragStart }}" onDragOver="{{ s.onDragOver }}" onDrop="{{ s.onDrop }}" onDragEnd="{{ s.onDragEnd }}" style="{{ s.rowStyle }}">
+        <div onClick="{{ s.onSelect }}" onContextMenu="{{ s.onCtx }}" onPointerDown="{{ s.onPressDown }}" onPointerMove="{{ s.onPressMove }}" onPointerUp="{{ s.onPressUp }}" onPointerLeave="{{ s.onPressUp }}" onPointerCancel="{{ s.onPressUp }}" draggable="{{ s.draggable }}" onDragStart="{{ s.onDragStart }}" onDragOver="{{ s.onDragOver }}" onDrop="{{ s.onDrop }}" onDragEnd="{{ s.onDragEnd }}" style="{{ s.rowStyle }}">
+          <sc-if value="{{ s.showPick }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ s.onPick }}" title="Select for combine" style="{{ s.pickStyle }}">
+              <sc-if value="{{ s.picked }}" hint-placeholder-val="{{ false }}">
+                <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2 5 8.4l4.5-5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </sc-if>
+            </button>
+          </sc-if>
           <sc-if value="{{ s.hasCaret }}" hint-placeholder-val="{{ false }}">
             <button onClick="{{ s.onCaret }}" style="{{ s.caretStyle }}">
               <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M4 2.5 8 6l-4 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -428,6 +443,11 @@
           <sc-if value="{{ s.hasOrder }}" hint-placeholder-val="{{ false }}">
             <span style="{{ s.orderStyle }}">{{ s.order }}</span>
           </sc-if>
+          <sc-if value="{{ s.showMenu }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ s.onMenu }}" title="Actions" style="background:transparent;border:none;color:#5B616B;cursor:pointer;padding:3px;border-radius:5px;flex:none;touch-action:none;" style-hover="color:#C7CCD4;background:#23272E;">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3.1" r="1.35"/><circle cx="8" cy="8" r="1.35"/><circle cx="8" cy="12.9" r="1.35"/></svg>
+            </button>
+          </sc-if>
           <sc-if value="{{ s.showDelete }}" hint-placeholder-val="{{ true }}">
             <button onClick="{{ s.onDelete }}" style="background:transparent;border:none;color:#5B616B;cursor:pointer;padding:3px;border-radius:5px;flex:none;" style-hover="color:#EF6B6B;background:#2B2023;">
               <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 5.5h7l-.5 7.5h-6l-.5-7.5ZM6.5 5.5V4.2h3v1.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -438,7 +458,7 @@
       <sc-if value="{{ readOnlyTree }}" hint-placeholder-val="{{ false }}">
         <div style="margin-top:6px;padding:8px 9px;border-radius:8px;background:#1B1814;border:1px solid #3A3322;display:flex;flex-direction:column;gap:7px;">
           <div style="display:flex;align-items:center;gap:7px;">
-            <span style="font-size:10.5px;color:#C9A867;line-height:1.45;flex:1;">Evaluated view (read-only). Select a top-level item to move / rotate / scale it as a group, or delete it. Individual generated instances can't be edited.</span>
+            <span style="font-size:10.5px;color:#C9A867;line-height:1.45;flex:1;">{{ roTreeHint }}</span>
             <button onClick="{{ exitReadOnly }}" style="background:#23272E;border:1px solid #3A3322;color:#C9A867;font:inherit;font-size:10.5px;padding:4px 8px;border-radius:6px;cursor:pointer;flex:none;">Clear</button>
           </div>
           <sc-if value="{{ roXformOn }}" hint-placeholder-val="{{ false }}">
@@ -446,6 +466,17 @@
               <button onClick="{{ setGizmoMove }}" style="{{ roMoveTab }}">Move</button>
               <button onClick="{{ setGizmoRotate }}" style="{{ roRotateTab }}">Rotate</button>
               <button onClick="{{ setGizmoScale }}" style="{{ roScaleTab }}">Scale</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ roCanCombine }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:6px;padding-top:1px;">
+              <span style="font-size:10px;color:#C9A867;line-height:1.4;opacity:.8;">{{ roCombineHint }}</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+                <button onClick="{{ roGroupUnion }}" title="Union" style="{{ roComboBtn }}">∪ Union</button>
+                <button onClick="{{ roGroupDiff }}" title="Difference (first = base)" style="{{ roComboBtn }}">− Diff</button>
+                <button onClick="{{ roGroupInt }}" title="Intersection" style="{{ roComboBtn }}">∩ Int</button>
+                <button onClick="{{ roGroupHull }}" title="Hull (convex wrap)" style="{{ roComboBtn }}">⬢ Hull</button>
+              </div>
             </div>
           </sc-if>
         </div>
@@ -461,7 +492,7 @@
           </div>
         </div>
       </sc-if>
-      <div style="margin-top:6px;padding:0 2px;font-size:10px;color:#4F555E;line-height:1.4;">⌘/Ctrl-click to multi-select · right-click to group</div>
+      <div style="margin-top:6px;padding:0 2px;font-size:10px;color:#4F555E;line-height:1.4;">{{ treeFooterHint }}</div>
     </div>
   </div>
 
@@ -655,6 +686,7 @@ class Component extends DCLogic {
   state = {
     ready: false,
     tool: 'select',
+    mode: (() => { try { return localStorage.getItem('scad-mode') === 'advanced' ? 'advanced' : 'basic'; } catch (_) { return 'basic'; } })(),  // 'basic' hides params / 2D / extrude affordances
     ppMode: 'linear',         // push/pull sub-mode: 'linear' | 'revolve'
     shapes: [],            // serializable mirror for the tree
     selectedShapeId: null,
@@ -1212,7 +1244,14 @@ class Component extends DCLogic {
     if (this.isExtrude(node)) {
       const geom = this.extrudeGeometry(node);
       if (!geom) return null;
-      const b = new Brush(geom);
+      let b = new Brush(geom);
+      b.updateMatrixWorld(true);
+      // Slice 5 for extrudes: stash the raw extruded geometry so buildGroupEdges can detect its
+      // rim / side feature edges, then apply any fillet/chamfer treatments before placement.
+      node._rawGeo = geom;
+      if (node.edgeTreatments && Object.keys(node.edgeTreatments).length) {
+        try { b = this.applyEdgeTreatBrush(b, node); } catch (e) { console.warn('extrude edge treatment failed', e); }
+      }
       const gp = node.pos || [0, 0, 0];
       b.position.set(gp[0], gp[1], gp[2]); this.setEuler(b, node.rot);
       b.updateMatrixWorld(true);
@@ -1359,6 +1398,14 @@ class Component extends DCLogic {
     const V = new THREE.Vector3().crossVectors(normal, U).normalize();
     // project each tri's 3 corners into the (U,V) face frame relative to origin
     const proj = tris.map(t => [0, 1, 2].map(k => { const d = this._triVtx(geo, t, k).sub(origin); return [d.dot(U), d.dot(V)]; }));
+    // Prefer the EXACT boundary edge-loops of the coplanar triangle set: the perimeter edges
+    // (shared by exactly one triangle) chain into clean rings that preserve the source vertices
+    // verbatim — so a circular cap stays a perfect N-gon (no radial bias, exact centre/radius)
+    // and a faceted prism stays an exact polygon. Only fall back to the lossy rasterize +
+    // marching-squares trace when the topology is non-manifold (overlapping CSG seams), which
+    // edge-chaining can't resolve.
+    let rings2D = this.faceEdgeRings(proj);
+    if (!rings2D) {
     let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
     for (const tri of proj) for (const [x, y] of tri) { if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y; }
     if (!isFinite(minx) || maxx <= minx || maxy <= miny) return null;
@@ -1379,7 +1426,8 @@ class Component extends DCLogic {
           if ((w0 >= 0 && w1 >= 0 && w2 >= 0) || (w0 <= 0 && w1 <= 0 && w2 <= 0)) grid[j * nx + i] = 1;
         } }
     }
-    const rings2D = this.marchSquares(grid, nx, ny, ox, oy, cw, ch);
+    rings2D = this.marchSquares(grid, nx, ny, ox, oy, cw, ch);
+    }
     if (!rings2D || !rings2D.length) return null;
     // outer ring = largest |signed area|; compute area + centroid from it
     const sArea = (r) => { let A = 0; for (let i = 0; i < r.length; i++) { const [x1, y1] = r[i], [x2, y2] = r[(i + 1) % r.length]; A += x1 * y2 - x2 * y1; } return A / 2; };
@@ -1390,6 +1438,67 @@ class Component extends DCLogic {
     const centerWorld = origin.clone().add(U.clone().multiplyScalar(center2[0])).add(V.clone().multiplyScalar(center2[1]));
     const frame = new THREE.Matrix4().makeBasis(U, V, normal).setPosition(origin);
     return { rings2D, frame: frame.elements.slice(), normal: normal.toArray(), origin: origin.toArray(), U: U.toArray(), V: V.toArray(), area: oa, center: centerWorld.toArray() };
+  }
+  // Exact boundary edge-loops of a coplanar triangle set, in the (U,V) face frame.
+  // Perimeter edges are shared by exactly one triangle; interior edges by two. We chain the
+  // perimeter edges into closed rings, preserving the source vertices verbatim (so a circular
+  // cap stays a perfect N-gon and a faceted prism an exact polygon). Returns null when the
+  // topology is non-manifold (an edge shared by >2 tris, or a ring that won't close) — e.g. an
+  // overlapping CSG seam — so faceData can fall back to the rasterized trace.
+  faceEdgeRings(proj) {
+    let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+    for (const tri of proj) for (const [x, y] of tri) { if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y; }
+    if (!isFinite(minx) || maxx <= minx || maxy <= miny) return null;
+    const span = Math.max(maxx - minx, maxy - miny) || 1;
+    const q = span * 1e-5;                       // vertex-weld quantum
+    const pts = new Map();                        // key -> representative [x,y] (full precision)
+    const keyOf = (p) => Math.round(p[0] / q) + ',' + Math.round(p[1] / q);
+    const reg = (p) => { const k = keyOf(p); if (!pts.has(k)) pts.set(k, p); return k; };
+    const undirected = new Map();                 // "ka|kb" (sorted) -> count
+    const directed = new Map();                   // "ka>kb" -> count (occurred orientation)
+    for (const tri of proj) {
+      const [a, b, c] = tri;
+      const area = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+      if (Math.abs(area) < q * q) continue;       // skip slivers
+      const ka = reg(a), kb = reg(b), kc = reg(c);
+      const add = (k1, k2) => {
+        if (k1 === k2) return;
+        const u = k1 < k2 ? k1 + '|' + k2 : k2 + '|' + k1;
+        undirected.set(u, (undirected.get(u) || 0) + 1);
+        const d = k1 + '>' + k2; directed.set(d, (directed.get(d) || 0) + 1);
+      };
+      add(ka, kb); add(kb, kc); add(kc, ka);
+    }
+    for (const c of undirected.values()) if (c > 2) return null;   // non-manifold seam
+    // directed perimeter edges (the orientation that actually occurred on the lone triangle)
+    const adj = new Map(); let nb = 0;
+    for (const [u, c] of undirected) {
+      if (c !== 1) continue;
+      const [k1, k2] = u.split('|');
+      const from = directed.get(k1 + '>' + k2) ? k1 : k2, to = from === k1 ? k2 : k1;
+      if (!adj.has(from)) adj.set(from, []);
+      adj.get(from).push(to); nb++;
+    }
+    if (nb < 3) return null;
+    const used = new Set(), eid = (a, b) => a + '>' + b, rings = [];
+    for (const start of adj.keys()) {
+      for (const first of (adj.get(start) || [])) {
+        if (used.has(eid(start, first))) continue;
+        const ring = [start]; let cur = first, prev = start, ok = false, guard = 0;
+        used.add(eid(prev, cur));
+        while (guard++ < nb + 4) {
+          if (cur === start) { ok = true; break; }
+          ring.push(cur);
+          const outs = (adj.get(cur) || []).filter(n => !used.has(eid(cur, n)));
+          if (!outs.length) break;
+          const nx = outs[0]; used.add(eid(cur, nx)); prev = cur; cur = nx;
+        }
+        if (!ok || ring.length < 3) return null;   // open chain -> bail to raster
+        rings.push(ring.map(k => pts.get(k)));
+      }
+    }
+    if (used.size !== nb || !rings.length) return null;   // leftover edges -> bail
+    return rings;
   }
   // convenience: face under a raycast-hit triangle index
   pickFace(geo, triIndex) {
@@ -2206,8 +2315,9 @@ class Component extends DCLogic {
     if (!this.tc) return;
     // read-only (evaluated) view: gizmo drives the whole top-level sub-group as a group transform
     if (this.state.readOnly) {
+      const ids = this.state.selectedIds || [];
       const id = this.state.selectedShapeId;
-      const row = id ? this.findTreeRow(this.state.tree, id) : null;
+      const row = (id && ids.length < 2) ? this.findTreeRow(this.state.tree, id) : null;
       const g = (row && row.root && row.srcLines && this._roGroups) ? this._roGroups[row.topIndex] : null;
       if (g) {
         g.position.set(0, 0, 0); g.rotation.set(0, 0, 0, 'ZYX'); g.scale.set(1, 1, 1); g.updateMatrix();
@@ -2535,7 +2645,7 @@ class Component extends DCLogic {
   // --- parameter CRUD ---
   // ---- draggable floating panels (drag by header) ----
   startPanelDrag = (key) => (e) => {
-    if (e.button !== 0) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     if (e.target.closest('button, input, select, textarea, a')) return;  // let controls work
     const panel = e.currentTarget.parentElement;
     if (!panel) return;
@@ -2552,8 +2662,12 @@ class Component extends DCLogic {
       const nt = Math.max(4, Math.min(top + (ev.clientY - sy), hostH - 36));
       this.setState({ panelPos: { ...this.state.panelPos, [key]: { left: nl, top: nt } } });
     };
-    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); document.body.style.cursor = ''; };
-    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+    const up = () => {
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up); document.body.style.cursor = '';
+    };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
     document.body.style.cursor = 'grabbing';
   };
   panelStyle(key, base) {
@@ -2861,6 +2975,14 @@ class Component extends DCLogic {
     const primary = ids.length ? ids[ids.length - 1] : null;
     this.setState({ selectedShapeId: primary, selectedIds: ids, selectedEdge: null }, () => { this.refreshSelectionMat(); this.updateGizmo(); });
   };
+  // read-only multi-select: toggle a top-level evaluated row in/out of the combine selection
+  toggleSelectReadOnly = (id) => {
+    let ids = (this.state.selectedIds || []).slice();
+    const k = ids.indexOf(id);
+    if (k >= 0) ids.splice(k, 1); else ids.push(id);
+    const primary = ids.length ? ids[ids.length - 1] : null;
+    this.setState({ selectedShapeId: primary, selectedIds: ids }, () => this.updateGizmo());
+  };
   refreshSelectionMat() {
     for (const n of this.tree) {
       if (!n.solid) continue;
@@ -2977,6 +3099,60 @@ class Component extends DCLogic {
     this.flashStatus('Transformed \u201c' + (row.label || 'item') + '\u201d');
   }
 
+  // ===== Read-only BOOLEAN COMBINE =====
+  // Selected top-level evaluated rows (each mapped to a source line span) get wrapped in one
+  // op(){ … } block and re-run. Reuses the delete/transform source-splice machinery. Item 3
+  // (nesting) is automatic: a combined block is a single statement whose __src spans the whole
+  // block, so re-selecting it + combining again produces a clean OUTER block.
+  canCombineReadOnly() {
+    if (!this.state.readOnly) return false;
+    const ids = this.state.selectedIds || [];
+    if (ids.length < 2) return false;
+    return ids.every(id => { const r = this.findTreeRow(this.state.tree, id); return r && r.root && r.srcLines; });
+  }
+  groupReadOnlySelection = (op) => {
+    const ids = (this.state.selectedIds || []).slice();
+    const rows = ids.map(id => this.findTreeRow(this.state.tree, id)).filter(r => r && r.root && r.srcLines);
+    if (rows.length < 2) { this.flashStatus('Select 2+ top-level items to combine'); this.setState({ ctxMenu: null }); return; }
+    const src = (this._codeArea ? this._codeArea.value : this.state.code) || '';
+    const lines = src.split('\n');
+    // each row -> {start,end} 1-based inclusive, absorbing a preceding marker/comment line
+    const spans = rows.map(r => {
+      let { start, end } = r.srcLines;
+      start = Math.max(1, start); end = Math.min(lines.length, end);
+      let s = start;
+      if (s >= 2 && /^\s*\/\/\s*push\/pull/.test(lines[s - 2] || '')) s -= 1;
+      if (s >= 2 && /@scs-xform/.test(lines[s - 2] || '')) s -= 1;
+      return { row: r, start: s, end };
+    });
+    const sorted = spans.slice().sort((a, b) => a.start - b.start);
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i].start <= sorted[i - 1].end) { this.flashStatus('Selection overlaps \u2014 can\u2019t combine'); this.setState({ ctxMenu: null }); return; }
+    }
+    const bodyOf = (sp) => lines.slice(sp.start - 1, sp.end).join('\n');
+    // difference subtracts later children from the first → keep SELECTION order (base first);
+    // union/intersection/hull are order-independent → use source order for a tidy block.
+    const ordered = (op === 'difference') ? spans : sorted;
+    const indent = (txt) => txt.split('\n').map(l => (l.trim() ? '  ' + l : l)).join('\n');
+    const block = op + '() {\n' + ordered.map(sp => indent(bodyOf(sp))).join('\n') + '\n}';
+    const remove = new Set();
+    for (const sp of spans) for (let i = sp.start; i <= sp.end; i++) remove.add(i);
+    const insertAt = sorted[0].start;     // emit the block where the topmost statement was
+    const out = [];
+    for (let i = 1; i <= lines.length; i++) {
+      if (i === insertAt) out.push(block);
+      if (remove.has(i)) continue;
+      out.push(lines[i - 1]);
+    }
+    let next = out.join('\n').replace(/\n{3,}/g, '\n\n').replace(/^\s+|\s+$/g, '') + '\n';
+    // the combined block becomes the top-level item at the index = how many top-level statements
+    // precede insertAt; approximate by reselecting the topmost original topIndex after re-run.
+    this._roReselectTop = Math.min(...rows.map(r => r.topIndex));
+    if (this._codeArea) this._codeArea.value = next;
+    this.setState({ selectedShapeId: null, selectedIds: [], ctxMenu: null, code: next }, () => this.runCode());
+    this.flashStatus('Combined ' + rows.length + ' items as ' + op);
+  };
+
   // ============ BOOLEAN GROUPS ============
   sameParent(ids) {
     if (!ids.length) return false;
@@ -3080,7 +3256,48 @@ class Component extends DCLogic {
     if (!sel.includes(id)) this.setState({ selectedShapeId: id, selectedIds: [id] }, () => { this.refreshSelectionMat(); this.updateGizmo(); });
     this.setState({ ctxMenu: { x: e.clientX, y: e.clientY, id } });
   };
-  closeCtx = () => { if (this.state.ctxMenu) this.setState({ ctxMenu: null }); };
+  closeCtx = () => {
+    // ignore the release-tap that immediately follows a long-press / kebab open (touch)
+    if (Date.now() - (this._ctxOpenedAt || 0) < 350) return;
+    if (this.state.ctxMenu) this.setState({ ctxMenu: null });
+  };
+  // Open the tree context menu at (x,y) for row `id` — shared by right-click, the ⋮ kebab, and
+  // long-press. Mirrors openCtx (normal) + the read-only onCtx branch.
+  showCtxFor = (id, x, y) => {
+    const st = this.state;
+    this._ctxOpenedAt = Date.now();
+    const row = this.findTreeRow(st.tree, id);
+    if (st.readOnly) {
+      if (!row || !row.root) return;
+      const sel = st.selectedIds || [];
+      if (!sel.includes(id)) this.setState({ selectedShapeId: id, selectedIds: [id], ctxMenu: { x, y, id } }, () => this.updateGizmo());
+      else this.setState({ ctxMenu: { x, y, id } });
+      return;
+    }
+    const sel = st.selectedIds || [];
+    if (!sel.includes(id)) this.setState({ selectedShapeId: id, selectedIds: [id] }, () => { this.refreshSelectionMat(); this.updateGizmo(); });
+    this.setState({ ctxMenu: { x, y, id } });
+  };
+  // ---- touch long-press → context menu (mouse keeps right-click) ----
+  treePressStart(id, e) {
+    if (e.pointerType === 'mouse') return;
+    this._lpX = e.clientX; this._lpY = e.clientY; this._lpFired = false;
+    clearTimeout(this._lpTimer);
+    this._lpTimer = setTimeout(() => {
+      this._lpTimer = null; this._lpFired = true;
+      try { if (navigator.vibrate) navigator.vibrate(8); } catch (_) {}
+      this.showCtxFor(id, this._lpX, this._lpY);
+    }, 480);
+  }
+  treePressMove(e) {
+    if (this._lpTimer == null) return;
+    if (Math.abs(e.clientX - this._lpX) > 8 || Math.abs(e.clientY - this._lpY) > 8) { clearTimeout(this._lpTimer); this._lpTimer = null; }
+  }
+  treePressEnd() { clearTimeout(this._lpTimer); this._lpTimer = null; }
+  isCoarsePointer() {
+    if (this._coarse === undefined) { try { this._coarse = matchMedia('(pointer: coarse)').matches; } catch (_) { this._coarse = false; } }
+    return this._coarse;
+  }
 
   // ============ MODEL-TREE REORDER (drag + context menu) ============
   // Reorder a node within its parent array (siblings only). Order matters — esp. a
@@ -3306,7 +3523,7 @@ class Component extends DCLogic {
         if (node.op === 'rotate_extrude') header = `rotate_extrude(angle = ${this.fmt(d.angle == null ? 360 : d.angle)}, $fn = ${this.gfn()})`;
         else { const tw = d.twist || 0, esc = (d.escale == null ? 1 : d.escale), dyn = (tw !== 0 || esc !== 1); header = `linear_extrude(height = ${this.fmt(d.height == null ? 30 : d.height)}${tw ? `, twist = ${this.fmt(tw)}` : ''}${esc !== 1 ? `, scale = ${this.fmt(esc)}` : ''}${dyn ? `, slices = ${Math.max(8, Math.ceil(Math.abs(tw) / 6))}` : ''})`; }
       } else header = node.op + '()';
-      const ets = this.isExtrude(node) ? [] : Object.values(node.edgeTreatments || {});
+      const ets = Object.values(node.edgeTreatments || {});
       if (!ets.length) {
         out.push(pad + header + ' {');
         for (const c of node.children) this.emitNode(c, level + 1, out);
@@ -5347,6 +5564,12 @@ class Component extends DCLogic {
   pickPush = () => { this._ppPend = null; this.clearEdge(); this.selectShape(null); this.setState({ tool: 'pushpull', ppPending: null }); };
   setPPMode = (m) => { this._ppPend = null; this.setState({ ppMode: m, ppPending: null }, () => { this.clearPPGhost(); this.clearHinge(); }); };
   toggleDrawer = () => this.setState({ drawerOpen: !this.state.drawerOpen });
+  setMode = (m) => {
+    if (m === this.state.mode) return;
+    try { localStorage.setItem('scad-mode', m); } catch (_) {}
+    const extra = m === 'basic' ? { shapeMenuOpen: false, paramsOpen: this.vars.length > 0 && this.state.paramsOpen } : {};
+    this.setState({ mode: m, ...extra });
+  };
 
   // ---- global $fn picker (status bar) ----
   toggleFnMenu = () => this.setState({ fnMenuOpen: !this.state.fnMenuOpen });
@@ -5439,8 +5662,17 @@ class Component extends DCLogic {
           ? `font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1;color:${isSel ? '#9CC2F5' : '#7E96B8'};`
           : `width:9px;height:9px;border-radius:${(r.type === 'cuboid' || r.type === 'wedge' || r.type === 'square' || r.type === 'polygon') ? '2px' : '50%'};background:${isSel ? '#3B82F6' : '#6B7280'};`,
         rowStyle: `display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:8px;cursor:grab;margin-bottom:2px;margin-left:${r.depth * 14}px;border:1px solid ${isSel ? '#2C4D78' : 'transparent'};background:${isSel ? '#17283f' : (isGroup ? '#16191E' : 'transparent')};${st.dragOver === r.id + ':before' ? 'box-shadow:inset 0 2px 0 #3B82F6;' : st.dragOver === r.id + ':after' ? 'box-shadow:inset 0 -2px 0 #3B82F6;' : ''}`,
-        onSelect: (e) => { if (st.readOnly) { if (r.root) this.setState({ selectedShapeId: r.id, selectedIds: [r.id] }, () => this.updateGizmo()); return; } this.clearEdge(); if (e && (e.metaKey || e.ctrlKey || e.shiftKey)) this.toggleSelect(r.id); else this.selectShape(r.id); },
-        onCtx: (e) => { if (st.readOnly) { e.preventDefault(); if (r.root) this.setState({ selectedShapeId: r.id, selectedIds: [r.id] }); return; } this.openCtx(r.id, e); },
+        onSelect: (e) => { if (this._lpFired) { this._lpFired = false; return; } if (st.readOnly) { if (!r.root) return; const mult = e && (e.metaKey || e.ctrlKey || e.shiftKey); if (mult) { this.toggleSelectReadOnly(r.id); } else { this.setState({ selectedShapeId: r.id, selectedIds: [r.id] }, () => this.updateGizmo()); } return; } this.clearEdge(); if (e && (e.metaKey || e.ctrlKey || e.shiftKey)) this.toggleSelect(r.id); else this.selectShape(r.id); },
+        onCtx: (e) => { e.preventDefault(); e.stopPropagation(); this.showCtxFor(r.id, e.clientX, e.clientY); },
+        onPressDown: (e) => this.treePressStart(r.id, e),
+        onPressMove: (e) => this.treePressMove(e),
+        onPressUp: () => this.treePressEnd(),
+        onMenu: (e) => { e.stopPropagation(); const rc = e.currentTarget.getBoundingClientRect(); this.showCtxFor(r.id, rc.right, rc.bottom + 3); },
+        showMenu: !st.readOnly || !!r.root,
+        showPick: this.isCoarsePointer() && (!st.readOnly || !!r.root),
+        picked: (st.selectedIds || []).includes(r.id),
+        pickStyle: `width:18px;height:18px;border-radius:5px;flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;border:1px solid ${(st.selectedIds || []).includes(r.id) ? '#2563EB' : '#3A4250'};background:${(st.selectedIds || []).includes(r.id) ? '#2563EB' : 'transparent'};touch-action:none;`,
+        onPick: (e) => { e.stopPropagation(); if (st.readOnly) { if (r.root) this.toggleSelectReadOnly(r.id); } else { this.toggleSelect(r.id); } },
         draggable: !st.readOnly,
         onDragStart: (e) => this.onTreeDragStart(r.id, e),
         onDragOver: (e) => this.onTreeDragOver(r.id, e),
@@ -5460,6 +5692,28 @@ class Component extends DCLogic {
     const ctx = st.ctxMenu;
     let ctxItems = [], ctxStyle = '';
     if (ctx) {
+      const mkRo = (glyph, label, onClick, opts = {}) => ({
+        isItem: true, isSep: false, glyph, glyphColor: opts.color || '#8A9099', label, checked: false,
+        onClick: () => onClick(),
+        style: `display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:transparent;border:none;color:${opts.danger ? '#E0736B' : '#D5DAE1'};font:inherit;font-size:12px;padding:7px 9px;border-radius:6px;cursor:pointer;`,
+      });
+      if (st.readOnly) {
+        const sepRo = { isItem: false, isSep: true };
+        const items = [];
+        if (this.canCombineReadOnly()) {
+          items.push(mkRo('\u222a', 'Group as Union', () => this.groupReadOnlySelection('union')));
+          items.push(mkRo('\u2212', 'Group as Difference', () => this.groupReadOnlySelection('difference')));
+          items.push(mkRo('\u2229', 'Group as Intersection', () => this.groupReadOnlySelection('intersection')));
+          items.push(mkRo('\u2b22', 'Group as Hull', () => this.groupReadOnlySelection('hull')));
+          items.push(sepRo);
+        }
+        const roRow = this.findTreeRow(st.tree, ctx.id);
+        if (roRow && roRow.root && roRow.srcLines) items.push(mkRo('\u2715', 'Delete', () => this.deleteReadOnlyRow(ctx.id), { danger: true, color: '#E0736B' }));
+        ctxItems = items;
+        const mx = Math.min(ctx.x, window.innerWidth - 200);
+        const my = Math.min(ctx.y, window.innerHeight - (Math.max(1, items.length) * 32 + 24));
+        ctxStyle = items.length ? `position:fixed;left:${mx}px;top:${Math.max(8, my)}px;z-index:49;min-width:184px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #34393F;border-radius:10px;box-shadow:0 16px 44px rgba(0,0,0,.6);padding:5px;` : '';
+      } else {
       const node = this.findNode(ctx.id);
       const nIsGroup = this.isGroup(node);
       const inSel = selIds.includes(ctx.id) ? selIds : [ctx.id];
@@ -5482,7 +5736,7 @@ class Component extends DCLogic {
         items.push(mk('\u2922', 'Ungroup', () => this.ungroupById(ctx.id)));
       }
       const nIs2D = node && !nIsGroup && ['circle', 'square', 'polygon'].includes(node.type);
-      if (nIs2D) {
+      if (nIs2D && st.mode === 'advanced') {
         if (items.length) items.push(sep);
         items.push(mk('\u21a5', 'Linear extrude', () => this.extrudeSelection('linear_extrude', ctx.id)));
         items.push(mk('\u21bb', 'Rotate extrude', () => this.extrudeSelection('rotate_extrude', ctx.id)));
@@ -5501,6 +5755,7 @@ class Component extends DCLogic {
       const mx = Math.min(ctx.x, window.innerWidth - 200);
       const my = Math.min(ctx.y, window.innerHeight - (items.length * 32 + 24));
       ctxStyle = `position:fixed;left:${mx}px;top:${Math.max(8, my)}px;z-index:49;min-width:184px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #34393F;border-radius:10px;box-shadow:0 16px 44px rgba(0,0,0,.6);padding:5px;`;
+      }
     }
 
     let radiusMax = 20;
@@ -5604,6 +5859,12 @@ class Component extends DCLogic {
       ppRevolveBtn: this.ppModeBtn(st.ppMode === 'revolve'),
       btnDelete: this.toolBtn(false),
       btnParams: this.toolBtn(st.paramsOpen),
+      advancedMode: st.mode === 'advanced',
+      showParamsBtn: st.mode === 'advanced' || this.vars.length > 0,
+      setBasic: () => this.setMode('basic'),
+      setAdvanced: () => this.setMode('advanced'),
+      basicTabStyle: `background:${st.mode === 'basic' ? '#2563EB' : 'transparent'};border:none;color:${st.mode === 'basic' ? '#fff' : '#8A9099'};font:inherit;font-size:11.5px;font-weight:500;padding:5px 13px;border-radius:8px;cursor:pointer;`,
+      advTabStyle: `background:${st.mode === 'advanced' ? '#2563EB' : 'transparent'};border:none;color:${st.mode === 'advanced' ? '#fff' : '#8A9099'};font:inherit;font-size:11.5px;font-weight:500;padding:5px 13px;border-radius:8px;cursor:pointer;`,
       pickSelect: this.pickSelect, addCuboid: this.addCuboid, addCylinder: this.addCylinder, addSphere: this.addSphere,
       btnShapes: this.toolBtn(st.shapeMenuOpen),
       shapeMenuOpen: st.shapeMenuOpen, toggleShapeMenu: this.toggleShapeMenu, closeShapeMenu: this.closeShapeMenu,
@@ -5644,8 +5905,9 @@ class Component extends DCLogic {
       removeTreatmentBtn: this.removeTreatmentBtn,
       clearEdge: () => this.clearEdge(),
 
-      hasShapePanel: !!st.selectedShapeId && !sel && !sshIsGroup,
+      hasShapePanel: !st.readOnly && !!st.selectedShapeId && !sel && !sshIsGroup,
       sshIs2D: !!ssh && !sshIsGroup && ['circle', 'square', 'polygon'].includes(ssh.type),
+      sshShowExtrude: !!ssh && !sshIsGroup && ['circle', 'square', 'polygon'].includes(ssh.type) && st.mode === 'advanced',
       sshIsPoly: !!ssh && !sshIsGroup && ssh.type === 'polygon',
       polyPoints: (!!ssh && !sshIsGroup && ssh.type === 'polygon' ? (ssh.dims.pts || []) : []).map((p, i) => ({
         idx: i, label: 'P' + (i + 1), xVal: this.fmt(p[0]), yVal: this.fmt(p[1]),
@@ -5699,9 +5961,21 @@ class Component extends DCLogic {
       deselectShape: () => this.selectShape(null),
 
       treeRows,
+      treeFooterHint: this.isCoarsePointer()
+        ? 'Tap to select \u00b7 long-press a row or tap \u22ee for actions'
+        : '\u2318/Ctrl-click to multi-select \u00b7 right-click or \u22ee for actions',
       isEmpty: treeRows.length === 0,
       readOnlyTree: st.readOnly,
-      roXformOn: st.readOnly && !!(st.selectedShapeId && this.findTreeRow(st.tree, st.selectedShapeId) && this.findTreeRow(st.tree, st.selectedShapeId).root),
+      roTreeHint: 'Evaluated view (read-only). Select a top-level item to move / rotate / scale it as a group, or delete it. '
+        + (this.isCoarsePointer() ? 'Tick 2+ items' : '\u2318/Ctrl-click 2+ items') + ' to combine them. Individual generated instances can\u2019t be edited.',
+      roXformOn: st.readOnly && (st.selectedIds || []).length < 2 && !!(st.selectedShapeId && this.findTreeRow(st.tree, st.selectedShapeId) && this.findTreeRow(st.tree, st.selectedShapeId).root),
+      roCanCombine: this.canCombineReadOnly(),
+      roCombineHint: (st.selectedIds || []).length + ' selected — first row is the difference base',
+      roComboBtn: `flex:1;display:flex;align-items:center;justify-content:center;gap:3px;padding:6px 4px;border-radius:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;border:1px solid #5A4A22;background:#241d10;color:#E7C98A;`,
+      roGroupUnion: () => this.groupReadOnlySelection('union'),
+      roGroupDiff: () => this.groupReadOnlySelection('difference'),
+      roGroupInt: () => this.groupReadOnlySelection('intersection'),
+      roGroupHull: () => this.groupReadOnlySelection('hull'),
       roMoveTab: this.tab(st.gizmoMode === 'translate'),
       roRotateTab: this.tab(st.gizmoMode === 'rotate'),
       roScaleTab: this.tab(st.gizmoMode === 'scale'),
