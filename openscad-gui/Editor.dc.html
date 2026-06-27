@@ -57,11 +57,11 @@
     </div>
   </sc-if>
 
-  <div style="position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:10px;z-index:30;">
+  <div style="position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:10px;z-index:30;flex-wrap:wrap;max-width:calc(100vw - 32px);">
     <div style="display:flex;align-items:center;gap:9px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:8px 13px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <div style="width:17px;height:17px;border-radius:5px;background:linear-gradient(135deg,#3B82F6,#2563EB);box-shadow:0 0 0 1px #2C3037, inset 0 1px 0 rgba(255,255,255,.25);"></div>
       <span style="font-weight:600;letter-spacing:.01em;color:#E6E9EE;">SCAD Studio</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.44.0</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.50.0</span>
     </div>
     <div style="display:flex;align-items:center;gap:2px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:4px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <button onClick="{{ setBasic }}" title="Basic — solids only (hides parameters, 2D shapes & extrudes)" style="{{ basicTabStyle }}">Basic</button>
@@ -75,41 +75,49 @@
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M10 4.5 13 7.5l-3 3M12.8 7.5H6a3 3 0 0 0 0 6h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div style="width:1px;height:18px;background:#2C3037;margin:0 1px;"></div>
-      <button onClick="{{ openFile }}" style="display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;" style-hover="background:#262A30;">
+      <button onClick="{{ toggleFileMenu }}" title="File — open, save, export, import" style="{{ fileMenuBtnStyle }}">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h2.7l1.2 1.5H12.5A1.5 1.5 0 0 1 14 6v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12V4.5Z" stroke="#9AA3AE" stroke-width="1.2"/></svg>
-        Open
+        File
+        <svg width="9" height="9" viewBox="0 0 12 12" fill="none" style="margin-left:1px;"><path d="M3 4.5 6 7.5l3-3" stroke="#9AA3AE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button onClick="{{ saveFile }}" style="display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;" style-hover="background:#262A30;">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v8m0 0 3-3m-3 3L5 7M3 11.5v1A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5v-1" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Save .scad
-      </button>
-      <button onClick="{{ exportSTL }}" title="Export the rendered model as a binary STL (for 3D printing / slicing)" style="display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;" style-hover="background:#262A30;">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2 13 4.7v6.6L8 14 3 11.3V4.7L8 2Z" stroke="#9AA3AE" stroke-width="1.2" stroke-linejoin="round"/><path d="M3.1 4.7 8 7.4l4.9-2.7M8 7.4V14" stroke="#9AA3AE" stroke-width="1.2" stroke-linejoin="round" opacity=".55"/></svg>
-        Export STL
-      </button>
-      <div style="width:1px;height:18px;background:#2C3037;margin:0 1px;"></div>
-      <button onClick="{{ openImport }}" title="Import a mesh (STL / OFF / 3MF / AMF), 2D vector (SVG / DXF), heightmap (DAT / PNG), or drop a .scad library onto the viewport — used by include &lt;…&gt; / use &lt;…&gt;" style="display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;" style-hover="background:#262A30;">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2.6 11 5.6M8 2.6 5 5.6M8 2.6V10" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 10.5v1.8A1.2 1.2 0 0 0 4.2 13.5h7.6a1.2 1.2 0 0 0 1.2-1.2v-1.8" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Import mesh
-      </button>
-      <sc-if value="{{ advancedMode }}" hint-placeholder-val="{{ false }}">
-        <div style="width:1px;height:18px;background:#2C3037;margin:0 1px;"></div>
-        <button onClick="{{ toggleLib }}" title="Import an OpenSCAD library from a GitHub repo (used by include &lt;…&gt; / use &lt;…&gt;)" style="display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;" style-hover="background:#262A30;">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M9.5 2.2 3.2 8.5a1.6 1.6 0 0 0 0 2.3l2 2a1.6 1.6 0 0 0 2.3 0l6.3-6.3M9.5 2.2l4.3 4.3M9.5 2.2 11.6.1l4.3 4.3-2.1 2.1M5.5 9.5l3 3" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Library
-        </button>
-        <button onClick="{{ toggleThread }}" title="Generate a parametric ISO metric thread (rod or nut)" style="display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;" style-hover="background:#262A30;">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5 1.5h6M5 14.5h6M5.5 1.5c0 2 5 2.4 5 4.3 0 1.9-5 2.3-5 4.2 0 1.9 5 2.3 5 3" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Thread
-        </button>
-      </sc-if>
     </div>
   </div>
 
+  <sc-if value="{{ fileMenuOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeFileMenu }}" style="position:fixed;inset:0;z-index:44;"></div>
+    <div style="{{ fileMenuStyle }}">
+      <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:4px 9px 6px;">Project</div>
+      <button onClick="{{ miOpen }}" style="{{ fileItemStyle }}" style-hover="background:#23272E;">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h2.7l1.2 1.5H12.5A1.5 1.5 0 0 1 14 6v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12V4.5Z" stroke="#9AA3AE" stroke-width="1.2"/></svg>
+        <span style="flex:1;">Open .scad…</span>
+      </button>
+      <button onClick="{{ miSave }}" style="{{ fileItemStyle }}" style-hover="background:#23272E;">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2v8m0 0 3-3m-3 3L5 7M3 11.5v1A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5v-1" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="flex:1;">Save .scad</span>
+      </button>
+      <div style="height:1px;background:#23272E;margin:5px 6px;"></div>
+      <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:4px 9px 6px;">Exchange</div>
+      <button onClick="{{ miExport }}" style="{{ fileItemStyle }}" style-hover="background:#23272E;">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2 13 4.7v6.6L8 14 3 11.3V4.7L8 2Z" stroke="#9AA3AE" stroke-width="1.2" stroke-linejoin="round"/><path d="M3.1 4.7 8 7.4l4.9-2.7M8 7.4V14" stroke="#9AA3AE" stroke-width="1.2" stroke-linejoin="round" opacity=".55"/></svg>
+        <span style="flex:1;">Export STL</span>
+      </button>
+      <button onClick="{{ miImport }}" style="{{ fileItemStyle }}" style-hover="background:#23272E;">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2.6 11 5.6M8 2.6 5 5.6M8 2.6V10" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 10.5v1.8A1.2 1.2 0 0 0 4.2 13.5h7.6a1.2 1.2 0 0 0 1.2-1.2v-1.8" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <div style="flex:1;min-width:0;"><div>Import mesh / vector…</div><div style="font-size:9.5px;color:#5B616B;">STL · OFF · 3MF · AMF · SVG · DXF · DAT · PNG</div></div>
+      </button>
+      <sc-if value="{{ advancedMode }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ miLibrary }}" style="{{ fileItemStyle }}" style-hover="background:#23272E;">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M9.5 2.2 3.2 8.5a1.6 1.6 0 0 0 0 2.3l2 2a1.6 1.6 0 0 0 2.3 0l6.3-6.3M9.5 2.2l4.3 4.3M9.5 2.2 11.6.1l4.3 4.3-2.1 2.1M5.5 9.5l3 3" stroke="#9AA3AE" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div style="flex:1;min-width:0;"><div>GitHub library…</div><div style="font-size:9.5px;color:#5B616B;">include &lt;…&gt; / use &lt;…&gt;</div></div>
+        </button>
+      </sc-if>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ libOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeLib }}" style="position:fixed;inset:0;z-index:44;"></div>
-    <div style="position:absolute;top:108px;left:16px;z-index:45;width:344px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.55);padding:13px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px;">
+    <div style="{{ libPanelStyle }}">
+      <div onPointerDown="{{ dragLib }}" style="display:flex;align-items:center;gap:8px;margin-bottom:11px;cursor:grab;touch-action:none;">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="#9CC2F5"><path d="M8 .6a7.4 7.4 0 0 0-2.34 14.42c.37.07.5-.16.5-.36v-1.26c-2.06.45-2.5-.99-2.5-.99-.34-.86-.82-1.09-.82-1.09-.67-.46.05-.45.05-.45.74.05 1.13.76 1.13.76.66 1.13 1.73.8 2.15.61.07-.48.26-.8.47-.99-1.64-.19-3.37-.82-3.37-3.65 0-.81.29-1.47.76-1.99-.08-.18-.33-.93.07-1.94 0 0 .62-.2 2.03.76a7.05 7.05 0 0 1 3.7 0c1.4-.96 2.02-.76 2.02-.76.4 1.01.15 1.76.07 1.94.48.52.76 1.18.76 1.99 0 2.84-1.73 3.46-3.38 3.64.27.23.5.68.5 1.37v2.03c0 .2.14.44.51.36A7.4 7.4 0 0 0 8 .6Z"/></svg>
         <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8A9099;font-weight:500;">GitHub library</span>
         <button onClick="{{ closeLib }}" style="margin-left:auto;background:transparent;border:none;color:#6B7280;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;" style-hover="color:#C7CCD4;">×</button>
@@ -133,15 +141,15 @@
 
   <sc-if value="{{ threadOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeThread }}" style="position:fixed;inset:0;z-index:44;"></div>
-    <div style="position:absolute;top:108px;left:16px;z-index:45;width:360px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.55);padding:14px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:13px;">
+    <div style="{{ threadPanelStyle }}">
+      <div onPointerDown="{{ dragThread }}" style="display:flex;align-items:center;gap:8px;margin-bottom:13px;cursor:grab;touch-action:none;">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M5 1.5h6M5 14.5h6M5.5 1.5c0 2 5 2.4 5 4.3 0 1.9-5 2.3-5 4.2 0 1.9 5 2.3 5 3" stroke="#9CC2F5" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8A9099;font-weight:500;">ISO metric thread</span>
+        <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8A9099;font-weight:500;">Thread &amp; hardware</span>
         <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9CC2F5;">{{ threadDesignation }}</span>
         <button onClick="{{ closeThread }}" style="background:transparent;border:none;color:#6B7280;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;" style-hover="color:#C7CCD4;">×</button>
       </div>
 
-      <div style="display:flex;gap:6px;margin-bottom:11px;">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px;">
         <button onClick="{{ setThreadRod }}" style="{{ threadRodStyle }}">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5.5" y="1.5" width="5" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 4h5M5.5 6.4h5M5.5 8.8h5M5.5 11.2h5" stroke="currentColor" stroke-width="1"/></svg>
           Rod
@@ -154,6 +162,14 @@
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.7h7l3 5.3-3 5.3h-7l-3-5.3 3-5.3Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="8" cy="8" r="2.8" stroke="currentColor" stroke-width="1.2"/></svg>
           Nut
         </button>
+        <button onClick="{{ setThreadWasher }}" style="{{ threadWasherStyle }}">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="2.6" stroke="currentColor" stroke-width="1.2"/></svg>
+          Washer
+        </button>
+        <button onClick="{{ setThreadHole }}" style="{{ threadHoleStyle }}">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2.5 5.5h11M2.5 5.5v7h11v-7M5 5.5v-2h6v2M5.5 8.5h5M6.3 11h3.4" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          Hole
+        </button>
       </div>
 
       <sc-if value="{{ threadIsBolt }}" hint-placeholder-val="{{ false }}">
@@ -164,6 +180,34 @@
             <button onClick="{{ setHeadSocket }}" style="{{ headSocketStyle }}">Socket cap</button>
             <button onClick="{{ setHeadCsk }}" style="{{ headCskStyle }}">Countersunk</button>
           </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ threadCanChamfer }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ toggleChamfer }}" style="{{ chamferStyle }}">
+          <span style="{{ chamferDot }}"></span>
+          Chamfered lead-in {{ chamferState }}
+        </button>
+      </sc-if>
+
+      <sc-if value="{{ threadIsNut }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:11px;">
+          <div style="font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:#6B7280;margin-bottom:5px;">Outer shape</div>
+          <div style="display:flex;gap:5px;">
+            <button onClick="{{ setNutRound }}" style="{{ nutRoundStyle }}">Round</button>
+            <button onClick="{{ setNutHex }}" style="{{ nutHexStyle }}">Hex</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ threadIsHole }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:11px;">
+          <div style="font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:#6B7280;margin-bottom:5px;">Recess for head</div>
+          <div style="display:flex;gap:5px;">
+            <button onClick="{{ setHoleCbore }}" style="{{ holeCboreStyle }}">Counterbore</button>
+            <button onClick="{{ setHoleCsink }}" style="{{ holeCsinkStyle }}">Countersink</button>
+          </div>
+          <div style="font-size:9.5px;color:#5B616B;margin-top:6px;line-height:1.4;">A cutter solid \u2014 subtract it from your part: <span style="font-family:'IBM Plex Mono',monospace;color:#8A9099;">difference(){ part; cutter; }</span></div>
         </div>
       </sc-if>
 
@@ -279,6 +323,11 @@
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M4 4 12 4 12 9 16 9 16 16 4 16Z" stroke="#9AA3AE" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="2.2 1.8"/></svg>
           Polygon
         </button>
+        <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:8px 8px 5px;border-top:1px solid #23272E;margin-top:4px;">Hardware</div>
+        <button onClick="{{ miThread }}" style="display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12.5px;padding:7px 8px;border-radius:8px;cursor:pointer;text-align:left;" style-hover="background:#23272E;">
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><rect x="7" y="2.2" width="6" height="15.6" rx="1.2" stroke="#9AA3AE" stroke-width="1.3"/><path d="M7 5h6M7 7.6h6M7 10.2h6M7 12.8h6M7 15.4h6" stroke="#9AA3AE" stroke-width="1"/></svg>
+          Thread &amp; hardware…
+        </button>
         </sc-if>
       </div>
     </sc-if>
@@ -368,9 +417,9 @@
   <sc-if value="{{ hasShapePanel }}" hint-placeholder-val="{{ false }}">
     <div style="{{ shapePanelStyle }}">
       <div onPointerDown="{{ dragShape }}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;cursor:grab;touch-action:none;">
-        <div style="display:flex;align-items:center;gap:9px;">
+        <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;">
           <span style="{{ shapeDotStyle }}"></span>
-          <span style="font-size:13px;color:#E6E9EE;font-weight:500;">{{ shapePanelLabel }}</span>
+          <input value="{{ shapePanelLabel }}" placeholder="{{ shapeNamePlaceholder }}" onInput="{{ onShapeNameInput }}" onBlur="{{ onShapeNameCommit }}" onKeyDown="{{ onShapeNameKey }}" onPointerDown="{{ stopProp }}" style="flex:1;min-width:0;background:transparent;border:none;border-bottom:1px solid transparent;color:#E6E9EE;font:inherit;font-size:13px;font-weight:500;padding:1px 0;outline:none;" style-hover="border-bottom-color:#34393F;" style-focus="border-bottom-color:#3B82F6;" />
         </div>
         <button onClick="{{ deselectShape }}" style="background:transparent;border:none;color:#6B7280;cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;" style-hover="color:#C7CCD4;">×</button>
       </div>
@@ -462,9 +511,9 @@
   <sc-if value="{{ hasGroupPanel }}" hint-placeholder-val="{{ false }}">
     <div style="{{ groupPanelStyle }}">
       <div onPointerDown="{{ dragGroup }}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;cursor:grab;touch-action:none;">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;background:#1C2530;color:#9CC2F5;font-family:'IBM Plex Mono',monospace;font-size:13px;">{{ groupGlyph }}</span>
-          <span style="font-size:13px;color:#E6E9EE;font-weight:500;">{{ groupPanelLabel }}</span>
+        <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;">
+          <span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;background:#1C2530;color:#9CC2F5;font-family:'IBM Plex Mono',monospace;font-size:13px;flex:none;">{{ groupGlyph }}</span>
+          <input value="{{ groupPanelLabel }}" placeholder="{{ groupNamePlaceholder }}" onInput="{{ onShapeNameInput }}" onBlur="{{ onShapeNameCommit }}" onKeyDown="{{ onShapeNameKey }}" onPointerDown="{{ stopProp }}" style="flex:1;min-width:0;background:transparent;border:none;border-bottom:1px solid transparent;color:#E6E9EE;font:inherit;font-size:13px;font-weight:500;padding:1px 0;outline:none;" style-hover="border-bottom-color:#34393F;" style-focus="border-bottom-color:#3B82F6;" />
         </div>
         <button onClick="{{ deselectGroup }}" style="background:transparent;border:none;color:#6B7280;cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;" style-hover="color:#C7CCD4;">×</button>
       </div>
@@ -545,12 +594,13 @@
   </sc-if>
 
   <div style="{{ treePanelStyle }}">
-    <div onPointerDown="{{ dragTree }}" style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid #2C3037;cursor:grab;touch-action:none;">
+    <div onPointerDown="{{ dragTree }}" onClick="{{ onTreeHeaderClick }}" style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid #2C3037;cursor:grab;touch-action:none;">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2.5 4h11M2.5 8h11M2.5 12h7" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round"/></svg>
       <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8A9099;font-weight:500;">Model Tree</span>
       <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5B616B;">{{ shapeCount }}</span>
+      <span style="{{ treeCaretStyle }}">▸</span>
     </div>
-    <div class="cad-scroll" style="max-height:210px;overflow-y:auto;padding:6px;">
+    <div class="cad-scroll" style="{{ treeScrollStyle }}">
       <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ true }}">
         <div style="padding:14px 10px;text-align:center;color:#5B616B;font-size:11.5px;line-height:1.5;">No solids yet.<br/>Add a cuboid to begin.</div>
       </sc-if>
@@ -632,6 +682,9 @@
       </sc-if>
       <div style="margin-top:6px;padding:0 2px;font-size:10px;color:#4F555E;line-height:1.4;">{{ treeFooterHint }}</div>
     </div>
+    <div onPointerDown="{{ startTreeResize }}" title="Drag to resize" style="{{ treeResizeStyle }}">
+      <span style="width:26px;height:3px;border-radius:2px;background:#3A4048;"></span>
+    </div>
   </div>
 
   <sc-if value="{{ ctxOpen }}" hint-placeholder-val="{{ false }}">
@@ -654,6 +707,7 @@
     </div>
   </sc-if>
 
+  <sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
   <div style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:25;display:flex;align-items:center;gap:0;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:9px;padding:5px 4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A9099;box-shadow:0 8px 24px rgba(0,0,0,.4);">
     <span style="padding:2px 11px;">{{ statusHint }}</span>
     <span style="width:1px;height:13px;background:#2C3037;"></span>
@@ -673,6 +727,7 @@
       </div>
     </sc-if>
   </div>
+  </sc-if>
 
   <sc-if value="{{ ppToolActive }}" hint-placeholder-val="{{ false }}">
     <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:34;display:flex;align-items:center;gap:6px;background:rgba(27,30,35,.88);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:10px;padding:5px;box-shadow:0 8px 24px rgba(0,0,0,.45);">
@@ -683,7 +738,7 @@
   </sc-if>
 
   <sc-if value="{{ readOnly }}" hint-placeholder-val="{{ false }}">
-    <div style="position:absolute;top:16px;right:16px;z-index:33;display:flex;align-items:center;gap:8px;background:rgba(40,33,18,.9);backdrop-filter:blur(12px);border:1px solid #5A4A22;border-radius:10px;padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45);">
+    <div style="{{ roBadgeStyle }}">
       <span style="width:8px;height:8px;border-radius:50%;background:#E0A33B;box-shadow:0 0 8px #E0A33B;flex:none;"></span>
       <span style="font-size:11.5px;color:#E7C98A;">read-only — evaluated from code</span>
       <button onClick="{{ exitReadOnly }}" style="background:transparent;border:none;color:#9C8550;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;" style-hover="color:#E7C98A;">×</button>
@@ -722,6 +777,12 @@
         <button onClick="{{ copyCode }}" title="Copy" style="display:flex;align-items:center;background:#23272E;border:1px solid #34393F;color:#9AA3AE;font:inherit;padding:5px 9px;border-radius:7px;cursor:pointer;" style-hover="color:#E6E9EE;">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="5.2" y="5.2" width="7.5" height="7.5" rx="1.4" stroke="currentColor" stroke-width="1.2"/><path d="M10.5 5V4A1.5 1.5 0 0 0 9 2.5H4.5A1.5 1.5 0 0 0 3 4v4.5A1.5 1.5 0 0 0 4.5 10h.8" stroke="currentColor" stroke-width="1.2"/></svg>
         </button>
+        <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleDrawer }}" title="Back to model" style="display:flex;align-items:center;gap:5px;background:#23272E;border:1px solid #34393F;color:#C7CCD4;font:inherit;font-size:11.5px;padding:5px 11px;border-radius:7px;cursor:pointer;">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Done
+          </button>
+        </sc-if>
       </div>
     </div>
     <div style="flex:1;display:flex;min-height:0;overflow:hidden;background:#101216;">
@@ -749,6 +810,7 @@
 
   <button onClick="{{ toggleDrawer }}" style="{{ drawerTab }}">
     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M6 4 2.5 8 6 12M10 4l3.5 4L10 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="{{ drawerTabLabelStyle }}">Code</span>
   </button>
 
   <sc-if value="{{ hasImports }}" hint-placeholder-val="{{ false }}">
@@ -830,7 +892,7 @@ class Component extends DCLogic {
     libBusy: false,        // a fetch is in flight
     libMsg: '',            // importer status / error line
     threadOpen: false,     // Thread generator popover
-    thread: { kind: 'rod', size: 'M12', fine: false, pitch: 1.75, len: 16, lh: false, tol: 0.0, head: 'hex' },
+    thread: { kind: 'rod', size: 'M12', fine: false, pitch: 1.75, len: 16, lh: false, tol: 0.0, head: 'hex', chamfer: false, nutHex: false, hole: 'counterbore' },
     ppMode: 'linear',         // push/pull sub-mode: 'linear' | 'revolve'
     shapes: [],            // serializable mirror for the tree
     selectedShapeId: null,
@@ -839,11 +901,14 @@ class Component extends DCLogic {
     gizmoMode: 'translate',
     radius: 3,
     drawerOpen: true,
+    isMobile: false,        // viewport <= 760px (reactive; gates the mobile layout)
+    mobileTreeOpen: false,  // mobile: model-tree bottom sheet expanded
     code: '',
     csgOk: true,
     dirty: false,
     fn: 48,
     fnMenuOpen: false,     // global $fn picker (bottom status bar)
+    fileMenuOpen: false,   // File ▾ dropdown (top toolbar)
     shapeMenuOpen: false,  // "add shape" flyout (left toolbar)
     vars: [],              // serializable mirror of this.vars
     paramsOpen: false,
@@ -882,6 +947,17 @@ class Component extends DCLogic {
   componentDidMount() {
     this._onKey = (e) => this.onKey(e);
     window.addEventListener('keydown', this._onKey);
+    // reactive mobile breakpoint — drives the bottom-sheet / full-screen-drawer layout
+    this._mq = (typeof matchMedia !== 'undefined') ? matchMedia('(max-width: 760px)') : null;
+    if (this._mq) {
+      this._onMq = () => {
+        const m = this._mq.matches;
+        this.setState(s => ({ isMobile: m, drawerOpen: m ? false : s.drawerOpen }),
+          () => { this.applyViewOffset(); this.onResize(); });
+      };
+      try { this._mq.addEventListener('change', this._onMq); } catch (_) { this._mq.addListener(this._onMq); }
+      if (this._mq.matches) this.setState({ isMobile: true, drawerOpen: false });
+    }
     if (window.__threeReady) this.initThree();
     else window.addEventListener('three-ready', () => this.initThree(), { once: true });
   }
@@ -1029,6 +1105,13 @@ class Component extends DCLogic {
   applyViewOffset() {
     if (!this.cam || !this._vp) return;
     const W = this._vp.clientWidth || window.innerWidth, H = this._vp.clientHeight || window.innerHeight;
+    if (this.state.isMobile) {
+      // no permanent side drawer on mobile — center the model in the full canvas
+      this.cam.aspect = W / H;
+      if (this.cam.clearViewOffset) this.cam.clearViewOffset();
+      this.cam.updateProjectionMatrix();
+      return;
+    }
     const fullW = W * 1.42;
     this.cam.aspect = fullW / H;
     this.cam.setViewOffset(fullW, H, W * 0.40, 0, W, H);
@@ -2817,9 +2900,31 @@ class Component extends DCLogic {
     document.body.style.cursor = 'grabbing';
   };
   panelStyle(key, base) {
+    if (this.state.isMobile) {
+      // bottom sheet: keep each panel's own bg/border/z-index, override only the layout
+      return base + ';left:0;right:0;bottom:0;top:auto;width:100%;max-width:100vw;transform:none;'
+        + 'border-radius:16px 16px 0 0;max-height:82vh;overflow-y:auto;box-shadow:0 -12px 40px rgba(0,0,0,.6);';
+    }
     const p = (this.state.panelPos || {})[key];
     return p ? `${base};left:${p.left}px;top:${p.top}px;right:auto;bottom:auto;transform:none;` : base;
   }
+  // resize the model-tree scroll area by dragging its bottom edge; height persisted in state.
+  startTreeResize = (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    const sy = e.clientY, h0 = this.state.treeHeight || 210;
+    const move = (ev) => {
+      const nh = Math.max(96, Math.min(h0 + (ev.clientY - sy), (window.innerHeight || 800) - 180));
+      this.setState({ treeHeight: nh });
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up); document.body.style.cursor = '';
+    };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    document.body.style.cursor = 'ns-resize';
+  };
 
   toggleParams = () => this.setState({ paramsOpen: !this.state.paramsOpen });
   setParamScroll = (el) => { this._paramScroll = el; };
@@ -2842,6 +2947,25 @@ class Component extends DCLogic {
     if (this.state.varDraft && this.state.varDraft.idx === i) this.setState({ varDraft: null });
     this.afterVarsChanged();
   };
+  // rename a tree node (primitive or group). Label is emitted only as a code comment, so any text
+  // is safe. Live-updates the node + Model-Tree/panel mirrors per keystroke; regenCode on commit.
+  renameNode(id, name) {
+    const node = this.findNode(id);
+    if (!node) return;
+    node.label = name;
+    this.syncShapesState();
+  }
+  commitRenameNode(id) {
+    const node = this.findNode(id);
+    if (!node) return;
+    if (!node.label || !node.label.trim()) node.label = this.defaultLabelFor(node);
+    this.regenCode(); this.syncShapesState();
+  }
+  defaultLabelFor(node) {
+    if (this.isGroup(node)) return (node.op ? node.op[0].toUpperCase() + node.op.slice(1) : 'Group');
+    const t = node.type || 'shape';
+    return t[0].toUpperCase() + t.slice(1);
+  }
   commitRename(i) {
     const d = this.state.varDraft;
     if (!d || d.idx !== i || !this.vars[i]) { this.setState({ varDraft: null }); return; }
@@ -3024,10 +3148,27 @@ class Component extends DCLogic {
   }
 
   addPrimitive(shape) {
+    // In read-only (advanced) view this.tree is the EVALUATED geom tree, not an authoring tree —
+    // pushing a GUI node onto it corrupts it and regenCode wipes the evaluated parts. Instead emit
+    // the shape as OpenSCAD and APPEND it to the document so it joins the evaluated parts.
+    if (this.state.readOnly) { this.appendPrimitiveCode(shape); return; }
     this.tree.push(shape); this.reindex();
     this.setState({ tool: 'select', selectedShapeId: shape.id, selectedIds: [shape.id] }, () => {
       this.rebuildScene(); this.syncShapesState(); this.regenCode();
     });
+  }
+  // Append a primitive as OpenSCAD to the current (advanced) document so it renders alongside the
+  // evaluated parts instead of wiping them. Tagged [scs-part] like generated hardware.
+  appendPrimitiveCode(shape) {
+    const out = [];
+    try { this.emitNode(shape, 0, out); } catch (e) { this.flashStatus('Could not add shape'); return; }
+    const block = '// ' + (shape.label || shape.type) + '  [scs-part]\n' + out.join('\n').replace(/\n+$/, '');
+    const cur = (this._codeArea ? this._codeArea.value : this.state.code) || '';
+    const next = (cur.trim() ? cur.replace(/\s+$/, '') + '\n\n' : '') + block + '\n';
+    this._pushHist();
+    if (this._codeArea) this._codeArea.value = next;
+    this.setState({ code: next }, () => this.runCode());
+    this.flashStatus('Added ' + (shape.label || shape.type) + ' \u2014 read-only');
   }
   addCuboid = () => {
     if (!this.scene) return;
@@ -3181,6 +3322,9 @@ class Component extends DCLogic {
     // also swallow a trailing comment line we emit above push/pull statements
     if (start >= 2 && /^\s*\/\/\s*push\/pull/.test(lines[start - 2] || '')) start -= 1;
     if (start >= 2 && /@scs-xform/.test(lines[start - 2] || '')) start -= 1;
+    // swallow the leading "// … [scs-part]" comment a generated part/primitive emits, so deleting a
+    // part doesn't leave an orphan comment that miscounts the next part's X offset.
+    if (start >= 2 && /\[scs-part\]/.test(lines[start - 2] || '')) start -= 1;
     const kept = lines.filter((_, i) => (i + 1) < start || (i + 1) > end);
     let next = kept.join('\n').replace(/\n{3,}/g, '\n\n').replace(/^\s+|\s+$/g, '');
     if (!next.trim()) next = '// (empty)\n';
@@ -4068,16 +4212,15 @@ class Component extends DCLogic {
     const nodes = roots.length ? roots : (res.geom || []);
     const grp = new this.THREE.Group();
     this._roGroups = {};   // topIndex -> sub-group, so a top-level item can be gizmo-transformed as a whole
-    try {
-      nodes.forEach((n, i) => {
-        const sub = new this.THREE.Group();
-        sub.userData = { roTopIndex: i };
-        this.realizeNode(n, this.IDENTITY(), null, sub);
-        grp.add(sub);
-        this._roGroups[i] = sub;
-      });
-    }
-    catch (e) { res.errors = res.errors.concat([{ msg: 'render: ' + (e.message || e) }]); }
+    nodes.forEach((n, i) => {
+      const sub = new this.THREE.Group();
+      sub.userData = { roTopIndex: i };
+      // per-node guard: a single failing part (e.g. a heavy CSG) must not abort the whole render
+      try { this.realizeNode(n, this.IDENTITY(), null, sub); }
+      catch (e) { res.errors = res.errors.concat([{ msg: 'render part ' + (i + 1) + ': ' + (e.message || e) }]); }
+      grp.add(sub);
+      this._roGroups[i] = sub;
+    });
     this._engineGroup = grp; this.scene.add(grp);
     // console
     const log = [];
@@ -4667,7 +4810,16 @@ class Component extends DCLogic {
     const raw = this.serializeGeomRaw(node, idx, depth);
     const row = this.collapseGeomRow(raw, depth);
     if (row && root) { row.root = true; row.topIndex = idx; row.srcLines = node && node.__src ? node.__src : null; }
+    // collapse can hoist a child's id up, so two top-level parts whose single child both sit at
+    // child-index 0 collide (both 'g1_0'). Re-stamp the whole subtree with a unique top-index prefix
+    // so tree selection + delete target the right row.
+    if (row && root) this.reidRow(row, 't' + idx);
     return row;
+  }
+  reidRow(row, prefix) {
+    if (!row) return;
+    row.id = prefix;
+    (row.children || []).forEach((c, i) => this.reidRow(c, prefix + '_' + i));
   }
   serializeGeomRaw(node, idx, depth) {
     if (!node) return null;
@@ -5173,34 +5325,32 @@ class Component extends DCLogic {
     this.setState({ thread: t });
   }
   threadNominal() { return parseFloat((this.state.thread.size || 'M12').replace(/^M/i, '')) || 12; }
-  buildThreadScad() {
-    const t = this.state.thread, d = this.threadNominal(), p = t.pitch, len = t.len, internal = t.kind === 'nut';
+  // Assemble a self-contained, appendable part. Reads the CURRENT code so it APPENDS (offset in +X)
+  // instead of replacing, and de-dupes the helper modules.
+  buildThreadScad(cur) {
+    cur = cur != null ? cur : ((this._codeArea ? this._codeArea.value : this.state.code) || '');
+    const t = this.state.thread, d = this.threadNominal(), p = t.pitch, len = t.len, lh = t.lh, tol = t.tol;
     const F = (n) => (Math.round(n * 1000) / 1000).toString();
-    const kindLabel = t.kind === 'bolt' ? 'bolt (' + t.head + ' head)' : t.kind === 'nut' ? 'internal (nut)' : 'external (rod)';
-    const desc = t.size + ' \u00d7 ' + F(p) + ' \u2014 ' + kindLabel + ', ' + (t.lh ? 'left' : 'right') + '-hand';
-    // ISO-ish head defaults derived from nominal diameter
-    const headAF = +(1.5 * d).toFixed(2);     // hex across-flats
+    const partN = (cur.match(/\[scs-part\]/g) || []).length;
+    const off = partN === 0 ? 0 : partN * Math.max(30, Math.round(3.2 * d));
+    const T = (s) => `translate([${off}, 0, 0]) ${s}`;
+    const seg = 64;
+    const c = F(Math.max(0.4, 0.6 * p));          // chamfer size
+    const headAF = +(1.5 * d).toFixed(2);
     const headDia = t.head === 'countersunk' ? +(2 * d).toFixed(2) : +(1.5 * d).toFixed(2);
     const headH = t.head === 'countersunk' ? +(0.5 * d).toFixed(2) : t.head === 'socket' ? +(1.0 * d).toFixed(2) : +(0.65 * d).toFixed(2);
     const headParam = t.head === 'hex' ? headAF : headDia;
+    const cos30 = Math.cos(Math.PI / 6);
 
-    const common = `// \u2500\u2500\u2500 ISO metric thread \u00b7 ${desc} \u2500\u2500\u2500
-// Generated by SCAD Studio \u2014 fully parametric, edit the values below.
-nominal_d = ${F(d)};      // nominal major diameter (mm)
-pitch     = ${F(p)};      // thread pitch (mm)
-length    = ${F(len)};      // threaded length (mm)
-fit_tol   = ${F(t.tol)};      // radial fit clearance (mm) \u2014 larger = looser fit
-left_hand = ${t.lh};    // thread direction
-seg       = 64;      // facets per revolution
-
-// V-tooth = polar profile swept by linear_extrude twist (a circle is twist-invariant, so a nut's
-// outer wall stays straight while the bore threads). depth = 0.6134*p is the ISO engagement depth.
+    // ---- helper modules (each emitted only if not already in the document) ----
+    const need = (sig, block) => cur.includes(sig) ? '' : block;
+    const HELP_THREAD = need('module iso_thread', `// V-tooth swept by linear_extrude twist (a circle is twist-invariant, so a nut's wall stays
+// straight while the bore threads). depth = 0.6134*p is the ISO engagement depth.
 function vee(Rmin, Rmaj, beta, n) =
   concat(
     [ for (i = [0:n])   let(a = -beta + 2*beta*i/n, r = Rmaj - (Rmaj-Rmin)*abs(a)/beta) [r*cos(a), r*sin(a)] ],
     [ for (i = [1:n-1]) let(a =  beta + (360-2*beta)*i/n) [Rmin*cos(a), Rmin*sin(a)] ]
   );
-
 module iso_thread(d, p, len, tol=0, internal=false, lh=false, wall=3, seg=64, beta=95) {
   depth = 0.6134 * p;
   Rmaj  = d/2 + (internal ? tol : -tol);
@@ -5213,50 +5363,94 @@ module iso_thread(d, p, len, tol=0, internal=false, lh=false, wall=3, seg=64, be
     op = [ for (i = [0:seg-1]) let(a = 360*i/seg) [Ro*cos(a), Ro*sin(a)] ];
     ip = vee(Rmin, Rmaj, beta, 24);
     linear_extrude(height=len, twist=dir*360*turns, slices=slices, convexity=10)
-      polygon(points = concat(op, ip),
-              paths  = [ [ for (i = [0:len(op)-1]) i ], [ for (i = [0:len(ip)-1]) len(op)+i ] ]);
+      polygon(points = concat(op, ip), paths = [ [ for (i=[0:len(op)-1]) i ], [ for (i=[0:len(ip)-1]) len(op)+i ] ]);
   } else {
     linear_extrude(height=len, twist=dir*360*turns, slices=slices, convexity=10)
       polygon(vee(Rmin, Rmaj, beta, 24));
   }
 }
-`;
-    if (t.kind === 'nut') {
-      return common + `wall = 3;       // nut wall thickness\n\niso_thread(nominal_d, pitch, length, fit_tol, true, left_hand, wall, seg);\n`;
-    }
-    if (t.kind === 'bolt') {
-      return common + `head_type = "${t.head}";   // "hex" | "socket" | "countersunk"
-head_size = ${F(headParam)};   // hex across-flats, or head diameter
-head_h    = ${F(headH)};
-shank     = 0;          // unthreaded length below the thread (0 = fully threaded)
-
-module bolt_head(type, hs, hh, d, seg) {
+// chamfered lead-in: clip the crests near both ends to a 45\u00b0 cone (intersection)
+module chamfered_thread(d, p, len, tol, lh, c, seg) {
+  Rmaj = d/2 - tol;
+  intersection() {
+    iso_thread(d, p, len, tol, false, lh, 3, seg);
+    rotate_extrude($fn=seg) polygon([[0,0],[Rmaj-c,0],[Rmaj,c],[Rmaj,len-c],[Rmaj-c,len],[0,len]]);
+  }
+}
+`);
+    const HELP_BOLT = need('module bolt_head', `module bolt_head(type, hs, hh, d, seg) {
   if (type == "hex") cylinder(h=hh, r=hs/2/cos(30), $fn=6);
-  else if (type == "socket")
-    difference() {
-      cylinder(h=hh, r=hs/2, $fn=seg);
-      translate([0,0,hh*0.45]) cylinder(h=hh, r=0.55*d/2/cos(30)*1.6, $fn=6);
-    }
-  else  // countersunk: flat-topped cone, wide at the head face
-    cylinder(h=hh, r1=d/2, r2=hs/2, $fn=seg);
+  else if (type == "socket") difference() { cylinder(h=hh, r=hs/2, $fn=seg); translate([0,0,hh*0.45]) cylinder(h=hh, r=0.42*d, $fn=6); }
+  else cylinder(h=hh, r1=d/2, r2=hs/2, $fn=seg);
 }
+`);
+    const HELP_WASHER = need('module washer', `function ring2(r, n) = [ for (i=[0:n-1]) let(a=360*i/n) [r*cos(a), r*sin(a)] ];
+module washer(od, id, th, seg) {
+  linear_extrude(height=th)
+    polygon(points = concat(ring2(od/2, seg), ring2(id/2, seg)),
+            paths  = [ [ for (i=[0:seg-1]) i ], [ for (i=[0:seg-1]) seg+i ] ]);
+}
+`);
+    const HELP_HOLE = need('module hole_cutter', `// clearance-hole cutter: subtract from your part. counterbore = flat recess (socket/hex head),
+// countersink = conical recess (flat head). One rotate_extrude, no boolean to build it.
+module hole_cutter(d, len, kind, headd, depth, tol, seg) {
+  rh = d/2 + tol;
+  if (kind == "counterbore") rotate_extrude($fn=seg) polygon([[0,0],[rh,0],[rh,len-depth],[headd/2,len-depth],[headd/2,len],[0,len]]);
+  else rotate_extrude($fn=seg) polygon([[0,0],[rh,0],[rh,len-depth],[headd/2,len],[0,len]]);
+}
+`);
 
-union() {
-  bolt_head(head_type, head_size, head_h, nominal_d, seg);
-  if (shank > 0) translate([0,0,head_h]) cylinder(h=shank, r=nominal_d/2 - fit_tol, $fn=seg);
-  translate([0,0,head_h + shank]) iso_thread(nominal_d, pitch, length, fit_tol, false, left_hand, 3, seg);
-}
-`;
+    // ---- the part itself ----
+    let desc, helpers, call;
+    if (t.kind === 'washer') {
+      desc = t.size + ' washer';
+      helpers = HELP_WASHER;
+      call = T(`washer(${F(2 * d)}, ${F(d + 2 * tol)}, ${F(Math.max(1, 0.2 * d))}, ${seg});`);
+    } else if (t.kind === 'hole') {
+      const depth = t.hole === 'counterbore' ? +(1.0 * d).toFixed(2) : +(0.5 * d).toFixed(2);
+      const hd = t.hole === 'counterbore' ? +(1.7 * d).toFixed(2) : +(2.0 * d).toFixed(2);
+      const ht = tol > 0 ? tol : 0.4;             // a hole wants clearance even at tol 0
+      desc = t.size + ' ' + t.hole + ' hole cutter';
+      helpers = HELP_HOLE;
+      call = `// subtract this from your part:  difference() { your_part(); <the line below>; }\n` + T(`hole_cutter(${F(d)}, ${F(len)}, "${t.hole}", ${F(hd)}, ${F(depth)}, ${F(ht)}, ${seg});`);
+    } else if (t.kind === 'nut') {
+      helpers = HELP_THREAD;
+      if (t.nutHex) {
+        const AF = +(1.8 * d).toFixed(2), circ = +(AF / 2 / cos30).toFixed(3);
+        desc = t.size + ' hex nut';
+        call = T(`intersection() { iso_thread(${F(d)}, ${F(p)}, ${F(len)}, ${F(tol)}, true, ${lh}, ${F(0.7 * d)}, ${seg}); cylinder(h=${F(len)}, r=${F(circ)}, $fn=6); }`);
+      } else {
+        desc = t.size + ' nut (round)';
+        call = T(`iso_thread(${F(d)}, ${F(p)}, ${F(len)}, ${F(tol)}, true, ${lh}, 3, ${seg});`);
+      }
+    } else if (t.kind === 'bolt') {
+      helpers = HELP_THREAD + HELP_BOLT;
+      const shaft = t.chamfer
+        ? `chamfered_thread(${F(d)}, ${F(p)}, ${F(len)}, ${F(tol)}, ${lh}, ${c}, ${seg})`
+        : `iso_thread(${F(d)}, ${F(p)}, ${F(len)}, ${F(tol)}, false, ${lh}, 3, ${seg})`;
+      desc = t.size + ' bolt (' + t.head + (t.chamfer ? ', chamfered' : '') + ')';
+      call = T(`union() { bolt_head("${t.head}", ${F(headParam)}, ${F(headH)}, ${F(d)}, ${seg}); translate([0,0,${F(headH)}]) ${shaft}; }`);
+    } else { // rod
+      helpers = HELP_THREAD;
+      desc = t.size + ' rod' + (t.chamfer ? ' (chamfered)' : '');
+      call = t.chamfer
+        ? T(`chamfered_thread(${F(d)}, ${F(p)}, ${F(len)}, ${F(tol)}, ${lh}, ${c}, ${seg});`)
+        : T(`iso_thread(${F(d)}, ${F(p)}, ${F(len)}, ${F(tol)}, false, ${lh}, 3, ${seg});`);
     }
-    return common + `iso_thread(nominal_d, pitch, length, fit_tol, false, left_hand, 3, seg);\n`;
+
+    const block = `// ${desc} \u00b7 ${lh ? 'LH' : 'RH'}  [scs-part]\n${helpers}${call}\n`;
+    const prefix = cur.replace(/\s+$/, '');
+    return prefix ? prefix + '\n\n' + block : `// Generated by SCAD Studio \u2014 fully parametric, edit the numbers in the call.\n` + block;
   }
   insertThread = () => {
-    const code = this.buildThreadScad();
+    const cur = (this._codeArea ? this._codeArea.value : this.state.code) || '';
+    const code = this.buildThreadScad(cur);
     this._pushHist();
     if (this._codeArea) this._codeArea.value = code;
     this.setState({ code, threadOpen: false }, () => this.runCode());
     const t = this.state.thread;
-    this.flashStatus('Generated ' + t.size + ' ' + t.kind + ' \u2014 read-only');
+    const verb = (cur.match(/\[scs-part\]/g) || []).length ? 'Added' : 'Generated';
+    this.flashStatus(verb + ' ' + t.size + ' ' + t.kind + ' \u2014 read-only');
   };
   loadImportFiles(files) {
     files = (files || []).filter(Boolean); if (!files.length) return;
@@ -6206,8 +6400,12 @@ union() {
     }));
 
     const drawerW = 420;
-    const drawerStyle = `position:absolute;top:0;bottom:0;right:0;width:${drawerW}px;z-index:28;display:flex;flex-direction:column;background:rgba(18,20,24,.94);backdrop-filter:blur(16px);border-left:1px solid #23272E;box-shadow:-12px 0 40px rgba(0,0,0,.4);transform:translateX(${st.drawerOpen ? '0' : drawerW + 'px'});transition:transform .28s cubic-bezier(.4,0,.2,1);`;
-    const drawerTab = `position:absolute;top:50%;right:${st.drawerOpen ? drawerW : 0}px;transform:translateY(-50%);z-index:29;display:flex;align-items:center;justify-content:center;width:26px;height:54px;border-radius:9px 0 0 9px;border:1px solid #2C3037;border-right:none;background:rgba(27,30,35,.9);backdrop-filter:blur(12px);color:#9AA3AE;cursor:pointer;transition:right .28s cubic-bezier(.4,0,.2,1);transform-origin:center;` + (st.drawerOpen ? 'transform:translateY(-50%) rotate(180deg);' : '');
+    const drawerStyle = st.isMobile
+      ? `position:fixed;inset:0;z-index:47;display:flex;flex-direction:column;background:rgba(16,18,22,.985);backdrop-filter:blur(16px);transform:translateX(${st.drawerOpen ? '0' : '100%'});transition:transform .28s cubic-bezier(.4,0,.2,1);`
+      : `position:absolute;top:64px;bottom:0;right:0;width:${drawerW}px;z-index:28;display:flex;flex-direction:column;background:rgba(18,20,24,.94);backdrop-filter:blur(16px);border-left:1px solid #23272E;border-top:1px solid #23272E;border-radius:12px 0 0 0;box-shadow:-12px 0 40px rgba(0,0,0,.4);transform:translateX(${st.drawerOpen ? '0' : drawerW + 'px'});transition:transform .28s cubic-bezier(.4,0,.2,1);`;
+    const drawerTab = st.isMobile
+      ? `position:fixed;bottom:18px;right:16px;z-index:46;display:${st.drawerOpen ? 'none' : 'flex'};align-items:center;justify-content:center;gap:7px;height:46px;padding:0 18px;border-radius:23px;border:1px solid #2C4D78;background:rgba(28,50,81,.96);backdrop-filter:blur(12px);color:#9CC2F5;font:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5);`
+      : `position:absolute;top:50%;right:${st.drawerOpen ? drawerW : 0}px;transform:translateY(-50%);z-index:29;display:flex;align-items:center;justify-content:center;width:26px;height:54px;border-radius:9px 0 0 9px;border:1px solid #2C3037;border-right:none;background:rgba(27,30,35,.9);backdrop-filter:blur(12px);color:#9AA3AE;cursor:pointer;transition:right .28s cubic-bezier(.4,0,.2,1);transform-origin:center;` + (st.drawerOpen ? 'transform:translateY(-50%) rotate(180deg);' : '');
 
     return {
       setViewport: this.setViewport,
@@ -6236,16 +6434,34 @@ union() {
       redoBtnStyle: `display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:${this._redo.length ? '#C7CCD4' : '#454B54'};padding:6px 8px;border-radius:7px;cursor:${this._redo.length ? 'pointer' : 'default'};` + (this._redo.length ? '' : 'pointer-events:none;'),
       libOpen: st.libOpen, libSpec: st.libSpec, libMsg: st.libMsg, hasLibMsg: !!st.libMsg,
       toggleLib: this.toggleLib, closeLib: this.closeLib, setLibSpec: this.setLibSpec, onLibKey: this.onLibKey,
+      dragLib: this.startPanelDrag('lib'),
+      libPanelStyle: this.panelStyle('lib', 'position:absolute;top:108px;left:16px;z-index:45;width:344px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.55);padding:13px;'),
       fetchLib: () => this.fetchGithubLib(),
       // ---- Thread generator ----
       threadOpen: st.threadOpen,
       toggleThread: this.toggleThread, closeThread: this.closeThread, insertThread: this.insertThread,
+      dragThread: this.startPanelDrag('thread'),
+      threadPanelStyle: this.panelStyle('thread', 'position:absolute;top:108px;left:16px;z-index:45;width:360px;max-height:calc(100vh - 128px);overflow-y:auto;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.55);padding:14px;'),
       threadSize: st.thread.size, threadSizeOpts: this.threadSizes(),
       threadPitch: this.fmt(st.thread.pitch), threadLen: this.fmt(st.thread.len),
       threadTol: st.thread.tol, threadTolLabel: '\u00b1' + st.thread.tol.toFixed(2) + ' mm',
-      threadDesignation: st.thread.size + ' \u00d7 ' + this.fmt(st.thread.pitch),
+      threadDesignation: (st.thread.kind === 'washer' || st.thread.kind === 'hole') ? st.thread.size : st.thread.size + ' \u00d7 ' + this.fmt(st.thread.pitch),
       threadKindLabel: st.thread.kind === 'nut' ? 'nut' : st.thread.kind,
       threadIsBolt: st.thread.kind === 'bolt',
+      threadIsNut: st.thread.kind === 'nut',
+      threadIsHole: st.thread.kind === 'hole',
+      threadCanChamfer: st.thread.kind === 'rod' || st.thread.kind === 'bolt',
+      threadWasherStyle: this.segBtn(st.thread.kind === 'washer'),
+      threadHoleStyle: this.segBtn(st.thread.kind === 'hole'),
+      setThreadWasher: () => this.setThread({ kind: 'washer' }), setThreadHole: () => this.setThread({ kind: 'hole' }),
+      toggleChamfer: () => this.setThread({ chamfer: !st.thread.chamfer }),
+      chamferState: st.thread.chamfer ? 'ON' : 'OFF',
+      chamferStyle: `display:flex;align-items:center;gap:9px;width:100%;margin-bottom:12px;background:${st.thread.chamfer ? '#1C3251' : '#16181C'};border:1px solid ${st.thread.chamfer ? '#2C4D78' : '#2C3037'};color:${st.thread.chamfer ? '#9CC2F5' : '#8A9099'};font:inherit;font-size:12px;padding:8px 11px;border-radius:8px;cursor:pointer;text-align:left;`,
+      chamferDot: `width:9px;height:9px;border-radius:50%;flex:none;background:${st.thread.chamfer ? '#5B9BF5' : '#3A4250'};`,
+      setNutRound: () => this.setThread({ nutHex: false }), setNutHex: () => this.setThread({ nutHex: true }),
+      nutRoundStyle: this.segBtnSm(!st.thread.nutHex), nutHexStyle: this.segBtnSm(st.thread.nutHex),
+      setHoleCbore: () => this.setThread({ hole: 'counterbore' }), setHoleCsink: () => this.setThread({ hole: 'countersink' }),
+      holeCboreStyle: this.segBtnSm(st.thread.hole === 'counterbore'), holeCsinkStyle: this.segBtnSm(st.thread.hole === 'countersink'),
       threadTolHint: st.thread.kind === 'nut'
         ? 'Nut bore grows by this · ~0.2\u20130.4 typical for FDM mating parts'
         : 'Rod/bolt shrinks by this · ~0.2\u20130.4 typical for FDM mating parts',
@@ -6288,12 +6504,20 @@ union() {
       miCone: () => this.pickShape('cone'), miPyramid: () => this.pickShape('pyramid'), miSphere: () => this.pickShape('sphere'),
       miTorus: () => this.pickShape('torus'), miTube: () => this.pickShape('tube'), miWedge: () => this.pickShape('wedge'),
       miCircle: () => this.pickShape('circle'), miSquare: () => this.pickShape('square'), miPolygon: () => this.pickShape('polygon'),
+      miThread: () => this.setState({ shapeMenuOpen: false, threadOpen: true }),
       pickMove: this.pickMove, deleteSelected: this.deleteSelected,
       toggleParams: this.toggleParams,
 
       paramsOpen: st.paramsOpen,
       dragParams: this.startPanelDrag('params'),
       dragTree: this.startPanelDrag('tree'),
+      startTreeResize: this.startTreeResize,
+      treeScrollStyle: `max-height:${st.treeHeight || 210}px;overflow-y:auto;padding:6px;` + ((st.isMobile && !st.mobileTreeOpen) ? 'display:none;' : ''),
+      isMobile: st.isMobile,
+      showStatusBar: !st.isMobile,
+      onTreeHeaderClick: () => { if (this.state.isMobile) this.setState(s => ({ mobileTreeOpen: !s.mobileTreeOpen })); },
+      treeCaretStyle: `display:${st.isMobile ? 'flex' : 'none'};align-items:center;justify-content:center;width:16px;height:16px;color:#6B7280;font-size:11px;transition:transform .15s;transform:rotate(${st.mobileTreeOpen ? '90deg' : '0deg'});`,
+      treeResizeStyle: `height:11px;display:${st.isMobile ? 'none' : 'flex'};align-items:center;justify-content:center;cursor:ns-resize;touch-action:none;border-top:1px solid #23272E;`,
       treePanelStyle: this.panelStyle('tree', 'position:absolute;left:16px;bottom:16px;z-index:30;width:226px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);overflow:hidden;'),
       dragEdge: this.startPanelDrag('edge'),
       dragShape: this.startPanelDrag('shape'),
@@ -6335,6 +6559,12 @@ union() {
       doLinearExtrude: () => this.extrudeSelection('linear_extrude'),
       doRotateExtrude: () => this.extrudeSelection('rotate_extrude'),
       shapePanelLabel: ssh ? ssh.label : '',
+      shapeNamePlaceholder: ssh ? this.defaultLabelFor(ssh) : 'Name',
+      groupNamePlaceholder: ssh ? this.defaultLabelFor(ssh) : 'Name',
+      stopProp: (e) => { e.stopPropagation(); },
+      onShapeNameInput: (e) => { if (st.selectedShapeId) this.renameNode(st.selectedShapeId, e.target.value); },
+      onShapeNameCommit: () => { if (st.selectedShapeId) this.commitRenameNode(st.selectedShapeId); },
+      onShapeNameKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } else if (e.key === 'Escape') { e.target.blur(); } },
       shapeDotStyle: `width:10px;height:10px;border-radius:${sshIsCyl || (ssh && ssh.type === 'sphere') ? '50%' : '2px'};background:#3B82F6;box-shadow:0 0 8px rgba(59,130,246,.6);`,
       showGizmoTabs, sshNested, sshNestedNotice,
       moveTab: this.tab(st.gizmoMode === 'translate'),
@@ -6396,6 +6626,7 @@ union() {
       roRotateTab: this.tab(st.gizmoMode === 'rotate'),
       roScaleTab: this.tab(st.gizmoMode === 'scale'),
       exitReadOnly: this.exitReadOnly,
+      roBadgeStyle: `position:absolute;top:74px;right:${st.drawerOpen ? 436 : 16}px;z-index:33;display:flex;align-items:center;gap:8px;background:rgba(40,33,18,.9);backdrop-filter:blur(12px);border:1px solid #5A4A22;border-radius:10px;padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45);`,
       shapeCount: this.shapes.length,
       hasMultiSel: !st.readOnly && selIds.length >= 2,
       multiSelHint: canGroup ? (selIds.length + ' selected \u2014 first row is the difference base') : 'Select shapes at the same level to combine',
@@ -6422,6 +6653,7 @@ union() {
       })),
 
       drawerStyle, drawerTab,
+      drawerTabLabelStyle: `display:${st.isMobile ? 'inline' : 'none'};`,
       ppHudOn, ppHudStyle, ppHudValue, ppHudUnit, ppHudLabel, ppHudHint,
       ppHudReadOnly, ppHudInputStyle, ppShowConfirm: !!pend,
       ppInputRef: (el) => { this._ppInput = el; },
@@ -6432,6 +6664,17 @@ union() {
       onCodeChange: this.onCodeChange,
       runCode: this.runCode, copyCode: this.copyCode,
       openFile: this.openFile, saveFile: this.saveFile, exportSTL: this.exportSTL, onFileChosen: this.onFileChosen,
+      fileMenuOpen: st.fileMenuOpen,
+      toggleFileMenu: () => this.setState({ fileMenuOpen: !st.fileMenuOpen }),
+      closeFileMenu: () => this.setState({ fileMenuOpen: false }),
+      miOpen: () => { this.setState({ fileMenuOpen: false }); this.openFile(); },
+      miSave: () => { this.setState({ fileMenuOpen: false }); this.saveFile(); },
+      miExport: () => { this.setState({ fileMenuOpen: false }); this.exportSTL(); },
+      miImport: () => { this.setState({ fileMenuOpen: false }); this.openImport(); },
+      miLibrary: () => this.setState({ fileMenuOpen: false, libOpen: true }),
+      fileMenuBtnStyle: `display:flex;align-items:center;gap:7px;background:${st.fileMenuOpen ? '#262A30' : 'transparent'};border:none;color:#C7CCD4;font:inherit;font-size:12px;padding:6px 11px;border-radius:7px;cursor:pointer;`,
+      fileMenuStyle: 'position:absolute;top:62px;right:16px;z-index:45;width:236px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.55);padding:6px;',
+      fileItemStyle: "display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12.5px;padding:8px 9px;border-radius:8px;cursor:pointer;text-align:left;",
       openImport: this.openImport, onImportChosen: this.onImportChosen,
       hasImports: !!((this._imports && this._imports.size) || (this._surfaces && this._surfaces.size) || (this._svg && this._svg.size) || (this._scadFiles && this._scadFiles.size)),
       importsList: [].concat(
