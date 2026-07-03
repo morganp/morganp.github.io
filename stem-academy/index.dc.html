@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Homepage">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1.5px solid #2b2620;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 40px; height: 40px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 18px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: -0.02em;">Lizard-Spock STEM</div>
+    </div>
+    <div style="display: flex; gap: 28px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; align-items: center;">
+      <a href="#worlds" style="color: #2b2620; text-decoration: none;">Topics</a>
+      <a href="periodic-table.html" style="color: #2b2620; text-decoration: none;">Periodic Table</a>
+      <a href="periodic-table.html" style="color: #faf6ef; background: #2b2620; padding: 8px 16px; text-decoration: none;">Start learning</a>
+    </div>
+  </div>
+
+  <!-- hero -->
+  <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; padding: 64px 40px 56px; align-items: center; max-width: 1240px; margin: 0 auto; box-sizing: border-box; width: 100%;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — INTERACTIVE SCIENCE FOR AGES 10+</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 62px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Poke it. Spin it. Heat it up. That's how you learn science.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.5; color: #554c42; max-width: 480px;">Hands-on experiments you run in your browser. Start with the periodic table — every element, clickable.</div>
+      <div style="display: flex; gap: 14px; margin-top: 6px; flex-wrap: wrap;">
+        <a href="periodic-table.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 14px 24px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;" style-hover="box-shadow: 2px 2px 0 #2b2620; transform: translate(2px, 2px);">Open the Periodic Table →</a>
+        <a href="#worlds" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 14px 24px; border: 2px solid #2b2620; text-decoration: none;">Browse topics</a>
+      </div>
+    </div>
+    <!-- mini periodic table teaser -->
+    <a href="periodic-table.html" style="background: #fff; border: 2px solid #2b2620; padding: 24px; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); text-decoration: none; color: #2b2620; display: block;" style-hover="box-shadow: 8px 8px 0 rgba(43,38,32,0.2);">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; margin-bottom: 14px; color: #6b6156;">SPECIMEN: THE PERIODIC TABLE</div>
+      <div style="display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px;">
+        <sc-for list="{{ teaserCells }}" as="c" hint-placeholder-count="27">
+          <div style="aspect-ratio: 1; background: {{ c.bg }}; border: 1px solid #2b2620; display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: {{ c.fg }};">{{ c.sym }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 14px; color: #e8590c;">▸ 118 ELEMENTS · TAP ANY TO INSPECT</div>
+    </a>
+  </div>
+
+  <!-- eight worlds -->
+  <div id="worlds" style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 64px;">
+    <div style="border-top: 1.5px solid #2b2620; padding-top: 24px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 02 — THE CURRICULUM MAP</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 38px; letter-spacing: -0.03em;">Eight worlds to explore</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #6b6156;">EVERY TOPIC IS LEVELLED: L1 EXPLORER (AGE 10) → L5 EXPERT (A-LEVEL / ADVANCED HIGHER)</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 40px; border-top: 2px solid #2b2620;">
+      <sc-for list="{{ topics }}" as="t" hint-placeholder-count="8">
+        <a href="{{ t.href }}" style="display: flex; align-items: center; gap: 16px; padding: 20px 8px; border-bottom: 1px solid #d8d0c4; text-decoration: none; color: #2b2620; cursor: {{ t.cursor }};" style-hover="background: rgba(255,255,255,0.7);">
+          <div style="width: 48px; height: 48px; background: {{ t.color }}; border: 2px solid #2b2620; color: #faf6ef; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 19px; flex-shrink: 0;">{{ t.abbr }}</div>
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: -0.01em;">{{ t.name }}</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 8px; border: 1px solid #2b2620; background: {{ t.badgeBg }}; color: {{ t.badgeFg }};">{{ t.badge }}</span>
+            </div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: #6b6156; line-height: 1.4;">{{ t.desc }}</div>
+          </div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; color: {{ t.arrowColor }};">→</div>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div style="border-top: 1.5px solid #2b2620; padding: 16px 40px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM — learn by doing</span><span>ROCK · PAPER · SCISSORS · LIZARD · SPOCK</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const topics = [
+      { name: "Chemistry", abbr: "Ch", desc: "The interactive periodic table — heat, click, and quiz all 118 elements.", live: true, color: "#e8590c", href: "chemistry.html" },
+      { name: "Physics", abbr: "Ph", desc: "Push crates, fight friction, and read live motion graphs in the crate lab.", live: true, color: "#d9480f", href: "forces-motion.html" },
+      { name: "Biology", abbr: "Bi", desc: "Zoom from cells to ecosystems. Build a food web, breed virtual pea plants.", live: false, color: "#c2410c" },
+      { name: "Math", abbr: "Ma", desc: "Graphing playgrounds, geometry puzzles, and probability machines.", live: false, color: "#b45309" },
+      { name: "Astronomy", abbr: "As", desc: "Fly the solar system to scale. Discover why space is mostly... space.", live: false, color: "#a16207" },
+      { name: "Earth Science", abbr: "Ea", desc: "Drive plate tectonics, brew weather systems, and read the rock record.", live: false, color: "#e8590c" },
+      { name: "Engineering", abbr: "En", desc: "Build bridges that hold (or don't). Wire circuits. Test, fail, improve.", live: false, color: "#d9480f" },
+      { name: "Coding", abbr: "Co", desc: "Logic puzzles and your first real programs — no setup required.", live: false, color: "#c2410c" },
+    ].map(t => ({
+      ...t,
+      href: t.live ? t.href : "#worlds",
+      cursor: t.live ? "pointer" : "default",
+      badge: t.live ? "LIVE NOW · L1–L3" : "COMING SOON",
+      badgeBg: t.live ? "#e8590c" : "#faf6ef",
+      badgeFg: t.live ? "#faf6ef" : "#6b6156",
+      arrowColor: t.live ? "#e8590c" : "#c9c0b2",
+    }));
+
+    const pal = { alkali: "#e8590c", alkaline: "#f08c00", transition: "#ffd43b", nonmetal: "#7ca982", noble: "#a08fd0", metalloid: "#b0a458", halogen: "#66a3a3" };
+    const teaser = [
+      ["H","nonmetal"],["Li","alkali"],["Be","alkaline"],["B","metalloid"],["C","nonmetal"],["N","nonmetal"],["O","nonmetal"],["F","halogen"],["Ne","noble"],
+      ["Na","alkali"],["Mg","alkaline"],["Al","transition"],["Si","metalloid"],["P","nonmetal"],["S","nonmetal"],["Cl","halogen"],["Ar","noble"],["K","alkali"],
+      ["Ca","alkaline"],["Fe","transition"],["Cu","transition"],["Zn","transition"],["Ag","transition"],["Au","transition"],["Hg","transition"],["Pb","transition"],["U","alkali"],
+    ];
+    const teaserCells = teaser.map(([sym, cat]) => ({ sym, bg: pal[cat], fg: "#2b2620" }));
+
+    return { topics, teaserCells };
+  }
+}
+</script>
+</body>
+</html>
