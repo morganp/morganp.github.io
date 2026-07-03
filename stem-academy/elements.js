@@ -1,4 +1,4 @@
-// Lizard-Spock STEM — periodic table dataset
+// Lizard-Spock STEM Academy — periodic table dataset
 // n=atomic number, s=symbol, m=atomic mass, cat=category, g=group, p=period,
 // melt/boil in Kelvin (null = unknown), sh=electrons per shell, fact=friendly fact
 
