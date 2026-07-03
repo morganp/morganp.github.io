@@ -39,16 +39,23 @@
     <!-- account card -->
     <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
       <div style="display: flex; align-items: center; gap: 14px;">
-        <div style="width: 44px; height: 44px; border-radius: 50%; background: #faf6ef; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">👤</div>
+        <div style="{{ avatarStyle }}">{{ avatarGlyph }}</div>
         <div style="display: flex; flex-direction: column; gap: 2px;">
-          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">Guest — this browser only</div>
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">Progress is saved locally. Sign in to sync across devices.</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ accountLabel }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">{{ accountSub }}</div>
         </div>
       </div>
-      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 2px solid #c9c0b2; background: #f2ede3; color: #a89d8e; cursor: not-allowed;">SIGN IN WITH GOOGLE</div>
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;">needs Firebase connected — ask your admin</div>
-      </div>
+      <sc-if value="{{ isSignedIn }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ doSignOut }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 2px solid #2b2620; background: #faf6ef; color: #2b2620; cursor: pointer;">SIGN OUT</button>
+      </sc-if>
+      <sc-if value="{{ notSignedIn }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+          <button onClick="{{ doSignIn }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 2px solid #2b2620; background: #e8590c; color: #faf6ef; cursor: pointer;">{{ signInLabel }}</button>
+          <sc-if value="{{ authError }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #c0392b; max-width: 220px; text-align: right;">{{ authError }}</div>
+          </sc-if>
+        </div>
+      </sc-if>
     </div>
 
     <!-- stats -->
@@ -101,12 +108,25 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  state = { user: null, syncing: false, authError: null };
+
   componentDidMount() {
-    if (window.Progress) this._unsub = window.Progress.onChange(() => this.forceUpdate());
+    if (window.Progress) {
+      this._unsub = window.Progress.onChange(() => this.forceUpdate());
+      this._unsubAuth = window.Progress.onAuthChange(({ user, syncing }) => this.setState({ user, syncing }));
+    }
   }
   componentWillUnmount() {
     if (this._unsub) this._unsub();
+    if (this._unsubAuth) this._unsubAuth();
   }
+
+  doSignIn = async () => {
+    this.setState({ authError: null });
+    try { await window.Progress.signIn(); }
+    catch (e) { this.setState({ authError: "Sign-in failed — check Firebase is configured & this domain is authorized." }); }
+  };
+  doSignOut = async () => { await window.Progress.signOutUser(); };
 
   renderVals() {
     const hrefs = {
@@ -149,7 +169,26 @@ class Component extends DCLogic {
       };
     });
 
-    return { stats, pct, rows };
+    const user = this.state.user;
+    const isSignedIn = !!user;
+    const accountLabel = user ? (user.displayName || user.email || "Signed in") : "Guest — this browser only";
+    const accountSub = user
+      ? (this.state.syncing ? "Syncing progress…" : "Progress synced to your Google account.")
+      : "Progress is saved locally. Sign in to sync across devices.";
+    const avatarBase = "width: 44px; height: 44px; border-radius: 50%; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; background-size: cover; background-position: center;";
+    const avatarStyle = user && user.photoURL
+      ? `${avatarBase} background-image: url('${user.photoURL}'); background-color: #faf6ef;`
+      : `${avatarBase} background: #faf6ef;`;
+    const avatarGlyph = user && user.photoURL ? "" : "👤";
+
+    return {
+      stats, pct, rows,
+      user, isSignedIn, notSignedIn: !isSignedIn,
+      accountLabel, accountSub, avatarStyle, avatarGlyph,
+      signInLabel: this.state.syncing ? "SIGNING IN…" : "SIGN IN WITH GOOGLE",
+      authError: this.state.authError,
+      doSignIn: this.doSignIn, doSignOut: this.doSignOut,
+    };
   }
 }
 </script>
