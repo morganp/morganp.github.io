@@ -87,6 +87,17 @@
       const rMin = 26, rMax = 92;
       const ink = "#2b2620", ring = "#c9c0b2", accent = "#e8590c";
 
+      // each shell's ring plane gets its own tilt so shells cross at angles
+      // (like real orbital planes) instead of sitting as flat parallel rings.
+      // outer/valence shells get more tilt — more "chaotic" orbit look.
+      const tilt = (x, y, i) => {
+        const a = i * 0.85 + 0.3, b = i * 0.5;
+        let y1 = y * Math.cos(a), z1 = y * Math.sin(a);
+        let x2 = x * Math.cos(b) + z1 * Math.sin(b);
+        let z2 = -x * Math.sin(b) + z1 * Math.cos(b);
+        return { x: x2, y: y1, z: z2 };
+      };
+
       // rings
       ctx.strokeStyle = ring;
       ctx.lineWidth = 1;
@@ -95,7 +106,8 @@
         ctx.beginPath();
         for (let k = 0; k <= 72; k++) {
           const a = (k / 72) * Math.PI * 2;
-          const p = this._project(r * Math.cos(a), r * Math.sin(a), 0);
+          const t = tilt(r * Math.cos(a), r * Math.sin(a), i);
+          const p = this._project(t.x, t.y, t.z);
           if (k === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
         }
         ctx.stroke();
@@ -108,7 +120,8 @@
         const speed = 0.55 / (i * 0.6 + 1);
         for (let j = 0; j < count; j++) {
           const a = (j / count) * Math.PI * 2 + this._t * speed + i * 0.7;
-          dots.push(this._project(r * Math.cos(a), r * Math.sin(a), 0));
+          const t = tilt(r * Math.cos(a), r * Math.sin(a), i);
+          dots.push(this._project(t.x, t.y, t.z));
         }
       });
       dots.sort((a, b) => a.z - b.z);

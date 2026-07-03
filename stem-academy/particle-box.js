@@ -40,11 +40,14 @@
     attributeChangedCallback() { /* read each frame */ }
 
     _lattice(i) {
-      // 7 x 6 grid centered
+      // compact packed block (not spanning the whole box) — reads as "solid" vs gas filling everything
       const cols = 7, rows = 6;
+      const spacing = 15; // tight, particle-diameter-ish spacing
+      const blockW = (cols - 1) * spacing, blockH = (rows - 1) * spacing;
+      const startX = this._w / 2 - blockW / 2;
+      const startY = this._h - 22 - blockH; // sits on the "floor" like a resting block
       const gx = i % cols, gy = Math.floor(i / cols);
-      const spx = (this._w - 40) / (cols - 1), spy = (this._h - 40) / (rows - 1);
-      return { x: 20 + gx * spx, y: 20 + gy * spy };
+      return { x: startX + gx * spacing, y: startY + gy * spacing };
     }
 
     _step(dt) {
@@ -55,8 +58,11 @@
           const L = this._lattice(i);
           const jx = Math.sin(this._t * 9 + p.phase) * 1.6;
           const jy = Math.cos(this._t * 8 + p.phase * 1.3) * 1.6;
-          p.x += ((L.x + jx) - p.x) * Math.min(dt * 6, 1);
-          p.y += ((L.y + jy) - p.y) * Math.min(dt * 6, 1);
+          // gentle ease-in to the lattice spot, so settling into a solid reads as
+          // a real animation rather than an instant snap
+          const settle = 1 - Math.exp(-dt * 1.8);
+          p.x += ((L.x + jx) - p.x) * settle;
+          p.y += ((L.y + jy) - p.y) * settle;
           p.vx = p.vy = 0;
         } else {
           const speed = st === "liquid" ? 26 : st === "gas" ? 95 : 170;

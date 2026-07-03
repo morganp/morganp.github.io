@@ -24,7 +24,7 @@
       <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
     </a>
     <div style="display: flex; align-items: center; gap: 20px;">
-      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;">CHEMISTRY / LEVEL L1–L2</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY / LEVEL L1–L2</a>
       <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
     </div>
   </div>
@@ -40,19 +40,22 @@
     <!-- three cards -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
       <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
-        <x-import component-from-global-scope="particle-diagram" from="./particle-diagram.js" kind="element" width="160" height="120" hint-size="160px,120px"></x-import>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; color: #e8590c; align-self: flex-start;">// FIG. 01 — ELEMENT PARTICLE DIAGRAM</div>
+        <x-import component-from-global-scope="particle-diagram" from="./particle-diagram.js" kind="element" width="200" height="188" hint-size="200px,188px"></x-import>
         <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px;">Element</div>
         <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; text-align: center; color: #554c42;">One type of atom only. Can't be broken into anything simpler. Every square on the periodic table is one.</div>
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156;">e.g. OXYGEN, GOLD, CARBON</div>
       </div>
       <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
-        <x-import component-from-global-scope="particle-diagram" from="./particle-diagram.js" kind="compound" width="160" height="120" hint-size="160px,120px"></x-import>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; color: #e8590c; align-self: flex-start;">// FIG. 02 — COMPOUND PARTICLE DIAGRAM</div>
+        <x-import component-from-global-scope="particle-diagram" from="./particle-diagram.js" kind="compound" width="200" height="168" hint-size="200px,168px"></x-import>
         <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px;">Compound</div>
         <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; text-align: center; color: #554c42;">Two or more elements <strong>chemically bonded</strong> in a fixed ratio. Only a reaction can pull it back apart.</div>
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156;">e.g. WATER (H₂O), SALT (NaCl)</div>
       </div>
       <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
-        <x-import component-from-global-scope="particle-diagram" from="./particle-diagram.js" kind="mixture" width="160" height="120" hint-size="160px,120px"></x-import>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; color: #e8590c; align-self: flex-start;">// FIG. 03 — MIXTURE PARTICLE DIAGRAM</div>
+        <x-import component-from-global-scope="particle-diagram" from="./particle-diagram.js" kind="mixture" width="200" height="168" hint-size="200px,168px"></x-import>
         <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px;">Mixture</div>
         <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; text-align: center; color: #554c42;">Substances <strong>jumbled together, not bonded</strong> — no fixed ratio. Easy to pull back apart with physical methods.</div>
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156;">e.g. AIR, SALAD, SEAWATER</div>
@@ -176,6 +179,12 @@ class Component extends DCLogic {
         { label: "MIXTURE BIN", items: bins.mixture },
       ],
       scoreText: done === 0 ? "CLICK E / C / M NEXT TO EACH SUBSTANCE TO SORT IT." : (done + "/" + total + " SORTED — " + correctCount + " CORRECT" + (done === total ? (correctCount === total ? "  PERFECT!" : "  — check the ✗ marks") : "")),
+      techniques: [
+        { name: "Filtration", property: "PARTICLE SIZE", text: "Pours a mixture through a filter — an insoluble solid stays behind while the liquid passes through." },
+        { name: "Evaporation", property: "BOILING POINT", text: "Heats a solution until the liquid boils away, leaving the dissolved solid behind (e.g. getting salt back from seawater)." },
+        { name: "Distillation", property: "BOILING POINT", text: "Boils a mixture and re-condenses the vapour — collects the liquid itself instead of just leaving the solid behind." },
+        { name: "Chromatography", property: "SOLUBILITY", text: "Different substances travel different distances up absorbent paper, separating out a mixture of dyes or inks." },
+      ],
     };
   }
 }

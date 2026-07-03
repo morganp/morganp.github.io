@@ -48,6 +48,16 @@
           <div onClick="{{ b.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 16px; border: 2px solid #2b2620; cursor: pointer; background: {{ b.bg }}; color: {{ b.fg }};">{{ b.label }}</div>
         </sc-for>
       </div>
+      <div style="position: relative; width: 620px; height: 230px;">
+        <x-import component-from-global-scope="state-fsm" from="./state-fsm.js" current="{{ selState }}" path="{{ pathAttr }}" width="620" height="230" hint-size="620px,230px"></x-import>
+        <sc-for list="{{ nodeOverlays }}" as="no" hint-placeholder-count="4">
+          <div onClick="{{ no.onClick }}" style="position: absolute; left: {{ no.x }}px; top: {{ no.y }}px; width: 60px; height: 60px; margin-left: -30px; margin-top: -30px; border-radius: 50%; cursor: pointer;"></div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;">CLICK A NODE OR A BUTTON TO CHANGE STATE</div>
+      <sc-if value="{{ hasPath }}" hint-placeholder-val="{{ false }}">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 700; color: #e8590c; text-align: center;">PATH TAKEN: {{ pathCaption }}</div>
+      </sc-if>
       <x-import component-from-global-scope="particle-box" from="./particle-box.js" state="{{ selState }}" width="480" height="240" hint-size="480px,240px"></x-import>
       <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156; text-align: center; max-width: 480px;">{{ stateCaption }}</div>
     </div>
@@ -116,10 +126,50 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { sel: 0 };
+  state = { sel: 0, path: [] };
 
   componentDidMount() {
     if (window.Progress) window.Progress.markVisited("states-of-matter");
+  }
+
+  edges = [
+    { id: "SL", a: "solid", b: "liquid", fwd: "MELTING", bwd: "FREEZING" },
+    { id: "LG", a: "liquid", b: "gas", fwd: "BOILING", bwd: "CONDENSING" },
+    { id: "GP", a: "gas", b: "plasma", fwd: "IONISATION", bwd: "RECOMBINATION" },
+    { id: "SG", a: "solid", b: "gas", fwd: "SUBLIMATION", bwd: "DEPOSITION" },
+  ];
+
+  findPath(fromKey, toKey) {
+    if (fromKey === toKey) return [];
+    const adj = {};
+    this.edges.forEach(e => {
+      (adj[e.a] = adj[e.a] || []).push({ to: e.b, edge: e, dir: "fwd" });
+      (adj[e.b] = adj[e.b] || []).push({ to: e.a, edge: e, dir: "bwd" });
+    });
+    const visited = { [fromKey]: true };
+    const queue = [[fromKey, []]];
+    while (queue.length) {
+      const [node, path] = queue.shift();
+      if (node === toKey) return path;
+      (adj[node] || []).forEach(link => {
+        if (!visited[link.to]) {
+          visited[link.to] = true;
+          queue.push([link.to, path.concat([{ id: link.edge.id, dir: link.dir, term: link.dir === "fwd" ? link.edge.fwd : link.edge.bwd }])]);
+        }
+      });
+    }
+    return [];
+  }
+
+  selectState(i, key) {
+    const prevKey = ["solid", "liquid", "gas", "plasma"][this.state.sel];
+    const path = this.findPath(prevKey, key);
+    this.setState({ sel: i, path });
+  }
+
+  selectStateByKey(key) {
+    const i = ["solid", "liquid", "gas", "plasma"].indexOf(key);
+    if (i >= 0) this.selectState(i, key);
   }
 
   renderVals() {
@@ -130,13 +180,23 @@ class Component extends DCLogic {
       { key: "plasma", label: "PLASMA", cap: "So energetic that electrons (small dark dots) have been ripped off the glowing charged atoms." },
     ];
     const s = states[this.state.sel];
+    const stateButtons = states.map((x, i) => ({
+      label: x.label,
+      bg: i === this.state.sel ? "#2b2620" : "#faf6ef",
+      fg: i === this.state.sel ? "#faf6ef" : "#2b2620",
+      onClick: () => this.selectState(i, x.key),
+    }));
+    const nodePositions = { solid: 78, liquid: 240, gas: 402, plasma: 564 };
+    const nodeOverlays = states.map((x, i) => ({
+      x: nodePositions[x.key], y: 78,
+      onClick: () => this.selectState(i, x.key),
+    }));
     return {
-      stateButtons: states.map((x, i) => ({
-        label: x.label,
-        bg: i === this.state.sel ? "#2b2620" : "#faf6ef",
-        fg: i === this.state.sel ? "#faf6ef" : "#2b2620",
-        onClick: () => this.setState({ sel: i }),
-      })),
+      stateButtons,
+      nodeOverlays,
+      pathAttr: this.state.path.map(p => p.id + ":" + p.dir).join(","),
+      hasPath: this.state.path.length > 0,
+      pathCaption: this.state.path.map(p => p.term).join(" → "),
       selState: s.key,
       stateCaption: s.cap,
       transitions: [
@@ -146,6 +206,7 @@ class Component extends DCLogic {
         { from: "GAS", to: "LIQUID", name: "Condensing", dir: "REMOVE ENERGY" },
         { from: "LIQUID", to: "SOLID", name: "Freezing", dir: "REMOVE ENERGY" },
         { from: "SOLID", to: "GAS", name: "Sublimation", dir: "SKIPS LIQUID" },
+        { from: "GAS", to: "SOLID", name: "Deposition", dir: "SKIPS LIQUID" },
       ],
     };
   }
