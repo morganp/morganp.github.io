@@ -96,4 +96,5 @@ WEBAPPS = [
     ('Fretdrom Editor', '/fretdrom-editor/'),
     ('AMBA Explorer', '/amba-explorer/'),
     ('OpenSCAD GUI', '/openscad-gui/'),
+    ('STEM Academy', '/stem-academy/'),
 ]
