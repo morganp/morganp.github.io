@@ -134,7 +134,7 @@
 
       <div style="padding: 14px 18px 10px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1.5px solid #2b2620; align-items: center;">
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c; align-self: flex-start;">// THE ATOM — ELECTRON SHELLS</div>
-        <x-import component-from-global-scope="atom-3d" from="./atom-3d.js" shells="{{ shellsAttr }}" symbol="{{ selSym }}" size="182" hint-size="182px,182px"></x-import>
+        <x-import component-from-global-scope="atom-3d" from="./atom-3d.js" shells="{{ shellsAttr }}" symbol="{{ selSym }}" protons="{{ selProtons }}" neutrons="{{ selNeutrons }}" size="182" hint-size="182px,182px"></x-import>
         <div style="display: flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">
           <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 9px; height: 9px; border-radius: 50%; background: #e8590c; display: inline-block;"></span>PROTON</span>
           <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 9px; height: 9px; border-radius: 50%; background: #a89d8e; display: inline-block;"></span>NEUTRON</span>
@@ -332,6 +332,8 @@ class Component extends DCLogic {
       selStateLabel: selEl ? selState.label.toUpperCase() + " AT " + tempK + " K" : "",
       selProps, shellRings, shellDots, shellConfig,
       shellsAttr: selEl ? selEl.sh.join(",") : "",
+      selProtons: selEl ? selEl.n : "",
+      selNeutrons: selEl ? Math.max(0, Math.round(selEl.m) - selEl.n) : "",
       selFact: selEl ? selEl.fact : "",
     };
   }

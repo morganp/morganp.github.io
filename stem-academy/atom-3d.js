@@ -2,7 +2,7 @@
 // attrs: shells="2,8,14,2"  symbol="Fe"  size="182"
 (function () {
   class Atom3D extends HTMLElement {
-    static get observedAttributes() { return ["shells", "symbol", "size"]; }
+    static get observedAttributes() { return ["shells", "symbol", "size", "protons", "neutrons"]; }
 
     constructor() {
       super();
@@ -87,15 +87,35 @@
       const rMin = 26, rMax = 92;
       const ink = "#2b2620", ring = "#c9c0b2", accent = "#e8590c";
 
-      // each shell's ring plane gets its own tilt so shells cross at angles
-      // (like real orbital planes) instead of sitting as flat parallel rings.
-      // outer/valence shells get more tilt — more "chaotic" orbit look.
+      // each shell's guide-ring plane gets its own tilt (like real orbital planes)
+      // — this is just the reference ring; electrons below get their OWN individual
+      // tilt so they don't all sit flush on one flat disc (no "rings of Saturn").
       const tilt = (x, y, i) => {
         const a = i * 0.85 + 0.3, b = i * 0.5;
         let y1 = y * Math.cos(a), z1 = y * Math.sin(a);
         let x2 = x * Math.cos(b) + z1 * Math.sin(b);
         let z2 = -x * Math.sin(b) + z1 * Math.cos(b);
         return { x: x2, y: y1, z: z2 };
+      };
+
+      // deterministic pseudo-random per electron: small individual wobble ON TOP of
+      // the shared shell-plane tilt, so electrons stay visibly attached to their
+      // shell's guide ring while still each rotating on a slightly different tilt
+      // (avoids both the flat "Saturn ring" look AND detaching from the shell).
+      const seeded = (k) => { const x = Math.sin(k * 999.7 + 12.9898) * 43758.5453; return x - Math.floor(x); };
+      const electronPoint = (r, a, shellIdx, elIdx) => {
+        const k = shellIdx * 131 + elIdx;
+        const wobble = (seeded(k * 1.7 + 0.3) - 0.5) * 0.5; // small extra inclination, radians
+        const wobbleNode = seeded(k * 3.1 + 1.2) * Math.PI * 2;
+        // start from the shell's shared orbital plane (same as its guide ring)…
+        const base = tilt(r * Math.cos(a), r * Math.sin(a), shellIdx);
+        // …then tip it slightly around a per-electron axis for individual variation.
+        const cn = Math.cos(wobbleNode), sn = Math.sin(wobbleNode);
+        const bx = base.x * cn + base.y * sn, by = -base.x * sn + base.y * cn, bz = base.z;
+        const by2 = by * Math.cos(wobble) - bz * Math.sin(wobble);
+        const bz2 = by * Math.sin(wobble) + bz * Math.cos(wobble);
+        const x2 = bx * cn - by2 * sn, y2 = bx * sn + by2 * cn;
+        return { x: x2, y: y2, z: bz2 };
       };
 
       // rings
@@ -120,7 +140,7 @@
         const speed = 0.55 / (i * 0.6 + 1);
         for (let j = 0; j < count; j++) {
           const a = (j / count) * Math.PI * 2 + this._t * speed + i * 0.7;
-          const t = tilt(r * Math.cos(a), r * Math.sin(a), i);
+          const t = electronPoint(r, a, i, j);
           dots.push(this._project(t.x, t.y, t.z));
         }
       });
@@ -137,23 +157,35 @@
 
       dots.filter(p => p.z < 0).forEach(drawDot);
 
-      // nucleus — packed proton/neutron cluster (protons orange, neutrons grey)
-      const protons = shells.reduce((a, b) => a + b, 0);
-      const nucleons = Math.min(protons * 2, 44); // representative cluster, capped for legibility
-      if (!this._cluster || this._clusterN !== nucleons) {
-        this._clusterN = nucleons;
+      // nucleus — packed proton/neutron cluster, sized from the REAL atom (protons attr,
+      // neutrons attr) rather than a generic guess, so different elements' nuclei actually differ.
+      // Every proton and neutron is drawn — no sampling/cap — so the nucleus visibly grows
+      // with atomic number/mass right up through the heaviest elements.
+      const realProtons = Number(this.getAttribute("protons"));
+      const realNeutrons = Number(this.getAttribute("neutrons"));
+      const protons = realProtons > 0 ? realProtons : shells.reduce((a, b) => a + b, 0);
+      const neutrons = realNeutrons >= 0 && this.hasAttribute("neutrons") ? realNeutrons : protons;
+      const totalNucleons = Math.max(protons + neutrons, 1);
+      const protonFrac = protons / totalNucleons;
+      // dot radius shrinks gently as the count climbs (so ~250 nucleons stay legible)
+      // but never collapses so much that the cluster's overall growth disappears.
+      const dotR = Math.max(2.6, 5.2 - Math.cbrt(totalNucleons) * 0.55);
+      // physically-correct close-packing radius: N spheres of radius dotR packed at
+      // ~74% density (real close-packing fraction) fill a sphere of radius R.
+      const R = dotR * Math.cbrt(totalNucleons / 0.74);
+      if (!this._cluster || this._clusterKey !== protons + "/" + neutrons) {
+        this._clusterKey = protons + "/" + neutrons;
         this._cluster = [];
-        const R = nucleons <= 2 ? 3.5 : 10.5;
         const GA = Math.PI * (3 - Math.sqrt(5));
-        for (let i = 0; i < nucleons; i++) {
-          const rr = R * Math.cbrt((i + 0.5) / nucleons);
-          const th = Math.acos(1 - 2 * ((i + 0.5) / nucleons));
+        for (let i = 0; i < totalNucleons; i++) {
+          const rr = R * Math.cbrt((i + 0.5) / totalNucleons);
+          const th = Math.acos(1 - 2 * ((i + 0.5) / totalNucleons));
           const ph = i * GA;
           this._cluster.push({
             x: rr * Math.sin(th) * Math.cos(ph),
             y: rr * Math.sin(th) * Math.sin(ph),
             z: rr * Math.cos(th),
-            proton: i % 2 === 0,
+            proton: i < Math.round(totalNucleons * protonFrac),
           });
         }
       }
@@ -165,7 +197,7 @@
       nucDots.sort((a, b) => a.z - b.z);
       nucDots.forEach((p) => {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 4.6 * p.s * (size / 200), 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, dotR * p.s * (size / 200), 0, Math.PI * 2);
         ctx.fillStyle = p.proton ? accent : "#a89d8e";
         ctx.fill();
         ctx.strokeStyle = "#faf6ef";
