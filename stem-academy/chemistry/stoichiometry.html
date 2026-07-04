@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Stoichiometry">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L4</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L4 — STOICHIOMETRY</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">The recipe maths of chemistry.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">A balanced equation is a recipe in ratios. Weigh out a reactant and the equation tells you — exactly — how much product you'll get. Turn the dial and follow every step of the calculation.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE REACTING-MASS CALCULATOR</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 13px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="border: 1.5px solid #2b2620; background: #faf6ef; padding: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 17px; text-align: center; font-weight: 600;">{{ equation }}</div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>MASS OF {{ givenName }}</span><span style="color: #e8590c;">{{ mass }} g</span></div>
+        <input type="range" min="1" max="100" step="1" value="{{ mass }}" onChange="{{ setMass }}" style="width: 100%;">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0; border: 1.5px solid #2b2620;">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+          <div style="display: flex; align-items: baseline; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #e6dfd2;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c; flex-shrink: 0; width: 54px;">{{ s.tag }}</span>
+            <span style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: #554c42; flex: 1;">{{ s.desc }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: #2b2620;">{{ s.val }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; background: #2b2620; color: #faf6ef; padding: 16px; font-family: 'IBM Plex Mono', monospace;">
+        <span style="font-size: 12px; opacity: 0.8;">YOU WILL MAKE</span>
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; color: #ff9d3c;">{{ answer }} g</span>
+        <span style="font-size: 12px; opacity: 0.8;">OF {{ findName }}</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE MOLE — CHEMISTRY'S COUNTING UNIT</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Atoms are far too small and too numerous to count one by one, so chemists count them in <strong>moles</strong>. One mole is <strong>6.02 × 10²³</strong> particles (Avogadro's number) — and, handily, one mole of any substance has a mass in grams equal to its relative formula mass (Mr). So 1 mol of water (Mr 18) weighs 18 g. The bridge between the lab (grams) and the equation (ratios) is one formula:</div>
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; text-align: center;">moles = mass (g) ÷ Mr</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE FOUR-STEP METHOD</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+        <sc-for list="{{ method }}" as="m" hint-placeholder-count="4">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px; color: #e8590c;">{{ m.n }}</div>
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px;">{{ m.title }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ m.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// CONCENTRATION &amp; SOLUTIONS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">For reactions in solution we measure amount as <strong>concentration</strong> — moles of solute per cubic decimetre of solution (mol/dm³, where 1 dm³ = 1 litre = 1000 cm³): <strong>concentration = moles ÷ volume</strong>. This is the backbone of titration calculations, where you find an unknown concentration by reacting it with a solution you already know.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// LIMITING REACTANTS &amp; YIELD</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">In a real reaction one reactant usually runs out first — the <strong>limiting reactant</strong> — and it alone decides how much product forms; the rest is left over in excess. And you rarely get every gram the maths predicts: the <strong>percentage yield</strong> compares what you actually made to the theoretical maximum, lost to spills, side-reactions and incomplete reactions.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="quantitative-chem.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Quantitative Chemistry (L3)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L4 / STOICHIOMETRY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { rxn: 0, mass: 24, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("stoichiometry");
+  }
+
+  _reactions() {
+    return [
+      { label: "MAGNESIUM BURNS", eq: "2 Mg  +  O₂  →  2 MgO", given: { name: "Mg", mr: 24, coef: 2 }, find: { name: "MgO", mr: 40, coef: 2 } },
+      { label: "LIMESTONE DECOMPOSES", eq: "CaCO₃  →  CaO  +  CO₂", given: { name: "CaCO₃", mr: 100, coef: 1 }, find: { name: "CO₂", mr: 44, coef: 1 } },
+      { label: "HABER PROCESS", eq: "N₂  +  3 H₂  →  2 NH₃", given: { name: "H₂", mr: 2, coef: 3 }, find: { name: "NH₃", mr: 17, coef: 2 } },
+      { label: "METHANE BURNS", eq: "CH₄  +  2 O₂  →  CO₂  +  2 H₂O", given: { name: "CH₄", mr: 16, coef: 1 }, find: { name: "CO₂", mr: 44, coef: 1 } },
+    ];
+  }
+
+  renderVals() {
+    const { rxn, mass } = this.state;
+    const rxns = this._reactions();
+    const r = rxns[rxn];
+    const molGiven = mass / r.given.mr;
+    const molFind = molGiven * (r.find.coef / r.given.coef);
+    const massFind = molFind * r.find.mr;
+
+    const tabs = rxns.map((x, i) => ({
+      label: x.label,
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [i]: true };
+        if (window.Progress && Object.keys(tried2).length >= 3) window.Progress.markCompleted("stoichiometry");
+        return { rxn: i, tried: tried2 };
+      }),
+      bg: rxn === i ? "#2b2620" : "#faf6ef",
+      fg: rxn === i ? "#faf6ef" : "#2b2620",
+    }));
+
+    return {
+      equation: r.eq, mass,
+      givenName: r.given.name, findName: r.find.name,
+      answer: massFind.toFixed(1),
+      setMass: (e) => this.setState({ mass: Number(e.target.value) }),
+      tabs,
+      steps: [
+        { tag: "STEP 1", desc: "moles of " + r.given.name + " = mass ÷ Mr = " + mass + " ÷ " + r.given.mr, val: molGiven.toFixed(3) + " mol" },
+        { tag: "STEP 2", desc: "ratio from equation: " + r.given.coef + " " + r.given.name + " → " + r.find.coef + " " + r.find.name, val: "× " + (r.find.coef / r.given.coef).toFixed(2) },
+        { tag: "STEP 3", desc: "moles of " + r.find.name + " = " + molGiven.toFixed(3) + " × " + (r.find.coef / r.given.coef).toFixed(2), val: molFind.toFixed(3) + " mol" },
+        { tag: "STEP 4", desc: "mass of " + r.find.name + " = moles × Mr = " + molFind.toFixed(3) + " × " + r.find.mr, val: massFind.toFixed(1) + " g" },
+      ],
+      method: [
+        { n: "1", title: "Balance & moles", text: "Write the balanced equation, then convert the known mass to moles (mass ÷ Mr)." },
+        { n: "2", title: "Use the ratio", text: "Multiply by the mole ratio from the big numbers in the equation." },
+        { n: "3", title: "Back to grams", text: "Convert your answer in moles back to a mass (moles × Mr)." },
+        { n: "4", title: "Sanity check", text: "Mass is conserved — total mass of reactants equals total mass of products." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

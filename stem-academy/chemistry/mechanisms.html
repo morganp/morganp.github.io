@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Organic Mechanisms">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L5</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L5 — ORGANIC MECHANISMS</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Follow the electrons, one arrow at a time.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">A mechanism is the story of a reaction told through moving electrons. Pick a reaction type and step through it — every stage shows exactly which bonds break, which form, and where the electron pairs go.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — MECHANISM PLAYER</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 12px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; background: #faf6ef; border: 1.5px solid #2b2620; padding: 10px 12px;">{{ equation }}</div>
+
+      <div style="border: 2px solid #2b2620; background: #fbf8f2; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-height: 190px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; padding: 3px 9px; border: 1.5px solid #2b2620; background: #e8590c; color: #faf6ef;">{{ stepTag }}</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">{{ stepLabel }}</span>
+        </div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 27px; letter-spacing: -0.01em; line-height: 1.2; text-wrap: balance;">{{ species }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; line-height: 1.6; color: #3a332b;">{{ move }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.5; color: #6b6156; border-top: 1px dashed #d8d0c4; padding-top: 10px;">▸ {{ note }}</div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div onClick="{{ prevOnClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 2px solid #2b2620; cursor: pointer; background: {{ prevBg }}; color: {{ prevFg }};">← PREV</div>
+        <div style="display: flex; gap: 6px; flex: 1; justify-content: center;">
+          <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+            <div onClick="{{ d.onClick }}" style="width: 12px; height: 12px; border: 1.5px solid #2b2620; background: {{ d.bg }}; cursor: pointer;"></div>
+          </sc-for>
+        </div>
+        <div onClick="{{ nextOnClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 2px solid #2b2620; cursor: pointer; background: {{ nextBg }}; color: {{ nextFg }};">NEXT →</div>
+      </div>
+
+      <div style="border-top: 1.5px solid #2b2620; padding-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #6b6156;">LEGEND — MECHANISM NOTATION</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 6px 16px;">
+          <sc-for list="{{ legend }}" as="g" hint-placeholder-count="4">
+            <div style="display: flex; align-items: baseline; gap: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; color: #554c42;"><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #e8590c; min-width: 34px;">{{ g.sym }}</span>{{ g.text }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// HOMOLYTIC vs HETEROLYTIC — TWO WAYS TO BREAK A BOND</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">When a covalent bond breaks, its shared pair of electrons has to go somewhere. In <strong>homolytic fission</strong> the bond splits evenly — each atom keeps one electron, giving two <strong>radicals</strong>. In <strong>heterolytic fission</strong> one atom takes both electrons, giving a positive and a negative ion. Radical mechanisms use homolytic fission; ionic mechanisms (like electrophilic addition and nucleophilic substitution) use heterolytic fission.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE CAST OF CHARACTERS</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <sc-for list="{{ cast }}" as="c" hint-placeholder-count="4">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 15px; color: #e8590c;">{{ c.name }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ c.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// WHY MECHANISMS MATTER</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Knowing the mechanism lets you <strong>predict</strong> what a new molecule will do, not just memorise reactions. It explains why a reaction needs UV light, why one product forms and not another, and why some reactions happen in one step (SN2) while others go through an intermediate (SN1). The curly arrow — always drawn from a lone pair or a bond to where the electrons end up — is the single most useful tool in organic chemistry.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="further-organic.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Further Organic (L4)</a>
+      <a href="aromatic.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Aromatic Chemistry (L5)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L5 / ORGANIC MECHANISMS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mech: "radical", step: 0, seen: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("mechanisms");
+  }
+
+  _data() {
+    return {
+      radical: {
+        label: "Free-radical substitution",
+        equation: "CH₄ + Cl₂ → CH₃Cl + HCl   (needs UV light)",
+        steps: [
+          { tag: "INITIATION", species: "Cl₂ → 2 Cl•", move: "UV light supplies the energy to break the Cl–Cl bond evenly (homolytic fission). Each chlorine keeps one electron, so two chlorine radicals form.", note: "A radical (•) has a single unpaired electron and is highly reactive." },
+          { tag: "PROPAGATION 1", species: "Cl• + CH₄ → •CH₃ + HCl", move: "A chlorine radical pulls a hydrogen atom off methane, making HCl and a methyl radical. A radical is used up, but a new one is made.", note: "One radical in, one radical out — the chain keeps going." },
+          { tag: "PROPAGATION 2", species: "•CH₃ + Cl₂ → CH₃Cl + Cl•", move: "The methyl radical grabs a chlorine atom from Cl₂, forming chloromethane and regenerating a chlorine radical.", note: "The fresh Cl• restarts propagation — this is why it's a chain reaction." },
+          { tag: "TERMINATION", species: "•CH₃ + Cl• → CH₃Cl", move: "Two radicals collide and pair up their unpaired electrons, forming a stable molecule and ending that chain.", note: "Termination mops up radicals (e.g. 2 Cl• → Cl₂ as well), so the reaction slows and stops." },
+        ],
+      },
+      addition: {
+        label: "Electrophilic addition",
+        equation: "CH₂=CH₂ + HBr → CH₃CH₂Br",
+        steps: [
+          { tag: "POLARISATION", species: "C=C   +   H–Br  (Hᵟ⁺–Brᵟ⁻)", move: "The C=C double bond is a region of high electron density. It repels the shared pair in H–Br toward the bromine, so the hydrogen becomes slightly positive (δ+).", note: "δ+ / δ- mark a polar bond: the electrons are shared unequally." },
+          { tag: "ELECTROPHILE ATTACKS", species: "→ CH₃–CH₂⁺   +   Br⁻", move: "The π electrons of the double bond swing across to the δ+ hydrogen (curly arrow). H–Br breaks heterolytically — both electrons go to bromine, releasing a bromide ion.", note: "This leaves a carbocation: a carbon carrying a full positive charge." },
+          { tag: "NUCLEOPHILE ADDS", species: "CH₃–CH₂⁺ + Br⁻ → CH₃CH₂Br", move: "A lone pair on the bromide ion attacks the positive carbon (curly arrow), forming the new C–Br bond.", note: "Product: bromoethane. The double bond is now a single bond — atoms have been added across it." },
+        ],
+      },
+      substitution: {
+        label: "Nucleophilic substitution (SN2)",
+        equation: "CH₃CH₂Br + OH⁻ → CH₃CH₂OH + Br⁻",
+        steps: [
+          { tag: "POLAR BOND", species: "Cᵟ⁺–Brᵟ⁻", move: "Bromine is more electronegative than carbon, so the C–Br bond is polar: the carbon carries a δ+ charge.", note: "That δ+ carbon is the target — nucleophiles attack electron-poor atoms." },
+          { tag: "NUCLEOPHILE ATTACKS", species: "HO⁻ →  C  ← Br", move: "A lone pair on hydroxide attacks the δ+ carbon from the side directly opposite bromine (curly arrow). As the C–O bond starts to form, the C–Br bond starts to break.", note: "In SN2, bond-making and bond-breaking happen together in a single step." },
+          { tag: "LEAVING GROUP GOES", species: "→ CH₃CH₂OH + Br⁻", move: "Bromide departs taking both bonding electrons, becoming a bromide ion. Ethanol is left behind.", note: "The carbon centre inverts — like an umbrella flipping in the wind." },
+        ],
+      },
+    };
+  }
+
+  _order() { return ["radical", "addition", "substitution"]; }
+
+  _go(step) {
+    const d = this._data()[this.state.mech];
+    const clamped = Math.max(0, Math.min(d.steps.length - 1, step));
+    this.setState(st => {
+      const seen = { ...st.seen };
+      if (clamped === d.steps.length - 1) {
+        seen[st.mech] = true;
+        if (window.Progress && Object.keys(seen).length >= 2) window.Progress.markCompleted("mechanisms");
+      }
+      return { step: clamped, seen };
+    });
+  }
+
+  renderVals() {
+    const data = this._data();
+    const cur = data[this.state.mech];
+    const s = cur.steps[this.state.step];
+    const n = cur.steps.length;
+    const atStart = this.state.step === 0;
+    const atEnd = this.state.step === n - 1;
+
+    const tabs = this._order().map(key => ({
+      label: data[key].label,
+      onClick: () => this.setState({ mech: key, step: 0 }),
+      bg: this.state.mech === key ? "#2b2620" : "#faf6ef",
+      fg: this.state.mech === key ? "#faf6ef" : "#2b2620",
+    }));
+
+    const dots = cur.steps.map((_, i) => ({
+      onClick: () => this._go(i),
+      bg: i === this.state.step ? "#e8590c" : (i < this.state.step ? "#c9c0b2" : "#fff"),
+    }));
+
+    return {
+      tabs,
+      equation: cur.equation,
+      stepTag: s.tag,
+      species: s.species,
+      move: s.move,
+      note: s.note,
+      stepLabel: "STEP " + (this.state.step + 1) + " / " + n,
+      dots,
+      prevOnClick: () => this._go(this.state.step - 1),
+      nextOnClick: () => this._go(this.state.step + 1),
+      prevBg: atStart ? "#efe9de" : "#faf6ef", prevFg: atStart ? "#b3a998" : "#2b2620",
+      nextBg: atEnd ? "#efe9de" : "#e8590c", nextFg: atEnd ? "#b3a998" : "#faf6ef",
+      legend: [
+        { sym: "•", text: "an unpaired electron — marks a radical" },
+        { sym: "δ+ / δ-", text: "partial charges on a polarised bond" },
+        { sym: "curly arrow", text: "movement of a pair of electrons" },
+        { sym: "⁺ / ⁻", text: "a full charge on an ion" },
+      ],
+      cast: [
+        { name: "Radical", text: "A species with an unpaired electron (•). Very reactive; drives chain reactions under UV light." },
+        { name: "Electrophile", text: "\"Electron-loving\" — an electron-poor species (often δ+ or +) that accepts a pair of electrons." },
+        { name: "Nucleophile", text: "\"Nucleus-loving\" — an electron-rich species with a lone pair (OH⁻, NH₃, CN⁻) that donates electrons." },
+        { name: "Carbocation", text: "A carbon with only three bonds and a positive charge. An unstable intermediate in ionic mechanisms." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

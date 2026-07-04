@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Acid Base Equilibria">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L5</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L5 — ACID-BASE EQUILIBRIA</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Strong, weak, and the maths of pH.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">A strong acid fully ionises; a weak acid barely bothers. That single difference reshapes the pH — and Ka puts a precise number on it. Pick an acid, set the concentration, and compute its pH.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE pH CALCULATOR</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 12px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 130px; border: 1.5px solid #2b2620; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="color: #6b6156; font-size: 10px; display: block;">STRENGTH</span><b style="font-size: 14px;">{{ strength }}</b></div>
+        <div style="flex: 1; min-width: 130px; border: 1.5px solid #2b2620; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="color: #6b6156; font-size: 10px; display: block;">Ka</span><b style="font-size: 14px;">{{ kaLabel }}</b></div>
+        <div style="flex: 1; min-width: 130px; border: 1.5px solid #2b2620; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="color: #6b6156; font-size: 10px; display: block;">pKa</span><b style="font-size: 14px;">{{ pkaLabel }}</b></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>CONCENTRATION</span><span style="color: #e8590c;">{{ concLabel }} mol/dm³</span></div>
+        <input type="range" min="-3" max="0" step="0.1" value="{{ logc }}" onChange="{{ setLogc }}" style="width: 100%;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;"><span>0.001 (dilute)</span><span>1.0 (concentrated)</span></div>
+      </div>
+
+      <div style="border: 1.5px solid #2b2620; background: #faf6ef; padding: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-align: center;">{{ formula }}</div>
+
+      <div style="position: relative; height: 30px; border: 2px solid #2b2620; background: linear-gradient(90deg,#b2182b,#ef8a62,#fddbc7,#78c679,#7fbf7f,#74a9cf,#453782);">
+        <div style="position: absolute; top: -7px; left: {{ phPct }}%; transform: translateX(-50%); width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 9px solid #2b2620;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #a89d8e;"><span>0</span><span>7</span><span>14</span></div>
+
+      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; background: #2b2620; color: #faf6ef; padding: 16px; font-family: 'IBM Plex Mono', monospace;">
+        <span style="font-size: 12px; opacity: 0.85;">pH =</span>
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; color: #ff9d3c;">{{ ph }}</span>
+        <span style="font-size: 12px;">[H⁺] ≈ {{ hplus }} mol/dm³</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// STRONG vs WEAK</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Don't confuse <strong>strong</strong> with <strong>concentrated</strong>. Strength is about how <em>fully</em> an acid ionises. A <strong>strong acid</strong> (HCl, H₂SO₄, HNO₃) ionises completely — every molecule gives up its H⁺ — so [H⁺] equals the concentration. A <strong>weak acid</strong> (ethanoic, carbonic) sets up an equilibrium and only a tiny fraction ionises, so [H⁺] is much smaller and the pH is higher. Switch between HCl and ethanoic acid above at the same concentration to see the pH jump by two whole units.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// Ka AND pKa</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">For a weak acid HA ⇌ H⁺ + A⁻, the acid dissociation constant is <strong>Ka = [H⁺][A⁻] ÷ [HA]</strong>. A bigger Ka means more ionisation — a stronger weak acid. Because the numbers are tiny and awkward, we usually quote <strong>pKa = −log Ka</strong>: now a <em>smaller</em> pKa means a stronger acid. For a weak acid, [H⁺] ≈ √(Ka × concentration), which is the sum running in the calculator above.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// BUFFERS — RESISTING CHANGE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">A <strong>buffer</strong> is a solution that barely changes pH when small amounts of acid or alkali are added. It's made from a weak acid together with its conjugate base (e.g. ethanoic acid + sodium ethanoate). The weak acid mops up added OH⁻; the conjugate base mops up added H⁺ — so the equilibrium shifts to soak up the shock. Your blood is buffered by carbonic acid and hydrogencarbonate to hold its pH near 7.4; stray far from that and cells stop working. That's acid-base equilibria keeping you alive.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="salts.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Acids, Bases &amp; Salts (L3)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L5 / ACID-BASE EQUILIBRIA</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { acid: 1, logc: -1, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("acid-base-equilibria");
+  }
+
+  _acids() {
+    return [
+      { label: "HYDROCHLORIC (strong)", name: "HCl", strong: true, ka: null, pka: null },
+      { label: "ETHANOIC (weak)", name: "CH₃COOH", strong: false, ka: 1.74e-5, pka: 4.76 },
+      { label: "METHANOIC (weak)", name: "HCOOH", strong: false, ka: 1.8e-4, pka: 3.75 },
+      { label: "CARBONIC (weak)", name: "H₂CO₃", strong: false, ka: 4.3e-7, pka: 6.37 },
+    ];
+  }
+
+  renderVals() {
+    const { acid, logc } = this.state;
+    const a = this._acids()[acid];
+    const c = Math.pow(10, logc);
+    let hplus, ph, formula;
+    if (a.strong) {
+      hplus = c; ph = -Math.log10(hplus);
+      formula = "Strong acid: [H⁺] = concentration = " + c.toFixed(3) + "  →  pH = −log[H⁺]";
+    } else {
+      hplus = Math.sqrt(a.ka * c);
+      ph = -Math.log10(hplus);
+      formula = "Weak acid: [H⁺] = √(Ka × c) = √(" + a.ka.toExponential(1) + " × " + c.toFixed(3) + ")";
+    }
+    const phPct = Math.max(0, Math.min(100, ph / 14 * 100));
+
+    const tabs = this._acids().map((x, i) => ({
+      label: x.label,
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [i]: true };
+        if (window.Progress && Object.keys(tried2).length >= 3) window.Progress.markCompleted("acid-base-equilibria");
+        return { acid: i, tried: tried2 };
+      }),
+      bg: acid === i ? "#2b2620" : "#faf6ef",
+      fg: acid === i ? "#faf6ef" : "#2b2620",
+    }));
+
+    return {
+      tabs, logc,
+      concLabel: c.toFixed(3),
+      strength: a.strong ? "STRONG (fully ionised)" : "WEAK (partly ionised)",
+      kaLabel: a.ka == null ? "very large" : a.ka.toExponential(1),
+      pkaLabel: a.pka == null ? "< 0" : a.pka.toFixed(2),
+      setLogc: (e) => this.setState({ logc: Number(e.target.value) }),
+      formula,
+      ph: ph.toFixed(2),
+      hplus: hplus.toExponential(1),
+      phPct,
+    };
+  }
+}
+</script>
+</body>
+</html>

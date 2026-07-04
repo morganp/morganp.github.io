@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Further Organic">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L4</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L4 — FURTHER ORGANIC</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Same backbone, different endings.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Swap a hydrogen on a carbon chain for an –OH and you've made an alcohol; add another twist and you've got acids and the fruity-smelling esters. React an acid with an alcohol below and name the ester you make.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE ESTERIFICATION BENCH</div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156;">CARBOXYLIC ACID</div>
+          <sc-for list="{{ acidTabs }}" as="t" hint-placeholder-count="3">
+            <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 12px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156;">ALCOHOL</div>
+          <sc-for list="{{ alcoholTabs }}" as="t" hint-placeholder-count="3">
+            <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 12px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="border: 1.5px solid #2b2620; background: #faf6ef; padding: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; text-align: center; line-height: 1.8;">{{ reaction }}</div>
+
+      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; background: #2b2620; color: #faf6ef; padding: 16px; font-family: 'IBM Plex Mono', monospace;">
+        <span style="font-size: 12px; opacity: 0.85;">YOU MADE THE ESTER</span>
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px; color: #ff9d3c;">{{ esterName }}</span>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">{{ smell }} A drop of concentrated sulfuric acid catalyses the reaction, and the water is pulled out from the acid's –OH and the alcohol's –H.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE FUNCTIONAL GROUPS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">A <strong>functional group</strong> is the reactive part of a molecule — the bit that decides how it behaves. Molecules sharing a functional group form a <strong>homologous series</strong>: same general formula, similar reactions, gradually changing physical properties as the chain grows.</div>
+      <div style="display: flex; flex-direction: column; gap: 0; border: 1.5px solid #2b2620;">
+        <sc-for list="{{ groups }}" as="g" hint-placeholder-count="4">
+          <div style="display: grid; grid-template-columns: 130px 90px 1fr; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #e6dfd2; align-items: center;">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px; color: #e8590c;">{{ g.name }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;">{{ g.group }}</span>
+            <span style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #554c42;">{{ g.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// ALCOHOLS — THE VERSATILE MIDDLE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Alcohols (like <strong>ethanol</strong>, the one in drinks and hand-sanitiser) contain the <strong>–OH</strong> group. They burn cleanly as fuels, dissolve things water can't, and — crucially — can be <strong>oxidised</strong>: gentle oxidation turns a primary alcohol into a carboxylic acid (this is exactly what turns wine into vinegar as it goes off). That makes alcohols a key stepping-stone in building bigger molecules.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// ESTERS — SMELLS &amp; MATERIALS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Esters form when a carboxylic acid reacts with an alcohol (the reaction you ran above). Small esters are volatile and <strong>sweet-smelling</strong> — they give fruits their scent and are used in perfumes and flavourings. Chain many ester links together and you get <strong>polyesters</strong>: the plastic in drink bottles and clothing fibres.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="organic-intro.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Organic Intro (L3)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L4 / FURTHER ORGANIC</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { acid: 1, alcohol: 1, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("further-organic");
+  }
+
+  renderVals() {
+    const acids = [
+      { label: "Methanoic acid", formula: "HCOOH", oate: "methanoate" },
+      { label: "Ethanoic acid", formula: "CH₃COOH", oate: "ethanoate" },
+      { label: "Propanoic acid", formula: "C₂H₅COOH", oate: "propanoate" },
+    ];
+    const alcohols = [
+      { label: "Methanol", formula: "CH₃OH", alkyl: "methyl", smell: "Methyl esters tend to smell sharp and solventy." },
+      { label: "Ethanol", formula: "C₂H₅OH", alkyl: "ethyl", smell: "Ethyl esters often smell fruity — ethyl ethanoate has a pear-drop/nail-varnish scent." },
+      { label: "Propan-1-ol", formula: "C₃H₇OH", alkyl: "propyl", smell: "Propyl esters carry sweet, fruity aromas used in flavourings." },
+    ];
+    const { acid, alcohol } = this.state;
+    const a = acids[acid], al = alcohols[alcohol];
+    const esterName = al.alkyl + " " + a.oate;
+
+    const mk = (key, arr) => arr.map((x, i) => ({
+      label: x.label,
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [key + i]: true };
+        if (window.Progress && Object.keys(tried2).length >= 4) window.Progress.markCompleted("further-organic");
+        return { [key]: i, tried: tried2 };
+      }),
+      bg: this.state[key] === i ? "#2b2620" : "#faf6ef",
+      fg: this.state[key] === i ? "#faf6ef" : "#2b2620",
+    }));
+
+    return {
+      acidTabs: mk("acid", acids),
+      alcoholTabs: mk("alcohol", alcohols),
+      reaction: a.formula + "  +  " + al.formula + "   ⇌   " + esterName + "   +   H₂O",
+      esterName,
+      smell: al.smell,
+      groups: [
+        { name: "Alkanes", group: "C–C, C–H", text: "Saturated hydrocarbons (single bonds only). Fuels — unreactive, burn well. e.g. methane, propane." },
+        { name: "Alkenes", group: "C=C", text: "A reactive double bond. Used to make polymers; decolourise bromine water. e.g. ethene." },
+        { name: "Alcohols", group: "–OH", text: "Fuels and solvents; oxidise to acids. e.g. ethanol, methanol." },
+        { name: "Carboxylic acids", group: "–COOH", text: "Weak acids — sour taste of vinegar. React with alcohols to form esters. e.g. ethanoic acid." },
+        { name: "Esters", group: "–COO–", text: "Sweet, fruity smells; perfumes, flavours, polyesters. e.g. ethyl ethanoate." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

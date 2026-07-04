@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Kinetics">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L5</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L5 — KINETICS</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">How fast, and what controls it.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">The rate equation is a reaction's fingerprint — found only by experiment, never from the equation. Change the order and watch how doubling a concentration reshapes the rate.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — RATE vs CONCENTRATION</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">ORDER w.r.t. [A]:</span>
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>CONCENTRATION [A]</span><span style="color: #e8590c;">{{ concLabel }} mol/dm³</span></div>
+        <input type="range" min="0.05" max="1" step="0.05" value="{{ conc }}" onChange="{{ setConc }}" style="width: 100%;">
+      </div>
+
+      <div style="display: flex; justify-content: center;">
+        <x-import component-from-global-scope="rate-plot" from="../lib/rate-plot.js" order="{{ order }}" conc="{{ conc }}" width="740" height="300" hint-size="740px,300px"></x-import>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">{{ blurb }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE RATE EQUATION</div>
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 17px; text-align: center;">rate = k [A]ᵐ [B]ⁿ</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The powers <strong>m</strong> and <strong>n</strong> are the <strong>orders</strong> of reaction with respect to each reactant, and their sum is the <strong>overall order</strong>. Crucially, they are <em>not</em> the numbers in the balanced equation — you can only find them by experiment, by changing one concentration at a time and measuring what happens to the rate. <strong>k</strong> is the rate constant, fixed at a given temperature.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// READING THE ORDER</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+        <sc-for list="{{ orders }}" as="o" hint-placeholder-count="3">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 15px; color: #e8590c;">{{ o.name }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">{{ o.shape }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ o.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE RATE-DETERMINING STEP</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Most reactions happen in several steps (a <strong>mechanism</strong>). The whole thing can only go as fast as its slowest step — the <strong>rate-determining step</strong> — like a checkout queue moving at the pace of its slowest till. Only the reactants involved up to and including that slow step appear in the rate equation. That's the powerful link between kinetics and mechanism: the rate equation is direct evidence for how a reaction actually proceeds.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE ARRHENIUS EQUATION — TEMPERATURE &amp; k</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Raising the temperature speeds reactions up because the rate constant k itself grows. The <strong>Arrhenius equation, k = Ae^(−Eₐ/RT)</strong>, captures it: a higher activation energy Eₐ means a smaller k (slower reaction), and a higher temperature T means a larger k. A rough rule of thumb: a 10 °C rise roughly doubles the rate — a huge effect from a small change, because it lifts far more molecules over the activation-energy barrier.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="rates-of-reaction.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Rates of Reaction (L3)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L5 / KINETICS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { order: 1, conc: 0.5, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("kinetics");
+  }
+
+  renderVals() {
+    const { order, conc } = this.state;
+    const tabs = [0, 1, 2].map(o => ({
+      label: o === 0 ? "ZERO" : o === 1 ? "FIRST" : "SECOND",
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [o]: true };
+        if (window.Progress && Object.keys(tried2).length >= 3) window.Progress.markCompleted("kinetics");
+        return { order: o, tried: tried2 };
+      }),
+      bg: order === o ? "#2b2620" : "#faf6ef",
+      fg: order === o ? "#faf6ef" : "#2b2620",
+    }));
+    const blurbs = {
+      0: "Zero order: the rate is completely independent of [A] — a flat line. Doubling the concentration does nothing. (Common when a surface or catalyst is saturated.)",
+      1: "First order: rate is directly proportional to [A] — a straight line through the origin. Double [A], double the rate.",
+      2: "Second order: rate depends on [A]² — an upward curve. Double [A] and the rate quadruples.",
+    };
+    return {
+      order, conc, concLabel: conc.toFixed(2), tabs, blurb: blurbs[order],
+      setConc: (e) => this.setState({ conc: Number(e.target.value) }),
+      orders: [
+        { name: "Zero order", shape: "flat line", text: "Rate = k. Independent of concentration — doubling [A] changes nothing." },
+        { name: "First order", shape: "straight line", text: "Rate = k[A]. Proportional — double [A], double the rate. Constant half-life." },
+        { name: "Second order", shape: "upward curve", text: "Rate = k[A]². Double [A] and the rate quadruples (2² = 4)." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

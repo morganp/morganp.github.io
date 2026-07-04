@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Radioactivity">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="physics.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">PHYSICS</a> / LEVEL L3</span>
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← PHYSICS MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// PHYSICS 10 — LEVEL L3</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Unstable atoms, ticking down.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Some atomic nuclei are unstable and fall apart at random — but a huge pile of them decays with clockwork regularity. Watch 400 nuclei halve, again and again, on a fixed schedule.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE DECAY CHAMBER</div>
+
+      <div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 220px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>HALF-LIFE</span><span style="color: #e8590c;">{{ halflife }} s</span></div>
+          <input type="range" min="2" max="14" step="1" value="{{ halflife }}" onChange="{{ setHalflife }}" style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;"><span>FAST (unstable)</span><span>SLOW (stable-ish)</span></div>
+        </div>
+        <div onClick="{{ reset }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 18px; border: 2px solid #2b2620; cursor: pointer; background: #faf6ef;" style-hover="background: #2b2620; color: #faf6ef;">↻ FRESH SAMPLE</div>
+      </div>
+
+      <div style="display: flex; justify-content: center;">
+        <x-import component-from-global-scope="decay-sim" from="../lib/decay-sim.js" halflife="{{ halflife }}" resetkey="{{ resetKey }}" width="760" height="320" hint-size="760px,320px"></x-import>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">Every nucleus decays at a random moment — but the crowd always halves each half-life. That's why the count is so predictable.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — WHY SOME ATOMS ARE UNSTABLE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The nucleus is a tight ball of protons and neutrons. In some atoms the balance is wrong — too many neutrons, or simply too many particles crammed together — and the nucleus is <strong>unstable</strong>. Sooner or later it throws out a chunk of itself as <strong>radiation</strong> to become more stable, turning into a different (<em>daughter</em>) nucleus. We can't predict <em>when</em> any single atom will go, only the odds — which is why decay is a game of probability. <em>(For a refresher on what's inside the nucleus, see Chemistry → Electron Shells.)</em></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — THREE TYPES OF RADIATION</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <sc-for list="{{ radiation }}" as="r" hint-placeholder-count="3">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 18px; color: #e8590c;">{{ r.name }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156;">{{ r.what }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ r.text }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2b2620; margin-top: auto; border-top: 1px solid #d8d0c4; padding-top: 6px;">STOPPED BY: {{ r.stop }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — HALF-LIFE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The <strong>half-life</strong> is the time it takes for half the unstable nuclei in a sample to decay. After one half-life, 50% are left; after two, 25%; after three, 12.5% — halving every time, never quite reaching zero. Half-lives range wildly: some isotopes last fractions of a second, uranium-238 takes 4.5 billion years. This clock is what lets us <strong>carbon-date</strong> ancient bones and run <strong>nuclear power</strong> and medical scans safely.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Physics map →</a>
+      <a href="../chemistry/electron-shells.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Inside the atom</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>PHYSICS 10 / RADIOACTIVITY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { halflife: 6, resetKey: 0, moved: 0 };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("radioactivity");
+  }
+
+  renderVals() {
+    const { halflife, resetKey } = this.state;
+    return {
+      halflife, resetKey,
+      setHalflife: (e) => this.setState(s => {
+        const moved = s.moved + 1;
+        if (window.Progress && moved >= 2) window.Progress.markCompleted("radioactivity");
+        return { halflife: Number(e.target.value), resetKey: s.resetKey + 1, moved };
+      }),
+      reset: () => this.setState(s => ({ resetKey: s.resetKey + 1 })),
+      radiation: [
+        { name: "Alpha (α)", what: "2 protons + 2 neutrons", text: "A heavy, slow, strongly-charged particle. Very ionising but not very penetrating.", stop: "a sheet of paper / skin" },
+        { name: "Beta (β)", what: "a fast electron", text: "Light and quick, thrown out when a neutron turns into a proton. Medium range.", stop: "a few mm of aluminium" },
+        { name: "Gamma (γ)", what: "high-energy EM wave", text: "No mass, no charge — pure energy. Weakly ionising but extremely penetrating.", stop: "thick lead or concrete" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Electrochemistry">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L5</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L5 — ELECTROCHEMISTRY</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Build a battery from two metals.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Connect two different metals in their salt solutions and electrons flow — that's a cell. The bigger the gap in their electrode potentials, the bigger the voltage. Pick two and read the EMF.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE CELL BUILDER</div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156;">ELECTRODE A</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <sc-for list="{{ tabsA }}" as="t" hint-placeholder-count="6">
+              <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 7px 10px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156;">ELECTRODE B</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <sc-for list="{{ tabsB }}" as="t" hint-placeholder-count="6">
+              <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 7px 10px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: stretch; gap: 0; border: 2px solid #2b2620; min-height: 150px;">
+        <div style="flex: 1; background: #f3d6d0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px; border-right: 1.5px solid #2b2620;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620;">{{ negTerm }} TERMINAL (−)</div>
+          <div style="width: 40px; height: 60px; background: #b8b0a3; border: 2px solid #2b2620;"></div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 20px;">{{ negMetal }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #c0392b;">OXIDATION (loses e⁻)</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-align: center;">{{ negHalf }}</div>
+        </div>
+        <div style="flex: 1; background: #cde3d3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620;">{{ posTerm }} TERMINAL (+)</div>
+          <div style="width: 40px; height: 60px; background: #c99a5a; border: 2px solid #2b2620;"></div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 20px;">{{ posMetal }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #2a5d8f;">REDUCTION (gains e⁻)</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-align: center;">{{ posHalf }}</div>
+        </div>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156; text-align: center;">electrons flow through the wire {{ negMetal }} → {{ posMetal }} · a salt bridge completes the circuit</div>
+
+      <div style="border: 1.5px solid #2b2620; background: #faf6ef; padding: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-align: center;">E°cell = E°(+) − E°(−) = ({{ posE }}) − ({{ negE }})</div>
+
+      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; background: #2b2620; color: #faf6ef; padding: 16px; font-family: 'IBM Plex Mono', monospace;">
+        <span style="font-size: 12px; opacity: 0.85;">CELL VOLTAGE E°cell =</span>
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; color: #ff9d3c;">{{ emf }} V</span>
+        <span style="font-size: 12px; font-weight: 600;">{{ feasible }}</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// STANDARD ELECTRODE POTENTIALS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Every half-reaction has a <strong>standard electrode potential, E°</strong> — measured against a hydrogen electrode set at exactly 0.00 V, under standard conditions (298 K, 1 mol/dm³, 100 kPa). A <strong>more negative</strong> E° means the metal gives up electrons more readily — it gets oxidised and becomes the <strong>negative electrode</strong>. The <strong>more positive</strong> half-cell gains those electrons (reduction) and is the <strong>positive electrode</strong>.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE ELECTROCHEMICAL SERIES</div>
+      <div style="display: flex; flex-direction: column; gap: 0; border: 1.5px solid #2b2620;">
+        <sc-for list="{{ series }}" as="s" hint-placeholder-count="6">
+          <div style="display: flex; justify-content: space-between; padding: 9px 14px; border-bottom: 1px solid #e6dfd2; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">
+            <span>{{ s.half }}</span>
+            <span style="font-weight: 600; color: {{ s.color }};">{{ s.e }} V</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #6b6156;">The famous Daniell cell (zinc + copper) sits in this table: E°cell = +0.34 − (−0.76) = <strong>1.10 V</strong>. This is also exactly why a reactive metal displaces a less reactive one — electrochemistry and the reactivity series are the same order.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// FROM CELLS TO BATTERIES &amp; FUEL CELLS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">A positive E°cell means the reaction is <strong>feasible</strong> — it will drive a current. Everyday batteries are cleverly packaged versions of this; rechargeable ones simply run the reaction backwards using an external supply. A <strong>hydrogen fuel cell</strong> combines hydrogen and oxygen to make electricity directly, with only water as the by-product — a leading candidate for clean transport.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="electrolysis.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Electrolysis (L3)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L5 / ELECTROCHEMISTRY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { a: 0, b: 3, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("electrochemistry");
+  }
+
+  _electrodes() {
+    return [
+      { sym: "Mg", e: -2.37, half: "Mg²⁺ + 2e⁻ ⇌ Mg" },
+      { sym: "Zn", e: -0.76, half: "Zn²⁺ + 2e⁻ ⇌ Zn" },
+      { sym: "Fe", e: -0.44, half: "Fe²⁺ + 2e⁻ ⇌ Fe" },
+      { sym: "Pb", e: -0.13, half: "Pb²⁺ + 2e⁻ ⇌ Pb" },
+      { sym: "Cu", e: 0.34, half: "Cu²⁺ + 2e⁻ ⇌ Cu" },
+      { sym: "Ag", e: 0.80, half: "Ag⁺ + e⁻ ⇌ Ag" },
+    ];
+  }
+
+  renderVals() {
+    const els = this._electrodes();
+    const { a, b } = this.state;
+    const A = els[a], B = els[b];
+    // more negative = negative electrode (oxidation)
+    const neg = A.e <= B.e ? A : B;
+    const pos = A.e <= B.e ? B : A;
+    const emf = (pos.e - neg.e);
+
+    const mk = (key) => els.map((x, i) => ({
+      label: x.sym,
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [key + i]: true };
+        if (window.Progress && Object.keys(tried2).length >= 4) window.Progress.markCompleted("electrochemistry");
+        return { [key]: i, tried: tried2 };
+      }),
+      bg: this.state[key] === i ? "#2b2620" : "#faf6ef",
+      fg: this.state[key] === i ? "#faf6ef" : "#2b2620",
+    }));
+
+    const same = A.sym === B.sym;
+    return {
+      tabsA: mk("a"), tabsB: mk("b"),
+      negMetal: neg.sym, posMetal: pos.sym,
+      negTerm: "NEGATIVE", posTerm: "POSITIVE",
+      negE: neg.e.toFixed(2) + " V", posE: pos.e.toFixed(2) + " V",
+      negHalf: neg.half.replace("⇌", "→") + " ... reversed",
+      posHalf: pos.half,
+      emf: same ? "0.00" : emf.toFixed(2),
+      feasible: same ? "SAME METAL — NO VOLTAGE" : emf > 0 ? "FEASIBLE ✓" : "—",
+      series: els.slice().sort((x, y) => x.e - y.e).map(x => ({
+        half: x.half, e: (x.e > 0 ? "+" : "") + x.e.toFixed(2),
+        color: x.e < 0 ? "#c0392b" : "#2a5d8f",
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

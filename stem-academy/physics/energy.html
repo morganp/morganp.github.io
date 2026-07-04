@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Energy">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="physics.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">PHYSICS</a> / LEVEL L1–L3</span>
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← PHYSICS MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// PHYSICS 04 — LEVEL L1–L3</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Energy is never used up. It just moves.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Every device takes energy from one store and shifts it to others — some useful, some wasted as heat. Watch the flow, and see why nothing is ever 100% efficient.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE ENERGY-FLOW (SANKEY) DIAGRAM</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="6">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; padding: 8px 13px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px; max-width: 320px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>ENERGY IN</span><span style="color: #e8590c;">{{ input }} J</span></div>
+        <input type="range" min="50" max="1000" step="10" value="{{ input }}" onChange="{{ setInput }}" style="width: 100%;">
+      </div>
+
+      <div style="display: flex; justify-content: center;">
+        <x-import component-from-global-scope="energy-flow" from="../lib/energy-flow.js" device="{{ device }}" input="{{ input }}" width="740" height="300" hint-size="740px,300px"></x-import>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">The width of each band is the amount of energy. Add the useful and wasted bands and you always get back exactly what went in — that's conservation of energy.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L1 — WHERE ENERGY COMES FROM</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Some energy sources will run out; others keep refilling. <strong>Non-renewables</strong> — coal, oil, gas, uranium — took millions of years to form and we're burning through them fast. <strong>Renewables</strong> — sunlight, wind, waves, flowing water, geothermal heat — top themselves up every day. Almost all of them trace back to one giant reactor: the Sun.</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+        <sc-for list="{{ sources }}" as="s" hint-placeholder-count="4">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 12px; height: 12px; background: {{ s.color }}; border: 1.5px solid #2b2620;"></span>
+              <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ s.name }}</span>
+            </div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">{{ s.tag }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ s.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L2 — THE EIGHT ENERGY STORES</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Modern physics doesn't talk about "types" of energy so much as where it's <strong>stored</strong>. Energy sits in a store until something transfers it somewhere else — by heating, by a force moving, by an electric current, or by radiation (light and sound).</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+        <sc-for list="{{ stores }}" as="st" hint-placeholder-count="8">
+          <div style="border: 1.5px solid #2b2620; background: #fff; padding: 12px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px; color: #e8590c;">{{ st.name }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.45; color: #554c42;">{{ st.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — CONSERVATION &amp; EFFICIENCY</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The <strong>law of conservation of energy</strong> is one of the deepest rules in all of science: energy cannot be created or destroyed, only transferred between stores. So why does everything run down? Because most transfers spill some energy as heat to the surroundings — energy that's now too spread out to be useful. <strong>Efficiency</strong> measures how much you actually got where you wanted it:</div>
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; text-align: center;">efficiency = (useful energy out ÷ total energy in) × 100%</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #6b6156;">Swap the filament bulb for an LED in the diagram above: the useful (light) band goes from a sliver to almost the whole thing. Same electricity in — far less wasted. That's why we changed every bulb in the country.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Physics map →</a>
+      <a href="electricity.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Electricity</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>PHYSICS 04 / ENERGY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { device: "led", input: 300, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("energy");
+  }
+
+  renderVals() {
+    const { device, input, tried } = this.state;
+    const devs = [
+      { key: "led", label: "LED LAMP" },
+      { key: "filament", label: "FILAMENT BULB" },
+      { key: "kettle", label: "KETTLE" },
+      { key: "car", label: "PETROL CAR" },
+      { key: "turbine", label: "WIND TURBINE" },
+      { key: "phone", label: "PHONE" },
+    ];
+    const tabs = devs.map(d => ({
+      label: d.label,
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [d.key]: true };
+        if (window.Progress && Object.keys(tried2).length >= 4) window.Progress.markCompleted("energy");
+        return { device: d.key, tried: tried2 };
+      }),
+      bg: device === d.key ? "#2b2620" : "#faf6ef",
+      fg: device === d.key ? "#faf6ef" : "#2b2620",
+    }));
+
+    return {
+      device, input, tabs,
+      setInput: (e) => this.setState({ input: Number(e.target.value) }),
+      sources: [
+        { name: "Sun", tag: "RENEWABLE", color: "#f08c00", text: "Solar panels and solar heaters. Also drives wind, waves and weather." },
+        { name: "Wind & water", tag: "RENEWABLE", color: "#66a3a3", text: "Turbines in moving air or flowing water spin generators. No fuel, no waste gas." },
+        { name: "Fossil fuels", tag: "NON-RENEWABLE", color: "#6b6156", text: "Coal, oil and gas burn to release stored chemical energy — but give off CO₂." },
+        { name: "Nuclear fuel", tag: "NON-RENEWABLE", color: "#a08fd0", text: "Uranium releases huge energy by fission. No CO₂, but radioactive waste." },
+      ],
+      stores: [
+        { name: "Kinetic", text: "Anything moving — a car, the wind, a thrown ball." },
+        { name: "Gravitational", text: "Anything lifted up high — water behind a dam." },
+        { name: "Chemical", text: "Food, fuel, batteries — released by reactions." },
+        { name: "Elastic", text: "Stretched or squashed springs and bands." },
+        { name: "Thermal", text: "Hot objects — the faster the particles, the more." },
+        { name: "Nuclear", text: "Locked inside the nucleus of every atom." },
+        { name: "Electrostatic", text: "Separated charges, like static on a balloon." },
+        { name: "Magnetic", text: "Between magnets pushed together or apart." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

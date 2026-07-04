@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Acids Bases Salts">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L3</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIELD GUIDE 17 — LEVEL L3 (GCSE / NATIONAL 5)</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Acids, bases &amp; making salts</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Every acid has three different ways to be neutralised — by a metal, a base, or a carbonate — and each one hands you a different salt. Pick a partner below and see what forms.</div>
+    </div>
+
+    <!-- salt builder -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// SALT BUILDER — HYDROCHLORIC ACID + …</div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ partners }}" as="p" hint-placeholder-count="3">
+          <div onClick="{{ p.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 14px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ p.bg }}; color: {{ p.fg }};">{{ p.label }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; padding: 20px; background: #faf6ef; border: 1.5px dashed #c9c0b2;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px; text-align: center;">HCl + {{ partnerFormula }}</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: #a89d8e;">→</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px; text-align: center; color: #e8590c;">{{ productFormula }}</div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #554c42; text-align: center;">{{ blurb }}</div>
+    </div>
+
+    <!-- titration -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — TITRATION: DRIP IN THE ALKALI</div>
+      <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>ALKALI ADDED</span><span style="color: #e8590c;">{{ volume }} mL</span></div>
+      <input type="range" min="0" max="50" step="0.5" value="{{ volume }}" onChange="{{ setVolume }}" style="width: 100%;">
+      <div style="display: flex; justify-content: center;">
+        <x-import component-from-global-scope="titration-curve" from="../lib/titration-curve.js" volume="{{ volume }}" width="560" height="260" hint-size="560px,260px"></x-import>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.6; color: #554c42; text-align: center;">{{ titrationHint }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — THREE WAYS TO MAKE A SALT</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;"><strong>Acid + metal</strong> → salt + hydrogen (fizzes). <strong>Acid + base/alkali</strong> → salt + water (neutralisation). <strong>Acid + carbonate</strong> → salt + water + carbon dioxide (fizzes differently — CO₂ turns limewater cloudy, hydrogen pops). Which acid you use decides the salt's second half: hydrochloric acid always makes a chloride, sulfuric acid a sulfate, nitric acid a nitrate.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — TITRATION FINDS THE EXACT POINT</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">A titration adds alkali to acid drop by drop while tracking pH, so you can find the exact volume where they've fully neutralised each other — the <strong>equivalence point</strong>. Notice how flat the curve is far from that point, then how sharply it jumps right around it: a single extra drop of alkali can swing the pH by several units near equivalence.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="acids-bases.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Acids, Bases &amp; pH intro</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>FIELD GUIDE 17 / ACIDS, BASES &amp; SALTS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sel: 0, volume: 0, seen: { 0: true }, touchedVol: false };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("salts");
+  }
+
+  renderVals() {
+    const PARTNERS = [
+      { label: "MAGNESIUM (metal)", formula: "Mg", product: "MgCl₂ + H₂ ↑", blurb: "Metal + acid → salt + hydrogen gas. You'd see fizzing as hydrogen escapes — test it with a lit splint for the classic 'squeaky pop.'" },
+      { label: "SODIUM HYDROXIDE (base)", formula: "NaOH", product: "NaCl + H₂O", blurb: "Base + acid → salt + water. This is neutralisation — no gas, just a colour change if you're using an indicator." },
+      { label: "CALCIUM CARBONATE (carbonate)", formula: "CaCO₃", product: "CaCl₂ + H₂O + CO₂ ↑", blurb: "Carbonate + acid → salt + water + carbon dioxide. The fizzing gas here turns limewater cloudy, unlike the hydrogen from a metal." },
+    ];
+    const cur = PARTNERS[this.state.sel];
+    const v = this.state.volume;
+    let titrationHint = "DRAG THE SLIDER TO SEE PH RESPOND AS ALKALI IS ADDED.";
+    if (Math.abs(v - 25) < 1) titrationHint = "RIGHT AT THE EQUIVALENCE POINT — ACID AND ALKALI HAVE EXACTLY CANCELLED OUT.";
+    else if (v < 20) titrationHint = "STILL MOSTLY ACID — PH STAYS LOW UNTIL YOU'RE CLOSE TO EQUIVALENCE.";
+    else if (v > 30) titrationHint = "EXCESS ALKALI NOW — PH HAS SWUNG HIGH AND LEVELS OFF.";
+
+    return {
+      partnerFormula: cur.formula,
+      productFormula: cur.product,
+      blurb: cur.blurb,
+      partners: PARTNERS.map((p, i) => ({
+        label: p.label,
+        bg: i === this.state.sel ? "#2b2620" : "#faf6ef",
+        fg: i === this.state.sel ? "#faf6ef" : "#2b2620",
+        onClick: () => this.setState(s => {
+          const seen = { ...s.seen, [i]: true };
+          if (window.Progress && Object.keys(seen).length >= PARTNERS.length && s.touchedVol) window.Progress.markCompleted("salts");
+          return { sel: i, seen };
+        }),
+      })),
+      volume: v,
+      titrationHint,
+      setVolume: (e) => {
+        const seen = this.state.seen;
+        this.setState({ volume: Number(e.target.value), touchedVol: true });
+        if (window.Progress && Object.keys(seen).length >= 3) window.Progress.markCompleted("salts");
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

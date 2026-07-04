@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Periodic Table">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / MODULE 01</span>
+      <a href="../index.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← ALL TOPICS</a>
+    </div>
+  </div>
+
+  <!-- title + controls -->
+  <div style="padding: 24px 32px 0; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE INTERACTIVE PERIODIC TABLE</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 34px; letter-spacing: -0.03em; line-height: 1;">118 elements. Tap any of them.</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">FIELD LOG: {{ inspectedLabel }}</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
+      <!-- search -->
+      <input type="text" placeholder="SEARCH: gold, Fe, 26…" value="{{ query }}" onInput="{{ onQuery }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 10px 14px; border: 2px solid #2b2620; background: #fff; color: #2b2620; outline: none; width: 190px;">
+      <!-- explore / quiz -->
+      <div style="display: flex; border: 2px solid #2b2620; background: #fff;">
+        <div onClick="{{ setExplore }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; cursor: pointer; background: {{ exploreBg }}; color: {{ exploreFg }};">EXPLORE</div>
+        <div onClick="{{ setQuiz }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; cursor: pointer; border-left: 2px solid #2b2620; background: {{ quizBg }}; color: {{ quizFg }};">QUIZ</div>
+      </div>
+      <!-- color mode -->
+      <div style="display: flex; border: 2px solid #2b2620; background: #fff;">
+        <div onClick="{{ setCatMode }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; cursor: pointer; background: {{ catBg }}; color: {{ catFg }};">COLOR: FAMILY</div>
+        <div onClick="{{ setStateMode }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; cursor: pointer; border-left: 2px solid #2b2620; background: {{ stateBg }}; color: {{ stateFg }};">COLOR: STATE</div>
+      </div>
+      <!-- temp slider -->
+      <div style="display: flex; align-items: center; gap: 10px; border: 2px solid #2b2620; background: #fff; padding: 7px 14px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;">TEMP</span>
+        <input type="range" min="0" max="6000" step="5" value="{{ tempK }}" onChange="{{ onTemp }}" onInput="{{ onTemp }}" style="width: 170px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; min-width: 128px; text-align: right;">{{ tempLabel }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- quiz bar -->
+  <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+    <div style="margin: 16px 32px 0; border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; padding: 14px 20px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+      <div style="display: flex; border: 1px solid #574f45;">
+        <div onClick="{{ setLevel1 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 6px 10px; cursor: pointer; background: {{ lvl1Bg }}; color: {{ lvl1Fg }};">LV.1 NAME</div>
+        <div onClick="{{ setLevel2 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 6px 10px; cursor: pointer; border-left: 1px solid #574f45; background: {{ lvl2Bg }}; color: {{ lvl2Fg }};">LV.2 CLUE</div>
+      </div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.01em;">{{ quizPrompt }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #b8ab99; max-width: 520px;">HINT: {{ quizHint }}</div>
+      <div style="flex: 1;"></div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: {{ quizFeedbackColor }};">{{ quizFeedback }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border-left: 1px solid #574f45; padding-left: 20px;">SCORE {{ quizScore }} · STREAK {{ quizStreak }}</div>
+      <div onClick="{{ quizSkip }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; border: 1px solid #574f45; padding: 6px 12px; cursor: pointer; color: #b8ab99;">SKIP →</div>
+    </div>
+  </sc-if>
+
+  <!-- legend -->
+  <div style="display: flex; flex-wrap: wrap; gap: 14px; padding: 16px 32px 4px; align-items: center;">
+    <sc-for list="{{ legendItems }}" as="l" hint-placeholder-count="10">
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <div style="width: 13px; height: 13px; border: 1.5px solid #2b2620; background: {{ l.color }};"></div>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #55504a;">{{ l.label }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- table + panel -->
+  <div style="display: flex; gap: 24px; padding: 14px 32px 40px; align-items: flex-start;">
+
+    <!-- element grid -->
+    <div style="flex: 1; min-width: 0; overflow-x: auto; padding-bottom: 6px;">
+    <div style="display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 4px; min-width: 860px;">
+      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="60">
+        <div onClick="{{ c.onClick }}" title="{{ c.name }}" style="grid-column: {{ c.x }}; grid-row: {{ c.y }}; aspect-ratio: 1 / 1.06; background: {{ c.bg }}; border: {{ c.border }}; box-shadow: {{ c.shadow }}; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 5px; box-sizing: border-box; user-select: none; transition: transform 0.08s, opacity 0.15s; opacity: {{ c.dim }};" style-hover="transform: translate(-1px, -1px); z-index: 2;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; line-height: 1; color: #2b2620; opacity: 0.75;">{{ c.numLabel }}</div>
+            <div style="width: 5px; height: 5px; border-radius: 50%; background: {{ c.dotColor }};"></div>
+          </div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: clamp(11px, 1.15vw, 19px); line-height: 1; letter-spacing: -0.02em; color: #2b2620;">{{ c.sym }}</div>
+        </div>
+      </sc-for>
+      <div style="grid-column: 1 / -1; grid-row: 8; height: 10px;"></div>
+    </div>
+    </div>
+
+    <!-- detail panel -->
+    <div style="width: 330px; flex-shrink: 0; position: sticky; top: 16px; display: flex; flex-direction: column; gap: 0; border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15);">
+      <div style="display: flex; gap: 14px; padding: 18px; border-bottom: 1.5px solid #2b2620; align-items: center;">
+        <div style="width: 74px; height: 78px; border: 2px solid #2b2620; background: {{ selBg }}; display: flex; flex-direction: column; justify-content: space-between; padding: 5px 7px; box-sizing: border-box; flex-shrink: 0;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px;">{{ selNum }}</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; letter-spacing: -0.02em;">{{ selSym }}</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 25px; letter-spacing: -0.02em; line-height: 1;">{{ selName }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">{{ selCatLabel }}</div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: {{ selStateColor }};"></div>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;">{{ selStateLabel }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 14px 18px; display: flex; flex-direction: column; gap: 7px; border-bottom: 1.5px solid #2b2620;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c;">// PROPERTIES</div>
+        <sc-for list="{{ selProps }}" as="pr" hint-placeholder-count="5">
+          <div style="display: flex; justify-content: space-between; gap: 10px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #6b6156;">{{ pr.k }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; text-align: right;">{{ pr.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="padding: 14px 18px 10px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1.5px solid #2b2620; align-items: center;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c; align-self: flex-start;">// THE ATOM — ELECTRON SHELLS</div>
+        <x-import component-from-global-scope="atom-3d" from="../lib/atom-3d.js" shells="{{ shellsAttr }}" symbol="{{ selSym }}" protons="{{ selProtons }}" neutrons="{{ selNeutrons }}" size="182" hint-size="182px,182px"></x-import>
+        <div style="display: flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">
+          <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 9px; height: 9px; border-radius: 50%; background: #e8590c; display: inline-block;"></span>PROTON</span>
+          <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 9px; height: 9px; border-radius: 50%; background: #a89d8e; display: inline-block;"></span>NEUTRON</span>
+          <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #2b2620; display: inline-block;"></span>ELECTRON</span>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;">{{ atomComposition }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">SHELLS: {{ shellConfig }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e;">DRAG THE ATOM TO SPIN IT IN 3D</div>
+      </div>
+
+      <div style="padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 6px; background: #faf6ef;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c;">// FUN FACT</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.5;">{{ selFact }}</div>
+        <a href="electron-shells.html" style="margin-top: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; background: #fff; padding: 9px 12px; text-decoration: none; display: block; text-align: center;" style-hover="background: #e8590c; color: #faf6ef;">READ: HOW ELECTRON SHELLS WORK · L2–L3 →</a>
+        <a href="states-of-matter.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; background: #fff; padding: 9px 12px; text-decoration: none; display: block; text-align: center;" style-hover="background: #e8590c; color: #faf6ef;">READ: THE FOUR STATES OF MATTER · L1–L2 →</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>DRAG THE TEMP SLIDER TO MELT THINGS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showTileNumbers&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Table&quot;}}">
+class Component extends DCLogic {
+  state = {
+    data: null,
+    query: "",
+    inspected: (() => {
+      try { return new Set(JSON.parse(localStorage.getItem("lizard-spock-stem.inspected") || "[]")); }
+      catch (e) { return new Set(); }
+    })(),
+    selected: 26,
+    tempK: 295,
+    colorMode: "cat",
+    mode: "explore",
+    quizTarget: null,
+    quizScore: 0,
+    quizStreak: 0,
+    quizFeedback: "",
+    quizFeedbackKind: "",
+    quizLevel: 1,
+  };
+
+  async componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("periodic-table");
+    const mod = await import(new URL("../lib/elements.js", document.baseURI).href);
+    this.setState({ data: mod });
+    if (this.state.mode === "quiz" && !this.state.quizTarget) this.pickQuizTarget(mod);
+  }
+
+  pickQuizTarget(mod) {
+    const m = mod || this.state.data;
+    if (!m) return;
+    let t;
+    do { t = m.ELEMENTS[Math.floor(Math.random() * m.ELEMENTS.length)]; }
+    while (this.state.quizTarget && t.n === this.state.quizTarget);
+    this.setState({ quizTarget: t.n });
+  }
+
+  handleTileClick(el) {
+    const m = this.state.data;
+    if (this.state.mode === "quiz" && this.state.quizTarget) {
+      if (el.n === this.state.quizTarget) {
+        this.setState(s => ({
+          selected: el.n,
+          quizScore: s.quizScore + 1,
+          quizStreak: s.quizStreak + 1,
+          quizFeedback: "CORRECT! That's " + el.name + ".",
+          quizFeedbackKind: "good",
+        }));
+        clearTimeout(this._t);
+        this._t = setTimeout(() => {
+          this.setState({ quizFeedback: "" });
+          this.pickQuizTarget();
+        }, 1400);
+      } else {
+        this.setState({
+          quizStreak: 0,
+          quizFeedback: "Nope — that was " + el.name + ". Keep looking!",
+          quizFeedbackKind: "bad",
+        });
+      }
+    } else {
+      const inspected = new Set(this.state.inspected);
+      inspected.add(el.n);
+      try { localStorage.setItem("lizard-spock-stem.inspected", JSON.stringify([...inspected])); } catch (e) {}
+      this.setState({ selected: el.n, inspected });
+    }
+  }
+
+  matchesQuery(el) {
+    const q = this.state.query.trim().toLowerCase();
+    if (!q) return true;
+    return el.name.toLowerCase().startsWith(q) || el.s.toLowerCase() === q || String(el.n) === q;
+  }
+
+  renderVals() {
+    const m = this.state.data;
+    const ink = "#2b2620";
+    const paper = "#faf6ef";
+    const showNums = this.props.showTileNumbers ?? true;
+    const { tempK, colorMode, mode, selected } = this.state;
+
+    const btn = (active) => ({ bg: active ? ink : "#fff", fg: active ? paper : ink });
+    const ex = btn(mode === "explore"), qz = btn(mode === "quiz");
+    const cm = btn(colorMode === "cat"), sm = btn(colorMode === "state");
+
+    const tempC = Math.round(tempK - 273);
+    const tempLabel = tempK + " K / " + tempC + " °C";
+
+    let cells = [], legendItems = [], selEl = null;
+    let shellRings = [], shellDots = [], shellConfig = "", selProps = [], atomComposition = "";
+
+    if (m) {
+      const target = this.state.quizTarget;
+      cells = m.ELEMENTS.map(el => {
+        const pos = m.gridPos(el);
+        const st = m.stateAt(el, tempK);
+        const bg = colorMode === "cat" ? m.CATEGORIES[el.cat].color : m.STATE_COLORS[st].color;
+        const isSel = el.n === selected && mode === "explore";
+        return {
+          sym: el.s, name: el.name, numLabel: showNums ? String(el.n) : "",
+          x: pos.x, y: pos.y, bg,
+          dim: this.matchesQuery(el) ? 1 : 0.15,
+          dotColor: (mode === "explore" && this.state.inspected.has(el.n)) ? ink : "transparent",
+          border: isSel ? "2.5px solid " + ink : "1.5px solid " + ink,
+          shadow: isSel ? "3px 3px 0 " + ink : "none",
+          onClick: () => this.handleTileClick(el),
+        };
+      });
+
+      legendItems = colorMode === "cat"
+        ? Object.values(m.CATEGORIES).map(c => ({ label: c.label, color: c.color }))
+        : Object.values(m.STATE_COLORS).map(c => ({ label: c.label + " at this temp", color: c.color }));
+
+      selEl = m.ELEMENTS.find(e => e.n === selected) || m.ELEMENTS[0];
+      const st = m.stateAt(selEl, tempK);
+      const fmt = (k) => k == null ? "unknown" : Math.round(k - 273) + " °C (" + k + " K)";
+      selProps = [
+        { k: "Atomic number", v: String(selEl.n) },
+        { k: "Atomic mass", v: selEl.m + " u" },
+        { k: "Group / Period", v: (selEl.g || "f-block") + " / " + selEl.p },
+        { k: "Melting point", v: fmt(selEl.melt) },
+        { k: "Boiling point", v: fmt(selEl.boil) },
+      ];
+
+      shellConfig = selEl.sh.join(" · ") + "  (" + selEl.n + " electrons)";
+      var neutronCount = Math.max(0, Math.round(selEl.m) - selEl.n);
+      atomComposition = selEl.n + " protons · " + neutronCount + " neutrons · " + selEl.n + " electrons";
+
+      var selState = m.STATE_COLORS[st];
+      var selCatLabel = "№" + selEl.n + " — " + m.CATEGORIES[selEl.cat].label;
+      var selBg = m.CATEGORIES[selEl.cat].color;
+    }
+
+    const tEl = m && this.state.quizTarget ? m.ELEMENTS.find(e => e.n === this.state.quizTarget) : null;
+
+    return {
+      query: this.state.query,
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      atomComposition,
+      inspectedLabel: this.state.inspected.size + " OF 118 ELEMENTS INSPECTED",
+      tempK, tempLabel,
+      onTemp: (e) => this.setState({ tempK: Number(e.target.value) }),
+      setExplore: () => this.setState({ mode: "explore", quizFeedback: "" }),
+      setQuiz: () => { this.setState({ mode: "quiz", quizFeedback: "" }); if (!this.state.quizTarget) this.pickQuizTarget(); },
+      setCatMode: () => this.setState({ colorMode: "cat" }),
+      setStateMode: () => this.setState({ colorMode: "state" }),
+      exploreBg: ex.bg, exploreFg: ex.fg, quizBg: qz.bg, quizFg: qz.fg,
+      catBg: cm.bg, catFg: cm.fg, stateBg: sm.bg, stateFg: sm.fg,
+      isQuiz: mode === "quiz",
+      quizPrompt: !tEl ? "…" : (this.state.quizLevel === 1 ? "Find " + tEl.name : "Find the mystery element"),
+      quizHint: !tEl || !m ? "" : (this.state.quizLevel === 1
+        ? m.CATEGORIES[tEl.cat].label + " · period " + tEl.p
+        : tEl.fact.replace(new RegExp(tEl.name, "ig"), "???")),
+      setLevel1: () => this.setState({ quizLevel: 1 }),
+      setLevel2: () => this.setState({ quizLevel: 2 }),
+      lvl1Bg: this.state.quizLevel === 1 ? "#fcc419" : "transparent",
+      lvl1Fg: this.state.quizLevel === 1 ? "#2b2620" : "#b8ab99",
+      lvl2Bg: this.state.quizLevel === 2 ? "#fcc419" : "transparent",
+      lvl2Fg: this.state.quizLevel === 2 ? "#2b2620" : "#b8ab99",
+      quizScore: this.state.quizScore,
+      quizStreak: this.state.quizStreak,
+      quizFeedback: this.state.quizFeedback,
+      quizFeedbackColor: this.state.quizFeedbackKind === "good" ? "#8ce99a" : "#ffa8a8",
+      quizSkip: () => { this.setState({ quizFeedback: "" }); this.pickQuizTarget(); },
+      cells, legendItems,
+      selNum: selEl ? String(selEl.n) : "", selSym: selEl ? selEl.s : "",
+      selName: selEl ? selEl.name : "Loading…",
+      selCatLabel: selEl ? selCatLabel : "",
+      selBg: selEl ? selBg : "#eee",
+      selStateColor: selEl ? selState.color : "#ccc",
+      selStateLabel: selEl ? selState.label.toUpperCase() + " AT " + tempK + " K" : "",
+      selProps, shellRings, shellDots, shellConfig,
+      shellsAttr: selEl ? selEl.sh.join(",") : "",
+      selProtons: selEl ? selEl.n : "",
+      selNeutrons: selEl ? Math.max(0, Math.round(selEl.m) - selEl.n) : "",
+      selFact: selEl ? selEl.fact : "",
+    };
+  }
+}
+</script>
+</body>
+</html>

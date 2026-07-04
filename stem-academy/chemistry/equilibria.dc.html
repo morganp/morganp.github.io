@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Equilibria Le Chatelier">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L4</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L4 — EQUILIBRIA</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">A reaction that never finishes.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">In a sealed flask, many reactions reach a balance point — going forwards and backwards at the same rate. Poke that balance and it fights back. Run the Haber process and watch the position shift.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE HABER PROCESS  ·  N₂ + 3H₂ ⇌ 2NH₃  (forward reaction is exothermic)</div>
+
+      <div style="display: flex; align-items: stretch; gap: 0; border: 2px solid #2b2620; height: 92px; position: relative; overflow: hidden;">
+        <div style="width: {{ leftPct }}%; background: repeating-linear-gradient(45deg, #efe0d2 0 8px, #e8d3c0 8px 16px); display: grid; place-items: center; transition: width 0.4s ease;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; text-align: center; color: #6b4a2f;">REACTANTS<br>N₂ + 3H₂</div>
+        </div>
+        <div style="width: {{ rightPct }}%; background: repeating-linear-gradient(45deg, #f6d9c6 0 8px, #f3c9ae 8px 16px); display: grid; place-items: center; transition: width 0.4s ease;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; text-align: center; color: #a5461a;">PRODUCT<br>2NH₃</div>
+        </div>
+        <div style="position: absolute; top: 0; bottom: 0; left: {{ leftPct }}%; width: 3px; background: #e8590c; transition: left 0.4s ease;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620;">
+        <span>◀ SHIFTS LEFT = LESS AMMONIA</span>
+        <span style="color: #e8590c;">YIELD OF NH₃: {{ yieldPct }}%</span>
+        <span>SHIFTS RIGHT = MORE AMMONIA ▶</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;">PRESSURE</div>
+          <div style="display: flex; gap: 6px;">
+            <sc-for list="{{ pressureTabs }}" as="t" hint-placeholder-count="3">
+              <div onClick="{{ t.onClick }}" style="flex: 1; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 6px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;">TEMPERATURE</div>
+          <div style="display: flex; gap: 6px;">
+            <sc-for list="{{ tempTabs }}" as="t" hint-placeholder-count="3">
+              <div onClick="{{ t.onClick }}" style="flex: 1; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 6px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="border: 1.5px solid #2b2620; background: #faf6ef; padding: 14px; font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.55; color: #2b2620;">{{ explanation }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// DYNAMIC EQUILIBRIUM</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">A <strong>reversible reaction</strong> can go both ways: ⇌. Seal it in a closed container and it reaches <strong>dynamic equilibrium</strong> — the forward and backward reactions are still happening, but at <em>equal rates</em>, so the amounts of everything stop changing. Nothing has stopped; it's a busy stalemate. The mixture can settle anywhere between "mostly reactants" and "mostly products" — that balance point is the <strong>position of equilibrium</strong>.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// LE CHATELIER'S PRINCIPLE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Change a condition and the equilibrium <strong>shifts to oppose that change</strong>. Add more reactant → it shifts right to use it up. Raise the pressure → it shifts toward the side with <em>fewer gas molecules</em>. Raise the temperature → it shifts in the <em>endothermic</em> direction to absorb the heat. Add a catalyst and — importantly — <strong>nothing shifts</strong>: a catalyst speeds both directions equally, so it reaches the same equilibrium faster but doesn't change the yield.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE INDUSTRIAL COMPROMISE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The Haber process shows the real-world tension. High pressure and low temperature give the best <em>yield</em> of ammonia — but low temperature makes the reaction agonisingly <em>slow</em>. So industry compromises: about <strong>200 atm, 450 °C, and an iron catalyst</strong>. Unreacted gases are recycled. It's a deliberate trade of yield against rate against cost — the same balancing act behind fertiliser for half the planet's food.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="rates-of-reaction.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Rates of Reaction (L3)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L4 / EQUILIBRIA</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { pressure: 1, temp: 1, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("equilibria");
+  }
+
+  renderVals() {
+    const { pressure, temp } = this.state;
+    // base position 50%. Higher pressure -> right (more NH3, fewer gas moles).
+    // Higher temp -> left (forward is exothermic, so heat favours reverse).
+    let pos = 50 + (pressure - 1) * 16 - (temp - 1) * 18;
+    pos = Math.max(12, Math.min(88, pos));
+    const yieldPct = Math.round(pos);
+    const leftPct = 100 - pos, rightPct = pos;
+
+    const mk = (key, val, label) => ({
+      label, onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [key + val]: true };
+        if (window.Progress && Object.keys(tried2).length >= 3) window.Progress.markCompleted("equilibria");
+        return { [key]: val, tried: tried2 };
+      }),
+      bg: this.state[key] === val ? "#e8590c" : "#faf6ef",
+      fg: this.state[key] === val ? "#faf6ef" : "#2b2620",
+    });
+    const pressureTabs = [mk("pressure", 0, "LOW"), mk("pressure", 1, "MEDIUM"), mk("pressure", 2, "HIGH")];
+    const tempTabs = [mk("temp", 0, "LOW"), mk("temp", 1, "MEDIUM"), mk("temp", 2, "HIGH")];
+
+    let explanation;
+    if (pressure === 2 && temp === 0) explanation = "High pressure + low temperature = maximum ammonia yield. There are 4 gas molecules on the left but only 2 on the right, so squeezing favours the right; and since the forward reaction gives out heat, keeping it cool favours the right too. The catch: at low temperature the reaction is far too slow to be useful.";
+    else if (temp === 2) explanation = "High temperature pushes the equilibrium LEFT — the forward reaction is exothermic, so the system absorbs the added heat by running backwards. Faster, but a lower yield of ammonia.";
+    else if (pressure === 2) explanation = "High pressure pushes the equilibrium RIGHT: the right-hand side has fewer gas molecules (2 vs 4), so the system relieves the pressure by making more ammonia.";
+    else if (pressure === 0) explanation = "Low pressure favours the side with MORE gas molecules — the reactants. The equilibrium shifts left and the ammonia yield falls.";
+    else explanation = "Adjust the pressure and temperature. Le Chatelier's principle predicts which way the equilibrium will move to oppose each change.";
+
+    return { leftPct, rightPct, yieldPct, pressureTabs, tempTabs, explanation };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Electricity">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="physics.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">PHYSICS</a> / LEVEL L1–L3</span>
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← PHYSICS MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// PHYSICS 05 — LEVEL L1–L3</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Push the charge. Light the bulb.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">A circuit is a loop for electric charge to flow around. Turn up the voltage and the bulb glows brighter; add resistance and the current drops. It's all one equation — see it run.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE CIRCUIT BENCH</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>BATTERY VOLTAGE</span><span style="color: #e8590c;">{{ voltage }} V</span></div>
+          <input type="range" min="1" max="12" step="0.5" value="{{ voltage }}" onChange="{{ setVoltage }}" style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;"><span>AA CELL</span><span>CAR BATTERY</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>BULB RESISTANCE</span><span style="color: #e8590c;">{{ resistance }} Ω</span></div>
+          <input type="range" min="1" max="12" step="0.5" value="{{ resistance }}" onChange="{{ setResistance }}" style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;"><span>THICK WIRE</span><span>THIN FILAMENT</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center;">
+        <x-import component-from-global-scope="circuit-sim" from="../lib/circuit-sim.js" voltage="{{ voltage }}" resistance="{{ resistance }}" mode="{{ mode }}" width="740" height="330" hint-size="740px,330px"></x-import>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">{{ hint }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L1 — A CIRCUIT IS A COMPLETE LOOP</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Electric charge can only flow if there's an unbroken loop from one end of the battery, through the components, and back to the other end. Break the loop — flick a switch open — and everything stops instantly. <strong>Conductors</strong> (metals, especially copper) let charge through easily; <strong>insulators</strong> (plastic, rubber, glass) block it, which is why wires are copper wrapped in plastic.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L2 — CURRENT, VOLTAGE, RESISTANCE</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <sc-for list="{{ quantities }}" as="q" hint-placeholder-count="3">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 15px; color: #e8590c;">{{ q.name }} <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 12px; color: #6b6156;">({{ q.unit }})</span></div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">{{ q.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — OHM'S LAW &amp; POWER</div>
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; text-align: center; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;">
+        <span>V = I × R</span><span style="color: #a89d8e;">|</span><span>P = V × I</span>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;"><strong>Ohm's law</strong> ties the three together: voltage equals current times resistance. Double the voltage and the current doubles; double the resistance and it halves. <strong>Power</strong> (in watts) is how fast the circuit turns electrical energy into light and heat — voltage times current. The readouts under the circuit are these formulas computed live, 60 times a second.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — SERIES VS PARALLEL</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">In a <strong>series</strong> circuit there's one single loop: the same current passes through every component, but the battery's voltage has to share out between them — so two bulbs in series are dimmer than one. In a <strong>parallel</strong> circuit each bulb sits on its own branch, gets the full battery voltage, and stays bright — and if one bulb blows, the others keep working. That's why your house is wired in parallel. Switch the sim between the two and watch the brightness change.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — MAINS ELECTRICITY &amp; SAFETY</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The bench above runs on gentle direct current (dc) from a battery. Your wall sockets carry <strong>alternating current (ac)</strong> at around 230 V in the UK — high enough to be dangerous. That's why plugs have three pins: <strong>live</strong> (brings the current), <strong>neutral</strong> (completes the loop), and <strong>earth</strong> plus a <strong>fuse</strong> that melts and breaks the circuit if too much current flows. Never treat mains like a toy.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Physics map →</a>
+      <a href="magnetism.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Magnetism</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>PHYSICS 05 / ELECTRICITY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { voltage: 6, resistance: 4, mode: "single", tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("electricity");
+  }
+
+  renderVals() {
+    const { voltage, resistance, mode, tried } = this.state;
+    const modes = [
+      { key: "single", label: "ONE BULB" },
+      { key: "series", label: "TWO IN SERIES" },
+      { key: "parallel", label: "TWO IN PARALLEL" },
+    ];
+    const tabs = modes.map(m => ({
+      label: m.label,
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [m.key]: true };
+        if (window.Progress && Object.keys(tried2).length >= 3) window.Progress.markCompleted("electricity");
+        return { mode: m.key, tried: tried2 };
+      }),
+      bg: mode === m.key ? "#2b2620" : "#faf6ef",
+      fg: mode === m.key ? "#faf6ef" : "#2b2620",
+    }));
+    const hints = {
+      single: "Turn voltage up or resistance down — the current rises and the bulb burns brighter.",
+      series: "Same current through both bulbs, but the voltage splits — notice they're dimmer than one bulb alone.",
+      parallel: "Each branch gets the full voltage. The battery now pushes double the total current.",
+    };
+    return {
+      voltage, resistance, mode, tabs, hint: hints[mode],
+      setVoltage: (e) => this.setState({ voltage: Number(e.target.value) }),
+      setResistance: (e) => this.setState({ resistance: Number(e.target.value) }),
+      quantities: [
+        { name: "Current", unit: "amps, A", text: "How much charge flows past a point each second. Measured with an ammeter placed in the loop." },
+        { name: "Voltage", unit: "volts, V", text: "The push the battery gives each unit of charge — the energy per coulomb. Measured across a component." },
+        { name: "Resistance", unit: "ohms, Ω", text: "How hard a component fights the current. Thin, long, hot wires resist more." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

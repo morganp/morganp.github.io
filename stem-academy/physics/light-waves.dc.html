@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Light and Waves">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="physics.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">PHYSICS</a> / LEVEL L1–L3</span>
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← PHYSICS MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// PHYSICS 08 — LEVEL L1–L3</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Light travels straight — until it doesn't.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Light moves in dead-straight rays, which is why you get sharp shadows. But bounce it off a mirror or send it into water and it changes direction by exact, predictable rules. Aim the beam below.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE RAY BOX</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 220px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>ANGLE FROM NORMAL</span><span style="color: #e8590c;">{{ angle }}°</span></div>
+          <input type="range" min="5" max="80" step="1" value="{{ angle }}" onChange="{{ setAngle }}" style="width: 100%;">
+        </div>
+        <sc-if value="{{ isRefraction }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; gap: 6px;">
+            <sc-for list="{{ mediumTabs }}" as="m" hint-placeholder-count="3">
+              <div onClick="{{ m.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 12px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ m.bg }}; color: {{ m.fg }};">{{ m.label }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display: flex; justify-content: center;">
+        <x-import component-from-global-scope="ray-sim" from="../lib/ray-sim.js" mode="{{ mode }}" angle="{{ angle }}" medium="{{ medium }}" width="720" height="330" hint-size="720px,330px"></x-import>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L1 — STRAIGHT RAYS &amp; SHADOWS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Light travels in straight lines called <strong>rays</strong>. When an opaque object blocks some of those rays, the region behind it gets no light — a <strong>shadow</strong>. Because the rays are straight, the shadow is the same shape as the object, and moving the light closer makes the shadow bigger. We see things either because they glow (the Sun, a lamp) or because light bounces off them into our eyes.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — REFLECTION &amp; REFRACTION</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;"><strong>Reflection</strong>: when light hits a smooth surface it bounces off, and the angle it leaves at exactly equals the angle it arrived at (both measured from the <em>normal</em> — the line at 90° to the surface). <strong>Refraction</strong>: when light crosses into a denser material like water or glass it slows down and bends toward the normal — which is why a straw looks broken at the water's surface and a swimming pool looks shallower than it is. The denser the material, the sharper the bend.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L2–L3 — TRANSVERSE vs LONGITUDINAL</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Light is a <strong>transverse wave</strong> — its wobble is at right angles to the direction it travels, like a ripple on a rope you flick. Sound is a <strong>longitudinal wave</strong> — the wobble is back-and-forth along the travel direction. All waves share the same measurements: <strong>wavelength</strong> (crest to crest), <strong>frequency</strong> (waves per second), and <strong>amplitude</strong> (height). And they all obey one tidy equation: <strong>wave speed = frequency × wavelength</strong>.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// FIG. 02 — THE ELECTROMAGNETIC SPECTRUM</div>
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; height: 44px; border: 1.5px solid #2b2620;">
+          <sc-for list="{{ spectrum }}" as="s" hint-placeholder-count="7">
+            <div style="flex: 1; background: {{ s.color }}; display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; color: {{ s.fg }}; text-align: center; line-height: 1.1; border-right: 1px solid rgba(43,38,32,0.3);">{{ s.name }}</div>
+          </sc-for>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">
+          <span>◀ LONGER WAVELENGTH · LOWER FREQUENCY · LOWER ENERGY</span>
+          <span>SHORTER · HIGHER FREQUENCY · MORE ENERGY ▶</span>
+        </div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">Visible light — the rainbow we can see — is just a thin slice of a much larger family, all travelling at the speed of light. Radio carries your music; microwaves heat your food; infrared is felt as warmth; ultraviolet gives sunburn; X-rays see your bones; gamma rays come from nuclear reactions. The higher the frequency, the more energy each ray carries — and the more dangerous it becomes.</div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Physics map →</a>
+      <a href="sound.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Sound</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>PHYSICS 08 / LIGHT &amp; WAVES</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: "reflection", angle: 40, medium: "water", tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("light-waves");
+  }
+
+  renderVals() {
+    const { mode, angle, medium, tried } = this.state;
+    const modes = [{ key: "reflection", label: "REFLECTION (MIRROR)" }, { key: "refraction", label: "REFRACTION (INTO WATER)" }];
+    const tabs = modes.map(m => ({
+      label: m.label,
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [m.key]: true };
+        if (window.Progress && Object.keys(tried2).length >= 2) window.Progress.markCompleted("light-waves");
+        return { mode: m.key, tried: tried2 };
+      }),
+      bg: mode === m.key ? "#2b2620" : "#faf6ef",
+      fg: mode === m.key ? "#faf6ef" : "#2b2620",
+    }));
+    const media = [["water", "WATER"], ["glass", "GLASS"], ["diamond", "DIAMOND"]];
+    const mediumTabs = media.map(([key, label]) => ({
+      label,
+      onClick: () => this.setState({ medium: key }),
+      bg: medium === key ? "#e8590c" : "#faf6ef",
+      fg: medium === key ? "#faf6ef" : "#2b2620",
+    }));
+    const spectrum = [
+      { name: "RADIO", color: "#8f9bb3", fg: "#2b2620" },
+      { name: "MICRO-WAVE", color: "#6f7fd6", fg: "#fff" },
+      { name: "INFRARED", color: "#c0392b", fg: "#fff" },
+      { name: "VISIBLE", color: "linear-gradient(90deg,#e8590c,#f5d000,#3fa34d,#2a6fdb,#8e44ad)", fg: "#fff" },
+      { name: "ULTRA-VIOLET", color: "#7d3cc0", fg: "#fff" },
+      { name: "X-RAY", color: "#3a4a6b", fg: "#fff" },
+      { name: "GAMMA", color: "#1f2733", fg: "#fff" },
+    ];
+    return {
+      mode, angle, medium, tabs, mediumTabs, spectrum,
+      isRefraction: mode === "refraction",
+      setAngle: (e) => this.setState({ angle: Number(e.target.value) }),
+    };
+  }
+}
+</script>
+</body>
+</html>

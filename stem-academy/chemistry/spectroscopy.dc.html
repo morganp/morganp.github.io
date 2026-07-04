@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Spectroscopy">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L5</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L5 — SPECTROSCOPY</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Read a molecule's fingerprint.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Chemists identify an unknown compound without ever seeing it — by the way it breaks apart, absorbs infrared light, and lines up its hydrogens. Pick a molecule and compare its three spectra side by side.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE SPECTROMETER BENCH</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ molTabs }}" as="t" hint-placeholder-count="3">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 12px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px dashed #d8d0c4; border-bottom: 1px dashed #d8d0c4; padding: 10px 0;">
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 20px;">{{ molName }}</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #e8590c;">{{ molFormula }}</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">Mr = {{ molMr }}</span>
+      </div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ techTabs }}" as="t" hint-placeholder-count="3">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 7px 14px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="border: 2px solid #2b2620; background: #fbf8f2;">
+        <svg viewBox="0 0 720 250" width="100%" style="display: block;">
+          <line x1="52" y1="24" x2="52" y2="196" stroke="#2b2620" stroke-width="1.5"></line>
+          <line x1="52" y1="196" x2="700" y2="196" stroke="#2b2620" stroke-width="1.5"></line>
+          <sc-for list="{{ xticks }}" as="k" hint-placeholder-count="6">
+            <line x1="{{ k.x }}" y1="196" x2="{{ k.x }}" y2="200" stroke="#2b2620" stroke-width="1"></line>
+            <text x="{{ k.x }}" y="212" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#6b6156">{{ k.label }}</text>
+          </sc-for>
+          <polyline points="{{ linePts }}" fill="none" stroke="#e8590c" stroke-width="1.6"></polyline>
+          <sc-for list="{{ bars }}" as="b" hint-placeholder-count="5">
+            <rect x="{{ b.x }}" y="{{ b.top }}" width="{{ b.w }}" height="{{ b.h }}" fill="#e8590c"></rect>
+            <text x="{{ b.cx }}" y="{{ b.ly }}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" font-weight="600" fill="#2b2620">{{ b.text }}</text>
+          </sc-for>
+          <sc-for list="{{ markers }}" as="m" hint-placeholder-count="3">
+            <text x="{{ m.x }}" y="{{ m.y }}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#2549c9">{{ m.label }}</text>
+          </sc-for>
+          <text x="376" y="236" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#2b2620">{{ axisX }}</text>
+          <text x="14" y="110" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#2b2620" transform="rotate(-90 14 110)">{{ axisY }}</text>
+        </svg>
+      </div>
+
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156; line-height: 1.5;">{{ caption }}</div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed #d8d0c4; padding-top: 12px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #6b6156;">{{ readoutTitle }}</div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+          <div style="display: flex; gap: 10px; align-items: baseline; font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #3a332b;"><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #e8590c; min-width: 92px;">{{ r.key }}</span>{{ r.val }}</div>
+        </sc-for>
+      </div>
+
+      <div style="background: #faf6ef; border: 1.5px solid #2b2620; padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #3a332b;">▸ {{ molSummary }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THREE TECHNIQUES, THREE QUESTIONS</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+        <sc-for list="{{ techniques }}" as="t" hint-placeholder-count="3">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; color: #e8590c;">{{ t.name }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156;">{{ t.asks }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">{{ t.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE FINGERPRINT REGION</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">In an infrared spectrum, the region below about <strong>1500 cm⁻¹</strong> is called the fingerprint region. It's a dense, messy set of dips that is unique to each compound — like a barcode. You don't try to assign every peak; instead you match the whole pattern against a database. The bands <em>above</em> 1500 cm⁻¹ (O–H, N–H, C–H, C=O) are the ones you read directly to spot functional groups.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="chemical-analysis.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Chemical Analysis (L3)</a>
+      <a href="further-organic.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Further Organic (L4)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L5 / SPECTROSCOPY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mol: "ethanol", tech: "ms", seen: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("spectroscopy");
+  }
+
+  _mols() {
+    return {
+      ethanol: {
+        name: "Ethanol", formula: "CH₃CH₂OH", mr: 46,
+        ms: [
+          { mz: 46, int: 28, frag: "M⁺ — molecular ion, gives Mr = 46" },
+          { mz: 45, int: 42, frag: "loss of H" },
+          { mz: 31, int: 100, frag: "CH₂OH⁺ (base peak)" },
+          { mz: 29, int: 52, frag: "CHO⁺ / C₂H₅⁺" },
+          { mz: 27, int: 22, frag: "C₂H₃⁺" },
+        ],
+        ir: [
+          { c: 3350, w: 130, depth: 55, label: "O–H", note: "broad — O–H of an alcohol" },
+          { c: 2950, w: 80, depth: 32, label: "C–H", note: "C–H stretch" },
+          { c: 1050, w: 70, depth: 58, label: "C–O", note: "C–O stretch" },
+        ],
+        nmr: [
+          { d: 1.2, nH: 3, mult: "triplet", grp: "CH₃" },
+          { d: 2.6, nH: 1, mult: "singlet, broad", grp: "O–H" },
+          { d: 3.7, nH: 2, mult: "quartet", grp: "CH₂" },
+        ],
+        summary: "A broad O–H dip in the IR, a molecular ion at m/z 46, and three ¹H environments in a 3 : 1 : 2 ratio all point to ethanol.",
+      },
+      propanone: {
+        name: "Propanone", formula: "CH₃COCH₃", mr: 58,
+        ms: [
+          { mz: 58, int: 32, frag: "M⁺ — molecular ion, gives Mr = 58" },
+          { mz: 43, int: 100, frag: "CH₃CO⁺ acylium (base peak)" },
+          { mz: 15, int: 38, frag: "CH₃⁺" },
+        ],
+        ir: [
+          { c: 2960, w: 80, depth: 28, label: "C–H", note: "C–H stretch" },
+          { c: 1715, w: 55, depth: 72, label: "C=O", note: "sharp, strong — C=O of a ketone" },
+        ],
+        nmr: [
+          { d: 2.1, nH: 6, mult: "singlet", grp: "2 × CH₃ (equivalent)" },
+        ],
+        summary: "No O–H at all, one strong sharp C=O dip, and a single ¹H peak (all six hydrogens equivalent) — a symmetrical ketone: propanone.",
+      },
+      ethanoic: {
+        name: "Ethanoic acid", formula: "CH₃COOH", mr: 60,
+        ms: [
+          { mz: 60, int: 50, frag: "M⁺ — molecular ion, gives Mr = 60" },
+          { mz: 45, int: 90, frag: "COOH⁺ / loss of CH₃" },
+          { mz: 43, int: 55, frag: "CH₃CO⁺" },
+          { mz: 15, int: 100, frag: "CH₃⁺ (base peak)" },
+        ],
+        ir: [
+          { c: 3000, w: 300, depth: 45, label: "O–H", note: "very broad — O–H of a carboxylic acid" },
+          { c: 1710, w: 55, depth: 74, label: "C=O", note: "C=O of an acid" },
+          { c: 1250, w: 75, depth: 48, label: "C–O", note: "C–O stretch" },
+        ],
+        nmr: [
+          { d: 2.1, nH: 3, mult: "singlet", grp: "CH₃" },
+          { d: 11.5, nH: 1, mult: "singlet, broad", grp: "COOH" },
+        ],
+        summary: "A very broad acid O–H, a C=O dip, and a ¹H peak far downfield at ~11.5 ppm (the COOH proton) confirm a carboxylic acid: ethanoic acid.",
+      },
+    };
+  }
+
+  renderVals() {
+    const PX0 = 52, PX1 = 700, PY0 = 24, PY1 = 196;
+    const mols = this._mols();
+    const mol = mols[this.state.mol];
+    const tech = this.state.tech;
+
+    const molTabs = ["ethanol", "propanone", "ethanoic"].map(k => ({
+      label: mols[k].name,
+      onClick: () => this.setState({ mol: k }),
+      bg: this.state.mol === k ? "#2b2620" : "#faf6ef",
+      fg: this.state.mol === k ? "#faf6ef" : "#2b2620",
+    }));
+    const techList = [["ms", "MASS SPEC"], ["ir", "INFRARED (IR)"], ["nmr", "¹H NMR"]];
+    const techTabs = techList.map(([k, lbl]) => ({
+      label: lbl,
+      onClick: () => this.setState(st => {
+        const seen = { ...st.seen, [k]: true };
+        if (window.Progress && Object.keys(seen).length >= 2) window.Progress.markCompleted("spectroscopy");
+        return { tech: k, seen };
+      }),
+      bg: tech === k ? "#e8590c" : "#faf6ef",
+      fg: tech === k ? "#faf6ef" : "#2b2620",
+    }));
+
+    let bars = [], markers = [], xticks = [], linePts = "", axisX = "", axisY = "", caption = "", readoutTitle = "", rows = [];
+
+    if (tech === "ms") {
+      const xmax = Math.max.apply(null, mol.ms.map(p => p.mz)) + 8;
+      const mapX = mz => PX0 + (mz / xmax) * (PX1 - PX0);
+      const mapY = i => PY1 - (i / 100) * (PY1 - PY0);
+      bars = mol.ms.map(p => {
+        const cx = mapX(p.mz), top = mapY(p.int);
+        return { x: cx - 3, cx, top, w: 6, h: PY1 - top, ly: top - 4, text: p.mz };
+      });
+      for (let m = 0; m <= xmax; m += 10) xticks.push({ x: mapX(m), label: m });
+      axisX = "m/z"; axisY = "relative abundance / %";
+      caption = "Mass spectrum: the sample is ionised and fragmented; each stick is a fragment plotted by mass/charge (m/z). The peak at highest m/z is the molecular ion M⁺ (= Mr); the tallest is the base peak.";
+      readoutTitle = "PEAKS — m/z → fragment";
+      rows = mol.ms.slice().sort((a, b) => b.mz - a.mz).map(p => ({ key: "m/z " + p.mz, val: p.frag }));
+    } else if (tech === "ir") {
+      const mapX = wn => PX0 + ((4000 - wn) / (4000 - 400)) * (PX1 - PX0);
+      const mapY = T => PY0 + ((100 - T) / 100) * (PY1 - PY0);
+      const Tat = wn => {
+        let T = 97;
+        mol.ir.forEach(b => { T -= b.depth * Math.exp(-Math.pow((wn - b.c) / b.w, 2)); });
+        return Math.max(4, T);
+      };
+      const pts = [];
+      for (let wn = 4000; wn >= 400; wn -= 15) pts.push(mapX(wn).toFixed(1) + "," + mapY(Tat(wn)).toFixed(1));
+      linePts = pts.join(" ");
+      markers = mol.ir.map(b => ({ x: mapX(b.c), y: Math.max(PY0 + 8, mapY(Tat(b.c)) - 6), label: b.label }));
+      [4000, 3000, 2000, 1500, 1000, 500].forEach(w => xticks.push({ x: mapX(w), label: w }));
+      axisX = "wavenumber / cm⁻¹  (high → low)"; axisY = "transmittance / %";
+      caption = "Infrared spectrum: molecules absorb IR at frequencies that make their bonds vibrate. Each dip is an absorption; the wavenumber axis runs high→low. Blue labels mark the diagnostic bonds.";
+      readoutTitle = "ABSORPTIONS — wavenumber → bond";
+      rows = mol.ir.slice().sort((a, b) => b.c - a.c).map(b => ({ key: "~" + b.c + " cm⁻¹", val: b.label + " — " + b.note }));
+    } else {
+      const mapX = d => PX0 + ((12 - d) / 12) * (PX1 - PX0);
+      const maxH = Math.max.apply(null, mol.nmr.map(p => p.nH));
+      const hMax = PY1 - PY0 - 22;
+      bars = mol.nmr.map(p => {
+        const cx = mapX(p.d), h = 26 + (p.nH / maxH) * (hMax - 26), top = PY1 - h;
+        return { x: cx - 3, cx, top, w: 6, h, ly: top - 4, text: "δ " + p.d };
+      });
+      [12, 10, 8, 6, 4, 2, 0].forEach(d => xticks.push({ x: mapX(d), label: d }));
+      axisX = "chemical shift  δ / ppm  (TMS = 0, right)"; axisY = "signal";
+      const ratio = mol.nmr.map(p => p.nH).join(" : ");
+      caption = "¹H NMR: each chemically different hydrogen environment gives one signal. Peak position (δ) shows the environment; peak area (integration) gives the number of H — here " + ratio + ".";
+      readoutTitle = "ENVIRONMENTS — δ → group";
+      rows = mol.nmr.slice().sort((a, b) => b.d - a.d).map(p => ({ key: "δ " + p.d, val: "(" + p.nH + "H, " + p.mult + ") — " + p.grp }));
+    }
+
+    return {
+      molTabs, techTabs,
+      molName: mol.name, molFormula: mol.formula, molMr: mol.mr, molSummary: mol.summary,
+      bars, markers, xticks, linePts, axisX, axisY, caption, readoutTitle, rows,
+      techniques: [
+        { name: "Mass spectrometry", asks: "How heavy? What pieces?", text: "Blasts the molecule apart and weighs the pieces. The heaviest peak gives the relative molecular mass; the fragments hint at the structure." },
+        { name: "Infrared (IR)", asks: "Which bonds / groups?", text: "Shines infrared light through the sample. Bonds absorb at characteristic frequencies, so dips reveal groups like O–H and C=O." },
+        { name: "¹H NMR", asks: "How are the H atoms arranged?", text: "Reads the hydrogen atoms in a magnetic field. Number of signals = number of H environments; areas give how many H are in each." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

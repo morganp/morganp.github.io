@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Periodic Trends">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L3</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIELD GUIDE 12 — LEVEL L3 (GCSE / NATIONAL 5)</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Periodic trends</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">The table isn't just a list — it's arranged so properties change in predictable patterns as you move across or down it. Pick a trend and watch it play out across real elements.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — PICK A TREND</div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="3">
+          <div onClick="{{ tb.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 14px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ tb.bg }}; color: {{ tb.fg }};">{{ tb.label }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <x-import component-from-global-scope="trend-bars" from="../lib/trend-bars.js" data="{{ chartData }}" unit="{{ chartUnit }}" width="560" height="220" hint-size="560px,220px"></x-import>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #554c42; text-align: center;">{{ blurb }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — WHY TRENDS EXIST</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Every trend comes back to the same two things: how many <strong>shells</strong> of electrons an atom has, and how strongly its <strong>nucleus pulls</strong> on the outer ones. Add a shell (moving down a group) and the outer electrons sit further away, feeling a weaker pull. Add protons without adding a shell (moving across a period) and the pull gets stronger.</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">Atomic radius</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">Shrinks across a period (stronger pull, same shell count), grows down a group (an extra shell each time).</div>
+      </div>
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">Reactivity (metals)</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">Increases down Group 1/2 — outer electrons are further from the nucleus and easier to lose.</div>
+      </div>
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">Melting point</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">Follows bonding strength — spikes in the middle of a period where metallic bonding is strongest.</div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="periodic-table.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Periodic Table</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>FIELD GUIDE 12 / PERIODIC TRENDS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sel: 0, seen: { 0: true } };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("periodic-trends");
+  }
+
+  _trends() {
+    return [
+      {
+        label: "ATOMIC RADIUS — PERIOD 3",
+        unit: "picometres (pm)",
+        data: [
+          { sym: "Na", value: 186 }, { sym: "Mg", value: 160 }, { sym: "Al", value: 143 },
+          { sym: "Si", value: 117 }, { sym: "P", value: 110 }, { sym: "S", value: 104 }, { sym: "Cl", value: 99 },
+        ],
+        blurb: "Same number of shells (3) all the way across — but each element has one more proton pulling the outer shell in tighter. Radius shrinks steadily from sodium to chlorine.",
+      },
+      {
+        label: "REACTIVITY — GROUP 1 (ALKALI METALS)",
+        unit: "relative reactivity (arbitrary units)",
+        data: [
+          { sym: "Li", value: 2 }, { sym: "Na", value: 4 }, { sym: "K", value: 7 },
+          { sym: "Rb", value: 9 }, { sym: "Cs", value: 10 },
+        ],
+        blurb: "Going down Group 1, the single outer electron sits in a shell further and further from the nucleus, held on more weakly — so it's given away more easily and reactivity climbs.",
+      },
+      {
+        label: "MELTING POINT — PERIOD 3",
+        unit: "kelvin (K)",
+        data: [
+          { sym: "Na", value: 371 }, { sym: "Mg", value: 923 }, { sym: "Al", value: 933 },
+          { sym: "Si", value: 1687 }, { sym: "P", value: 317 }, { sym: "S", value: 388 }, { sym: "Cl", value: 172 },
+        ],
+        blurb: "Melting point climbs through the metals (stronger metallic bonding with more delocalised electrons), peaks at giant-covalent silicon, then crashes for the small, weakly-attracted non-metal molecules.",
+      },
+    ];
+  }
+
+  renderVals() {
+    const TRENDS = this._trends();
+    const cur = TRENDS[this.state.sel];
+    return {
+      chartData: cur.data.map(d => d.sym + ":" + d.value).join(","),
+      chartUnit: cur.unit,
+      blurb: cur.blurb,
+      tabs: TRENDS.map((t, i) => ({
+        label: t.label,
+        bg: i === this.state.sel ? "#2b2620" : "#faf6ef",
+        fg: i === this.state.sel ? "#faf6ef" : "#2b2620",
+        onClick: () => this.setState(s => {
+          const seen = { ...s.seen, [i]: true };
+          if (window.Progress && Object.keys(seen).length >= TRENDS.length) window.Progress.markCompleted("periodic-trends");
+          return { sel: i, seen };
+        }),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

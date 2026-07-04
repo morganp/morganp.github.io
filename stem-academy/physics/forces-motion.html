@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Forces and Motion Module">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="physics.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">PHYSICS</a> / LEVEL L1–L3</span>
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← PHYSICS MAP</a>
+    </div>
+  </div>
+
+  <!-- body -->
+  <div style="max-width: 980px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <!-- title -->
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// MODULE 02 — FORCES &amp; MOTION</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 54px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Push the crate. See the physics.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42; max-width: 700px;">Every force is a push or a pull, measured in newtons. Set your push, the crate's mass, and the roughness of the floor — then watch the free-body arrows, the motion, and the live velocity graph respond.</div>
+    </div>
+
+    <!-- THE SIM -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// EXPERIMENT 01 — THE CRATE LAB</div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>PUSH FORCE</span><span style="color: #e8590c;">{{ force }} N</span></div>
+          <input type="range" min="-200" max="200" step="5" value="{{ force }}" onChange="{{ setForce }}" style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;"><span>← PULL LEFT</span><span>PUSH RIGHT →</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>CRATE MASS</span><span style="color: #e8590c;">{{ mass }} kg</span></div>
+          <input type="range" min="1" max="50" step="1" value="{{ mass }}" onChange="{{ setMass }}" style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;"><span>SHOEBOX</span><span>FRIDGE</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>FLOOR FRICTION</span><span style="color: #e8590c;">μ = {{ mu }}</span></div>
+          <input type="range" min="0" max="1" step="0.05" value="{{ mu }}" onChange="{{ setMu }}" style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;"><span>ICE RINK</span><span>ROUGH CONCRETE</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center;">
+        <x-import component-from-global-scope="force-sim" from="../lib/force-sim.js" force="{{ force }}" mass="{{ mass }}" mu="{{ mu }}" resetkey="{{ resetKey }}" width="820" height="380" hint-size="820px,380px"></x-import>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">{{ simHint }}</div>
+        <div onClick="{{ reset }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 18px; border: 2px solid #2b2620; cursor: pointer; background: #faf6ef;" style-hover="background: #2b2620; color: #faf6ef;">RESET CRATE</div>
+      </div>
+    </div>
+
+    <!-- challenges -->
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// TRY THESE EXPERIMENTS</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+        <sc-for list="{{ challenges }}" as="ch" hint-placeholder-count="4">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 2px 7px; border: 1px solid #2b2620; background: #faf6ef;">{{ ch.level }}</span>
+              <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ ch.title }}</span>
+            </div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ ch.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- theory: levels -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L1 — EVERY FORCE IS A PUSH OR A PULL</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Kick a ball, stretch a rubber band, drop a spoon — every time, something is pushing or pulling. Forces have a <strong>size</strong> (measured in newtons, N) and a <strong>direction</strong>, which is why we draw them as arrows. About 1 N is the pull of gravity on an apple.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L2 — BALANCED VS UNBALANCED</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Forces gang up. If your push exactly matches friction pushing back, the forces are <strong>balanced</strong> — and the crate's motion doesn't change (still if it was still, coasting if it was coasting). Only an <strong>unbalanced</strong> force changes motion. Try it above: on rough concrete, a small push does nothing at all — friction cancels every newton of it.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — NEWTON'S THREE LAWS</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+        <sc-for list="{{ laws }}" as="law" hint-placeholder-count="3">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: #e8590c;">{{ law.n }}</div>
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ law.title }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">{{ law.text }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; margin-top: auto;">{{ law.formula }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #6b6156;">The crate lab is the second law running live: net force ÷ mass = acceleration, sixty times a second. Double the mass and watch the same push produce half the acceleration.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — READING THE VELOCITY–TIME GRAPH</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The strip at the bottom of the lab is a real <strong>velocity–time graph</strong>, drawing itself as the crate moves. A flat line means steady speed (balanced forces). A rising slope means acceleration — and the steeper the slope, the bigger the net force. The line sloping back to zero? That's friction winning after you let go. Physicists read these graphs the way you read a story.</div>
+    </div>
+
+    <!-- next -->
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Physics map →</a>
+      <a href="simple-machines.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Simple Machines</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MODULE 02 / FORCES &amp; MOTION</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { force: 0, mass: 10, mu: 0.2, resetKey: 0 };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("forces-motion");
+  }
+
+  renderVals() {
+    const { force, mass, mu, resetKey } = this.state;
+    const fMax = mu * mass * 9.8;
+    let simHint;
+    if (force === 0) simHint = "NO PUSH APPLIED — SLIDE THE FORCE TO GET STARTED";
+    else if (Math.abs(force) <= fMax) simHint = "YOUR PUSH (" + Math.abs(force) + " N) CAN'T BEAT STATIC FRICTION (" + fMax.toFixed(0) + " N) — PUSH HARDER OR SLICK THE FLOOR";
+    else simHint = "UNBALANCED FORCE — THE CRATE ACCELERATES AT " + (Math.abs(force) > fMax ? ((Math.abs(force) - fMax) / mass).toFixed(1) : "0") + " m/s²";
+
+    return {
+      force, mass, mu: mu.toFixed(2), resetKey,
+      setForce: (e) => this.setState({ force: Number(e.target.value) }),
+      setMass: (e) => this.setState({ mass: Number(e.target.value) }),
+      setMu: (e) => this.setState({ mu: Number(e.target.value) }),
+      reset: () => this.setState(s => ({ resetKey: s.resetKey + 1 })),
+      simHint,
+      challenges: [
+        { level: "L1", title: "Ice rink", text: "Set friction to 0, give one push, then set the push back to 0. Why doesn't the crate stop?" },
+        { level: "L2", title: "The stubborn fridge", text: "Mass 50 kg, rough concrete (μ = 1). How many newtons before it budges at all?" },
+        { level: "L3", title: "Halve the acceleration", text: "Push 100 N at 10 kg, note the acceleration. Predict what 20 kg gives — then check." },
+        { level: "L3", title: "Steady speed", text: "Get the crate moving, then find the exact push where the velocity line goes flat. What does that force equal?" },
+      ],
+      laws: [
+        { n: "I", title: "Things keep doing what they're doing", text: "No unbalanced force? Then no change: still stays still, moving keeps moving at the same speed and direction. That's inertia.", formula: "ΣF = 0 → v CONSTANT" },
+        { n: "II", title: "Force = mass × acceleration", text: "An unbalanced force accelerates things. More force, more acceleration; more mass, less. This one equation runs the whole lab above.", formula: "F = m × a" },
+        { n: "III", title: "Every push pushes back", text: "Push a wall and the wall pushes you, exactly as hard, the other way. Forces always come in equal-and-opposite pairs.", formula: "F(A ON B) = −F(B ON A)" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

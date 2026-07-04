@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Chemistry World Map">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / CHEMISTRY WORLD MAP</span>
+      <a href="../index.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← ALL TOPICS</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE CHEMISTRY MAP: AGE 10 TO A-LEVEL</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Chemistry, one path at a time</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 720px;">Every topic below builds on the ones above it — follow the lines. Orange topics are live now; the rest are on the bench. Start anywhere on your level and climb.</div>
+    <div style="display: flex; gap: 18px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; align-items: center;">
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #e8590c; border: 1.5px solid #2b2620; display: inline-block;"></span>LIVE — CLICK TO OPEN</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #fff; border: 1.5px solid #2b2620; display: inline-block;"></span>ON THE BENCH</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #2f7d3a; border: 1.5px solid #2b2620; display: inline-block;"></span>COMPLETED</span>
+      <span>LINES = "LEARN THIS FIRST"</span>
+      <a href="../progress.html" style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #fff;" style-hover="background: #2b2620; color: #faf6ef;">MY PROGRESS →</a>
+    </div>
+  </div>
+
+  <!-- graph -->
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 24px; overflow-x: auto;">
+    <div style="position: relative; width: 1160px; height: 640px; border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15);">
+      <svg width="1160" height="640" style="position: absolute; inset: 0; pointer-events: none;">
+        <sc-for list="{{ edges }}" as="e" hint-placeholder-count="10">
+          <path d="{{ e.d }}" fill="none" stroke="#d8d0c4" stroke-width="1.5"></path>
+        </sc-for>
+      </svg>
+      <sc-for list="{{ bands }}" as="band" hint-placeholder-count="5">
+        <div style="position: absolute; left: 0; right: 0; top: {{ band.y }}px; border-top: 1px dashed #e6dfd2; padding: 6px 0 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #a89d8e;">{{ band.label }}</div>
+      </sc-for>
+      <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="20">
+        <a href="{{ n.href }}" style="position: absolute; left: {{ n.x }}px; top: {{ n.y }}px; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; white-space: nowrap; padding: 6px 10px; border: 1.5px solid #2b2620; background: {{ n.bg }}; color: {{ n.fg }}; text-decoration: none; cursor: {{ n.cursor }}; box-shadow: 2px 2px 0 rgba(43,38,32,0.12);" style-hover="box-shadow: 3px 3px 0 rgba(43,38,32,0.3);">{{ n.mark }}{{ n.label }}</a>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- live list -->
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 64px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// LIVE NOW</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+      <sc-for list="{{ liveList }}" as="lv" hint-placeholder-count="4">
+        <a href="{{ lv.href }}" style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: #2b2620;" style-hover="box-shadow: 4px 4px 0 rgba(43,38,32,0.2);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 2px 7px; border: 1px solid #2b2620; background: #e8590c; color: #faf6ef;">{{ lv.level }}</span>
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; flex: 1;">{{ lv.title }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #2f7d3a;">{{ lv.mark }}</span>
+          </div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ lv.desc }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e8590c; margin-top: auto;">OPEN →</div>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY / L1 EXPLORER → L5 EXPERT</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    if (window.Progress) this._unsub = window.Progress.onChange(() => this.forceUpdate());
+  }
+  componentWillUnmount() {
+    if (this._unsub) this._unsub();
+  }
+
+  renderVals() {
+    const W = 1160, ML = 80, MR = 30;
+    const bandY = { 1: 0, 2: 118, 3: 240, 4: 390, 5: 508 };
+    const rowBase = { 1: 42, 2: 160, 3: 282, 4: 432, 5: 550 };
+
+    // id, level, label, href (live), row-position hints
+    const topics = [
+      { id: "states", l: 1, label: "States of matter", href: "states-of-matter.html" },
+      { id: "mix1", l: 1, label: "Mixtures & separating", href: "matter-classify.html" },
+      { id: "mats", l: 1, label: "Materials & properties", href: "materials-resources.html" },
+      { id: "rxn1", l: 1, label: "Simple reactions", href: "word-equations.html" },
+      { id: "acid1", l: 1, label: "Acids & alkalis intro", href: "acids-bases.html" },
+
+      { id: "particle", l: 2, label: "Particle model", href: "states-of-matter.html" },
+      { id: "aecm", l: 2, label: "Atoms · elements · compounds", href: "matter-classify.html" },
+      { id: "pt2", l: 2, label: "Periodic table intro", href: "periodic-table.html" },
+      { id: "rxn2", l: 2, label: "Reactions & word equations", href: "word-equations.html" },
+      { id: "acid2", l: 2, label: "Acids · bases · pH", href: "acids-bases.html" },
+      { id: "metals", l: 2, label: "Metals & reactivity", href: "reactivity-series.html" },
+      { id: "earth", l: 2, label: "Earth's resources", href: "materials-resources.html" },
+
+      { id: "atomic", l: 3, label: "Atomic structure", href: "electron-shells.html" },
+      { id: "bonding", l: 3, label: "Bonding", href: "bonding.html" },
+      { id: "trends", l: 3, label: "Periodic trends", href: "periodic-trends.html" },
+      { id: "quant", l: 3, label: "Quantitative chem", href: "quantitative-chem.html" },
+      { id: "rates", l: 3, label: "Rates of reaction", href: "rates-of-reaction.html" },
+      { id: "energetics", l: 3, label: "Energetics", href: "energetics.html" },
+      { id: "salts", l: 3, label: "Acids · bases · salts", href: "salts.html" },
+      { id: "electrolysis", l: 3, label: "Electrolysis", href: "electrolysis.html" },
+      { id: "organic1", l: 3, label: "Organic intro", href: "organic-intro.html" },
+      { id: "atmos", l: 3, label: "Atmosphere & climate", href: "atmosphere-climate.html" },
+      { id: "analysis", l: 3, label: "Chemical analysis", href: "chemical-analysis.html" },
+
+      { id: "stoich", l: 4, label: "Stoichiometry", href: "stoichiometry.html" },
+      { id: "equil1", l: 4, label: "Equilibria intro", href: "equilibria.html" },
+      { id: "redox", l: 4, label: "Redox", href: "redox.html" },
+      { id: "hess", l: 4, label: "Enthalpy & Hess", href: "enthalpy.html" },
+      { id: "organic2", l: 4, label: "Further organic", href: "further-organic.html" },
+      { id: "nuclear", l: 4, label: "Nuclear chemistry", href: "nuclear.html" },
+
+      { id: "thermo", l: 5, label: "Thermodynamics", href: "thermodynamics.html" },
+      { id: "kinetics", l: 5, label: "Kinetics", href: "kinetics.html" },
+      { id: "equil2", l: 5, label: "Equilibria Kc/Kp", href: "equilibrium-constant.html" },
+      { id: "electrochem", l: 5, label: "Electrochemistry", href: "electrochemistry.html" },
+      { id: "transition", l: 5, label: "Transition metals", href: "transition-metals.html" },
+      { id: "mechanisms", l: 5, label: "Organic mechanisms", href: "mechanisms.html" },
+      { id: "spectro", l: 5, label: "Spectroscopy", href: "spectroscopy.html" },
+      { id: "acidequil", l: 5, label: "Acid-base equilibria", href: "acid-base-equilibria.html" },
+      { id: "aromatic", l: 5, label: "Aromatic chemistry", href: "aromatic.html" },
+    ];
+
+    const links = [
+      ["states", "particle"], ["mix1", "aecm"], ["mats", "earth"], ["rxn1", "rxn2"], ["acid1", "acid2"],
+      ["particle", "rates"], ["aecm", "atomic"], ["pt2", "trends"], ["pt2", "atomic"],
+      ["rxn2", "quant"], ["rxn2", "energetics"], ["acid2", "salts"], ["metals", "electrolysis"], ["metals", "redox"],
+      ["earth", "atmos"], ["earth", "organic1"],
+      ["atomic", "bonding"], ["atomic", "nuclear"], ["bonding", "organic1"], ["trends", "transition"],
+      ["quant", "stoich"], ["rates", "kinetics"], ["energetics", "hess"], ["salts", "acidequil"],
+      ["electrolysis", "electrochem"], ["organic1", "organic2"], ["analysis", "spectro"],
+      ["stoich", "equil2"], ["equil1", "equil2"], ["redox", "electrochem"], ["hess", "thermo"],
+      ["organic2", "mechanisms"], ["organic2", "aromatic"],
+    ];
+
+    // estimate rendered pill width from label length (10.5px mono-ish font + 20px padding)
+    const estWidth = (label) => Math.max(70, label.length * 6.6 + 22);
+
+    const byLevel = {};
+    topics.forEach(t => { (byLevel[t.l] = byLevel[t.l] || []).push(t); });
+    const pos = {};
+    const nodes = [];
+    const usable = W - ML - MR;
+    const GAP = 14, SUBROW_H = 34;
+
+    Object.keys(byLevel).forEach(l => {
+      const row = byLevel[l];
+      // flow-wrap the row's nodes into sub-rows so labels never overlap
+      const lines = []; // array of {items:[{t,w}], totalW}
+      let cur = { items: [], totalW: 0 };
+      row.forEach(t => {
+        const w = estWidth(t.label);
+        const addW = cur.items.length ? w + GAP : w;
+        if (cur.totalW + addW > usable && cur.items.length) {
+          lines.push(cur);
+          cur = { items: [], totalW: 0 };
+        }
+        cur.items.push({ t, w });
+        cur.totalW += cur.items.length > 1 ? w + GAP : w;
+      });
+      if (cur.items.length) lines.push(cur);
+
+      lines.forEach((line, li) => {
+        // center this sub-row within usable width
+        let x = ML + (usable - line.totalW) / 2;
+        const y = rowBase[l] + li * SUBROW_H;
+        line.items.forEach(({ t, w }) => {
+          const cx = x + w / 2;
+          pos[t.id] = { x: cx, y };
+          const live = !!t.href;
+          const progId = live ? t.href.replace(/\.html$/, "") : null;
+          const done = live && window.Progress && window.Progress.isCompleted(progId);
+          const seen = live && window.Progress && window.Progress.isVisited(progId);
+          nodes.push({
+            label: t.label,
+            mark: done ? "✓ " : "",
+            href: t.href || "#",
+            x: Math.round(cx), y: Math.round(y),
+            bg: done ? "#2f7d3a" : live ? "#e8590c" : "#fff",
+            fg: live ? "#faf6ef" : "#2b2620",
+            cursor: live ? "pointer" : "default",
+          });
+          x += w + GAP;
+        });
+      });
+    });
+
+    const edges = links.map(([a, b]) => {
+      const p = pos[a], q = pos[b];
+      const y1 = p.y + 28, y2 = q.y - 2;
+      return { d: "M " + p.x + " " + y1 + " C " + p.x + " " + (y1 + 36) + ", " + q.x + " " + (y2 - 36) + ", " + q.x + " " + y2 };
+    });
+
+    const bands = [
+      { y: bandY[1], label: "L1 EXPLORER — AGE 10-11" },
+      { y: bandY[2], label: "L2 FOUNDATION — KS3 / S1-S3" },
+      { y: bandY[3], label: "L3 CORE — GCSE / NATIONAL 5" },
+      { y: bandY[4], label: "L4 ADVANCED — AS / HIGHER" },
+      { y: bandY[5], label: "L5 EXPERT — A-LEVEL / ADVANCED HIGHER" },
+    ];
+
+    const liveList = [
+      { key: "periodic-table", level: "L2", title: "The Periodic Table", desc: "All 118 elements — heat them, quiz them, inspect every one.", href: "periodic-table.html" },
+      { key: "states-of-matter", level: "L1-L2", title: "States of Matter", desc: "Solid, liquid, gas, plasma — and the particle model behind them.", href: "states-of-matter.html" },
+      { key: "electron-shells", level: "L2-L3", title: "Electron Shells", desc: "Energy levels, photon jumps, and a 3D atom you can spin.", href: "electron-shells.html" },
+      { key: "matter-classify", level: "L1-L2", title: "Elements, Compounds & Mixtures", desc: "Particle diagrams, a sorting game, and separating techniques.", href: "matter-classify.html" },
+      { key: "acids-bases", level: "L1-L2", title: "Acids, Bases & pH", desc: "Slide the pH scale and watch the indicator change colour.", href: "acids-bases.html" },
+      { key: "word-equations", level: "L1-L2", title: "Reactions & Word Equations", desc: "Build real reactions and read off their word equations.", href: "word-equations.html" },
+      { key: "reactivity-series", level: "L2", title: "Metals & Reactivity", desc: "Rank seven metals from explosive to practically inert.", href: "reactivity-series.html" },
+      { key: "materials-resources", level: "L1-L2", title: "Materials & Earth's Resources", desc: "Match materials to properties; mined, grown, or made.", href: "materials-resources.html" },
+      { key: "bonding", level: "L3", title: "Bonding", desc: "Ionic, covalent, metallic — flip between all three live diagrams.", href: "bonding.html" },
+      { key: "rates-of-reaction", level: "L3", title: "Rates of Reaction", desc: "Collision theory in a flask — dial concentration, temperature, surface area.", href: "rates-of-reaction.html" },
+      { key: "energetics", level: "L3", title: "Energetics", desc: "Exothermic vs endothermic energy profiles, side by side.", href: "energetics.html" },
+      { key: "electrolysis", level: "L3", title: "Electrolysis", desc: "Watch cations and anions drift to their electrodes and discharge live.", href: "electrolysis.html" },
+      { key: "periodic-trends", level: "L3", title: "Periodic Trends", desc: "Atomic radius, reactivity, melting point — real data, plotted live.", href: "periodic-trends.html" },
+      { key: "quantitative-chem", level: "L3", title: "Quantitative Chemistry", desc: "A live mass ↔ moles calculator for six common substances.", href: "quantitative-chem.html" },
+      { key: "organic-intro", level: "L3", title: "Organic Chemistry Intro", desc: "Build alkane and alkene chains and watch the formula update.", href: "organic-intro.html" },
+      { key: "chemical-analysis", level: "L3", title: "Chemical Analysis", desc: "Match metal ions to flame colours; reference card of gas tests.", href: "chemical-analysis.html" },
+      { key: "atmosphere-climate", level: "L3", title: "Atmosphere & Climate", desc: "Today's atmosphere by volume, plus the greenhouse effect explained.", href: "atmosphere-climate.html" },
+      { key: "salts", level: "L3", title: "Acids, Bases & Salts", desc: "Build salts three ways, then run a live titration curve.", href: "salts.html" },
+      { key: "stoichiometry", level: "L4", title: "Stoichiometry", desc: "A step-by-step reacting-mass calculator — weigh a reactant, predict the product.", href: "stoichiometry.html" },
+      { key: "equilibria", level: "L4", title: "Equilibria & Le Chatelier", desc: "Shift the Haber equilibrium with pressure and temperature; watch the yield move.", href: "equilibria.html" },
+      { key: "redox", level: "L4", title: "Redox & Oxidation Numbers", desc: "Audit oxidation numbers atom-by-atom; OIL RIG, half-equations, agents.", href: "redox.html" },
+      { key: "enthalpy", level: "L4", title: "Enthalpy & Hess's Law", desc: "A bond-energy ledger: break bonds, make bonds, read off ΔH.", href: "enthalpy.html" },
+      { key: "further-organic", level: "L4", title: "Further Organic", desc: "React an acid with an alcohol and name the ester; functional groups.", href: "further-organic.html" },
+      { key: "nuclear", level: "L4", title: "Nuclear Chemistry", desc: "Half-life decay chamber, nuclear equations, fission vs fusion, E=mc².", href: "nuclear.html" },
+      { key: "thermodynamics", level: "L5", title: "Thermodynamics", desc: "ΔG = ΔH − TΔS with a temperature dial — find the spontaneity crossover.", href: "thermodynamics.html" },
+      { key: "kinetics", level: "L5", title: "Kinetics", desc: "Switch reaction order and watch the rate–concentration graph reshape.", href: "kinetics.html" },
+      { key: "equilibrium-constant", level: "L5", title: "Equilibrium Constants", desc: "Compute Kc from equilibrium concentrations and read what the value means.", href: "equilibrium-constant.html" },
+      { key: "electrochemistry", level: "L5", title: "Electrochemistry", desc: "Pick two metals and build a cell; read the EMF from electrode potentials.", href: "electrochemistry.html" },
+      { key: "transition-metals", level: "L5", title: "Transition Metals", desc: "Tap an ion and see the colour its solution turns; complexes and catalysis.", href: "transition-metals.html" },
+      { key: "acid-base-equilibria", level: "L5", title: "Acid-Base Equilibria", desc: "A weak/strong-acid pH calculator using Ka; buffers and pKa.", href: "acid-base-equilibria.html" },
+      { key: "mechanisms", level: "L5", title: "Organic Mechanisms", desc: "Step through radical, electrophilic-addition and SN2 mechanisms, one curly arrow at a time.", href: "mechanisms.html" },
+      { key: "spectroscopy", level: "L5", title: "Spectroscopy", desc: "Compare mass-spec, IR and ¹H NMR for three molecules — read a compound's fingerprint.", href: "spectroscopy.html" },
+      { key: "aromatic", level: "L5", title: "Aromatic Chemistry", desc: "Toggle benzene's two models and run the classic electrophilic substitutions.", href: "aromatic.html" },
+    ].map(lv => ({ ...lv, mark: window.Progress && window.Progress.isCompleted(lv.key) ? "✓ DONE" : (window.Progress && window.Progress.isVisited(lv.key) ? "· started" : "") }));
+
+    return { nodes, edges, bands, liveList };
+  }
+}
+</script>
+</body>
+</html>

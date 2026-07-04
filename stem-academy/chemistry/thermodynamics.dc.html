@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Thermodynamics">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L5</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L5 — THERMODYNAMICS</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Will it happen? Ask free energy.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Some reactions run on their own; others never will. The deciding factor is Gibbs free energy — a tug-of-war between energy and disorder that temperature can tip either way. Turn the dial and find the tipping point.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE GIBBS FREE-ENERGY CALCULATOR</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 12px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="border: 1.5px solid #2b2620; background: #faf6ef; padding: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; text-align: center; font-weight: 600;">{{ equation }}</div>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 120px; border: 1.5px solid #2b2620; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="color: #6b6156; font-size: 10px; display: block;">ΔH (enthalpy)</span><b style="font-size: 15px;">{{ dhLabel }}</b></div>
+        <div style="flex: 1; min-width: 120px; border: 1.5px solid #2b2620; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="color: #6b6156; font-size: 10px; display: block;">ΔS (entropy)</span><b style="font-size: 15px;">{{ dsLabel }}</b></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;"><span>TEMPERATURE</span><span style="color: #e8590c;">{{ temp }} K  ({{ tempC }} °C)</span></div>
+        <input type="range" min="100" max="1500" step="10" value="{{ temp }}" onChange="{{ setTemp }}" style="width: 100%;">
+      </div>
+
+      <div style="position: relative; height: 46px; border: 2px solid #2b2620; display: flex; overflow: hidden;">
+        <div style="width: {{ spontLeftPct }}%; background: {{ leftColor }};"></div>
+        <div style="flex: 1; background: {{ rightColor }};"></div>
+        <div style="position: absolute; top: 0; bottom: 0; left: {{ crossPct }}%; width: 2px; background: #2b2620;"></div>
+        <div style="position: absolute; top: 3px; left: {{ crossPct }}%; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #2b2620; background: #faf6ef; padding: 1px 3px; white-space: nowrap;">{{ crossLabel }}</div>
+        <div style="position: absolute; top: 0; bottom: 0; left: {{ tempPct }}%; width: 3px; background: #e8590c;"></div>
+        <div style="position: absolute; bottom: 3px; left: {{ tempPct }}%; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #e8590c; font-weight: 600;">T</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;"><span>100 K</span><span>SPONTANEITY ACROSS TEMPERATURE</span><span>1500 K</span></div>
+
+      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; background: {{ verdictBg }}; color: #faf6ef; padding: 16px; font-family: 'IBM Plex Mono', monospace;">
+        <span style="font-size: 12px; opacity: 0.85;">ΔG =</span>
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px;">{{ dg }} kJ/mol</span>
+        <span style="font-size: 13px; font-weight: 600;">{{ verdict }}</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// ENTROPY — THE ARROW OF DISORDER</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;"><strong>Entropy (S)</strong> measures how spread-out and disordered energy and matter are. The universe relentlessly tends toward higher entropy — gases fill their container, hot things cool, sugar dissolves. A reaction that makes more gas molecules, or turns a solid into a liquid or gas, has a <strong>positive ΔS</strong> (more disorder). The second law of thermodynamics says the <em>total</em> entropy of the universe always increases in any real process.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// GIBBS FREE ENERGY — THE VERDICT</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Gibbs combined both ideas into one number: <strong>ΔG = ΔH − TΔS</strong>. A reaction is <strong>feasible (spontaneous)</strong> when <strong>ΔG is negative</strong>. Notice the tug-of-war: a negative ΔH (exothermic) helps, and a positive ΔS (more disorder) helps — but the entropy term is multiplied by temperature. So raising the temperature can flip a reaction from impossible to spontaneous (or vice versa), and the <strong>crossover temperature</strong> where ΔG = 0 is exactly T = ΔH ÷ ΔS. That's why limestone only decomposes in a hot kiln, and why ice melts above 0 °C but not below.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="enthalpy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Enthalpy &amp; Hess (L4)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L5 / THERMODYNAMICS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { rxn: 0, temp: 298, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("thermodynamics");
+  }
+
+  _reactions() {
+    // dh in kJ/mol, ds in J/K/mol
+    return [
+      { label: "ICE MELTS", eq: "H₂O(s) → H₂O(l)", dh: 6.0, ds: 22 },
+      { label: "LIMESTONE DECOMPOSES", eq: "CaCO₃ → CaO + CO₂", dh: 178, ds: 161 },
+      { label: "HABER (AMMONIA)", eq: "N₂ + 3H₂ → 2NH₃", dh: -92, ds: -199 },
+      { label: "CARBON BURNS", eq: "C + O₂ → CO₂", dh: -394, ds: 3 },
+    ];
+  }
+
+  renderVals() {
+    const { rxn, temp } = this.state;
+    const r = this._reactions()[rxn];
+    const dg = r.dh - temp * (r.ds / 1000);
+    const cross = r.ds !== 0 ? (r.dh / (r.ds / 1000)) : null; // K where dG=0
+    const T0 = 100, T1 = 1500, span = T1 - T0;
+    const pct = (t) => Math.max(0, Math.min(100, (t - T0) / span * 100));
+    const tempPct = pct(temp);
+    let crossPct = cross == null ? -10 : pct(cross);
+    // determine which side is spontaneous
+    const spontaneousWhenHot = r.ds > 0; // higher T -> -TΔS more negative
+    let leftColor, rightColor, spontLeftPct;
+    // left region = below crossover; right = above
+    if (cross == null || cross < T0 || cross > T1) {
+      // always same sign in range
+      const allSpont = dg < 0;
+      leftColor = allSpont ? "#cde3d3" : "#f3d6d0";
+      rightColor = leftColor;
+      spontLeftPct = 0; crossPct = -10;
+    } else {
+      spontLeftPct = crossPct;
+      if (spontaneousWhenHot) { leftColor = "#f3d6d0"; rightColor = "#cde3d3"; }
+      else { leftColor = "#cde3d3"; rightColor = "#f3d6d0"; }
+    }
+
+    const tabs = this._reactions().map((x, i) => ({
+      label: x.label,
+      onClick: () => this.setState(s => {
+        const tried2 = { ...s.tried, [i]: true };
+        if (window.Progress && Object.keys(tried2).length >= 3) window.Progress.markCompleted("thermodynamics");
+        return { rxn: i, tried: tried2 };
+      }),
+      bg: rxn === i ? "#2b2620" : "#faf6ef",
+      fg: rxn === i ? "#faf6ef" : "#2b2620",
+    }));
+
+    return {
+      tabs, temp, tempC: temp - 273,
+      equation: r.eq,
+      dhLabel: (r.dh > 0 ? "+" : "") + r.dh + " kJ/mol " + (r.dh < 0 ? "(exothermic)" : "(endothermic)"),
+      dsLabel: (r.ds > 0 ? "+" : "") + r.ds + " J/K/mol " + (r.ds > 0 ? "(more disorder)" : "(less disorder)"),
+      setTemp: (e) => this.setState({ temp: Number(e.target.value) }),
+      dg: dg.toFixed(1),
+      verdict: dg < 0 ? "SPONTANEOUS ✓" : "NOT SPONTANEOUS ✗",
+      verdictBg: dg < 0 ? "#2f7d3a" : "#c0392b",
+      tempPct, crossPct, spontLeftPct, leftColor, rightColor,
+      crossLabel: cross == null || cross < T0 || cross > T1 ? "" : "ΔG=0 @ " + Math.round(cross) + " K",
+    };
+  }
+}
+</script>
+</body>
+</html>

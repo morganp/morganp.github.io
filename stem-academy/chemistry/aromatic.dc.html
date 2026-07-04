@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Aromatic Chemistry">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L5</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L5 — AROMATIC CHEMISTRY</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">The ring that refuses to break.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Benzene's six carbons share their electrons in a doughnut of delocalised charge — so stable that benzene reacts by <em>substitution</em>, keeping its ring, where a normal alkene would add across the double bond. Flip between the two ways of drawing it, then run the classic reactions.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — TWO MODELS OF BENZENE (C₆H₆)</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ modelTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 12px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; gap: 22px; align-items: center; flex-wrap: wrap;">
+        <div style="background: #fbf8f2; border: 2px solid #2b2620; flex-shrink: 0;">
+          <svg viewBox="0 0 180 180" width="180" height="180" style="display: block;">
+            <polygon points="{{ hexPoints }}" fill="none" stroke="#2b2620" stroke-width="2.5"></polygon>
+            <sc-for list="{{ rings }}" as="r" hint-placeholder-count="1">
+              <circle cx="{{ r.cx }}" cy="{{ r.cy }}" r="{{ r.r }}" fill="none" stroke="#e8590c" stroke-width="2.5"></circle>
+            </sc-for>
+            <sc-for list="{{ kekuleLines }}" as="l" hint-placeholder-count="3">
+              <line x1="{{ l.x1 }}" y1="{{ l.y1 }}" x2="{{ l.x2 }}" y2="{{ l.y2 }}" stroke="#e8590c" stroke-width="2.5"></line>
+            </sc-for>
+            <sc-for list="{{ hVerts }}" as="v" hint-placeholder-count="6">
+              <circle cx="{{ v.x }}" cy="{{ v.y }}" r="3" fill="#2b2620"></circle>
+            </sc-for>
+          </svg>
+        </div>
+        <div style="flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px;">{{ modelName }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #3a332b;">{{ modelText }}</div>
+          <div style="display: flex; flex-direction: column; gap: 5px; border-top: 1px dashed #d8d0c4; padding-top: 10px;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #6b6156;">LEGEND</div>
+            <sc-for list="{{ legend }}" as="g" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; color: #554c42;"><span style="width: 14px; height: 14px; border: 1.5px solid #2b2620; background: {{ g.color }}; flex-shrink: 0; border-radius: {{ g.round }};"></span>{{ g.text }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — ELECTROPHILIC SUBSTITUTION BENCH</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; background: #faf6ef; border: 1.5px solid #2b2620; padding: 10px 12px;">General reaction:  C₆H₆ + E⁺  →  C₆H₅E + H⁺   (the ring survives — one H is swapped for E)</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ rxnTabs }}" as="t" hint-placeholder-count="5">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 12px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="border: 2px solid #2b2620; background: #fbf8f2; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px;">{{ rxnName }}</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
+          <sc-for list="{{ rxnRows }}" as="r" hint-placeholder-count="4">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c;">{{ r.key }}</div>
+              <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.45; color: #2b2620;">{{ r.val }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.5; color: #6b6156; border-top: 1px dashed #d8d0c4; padding-top: 10px;">▸ {{ rxnUse }}</div>
+      </div>
+
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156; line-height: 1.5;">Every reaction here follows the same three beats: (1) a catalyst generates a strong electrophile E⁺; (2) the ring's π electrons attack E⁺, briefly breaking aromaticity to form an unstable intermediate; (3) the intermediate loses H⁺, restoring the stable ring.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// WHY SUBSTITUTION, NOT ADDITION?</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">An alkene adds across its C=C double bond because that swaps a weak π bond for two strong σ bonds. Benzene <em>could</em> add too — but doing so would destroy the delocalised ring and lose its extra stability (about <strong>150 kJ mol⁻¹</strong>, measured from enthalpies of hydrogenation). Substitution keeps the ring intact, so it's the favoured path. That's the single big idea of aromatic chemistry.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE EVIDENCE FOR DELOCALISATION</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <sc-for list="{{ evidence }}" as="e" hint-placeholder-count="3">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 15px; color: #e8590c;">{{ e.name }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ e.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="mechanisms.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Organic Mechanisms (L5)</a>
+      <a href="further-organic.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Further Organic (L4)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L5 / AROMATIC CHEMISTRY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { model: "deloc", rxn: "nitration", seen: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("aromatic");
+  }
+
+  _rxns() {
+    return {
+      nitration: {
+        label: "Nitration",
+        name: "Nitration → nitrobenzene",
+        rows: [
+          { key: "REAGENTS", val: "conc. HNO₃ + conc. H₂SO₄ (catalyst)" },
+          { key: "CONDITIONS", val: "warm, ~50 °C, reflux" },
+          { key: "ELECTROPHILE", val: "NO₂⁺ — the nitronium ion" },
+          { key: "PRODUCT", val: "nitrobenzene, C₆H₅NO₂" },
+        ],
+        use: "Nitrobenzene is reduced to phenylamine (aniline) for dyes, and further nitration gives explosives such as TNT.",
+      },
+      bromination: {
+        label: "Bromination",
+        name: "Halogenation → bromobenzene",
+        rows: [
+          { key: "REAGENTS", val: "Br₂ + FeBr₃ (or AlBr₃) as halogen carrier" },
+          { key: "CONDITIONS", val: "room temperature, dry (anhydrous)" },
+          { key: "ELECTROPHILE", val: "Br⁺ — Br₂ polarised by FeBr₃" },
+          { key: "PRODUCT", val: "bromobenzene, C₆H₅Br" },
+        ],
+        use: "Note benzene needs a catalyst and gives substitution — an alkene decolourises bromine water instantly by addition, with no catalyst.",
+      },
+      alkylation: {
+        label: "Friedel–Crafts alkylation",
+        name: "Friedel–Crafts alkylation → alkylbenzene",
+        rows: [
+          { key: "REAGENTS", val: "chloroalkane (e.g. CH₃Cl) + AlCl₃ catalyst" },
+          { key: "CONDITIONS", val: "anhydrous, warm, reflux" },
+          { key: "ELECTROPHILE", val: "a carbocation, R⁺ (e.g. CH₃⁺)" },
+          { key: "PRODUCT", val: "an alkylbenzene (e.g. methylbenzene)" },
+        ],
+        use: "Attaches carbon chains to the ring. Industrially important, but the product is more reactive than benzene so it can over-substitute.",
+      },
+      acylation: {
+        label: "Friedel–Crafts acylation",
+        name: "Friedel–Crafts acylation → aromatic ketone",
+        rows: [
+          { key: "REAGENTS", val: "acyl chloride (e.g. CH₃COCl) + AlCl₃ catalyst" },
+          { key: "CONDITIONS", val: "anhydrous, reflux" },
+          { key: "ELECTROPHILE", val: "an acylium ion, RCO⁺" },
+          { key: "PRODUCT", val: "an aromatic ketone (e.g. phenylethanone)" },
+        ],
+        use: "The clean way to build aromatic ketones — the product is less reactive than benzene, so it doesn't over-react the way alkylation does.",
+      },
+      sulfonation: {
+        label: "Sulfonation",
+        name: "Sulfonation → benzenesulfonic acid",
+        rows: [
+          { key: "REAGENTS", val: "fuming sulfuric acid (conc. H₂SO₄ / oleum)" },
+          { key: "CONDITIONS", val: "reflux for several hours" },
+          { key: "ELECTROPHILE", val: "SO₃ (sulfur trioxide)" },
+          { key: "PRODUCT", val: "benzenesulfonic acid, C₆H₅SO₃H" },
+        ],
+        use: "Used to make detergents and, because it's reversible, to temporarily block a ring position during synthesis.",
+      },
+    };
+  }
+
+  renderVals() {
+    const cx = 90, cy = 90, R = 64;
+    const verts = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (-90 + 60 * i) * Math.PI / 180;
+      verts.push({ x: cx + R * Math.cos(a), y: cy + R * Math.sin(a) });
+    }
+    const hexPoints = verts.map(v => v.x.toFixed(1) + "," + v.y.toFixed(1)).join(" ");
+    const hVerts = verts.map(v => ({ x: v.x.toFixed(1), y: v.y.toFixed(1) }));
+
+    const kekuleLines = this.state.model === "kekule" ? [0, 2, 4].map(e => {
+      const A = verts[e], B = verts[(e + 1) % 6];
+      const t = 0.16, s = 0.15;
+      const Ax = A.x + t * (cx - A.x), Ay = A.y + t * (cy - A.y);
+      const Bx = B.x + t * (cx - B.x), By = B.y + t * (cy - B.y);
+      const dx = Bx - Ax, dy = By - Ay;
+      return { x1: (Ax + s * dx).toFixed(1), y1: (Ay + s * dy).toFixed(1), x2: (Bx - s * dx).toFixed(1), y2: (By - s * dy).toFixed(1) };
+    }) : [];
+    const rings = this.state.model === "deloc" ? [{ cx, cy, r: 34 }] : [];
+
+    const modelTabs = [["deloc", "DELOCALISED (modern)"], ["kekule", "KEKULÉ (historic)"]].map(([k, lbl]) => ({
+      label: lbl,
+      onClick: () => this.setState({ model: k }),
+      bg: this.state.model === k ? "#2b2620" : "#faf6ef",
+      fg: this.state.model === k ? "#faf6ef" : "#2b2620",
+    }));
+
+    const modelInfo = this.state.model === "deloc"
+      ? { name: "Delocalised model", text: "Each carbon donates one electron from a p-orbital into a shared ring above and below the plane. All six C–C bonds are identical — halfway between single and double — shown as a plain circle inside the hexagon." }
+      : { name: "Kekulé model", text: "Friedrich Kekulé's 1865 structure: alternating single and double bonds. It predicts two different bond lengths, which is wrong — but it's still handy for counting electrons and drawing mechanisms." };
+
+    const legend = this.state.model === "deloc"
+      ? [
+          { color: "#fbf8f2", round: "0", text: "hexagon outline = the 6-carbon σ-bonded ring" },
+          { color: "#e8590c", round: "50%", text: "orange circle = 6 delocalised π electrons, shared equally" },
+          { color: "#2b2620", round: "50%", text: "each corner = 1 carbon (+ 1 hydrogen, not drawn)" },
+        ]
+      : [
+          { color: "#fbf8f2", round: "0", text: "hexagon outline = the 6-carbon σ-bonded ring" },
+          { color: "#e8590c", round: "0", text: "orange lines = three localised C=C double bonds" },
+          { color: "#2b2620", round: "50%", text: "each corner = 1 carbon (+ 1 hydrogen, not drawn)" },
+        ];
+
+    const rxnData = this._rxns();
+    const rxn = rxnData[this.state.rxn];
+    const rxnOrder = ["nitration", "bromination", "alkylation", "acylation", "sulfonation"];
+    const rxnTabs = rxnOrder.map(k => ({
+      label: rxnData[k].label,
+      onClick: () => this.setState(st => {
+        const seen = { ...st.seen, [k]: true };
+        if (window.Progress && Object.keys(seen).length >= 3) window.Progress.markCompleted("aromatic");
+        return { rxn: k, seen };
+      }),
+      bg: this.state.rxn === k ? "#e8590c" : "#faf6ef",
+      fg: this.state.rxn === k ? "#faf6ef" : "#2b2620",
+    }));
+
+    return {
+      hexPoints, hVerts, rings, kekuleLines,
+      modelTabs, modelName: modelInfo.name, modelText: modelInfo.text, legend,
+      rxnTabs, rxnName: rxn.name, rxnRows: rxn.rows, rxnUse: rxn.use,
+      evidence: [
+        { name: "One bond length", text: "X-ray shows all six C–C bonds are the same length (0.139 nm) — between a single (0.154) and double (0.134) bond. Kekulé's model can't explain this." },
+        { name: "Enthalpy of hydrogenation", text: "Benzene releases ~150 kJ mol⁻¹ less than three separate C=C bonds would. That missing energy is the extra stability from delocalisation." },
+        { name: "Resists addition", text: "Benzene won't decolourise bromine water and needs a catalyst to react at all — the opposite of a reactive alkene." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

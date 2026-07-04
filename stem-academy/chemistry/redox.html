@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Redox">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L4</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L4 — REDOX</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Follow the electrons.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">Rusting, burning, batteries, respiration — all the same deal underneath: electrons moving from one atom to another. Oxidation numbers are the bookkeeping that tracks them. Tap a compound to audit it.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — OXIDATION-NUMBER AUDITOR</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="6">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 9px 15px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; padding: 10px 0;">
+        <sc-for list="{{ atoms }}" as="a" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+            <div style="width: 70px; height: 70px; border: 2px solid #2b2620; background: {{ a.bg }}; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: #2b2620;">{{ a.sym }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600; color: {{ a.color }};">{{ a.ox }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">×{{ a.count }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="border: 1.5px solid #2b2620; background: #faf6ef; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: center; color: #2b2620;">SUM OF OXIDATION NUMBERS = {{ sumLabel }}  ·  (must equal the overall charge)</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.55; color: #554c42;">{{ note }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// OIL RIG — THE ONE RULE TO REMEMBER</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; color: #c0392b;">OIL — Oxidation Is Loss</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">A species is <strong>oxidised</strong> when it <strong>loses electrons</strong>. Its oxidation number goes <strong>up</strong>. Magnesium burning: Mg → Mg²⁺ + 2e⁻ (0 → +2).</div>
+        </div>
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; color: #2a5d8f;">RIG — Reduction Is Gain</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">A species is <strong>reduced</strong> when it <strong>gains electrons</strong>. Its oxidation number goes <strong>down</strong>. Oxygen: O₂ + 4e⁻ → 2O²⁻ (0 → −2).</div>
+        </div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #6b6156;">The two always happen together — electrons lost by one species are gained by another — which is why we call it <strong>redox</strong> (REDuction + OXidation). The species that <em>causes</em> oxidation by grabbing the electrons is the <strong>oxidising agent</strong> (and is itself reduced); vice versa for the <strong>reducing agent</strong>.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// THE RULES FOR ASSIGNING OXIDATION NUMBERS</div>
+      <div style="display: flex; flex-direction: column; gap: 0; border: 1.5px solid #2b2620;">
+        <sc-for list="{{ rules }}" as="r" hint-placeholder-count="5">
+          <div style="display: flex; gap: 12px; padding: 11px 14px; border-bottom: 1px solid #e6dfd2;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c; flex-shrink: 0;">{{ r.rule }}</span>
+            <span style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: #554c42;">{{ r.eg }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// HALF-EQUATIONS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">A redox reaction splits neatly into two <strong>half-equations</strong> — one showing the oxidation (electrons on the right, being lost), one the reduction (electrons on the left, being gained). Balance the electrons in each, then add them so the electrons cancel. For zinc displacing copper: <strong>Zn → Zn²⁺ + 2e⁻</strong> and <strong>Cu²⁺ + 2e⁻ → Cu</strong> combine to <strong>Zn + Cu²⁺ → Zn²⁺ + Cu</strong>. The electrons never appear in the overall equation — they've simply changed owner.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="reactivity-series.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Reactivity Series (L2)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L4 / REDOX</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sel: 0, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("redox");
+  }
+
+  _species() {
+    return [
+      { label: "H₂O", charge: 0, atoms: [{ sym: "H", ox: 1, count: 2, bg: "#fde8dc" }, { sym: "O", ox: -2, count: 1, bg: "#d9ede0" }], note: "Hydrogen is +1 and oxygen is −2 (the usual values). 2(+1) + 1(−2) = 0, matching neutral water." },
+      { label: "NaCl", charge: 0, atoms: [{ sym: "Na", ox: 1, count: 1, bg: "#fde8dc" }, { sym: "Cl", ox: -1, count: 1, bg: "#d9ede0" }], note: "A Group-1 metal is always +1; the ionic compound is neutral, so chlorine must be −1." },
+      { label: "H₂SO₄", charge: 0, atoms: [{ sym: "H", ox: 1, count: 2, bg: "#fde8dc" }, { sym: "S", ox: 6, count: 1, bg: "#fff3c4" }, { sym: "O", ox: -2, count: 4, bg: "#d9ede0" }], note: "Set H = +1 and O = −2, then sulfur is whatever makes the total zero: 2(+1) + S + 4(−2) = 0 → S = +6." },
+      { label: "MnO₄⁻", charge: -1, atoms: [{ sym: "Mn", ox: 7, count: 1, bg: "#fff3c4" }, { sym: "O", ox: -2, count: 4, bg: "#d9ede0" }], note: "In this ion the total must equal the charge, −1. Oxygen is −2, so Mn + 4(−2) = −1 → Mn = +7. Manganese at its most oxidised — that's why manganate(VII) is such a powerful oxidiser." },
+      { label: "Fe₂O₃", charge: 0, atoms: [{ sym: "Fe", ox: 3, count: 2, bg: "#fff3c4" }, { sym: "O", ox: -2, count: 3, bg: "#d9ede0" }], note: "Rust. Oxygen is −2, three of them give −6, so the two irons share +6 — that's +3 each (iron(III))." },
+      { label: "O₂", charge: 0, atoms: [{ sym: "O", ox: 0, count: 2, bg: "#eef0f2" }], note: "An element in its pure form always has oxidation number 0 — no matter how reactive. Only once it bonds to something else does the number change." },
+    ];
+  }
+
+  renderVals() {
+    const { sel } = this.state;
+    const sp = this._species();
+    const s = sp[sel];
+    const tabs = sp.map((x, i) => ({
+      label: x.label,
+      onClick: () => this.setState(st => {
+        const tried2 = { ...st.tried, [i]: true };
+        if (window.Progress && Object.keys(tried2).length >= 4) window.Progress.markCompleted("redox");
+        return { sel: i, tried: tried2 };
+      }),
+      bg: sel === i ? "#2b2620" : "#faf6ef",
+      fg: sel === i ? "#faf6ef" : "#2b2620",
+    }));
+    const atoms = s.atoms.map(a => ({
+      sym: a.sym, count: a.count, bg: a.bg,
+      ox: (a.ox > 0 ? "+" : "") + a.ox,
+      color: a.ox > 0 ? "#c0392b" : a.ox < 0 ? "#2a5d8f" : "#6b6156",
+    }));
+    return {
+      tabs, atoms,
+      sumLabel: (s.charge > 0 ? "+" : "") + s.charge + (s.charge === 0 ? " (neutral)" : " (ion charge)"),
+      note: s.note,
+      rules: [
+        { rule: "Element = 0", eg: "Any uncombined element: Na, O₂, Cl₂, Fe are all 0." },
+        { rule: "Group 1 = +1, Group 2 = +2", eg: "Na is +1, Mg is +2 in every compound." },
+        { rule: "Oxygen = −2", eg: "Almost always −2 (except peroxides −1, and with fluorine)." },
+        { rule: "Hydrogen = +1", eg: "+1 with non-metals (−1 in metal hydrides like NaH)." },
+        { rule: "Sum = overall charge", eg: "All oxidation numbers add up to 0 for a compound, or the charge for an ion." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

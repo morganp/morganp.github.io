@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Transition Metals">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L5</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 860px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// CHEMISTRY L5 — TRANSITION METALS</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 52px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">The colourful middle of the table.</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">The d-block metals break all the tidy rules: many oxidation states, brilliantly coloured compounds, and a genius for catalysis. Tap an ion and see the colour its solution actually turns.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE ION COLOUR BENCH</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="8">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 12px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+        <div style="width: 110px; height: 130px; border: 2.5px solid #2b2620; border-top: none; border-radius: 0 0 14px 14px; background: {{ colour }}; flex-shrink: 0; position: relative; box-shadow: inset 0 -8px 16px rgba(0,0,0,0.12);">
+          <div style="position: absolute; top: -1px; left: -2.5px; right: -2.5px; height: 8px; background: {{ colour }}; border: 2.5px solid #2b2620; border-bottom: none;"></div>
+        </div>
+        <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px;">{{ ionName }}</div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 9px; border: 1.5px solid #2b2620; background: #faf6ef;">OX STATE {{ oxState }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 9px; border: 1.5px solid #2b2620; background: #faf6ef;">COLOUR: {{ colourName }}</span>
+          </div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">{{ ionNote }}</div>
+        </div>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156;">Colour comes from d-electrons absorbing part of the visible spectrum; we see the colours that are left.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// WHAT MAKES A TRANSITION METAL</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Transition metals are d-block elements that form at least one ion with a <strong>partially filled d-subshell</strong>. That half-empty d-shell is behind nearly all their special behaviour. They're typically hard, dense, high-melting metals — a world away from the soft, low-melting Group-1 metals.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// FOUR SIGNATURE PROPERTIES</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+        <sc-for list="{{ props }}" as="p" hint-placeholder-count="4">
+          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 15px; color: #e8590c;">{{ p.name }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ p.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// COMPLEX IONS &amp; WHY THEY'RE COLOURED</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">A transition-metal ion attracts <strong>ligands</strong> — molecules or ions with a lone pair (water, ammonia, chloride) — which bond to it forming a <strong>complex ion</strong>, like [Cu(H₂O)₆]²⁺. The ligands split the d-orbitals into two slightly different energy levels. A d-electron can absorb a photon of visible light to jump the gap, so the compound absorbs one colour and we see the rest. Change the ligand (add ammonia to copper sulfate) and you change the size of the gap — and the colour shifts from pale to deep blue before your eyes.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="periodic-trends.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Periodic Trends (L3)</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY L5 / TRANSITION METALS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sel: 0, tried: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("transition-metals");
+  }
+
+  _ions() {
+    return [
+      { label: "Cu²⁺(aq)", name: "[Cu(H₂O)₆]²⁺", ox: "+2", colour: "#7fb2e6", colourName: "pale blue", note: "Hydrated copper(II) — the familiar colour of copper sulfate solution." },
+      { label: "Cu + NH₃", name: "[Cu(NH₃)₄(H₂O)₂]²⁺", ox: "+2", colour: "#2549c9", colourName: "deep royal blue", note: "Add excess ammonia to the pale-blue solution and the ligands swap, deepening the colour dramatically." },
+      { label: "Fe²⁺(aq)", name: "[Fe(H₂O)₆]²⁺", ox: "+2", colour: "#8fbf7a", colourName: "pale green", note: "Iron(II). Slowly oxidises in air to iron(III), so solutions turn brown on standing." },
+      { label: "Fe³⁺(aq)", name: "[Fe(H₂O)₆]³⁺", ox: "+3", colour: "#c98a3c", colourName: "yellow-brown", note: "Iron(III). The colour of rust stains and old blood-red iron solutions." },
+      { label: "MnO₄⁻", name: "Manganate(VII)", ox: "+7", colour: "#7d2fb0", colourName: "intense purple", note: "Manganese at its highest oxidation state — such a strong colour it's used as an indicator in titrations." },
+      { label: "Cr₂O₇²⁻", name: "Dichromate(VI)", ox: "+6", colour: "#e8770c", colourName: "orange", note: "Chromium(VI). In alkali it converts to the yellow chromate(VI) ion, CrO₄²⁻." },
+      { label: "Cr³⁺(aq)", name: "[Cr(H₂O)₆]³⁺", ox: "+3", colour: "#4b8f6d", colourName: "green", note: "Chromium(III) — the most stable oxidation state of chromium." },
+      { label: "Ni²⁺(aq)", name: "[Ni(H₂O)₆]²⁺", ox: "+2", colour: "#3fa36b", colourName: "green", note: "Nickel(II). Used in electroplating and rechargeable batteries." },
+    ];
+  }
+
+  renderVals() {
+    const ions = this._ions();
+    const s = ions[this.state.sel];
+    const tabs = ions.map((x, i) => ({
+      label: x.label,
+      onClick: () => this.setState(st => {
+        const tried2 = { ...st.tried, [i]: true };
+        if (window.Progress && Object.keys(tried2).length >= 5) window.Progress.markCompleted("transition-metals");
+        return { sel: i, tried: tried2 };
+      }),
+      bg: this.state.sel === i ? "#2b2620" : "#faf6ef",
+      fg: this.state.sel === i ? "#faf6ef" : "#2b2620",
+    }));
+    return {
+      tabs,
+      colour: s.colour, colourName: s.colourName,
+      ionName: s.name, oxState: s.ox, ionNote: s.note,
+      props: [
+        { name: "Variable oxidation states", text: "Iron is +2 and +3; manganese runs from +2 to +7. The d-electrons are close in energy, so several are available." },
+        { name: "Coloured compounds", text: "d-electrons absorb visible light, giving the vivid colours you see in the bench above." },
+        { name: "Catalytic activity", text: "Iron in the Haber process, vanadium(V) oxide in the Contact process, nickel in hydrogenation — they offer surfaces and switch oxidation states easily." },
+        { name: "Form complex ions", text: "They bond to ligands, forming complexes with distinctive shapes and colours." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

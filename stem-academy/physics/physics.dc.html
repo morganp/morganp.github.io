@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Physics World Map">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / PHYSICS WORLD MAP</span>
+      <a href="../index.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← ALL TOPICS</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE PHYSICS MAP: AGE 10 TO A-LEVEL</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Physics, one path at a time</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 720px;">Every topic below builds on the ones above it — follow the lines. Orange topics are live now; the rest are on the bench. Start anywhere on your level and climb.</div>
+    <div style="display: flex; gap: 18px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; align-items: center;">
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #e8590c; border: 1.5px solid #2b2620; display: inline-block;"></span>LIVE — CLICK TO OPEN</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #fff; border: 1.5px solid #2b2620; display: inline-block;"></span>ON THE BENCH</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #2f7d3a; border: 1.5px solid #2b2620; display: inline-block;"></span>COMPLETED</span>
+      <span>LINES = "LEARN THIS FIRST"</span>
+      <a href="../progress.html" style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #fff;" style-hover="background: #2b2620; color: #faf6ef;">MY PROGRESS →</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 24px; overflow-x: auto;">
+    <div style="position: relative; width: 1160px; height: 640px; border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15);">
+      <svg width="1160" height="640" style="position: absolute; inset: 0; pointer-events: none;">
+        <sc-for list="{{ edges }}" as="e" hint-placeholder-count="10">
+          <path d="{{ e.d }}" fill="none" stroke="#d8d0c4" stroke-width="1.5"></path>
+        </sc-for>
+      </svg>
+      <sc-for list="{{ bands }}" as="band" hint-placeholder-count="5">
+        <div style="position: absolute; left: 0; right: 0; top: {{ band.y }}px; border-top: 1px dashed #e6dfd2; padding: 6px 0 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #a89d8e;">{{ band.label }}</div>
+      </sc-for>
+      <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="20">
+        <a href="{{ n.href }}" style="position: absolute; left: {{ n.x }}px; top: {{ n.y }}px; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; white-space: nowrap; padding: 6px 10px; border: 1.5px solid #2b2620; background: {{ n.bg }}; color: {{ n.fg }}; text-decoration: none; cursor: {{ n.cursor }}; box-shadow: 2px 2px 0 rgba(43,38,32,0.12);" style-hover="box-shadow: 3px 3px 0 rgba(43,38,32,0.3);">{{ n.mark }}{{ n.label }}</a>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 64px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// LIVE NOW</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+      <sc-for list="{{ liveList }}" as="lv" hint-placeholder-count="4">
+        <a href="{{ lv.href }}" style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: #2b2620;" style-hover="box-shadow: 4px 4px 0 rgba(43,38,32,0.2);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 2px 7px; border: 1px solid #2b2620; background: #e8590c; color: #faf6ef;">{{ lv.level }}</span>
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; flex: 1;">{{ lv.title }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #2f7d3a;">{{ lv.mark }}</span>
+          </div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ lv.desc }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e8590c; margin-top: auto;">OPEN →</div>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>PHYSICS / L1 EXPLORER → L5 EXPERT</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    if (window.Progress) this._unsub = window.Progress.onChange(() => this.forceUpdate());
+  }
+  componentWillUnmount() { if (this._unsub) this._unsub(); }
+
+  renderVals() {
+    const W = 1160, ML = 80, MR = 30;
+    const bandY = { 1: 0, 2: 118, 3: 240, 4: 390, 5: 508 };
+    const rowBase = { 1: 42, 2: 160, 3: 282, 4: 432, 5: 550 };
+
+    const topics = [
+      { id: "pushes", l: 1, label: "Pushes & pulls", href: "forces-motion.html" },
+      { id: "machines", l: 1, label: "Simple machines", href: "simple-machines.html" },
+      { id: "light1", l: 1, label: "Light & shadows", href: "light-waves.html" },
+      { id: "sound1", l: 1, label: "Sound", href: "sound.html" },
+      { id: "magnets1", l: 1, label: "Magnets", href: "magnetism.html" },
+      { id: "elec1", l: 1, label: "Electricity basics", href: "electricity.html" },
+      { id: "esource", l: 1, label: "Energy sources", href: "energy.html" },
+
+      { id: "fmbasic", l: 2, label: "Forces & motion basics", href: "forces-motion.html" },
+      { id: "estore", l: 2, label: "Energy transfers & stores", href: "energy.html" },
+      { id: "waves2", l: 2, label: "Waves intro", href: "light-waves.html" },
+      { id: "elec2", l: 2, label: "Circuits: series & parallel", href: "electricity.html" },
+      { id: "emag2", l: 2, label: "Magnetism & electromagnets", href: "magnetism.html" },
+      { id: "space2", l: 2, label: "Space: solar system", href: "space.html" },
+
+      { id: "motion3", l: 3, label: "Motion & Newton's laws", href: "forces-motion.html" },
+      { id: "momentum3", l: 3, label: "Momentum & collisions", href: "momentum.html" },
+      { id: "energy3", l: 3, label: "Energy & conservation", href: "energy.html" },
+      { id: "waves3", l: 3, label: "Waves & EM spectrum", href: "light-waves.html" },
+      { id: "elec3", l: 3, label: "Resistance, power & mains", href: "electricity.html" },
+      { id: "radio3", l: 3, label: "Radioactivity", href: "radioactivity.html" },
+      { id: "particle3", l: 3, label: "Particle model & pressure", href: "pressure.html" },
+      { id: "emag3", l: 3, label: "Motors & generators", href: "magnetism.html" },
+      { id: "space3", l: 3, label: "Space physics & stars", href: "space.html" },
+
+      { id: "kinematics", l: 4, label: "Kinematics (SUVAT)" },
+      { id: "dynamics", l: 4, label: "Dynamics & circular motion" },
+      { id: "impulse", l: 4, label: "Momentum & impulse" },
+      { id: "workpower", l: 4, label: "Work, energy & power" },
+      { id: "kirchhoff", l: 4, label: "Circuit analysis" },
+      { id: "radiation4", l: 4, label: "Waves & radiation" },
+      { id: "odu", l: 4, label: "Our Dynamic Universe" },
+
+      { id: "shm", l: 5, label: "Mechanics & SHM" },
+      { id: "capacitors", l: 5, label: "Capacitors & fields" },
+      { id: "fields", l: 5, label: "Grav/electric/magnetic fields" },
+      { id: "thermal", l: 5, label: "Thermal physics" },
+      { id: "nuclear5", l: 5, label: "Nuclear & particle physics" },
+      { id: "quantum", l: 5, label: "Quantum phenomena" },
+      { id: "astro", l: 5, label: "Astrophysics" },
+      { id: "rotation", l: 5, label: "Rotational dynamics" },
+    ];
+
+    const links = [
+      ["pushes", "fmbasic"], ["machines", "fmbasic"], ["light1", "waves2"], ["sound1", "waves2"],
+      ["magnets1", "emag2"], ["elec1", "elec2"], ["esource", "estore"],
+      ["fmbasic", "motion3"], ["estore", "energy3"], ["waves2", "waves3"], ["elec2", "elec3"],
+      ["emag2", "emag3"], ["space2", "space3"],
+      ["motion3", "momentum3"], ["motion3", "kinematics"], ["momentum3", "impulse"],
+      ["energy3", "workpower"], ["waves3", "radiation4"], ["elec3", "kirchhoff"],
+      ["radio3", "nuclear5"], ["particle3", "thermal"], ["emag3", "fields"], ["space3", "odu"],
+      ["kinematics", "shm"], ["dynamics", "shm"], ["workpower", "shm"], ["kirchhoff", "capacitors"],
+      ["radiation4", "quantum"], ["odu", "astro"], ["impulse", "rotation"], ["fields", "capacitors"],
+    ];
+
+    const estWidth = (label) => Math.max(70, label.length * 6.6 + 22);
+    const byLevel = {};
+    topics.forEach(t => { (byLevel[t.l] = byLevel[t.l] || []).push(t); });
+    const pos = {}; const nodes = [];
+    const usable = W - ML - MR; const GAP = 14, SUBROW_H = 34;
+
+    Object.keys(byLevel).forEach(l => {
+      const row = byLevel[l];
+      const lines = []; let cur = { items: [], totalW: 0 };
+      row.forEach(t => {
+        const w = estWidth(t.label);
+        const addW = cur.items.length ? w + GAP : w;
+        if (cur.totalW + addW > usable && cur.items.length) { lines.push(cur); cur = { items: [], totalW: 0 }; }
+        cur.items.push({ t, w });
+        cur.totalW += cur.items.length > 1 ? w + GAP : w;
+      });
+      if (cur.items.length) lines.push(cur);
+      lines.forEach((line, li) => {
+        let x = ML + (usable - line.totalW) / 2;
+        const y = rowBase[l] + li * SUBROW_H;
+        line.items.forEach(({ t, w }) => {
+          const cx = x + w / 2;
+          pos[t.id] = { x: cx, y };
+          const live = !!t.href;
+          const progId = live ? t.href.replace(/\.html$/, "") : null;
+          const done = live && window.Progress && window.Progress.isCompleted(progId);
+          nodes.push({
+            label: t.label, mark: done ? "✓ " : "", href: t.href || "#",
+            x: Math.round(cx), y: Math.round(y),
+            bg: done ? "#2f7d3a" : live ? "#e8590c" : "#fff",
+            fg: live ? "#faf6ef" : "#2b2620",
+            cursor: live ? "pointer" : "default",
+          });
+          x += w + GAP;
+        });
+      });
+    });
+
+    const edges = links.map(([a, b]) => {
+      const p = pos[a], q = pos[b]; if (!p || !q) return { d: "" };
+      const y1 = p.y + 28, y2 = q.y - 2;
+      return { d: "M " + p.x + " " + y1 + " C " + p.x + " " + (y1 + 36) + ", " + q.x + " " + (y2 - 36) + ", " + q.x + " " + y2 };
+    });
+
+    const bands = [
+      { y: bandY[1], label: "L1 EXPLORER — AGE 10-11" },
+      { y: bandY[2], label: "L2 FOUNDATION — KS3 / S1-S3" },
+      { y: bandY[3], label: "L3 CORE — GCSE / NATIONAL 5" },
+      { y: bandY[4], label: "L4 ADVANCED — AS / HIGHER" },
+      { y: bandY[5], label: "L5 EXPERT — A-LEVEL / ADVANCED HIGHER" },
+    ];
+
+    const liveList = [
+      { key: "forces-motion", level: "L1-L3", title: "Forces & Motion", desc: "Push the crate, fight friction, and read a live velocity–time graph.", href: "forces-motion.html" },
+      { key: "simple-machines", level: "L1", title: "Simple Machines", desc: "Levers, ramps and pulleys — trade force for distance on the machine bench.", href: "simple-machines.html" },
+      { key: "energy", level: "L1-L3", title: "Energy", desc: "Follow energy through a Sankey diagram; sources, stores and efficiency.", href: "energy.html" },
+      { key: "electricity", level: "L1-L3", title: "Electricity", desc: "Build circuits, glow bulbs, and watch Ohm's law run live.", href: "electricity.html" },
+      { key: "magnetism", level: "L1-L3", title: "Magnetism", desc: "Trace field lines and build an electromagnet you can switch on and off.", href: "magnetism.html" },
+      { key: "sound", level: "L1-L3", title: "Sound", desc: "Dial pitch and volume on a live oscilloscope of vibrating air.", href: "sound.html" },
+      { key: "light-waves", level: "L1-L3", title: "Light & Waves", desc: "Aim a light ray, reflect and refract it, and meet the EM spectrum.", href: "light-waves.html" },
+      { key: "momentum", level: "L3", title: "Momentum & Collisions", desc: "Crash two carts and watch momentum stay conserved every time.", href: "momentum.html" },
+      { key: "radioactivity", level: "L3", title: "Radioactivity", desc: "Watch 400 nuclei halve on schedule and plot the decay curve.", href: "radioactivity.html" },
+      { key: "pressure", level: "L3", title: "Particle Model & Pressure", desc: "Squeeze and heat a box of gas; see pressure build from tiny collisions.", href: "pressure.html" },
+      { key: "space", level: "L2-L3", title: "Space Physics", desc: "Set a satellite orbiting, tour the planets, and trace a star's life.", href: "space.html" },
+    ].map(lv => ({ ...lv, mark: window.Progress && window.Progress.isCompleted(lv.key) ? "✓ DONE" : (window.Progress && window.Progress.isVisited(lv.key) ? "· started" : "") }));
+
+    return { nodes, edges, bands, liveList };
+  }
+}
+</script>
+</body>
+</html>

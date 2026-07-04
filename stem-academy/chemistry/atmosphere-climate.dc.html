@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+    input[type="range"] { accent-color: #e8590c; }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Atmosphere and Climate">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / LEVEL L3</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 48px 32px 72px; display: flex; flex-direction: column; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIELD GUIDE 16 — LEVEL L3 (GCSE / NATIONAL 5)</div>
+      <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Earth's atmosphere &amp; climate</h1>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; line-height: 1.55; color: #554c42;">A thin shell of gas, mostly nitrogen, is the only thing standing between Earth's surface and the vacuum of space. A tiny slice of it controls the planet's temperature.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c; align-self: flex-start;">// FIG. 01 — TODAY'S ATMOSPHERE, BY VOLUME</div>
+      <x-import component-from-global-scope="atmos-pie" from="../lib/atmos-pie.js" width="280" height="280" hint-size="280px,280px"></x-import>
+    </div>
+
+    <!-- greenhouse toggle -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — THE GREENHOUSE EFFECT</div>
+      <div style="display: flex; gap: 8px;">
+        <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="2">
+          <div onClick="{{ tb.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 16px; border: 1.5px solid #2b2620; cursor: pointer; background: {{ tb.bg }}; color: {{ tb.fg }};">{{ tb.label }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 40px;">☀️</div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <div style="width: 260px; height: 3px; background: #f2b705;"></div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">SUNLIGHT IN (SHORT WAVELENGTH — PASSES THROUGH EASILY)</div>
+        </div>
+        <div style="width: 320px; height: 14px; background: {{ layerColor }}; border: 1.5px solid #2b2620; display: flex; align-items: center; justify-content: center;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700; color: #faf6ef;">{{ layerLabel }}</span>
+        </div>
+        <div style="width: 200px; height: 40px; background: #7ca982; border: 1.5px solid #2b2620; border-radius: 4px 4px 0 0; display: grid; place-items: center;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #faf6ef;">EARTH'S SURFACE</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 22px;">{{ arrows }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156; text-align: center; max-width: 320px;">{{ arrowCaption }}</div>
+        </div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #554c42; text-align: center;">{{ blurb }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L3 — WHY WE NEED SOME GREENHOUSE EFFECT</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Without any greenhouse gases at all, Earth's average temperature would sit around −18°C — a frozen planet. The natural greenhouse effect is what keeps it a habitable ~15°C. The problem isn't the effect itself — it's <strong>adding extra</strong> greenhouse gases (mainly CO₂ from burning fossil fuels) faster than the planet can remove them, trapping more heat than the climate is adapted to.</div>
+    </div>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Chemistry map →</a>
+      <a href="materials-resources.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Materials &amp; Earth's resources</a>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>FIELD GUIDE 16 / ATMOSPHERE &amp; CLIMATE</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: "normal", seen: { normal: true } };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("atmosphere-climate");
+  }
+
+  renderVals() {
+    const enhanced = this.state.mode === "enhanced";
+    return {
+      layerColor: enhanced ? "#c0392b" : "#c9c0b2",
+      layerLabel: enhanced ? "THICKER GREENHOUSE GAS LAYER (MORE CO₂)" : "GREENHOUSE GAS LAYER (CO₂, METHANE, WATER VAPOUR)",
+      arrows: enhanced ? "↑ ↑ ↑  (mostly reflected back down)" : "↑ ↑  (some escapes to space)",
+      arrowCaption: enhanced
+        ? "Earth re-radiates heat as infrared — but now far more of it bounces straight back to the surface instead of escaping, so the surface keeps warming."
+        : "Earth re-radiates absorbed sunlight as infrared (long wavelength) — greenhouse gases absorb some and radiate it back down, warming the surface just enough.",
+      blurb: enhanced
+        ? "This is the enhanced greenhouse effect: burning fossil fuels has added extra CO₂, thickening the layer and trapping more outgoing heat than natural cycles remove — driving global warming."
+        : "This is the natural greenhouse effect, running exactly as it has for millions of years — it's the reason Earth isn't a frozen rock.",
+      tabs: [
+        { key: "normal", label: "NATURAL GREENHOUSE EFFECT" },
+        { key: "enhanced", label: "ENHANCED (HUMAN-ADDED CO₂)" },
+      ].map(t => ({
+        label: t.label,
+        bg: t.key === this.state.mode ? "#2b2620" : "#faf6ef",
+        fg: t.key === this.state.mode ? "#faf6ef" : "#2b2620",
+        onClick: () => this.setState(s => {
+          const seen = { ...s.seen, [t.key]: true };
+          if (window.Progress && Object.keys(seen).length >= 2) window.Progress.markCompleted("atmosphere-climate");
+          return { mode: t.key, seen };
+        }),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>
