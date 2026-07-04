@@ -52,7 +52,7 @@
     <!-- mascot: the fire-breathing periodic dragon (drop-in art) -->
     <div style="position: relative; display: flex; flex-direction: column; gap: 10px; align-items: center;">
       <div style="width: 100%; aspect-ratio: 1 / 1;">
-        <img src="images/mascot/dragon-hero-train-1000.png" alt="Ls, the periodic dragon, driving a steam train" width="1000" height="1000" loading="eager" decoding="async" style="width: 100%; height: 100%; object-fit: contain; display: block;">
+        <img src="images/mascot/dragon-hero-train-hero.png" alt="Ls, the periodic dragon, driving a steam train" width="1000" height="1000" loading="eager" decoding="async" style="width: 100%; height: 100%; object-fit: contain; display: block;">
       </div>
       <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; text-align: center; letter-spacing: 0.01em;">FIG. 00 — Ls, THE PERIODIC DRAGON · ALL ABOARD THE SCIENCE EXPRESS</div>
     </div>
@@ -93,9 +93,9 @@
 class Component extends DCLogic {
   renderVals() {
     const topics = [
-      { name: "Chemistry", abbr: "Ch", desc: "The interactive periodic table — heat, click, and quiz all 118 elements.", live: true, color: "#e8590c", href: "chemistry/chemistry.html" },
-      { name: "Physics", abbr: "Ph", desc: "Push crates, build circuits, split atoms, and orbit planets across eleven live labs.", live: true, color: "#d9480f", href: "physics/physics.html" },
-      { name: "Biology", abbr: "Bi", desc: "Zoom from cells to ecosystems. Build a food web, breed virtual pea plants.", live: true, color: "#c2410c", href: "biology/biology.html" },
+      { name: "Chemistry", abbr: "Ch", desc: "The interactive periodic table — heat, click, and quiz all 118 elements.", live: true, levels: "L1–L5", color: "#e8590c", href: "chemistry/chemistry.html" },
+      { name: "Physics", abbr: "Ph", desc: "Push crates, build circuits, split atoms, and orbit planets across eleven live labs.", live: true, levels: "L1–L3", color: "#d9480f", href: "physics/physics.html" },
+      { name: "Biology", abbr: "Bi", desc: "Zoom from cells to ecosystems. Build a food web, breed virtual pea plants.", live: true, levels: "L1–L3", color: "#c2410c", href: "biology/biology.html" },
       { name: "Math", abbr: "Ma", desc: "Graphing playgrounds, geometry puzzles, and probability machines.", live: false, color: "#b45309" },
       { name: "Astronomy", abbr: "As", desc: "Fly the solar system to scale. Discover why space is mostly... space.", live: false, color: "#a16207" },
       { name: "Earth Science", abbr: "Ea", desc: "Drive plate tectonics, brew weather systems, and read the rock record.", live: false, color: "#e8590c" },
@@ -105,7 +105,7 @@ class Component extends DCLogic {
       ...t,
       href: t.live ? t.href : "#worlds",
       cursor: t.live ? "pointer" : "default",
-      badge: t.live ? "LIVE NOW · L1–L3" : "COMING SOON",
+      badge: t.live ? ("LIVE NOW · " + t.levels) : "COMING SOON",
       badgeBg: t.live ? "#e8590c" : "#faf6ef",
       badgeFg: t.live ? "#faf6ef" : "#6b6156",
       arrowColor: t.live ? "#e8590c" : "#c9c0b2",

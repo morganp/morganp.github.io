@@ -89,18 +89,34 @@
       <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;">{{ scoreText }}</div>
     </div>
 
-    <!-- separating techniques -->
+    <!-- separating techniques (interactive animations) -->
     <div style="display: flex; flex-direction: column; gap: 14px;">
       <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L1–L2 — SEPARATING MIXTURES</div>
-      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Because mixtures aren't bonded, you can pull them apart with nothing but physics — no reaction needed. The trick is picking a property the parts don't share:</div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px;">
-        <sc-for list="{{ techniques }}" as="t" hint-placeholder-count="4">
-          <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
-            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ t.name }}</div>
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #e8590c;">USES: {{ t.property }}</div>
-            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ t.text }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Because mixtures aren't bonded, you can pull them apart with nothing but physics — no reaction needed. The trick is picking a property the parts don't share. Tap a method on the right to watch it work:</div>
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; align-items: stretch;">
+
+        <!-- animation stage -->
+        <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 05 — {{ selName }} · SEPARATES BY {{ selProperty }}</div>
+          <div style="display: flex; justify-content: center; background: #faf6ef; border: 1.5px solid #e6dfd2;">
+            <x-import component-from-global-scope="separation-sim" from="../lib/separation-sim.js" method="{{ selMethodAttr }}" width="440" height="300" hint-size="440px,300px"></x-import>
           </div>
-        </sc-for>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">{{ selText }}</div>
+        </div>
+
+        <!-- method list (stacked) -->
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{ techniques }}" as="t" hint-placeholder-count="4">
+            <div onClick="{{ t.onSelect }}" onMouseEnter="{{ t.onSelect }}" style="border: 2px solid #2b2620; background: {{ t.bg }}; color: {{ t.fg }}; padding: 13px 15px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; box-shadow: {{ t.shadow }};" style-hover="box-shadow: 3px 3px 0 rgba(43,38,32,0.25);">
+              <div style="display: flex; align-items: center; gap: 9px;">
+                <span style="width: 11px; height: 11px; border-radius: 50%; background: {{ t.dot }}; border: 1.5px solid {{ t.fg }}; flex-shrink: 0;"></span>
+                <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ t.name }}</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ t.usesFg }};">USES: {{ t.property }}</span>
+            </div>
+          </sc-for>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e; margin-top: 2px;">HOVER OR TAP A METHOD — THE ANIMATION LOOPS</div>
+        </div>
       </div>
     </div>
 
@@ -119,6 +135,7 @@
 class Component extends DCLogic {
   state = {
     placed: {}, // name -> {bin, correct}
+    selMethod: "filtration",
     items: [
       { name: "Oxygen gas", kind: "element" },
       { name: "Table salt", kind: "compound" },
@@ -150,6 +167,14 @@ class Component extends DCLogic {
   renderVals() {
     const items = this.state.items;
     const placed = this.state.placed;
+
+    const SEP_METHODS = [
+      { key: "filtration", name: "Filtration", property: "PARTICLE SIZE", dot: "#b5895a", text: "Pour the mixture through filter paper: the insoluble solid bits are too big to pass and stay behind as the residue, while the liquid runs through as the clear filtrate. Great for sand in water." },
+      { key: "evaporation", name: "Evaporation", property: "BOILING POINT", dot: "#e8590c", text: "Gently heat a solution so the liquid turns to vapour and escapes into the air — leaving the dissolved solid behind as crystals. This is how you get salt back from salt water." },
+      { key: "distillation", name: "Distillation", property: "BOILING POINT", dot: "#2a6fb0", text: "Boil the mixture, then cool the vapour in a condenser so it turns back to liquid and drips into a fresh beaker. Unlike evaporation, you keep the pure liquid — the dissolved solid stays in the flask." },
+      { key: "chromatography", name: "Chromatography", property: "SOLUBILITY", dot: "#8a63d2", text: "A solvent creeps up absorbent paper, carrying each dye a different distance depending on how well it dissolves — so a single spot of mixed ink fans out into its separate colours." },
+    ];
+    const sel = SEP_METHODS.find(d => d.key === this.state.selMethod) || SEP_METHODS[0];
     const bins = { element: [], compound: [], mixture: [] };
     Object.keys(placed).forEach(name => {
       const it = items.find(i => i.name === name);
@@ -179,12 +204,21 @@ class Component extends DCLogic {
         { label: "MIXTURE BIN", items: bins.mixture },
       ],
       scoreText: done === 0 ? "CLICK E / C / M NEXT TO EACH SUBSTANCE TO SORT IT." : (done + "/" + total + " SORTED — " + correctCount + " CORRECT" + (done === total ? (correctCount === total ? "  PERFECT!" : "  — check the ✗ marks") : "")),
-      techniques: [
-        { name: "Filtration", property: "PARTICLE SIZE", text: "Pours a mixture through a filter — an insoluble solid stays behind while the liquid passes through." },
-        { name: "Evaporation", property: "BOILING POINT", text: "Heats a solution until the liquid boils away, leaving the dissolved solid behind (e.g. getting salt back from seawater)." },
-        { name: "Distillation", property: "BOILING POINT", text: "Boils a mixture and re-condenses the vapour — collects the liquid itself instead of just leaving the solid behind." },
-        { name: "Chromatography", property: "SOLUBILITY", text: "Different substances travel different distances up absorbent paper, separating out a mixture of dyes or inks." },
-      ],
+      techniques: SEP_METHODS.map(d => {
+        const active = this.state.selMethod === d.key;
+        return {
+          name: d.name, property: d.property, dot: d.dot,
+          bg: active ? "#2b2620" : "#fff",
+          fg: active ? "#faf6ef" : "#2b2620",
+          usesFg: active ? "#fcc419" : "#e8590c",
+          shadow: active ? "3px 3px 0 rgba(43,38,32,0.3)" : "none",
+          onSelect: () => this.setState({ selMethod: d.key }),
+        };
+      }),
+      selMethodAttr: sel.key,
+      selName: sel.name.toUpperCase(),
+      selProperty: sel.property,
+      selText: sel.text,
     };
   }
 }

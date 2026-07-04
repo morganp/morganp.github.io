@@ -76,14 +76,18 @@
     </div>
   </sc-if>
 
-  <!-- legend -->
-  <div style="display: flex; flex-wrap: wrap; gap: 14px; padding: 16px 32px 4px; align-items: center;">
+  <!-- legend (interactive: tap a family/state to light up where it sits) -->
+  <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 32px 4px; align-items: center;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #a89d8e; margin-right: 2px;">{{ legendHint }}</span>
     <sc-for list="{{ legendItems }}" as="l" hint-placeholder-count="10">
-      <div style="display: flex; align-items: center; gap: 7px;">
+      <div onClick="{{ l.onClick }}" title="{{ l.title }}" style="display: flex; align-items: center; gap: 7px; cursor: pointer; padding: 4px 9px 4px 7px; border: 1.5px solid {{ l.border }}; background: {{ l.bg }};" style-hover="border-color: #2b2620;">
         <div style="width: 13px; height: 13px; border: 1.5px solid #2b2620; background: {{ l.color }};"></div>
-        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #55504a;">{{ l.label }}</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: {{ l.weight }}; color: {{ l.fg }};">{{ l.label }}</span>
       </div>
     </sc-for>
+    <sc-if value="{{ hasHighlight }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ clearHighlight }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c; cursor: pointer; padding: 5px 9px; border: 1.5px solid #e8590c; background: #fff;" style-hover="background: #e8590c; color: #faf6ef;">✕ CLEAR HIGHLIGHT</div>
+    </sc-if>
   </div>
 
   <!-- table + panel -->
@@ -171,6 +175,7 @@ class Component extends DCLogic {
     selected: 26,
     tempK: 295,
     colorMode: "cat",
+    highlight: null,
     mode: "explore",
     quizTarget: null,
     quizScore: 0,
@@ -257,10 +262,12 @@ class Component extends DCLogic {
         const st = m.stateAt(el, tempK);
         const bg = colorMode === "cat" ? m.CATEGORIES[el.cat].color : m.STATE_COLORS[st].color;
         const isSel = el.n === selected && mode === "explore";
+        const hl = this.state.highlight;
+        const matchesH = !hl || (colorMode === "cat" ? el.cat === hl : st === hl);
         return {
           sym: el.s, name: el.name, numLabel: showNums ? String(el.n) : "",
           x: pos.x, y: pos.y, bg,
-          dim: this.matchesQuery(el) ? 1 : 0.15,
+          dim: (this.matchesQuery(el) && matchesH) ? 1 : 0.15,
           dotColor: (mode === "explore" && this.state.inspected.has(el.n)) ? ink : "transparent",
           border: isSel ? "2.5px solid " + ink : "1.5px solid " + ink,
           shadow: isSel ? "3px 3px 0 " + ink : "none",
@@ -268,9 +275,21 @@ class Component extends DCLogic {
         };
       });
 
-      legendItems = colorMode === "cat"
-        ? Object.values(m.CATEGORIES).map(c => ({ label: c.label, color: c.color }))
-        : Object.values(m.STATE_COLORS).map(c => ({ label: c.label + " at this temp", color: c.color }));
+      legendItems = (colorMode === "cat"
+        ? Object.keys(m.CATEGORIES).map(k => ({ key: k, label: m.CATEGORIES[k].label, color: m.CATEGORIES[k].color }))
+        : Object.keys(m.STATE_COLORS).map(k => ({ key: k, label: m.STATE_COLORS[k].label + " at this temp", color: m.STATE_COLORS[k].color }))
+      ).map(it => {
+        const active = this.state.highlight === it.key;
+        return {
+          label: it.label, color: it.color,
+          title: active ? "Click to clear" : "Click to highlight " + it.label,
+          bg: active ? "#2b2620" : "transparent",
+          fg: active ? "#faf6ef" : "#55504a",
+          border: active ? "#2b2620" : "transparent",
+          weight: active ? 600 : 400,
+          onClick: () => this.setState(s => ({ highlight: s.highlight === it.key ? null : it.key })),
+        };
+      });
 
       selEl = m.ELEMENTS.find(e => e.n === selected) || m.ELEMENTS[0];
       const st = m.stateAt(selEl, tempK);
@@ -303,8 +322,8 @@ class Component extends DCLogic {
       onTemp: (e) => this.setState({ tempK: Number(e.target.value) }),
       setExplore: () => this.setState({ mode: "explore", quizFeedback: "" }),
       setQuiz: () => { this.setState({ mode: "quiz", quizFeedback: "" }); if (!this.state.quizTarget) this.pickQuizTarget(); },
-      setCatMode: () => this.setState({ colorMode: "cat" }),
-      setStateMode: () => this.setState({ colorMode: "state" }),
+      setCatMode: () => this.setState({ colorMode: "cat", highlight: null }),
+      setStateMode: () => this.setState({ colorMode: "state", highlight: null }),
       exploreBg: ex.bg, exploreFg: ex.fg, quizBg: qz.bg, quizFg: qz.fg,
       catBg: cm.bg, catFg: cm.fg, stateBg: sm.bg, stateFg: sm.fg,
       isQuiz: mode === "quiz",
@@ -324,6 +343,9 @@ class Component extends DCLogic {
       quizFeedbackColor: this.state.quizFeedbackKind === "good" ? "#8ce99a" : "#ffa8a8",
       quizSkip: () => { this.setState({ quizFeedback: "" }); this.pickQuizTarget(); },
       cells, legendItems,
+      legendHint: colorMode === "cat" ? "TAP A FAMILY TO LIGHT UP WHERE IT SITS →" : "TAP A STATE TO LIGHT UP THOSE ELEMENTS →",
+      hasHighlight: !!this.state.highlight,
+      clearHighlight: () => this.setState({ highlight: null }),
       selNum: selEl ? String(selEl.n) : "", selSym: selEl ? selEl.s : "",
       selName: selEl ? selEl.name : "Loading…",
       selCatLabel: selEl ? selCatLabel : "",

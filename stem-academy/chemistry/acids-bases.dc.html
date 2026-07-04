@@ -60,9 +60,37 @@
       <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Every acid releases <strong>H⁺ ions</strong> in water; every alkali releases <strong>OH⁻ ions</strong>. pH just counts how many H⁺ ions are floating around — low pH means loads of them (acidic), high pH means hardly any (alkaline), and pH 7 is the perfect balance (neutral, like pure water). Each step on the scale is <strong>ten times</strong> more concentrated than the last — pH 4 has 10× more H⁺ than pH 5.</div>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L2 — NEUTRALISATION</div>
-      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Mix an acid and an alkali in the right amounts and their ions cancel each other out, leaving neutral water plus a salt: <strong>acid + base → salt + water</strong>. It's why a bee-sting cream (alkaline) soothes a sting (acidic), and why farmers spread lime (alkaline) on acidic soil.</div>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// L2 — NEUTRALISATION (INTERACTIVE)</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Mix an acid and an alkali and their ions cancel out: an <strong>H⁺</strong> from the acid grabs an <strong>OH⁻</strong> from the alkali to make plain <strong>water</strong>, while the leftover ions stay behind as a dissolved <strong>salt</strong>. Add alkali to the acid below, drop by drop, and watch the H⁺ ions disappear.</div>
+
+      <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 04 — HCl + NaOH → NaCl + H₂O</div>
+        <div style="display: flex; justify-content: center; background: #faf6ef; border: 1.5px solid #e6dfd2;">
+          <x-import component-from-global-scope="neutralise-sim" from="../lib/neutralise-sim.js" h="{{ freeH }}" oh="{{ freeOH }}" na="{{ naCount }}" cl="{{ clCount }}" water="{{ waterCount }}" ph="{{ nPh }}" width="460" height="240" hint-size="460px,240px"></x-import>
+        </div>
+        <!-- legend -->
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">
+          <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #e8590c; border: 1.5px solid #2b2620; display: inline-block;"></span>H⁺ — from the acid</span>
+          <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 13px; height: 9px; border-radius: 5px; background: #2a6fb0; border: 1.5px solid #2b2620; display: inline-block;"></span>OH⁻ — from the alkali</span>
+          <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #7fbfd0; border: 1.5px solid #2b2620; display: inline-block;"></span>H₂O — water made</span>
+          <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #8a8178; border: 1.5px solid #2b2620; display: inline-block;"></span>Na⁺ &amp; <span style="width: 11px; height: 11px; border-radius: 50%; background: #3f9c46; border: 1.5px solid #2b2620; display: inline-block;"></span>Cl⁻ — the salt</span>
+        </div>
+        <!-- controls -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <div onClick="{{ addAcid }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 16px; border: 2px solid #2b2620; cursor: pointer; background: #faf6ef;" style-hover="background: #e8590c; color: #faf6ef;">+ ADD ACID (H⁺)</div>
+          <div onClick="{{ addBase }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 16px; border: 2px solid #2b2620; cursor: pointer; background: #2a6fb0; color: #faf6ef; box-shadow: 3px 3px 0 rgba(43,38,32,0.25);" style-hover="background: #1e5a94;">+ ADD ALKALI (OH⁻)</div>
+          <div onClick="{{ resetMix }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px 14px; border: 1.5px solid #2b2620; cursor: pointer; color: #6b6156; background: #fff;" style-hover="background: #2b2620; color: #faf6ef;">RESET</div>
+        </div>
+        <!-- readout -->
+        <div style="border: 2px solid #2b2620; background: {{ verdictBg }}; color: {{ verdictFg }}; padding: 12px 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+          <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 18px;">{{ verdict }}</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">pH ≈ {{ nPh }}</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; opacity: 0.85;">free H⁺: {{ freeH }} · free OH⁻: {{ freeOH }} · H₂O made: {{ waterCount }}</span>
+        </div>
+      </div>
+
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #6b6156;">Once every H⁺ has paired with an OH⁻, only water and the dissolved salt (Na⁺ and Cl⁻) are left — that's <strong>neutral</strong>. It's the same reaction that lets a bee-sting cream (alkaline) soothe a sting (acidic), and lets farmers spread lime (alkaline) on acidic soil.</div>
     </div>
 
     <div style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1.5px solid #2b2620; padding-top: 24px;">
@@ -78,10 +106,21 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ph: 7, seen: {} };
+  state = { ph: 7, seen: {}, acidDrops: 2, baseDrops: 0 };
 
   componentDidMount() {
     if (window.Progress) window.Progress.markVisited("acids-bases");
+  }
+
+  addDrop(which) {
+    this.setState(s => {
+      const next = { ...s };
+      if (which === "acid") next.acidDrops = Math.min(6, s.acidDrops + 1);
+      else next.baseDrops = Math.min(6, s.baseDrops + 1);
+      const totalH = next.acidDrops * 3, totalOH = next.baseDrops * 3;
+      if (totalH > 0 && totalH === totalOH && window.Progress) window.Progress.markCompleted("acids-bases");
+      return next;
+    });
   }
 
   renderVals() {
@@ -89,6 +128,23 @@ class Component extends DCLogic {
       ["BATTERY ACID", 0.5], ["LEMON JUICE", 2.2], ["VINEGAR", 2.9], ["PURE WATER", 7],
       ["BAKING SODA", 9], ["AMMONIA", 11.5], ["DRAIN CLEANER", 13.5],
     ];
+
+    // --- neutralisation mix ---
+    const PER = 3;
+    const totalH = this.state.acidDrops * PER;   // H+
+    const totalCl = this.state.acidDrops * PER;  // Cl- spectator
+    const totalOH = this.state.baseDrops * PER;  // OH-
+    const totalNa = this.state.baseDrops * PER;  // Na+ spectator
+    const waterCount = Math.min(totalH, totalOH);
+    const freeH = totalH - waterCount;
+    const freeOH = totalOH - waterCount;
+    const netH = totalH - totalOH;
+    let nPh, verdict, verdictBg, verdictFg;
+    if (totalH === 0 && totalOH === 0) { nPh = 7; verdict = "EMPTY BEAKER"; verdictBg = "#faf6ef"; verdictFg = "#2b2620"; }
+    else if (netH > 0) { nPh = Math.max(1, +(7 - netH * 0.55).toFixed(1)); verdict = "ACIDIC"; verdictBg = "#f6dccb"; verdictFg = "#2b2620"; }
+    else if (netH < 0) { nPh = Math.min(13, +(7 + (-netH) * 0.55).toFixed(1)); verdict = "ALKALINE"; verdictBg = "#d7e6f2"; verdictFg = "#2b2620"; }
+    else { nPh = 7; verdict = "NEUTRAL — fully neutralised!"; verdictBg = "#2f7d3a"; verdictFg = "#fff"; }
+
     return {
       ph: this.state.ph,
       setPh: (e) => this.setState({ ph: Number(e.target.value) }),
@@ -100,6 +156,12 @@ class Component extends DCLogic {
           return { ph: v, seen };
         }),
       })),
+      // neutralisation
+      freeH, freeOH, waterCount, naCount: totalNa, clCount: totalCl, nPh,
+      verdict, verdictBg, verdictFg,
+      addAcid: () => this.addDrop("acid"),
+      addBase: () => this.addDrop("base"),
+      resetMix: () => this.setState({ acidDrops: 2, baseDrops: 0 }),
     };
   }
 }

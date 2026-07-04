@@ -84,20 +84,43 @@
     </div>
   </div>
 
-  <!-- five kingdoms reference -->
+  <!-- taxonomy: five kingdoms (interactive) -->
   <div style="max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 32px; display: flex; flex-direction: column; gap: 14px;">
-    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// 01 — THE FIVE KINGDOMS OF LIFE</div>
-    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The very first split biologists make is into five big <strong>kingdoms</strong>. Every organism belongs to exactly one:</div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;">
-      <sc-for list="{{ kingdoms }}" as="k" hint-placeholder-count="5">
-        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 5px;">
-          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 18px;">{{ k.name }}</div>
-          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ k.blurb }}</div>
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #a89d8e; margin-top: 2px;">e.g. {{ k.eg }}</div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// 01 — TAXONOMY: THE FIVE KINGDOMS OF LIFE</div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Sorting living things into named groups like this is called <strong>taxonomy</strong>. Its biggest groups are the five <strong>kingdoms</strong> — every living thing belongs to exactly one. Tap a kingdom to see what makes it different:</div>
+
+    <div style="display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 16px; align-items: stretch;">
+      <!-- left: the five kingdoms, colour-coded, same level -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <sc-for list="{{ kingdoms }}" as="k" hint-placeholder-count="5">
+          <div onClick="{{ k.onSelect }}" onMouseEnter="{{ k.onSelect }}" style="display: flex; align-items: center; gap: 12px; border: 2px solid #2b2620; background: {{ k.rowBg }}; padding: 11px 14px; cursor: pointer; box-shadow: {{ k.rowShadow }};">
+            <span style="width: 15px; align-self: stretch; min-height: 38px; background: {{ k.color }}; border: 1.5px solid #2b2620; flex-shrink: 0;"></span>
+            <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+              <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: {{ k.rowFg }};">{{ k.name }}</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ k.rowSub }};">{{ k.tag }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- right: detail of the selected kingdom -->
+      <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 4px 4px 0 rgba(43,38,32,0.15); display: flex; flex-direction: column;">
+        <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45; border-left: 10px solid {{ selColor }}; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">// KINGDOM</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; letter-spacing: -0.01em;">{{ selName }}</div>
         </div>
-      </sc-for>
+        <div style="padding: 8px 18px 14px; display: flex; flex-direction: column;">
+          <sc-for list="{{ selRows }}" as="r" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 96px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid #3a352e; align-items: baseline;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #b8ab99;">{{ r.label }}</div>
+              <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.5;">{{ r.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
     </div>
-    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #6b6156;">Within a kingdom, the sorting keeps going — phylum, class, order, family, genus, and finally <strong>species</strong>, the smallest group. Two organisms of the same species can breed and have fertile young.</div>
+
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #6b6156;">Taxonomy doesn't stop at kingdoms. Each one is split again and again — <strong>kingdom → phylum → class → order → family → genus → species</strong> — narrowing down until you reach a single <strong>species</strong>, the smallest group. Two living things of the same species can breed and have young that can breed too.</div>
   </div>
 
   <!-- next -->
@@ -156,6 +179,40 @@ class Component extends DCLogic {
     trail: [],
     solved: 0,
     streak: 0,
+    selKingdom: "animals",
+  };
+
+  KINGDOMS = {
+    animals:  { name: "Animals", color: "#e8590c", tag: "many cells · eat other life",
+      cells: "Many cells, each with a nucleus — but no cell wall.",
+      feeding: "Eat other living things; they can't make their own food.",
+      move: "Yes — most can move around to find food.",
+      found: "Land, sea and air, all over the world.",
+      eg: "fox, robin, earthworm, jellyfish" },
+    plants:   { name: "Plants", color: "#3f9c46", tag: "many cells · make their own food",
+      cells: "Many cells with a cell wall and green chloroplasts.",
+      feeding: "Make their own food from sunlight (photosynthesis).",
+      move: "No — they stay rooted in one place.",
+      found: "Anywhere with enough light and water.",
+      eg: "oak tree, moss, fern, grass" },
+    fungi:    { name: "Fungi", color: "#b5895a", tag: "absorb their food",
+      cells: "Cells with a wall, but no chloroplasts.",
+      feeding: "Absorb nutrients from dead or living matter around them.",
+      move: "No — they grow in place.",
+      found: "Soil, dead wood, and damp, dark places.",
+      eg: "mushroom, mould, yeast" },
+    protists: { name: "Protists", color: "#8a63d2", tag: "mostly single cells",
+      cells: "Usually a single cell — but it does have a nucleus.",
+      feeding: "A mixed bag: some make food, some hunt or absorb it.",
+      move: "Many swim using tiny hairs or a whip-like tail.",
+      found: "Ponds, oceans and damp soil.",
+      eg: "amoeba, algae, plankton" },
+    monerans: { name: "Monerans (bacteria)", color: "#2a6fb0", tag: "single cell · no nucleus",
+      cells: "A single cell with NO nucleus — the simplest of all.",
+      feeding: "Some absorb food; some make their own.",
+      move: "Some swim using a spinning tail.",
+      found: "Everywhere — soil, water, air, even inside you.",
+      eg: "E. coli, cyanobacteria" },
   };
 
   componentDidMount() {
@@ -197,6 +254,7 @@ class Component extends DCLogic {
     const node = this.KEY[this.state.node];
     const leaf = this.LEAF[this.state.node];
     const correct = this.state.wasCorrect;
+    const sel = this.KINGDOMS[this.state.selKingdom];
 
     return {
       mysteryName: this.ORGANISMS[this.state.mysteryIdx].name,
@@ -215,12 +273,26 @@ class Component extends DCLogic {
       nextRound: () => this.nextRound(),
       hasTrail: this.state.trail.length > 0,
       trail: this.state.trail,
-      kingdoms: [
-        { name: "Animals", blurb: "Many-celled, feed on other living things, usually move around.", eg: "fox, robin, worm" },
-        { name: "Plants", blurb: "Many-celled, make their own food from sunlight using chloroplasts.", eg: "oak, moss, fern" },
-        { name: "Fungi", blurb: "Feed by absorbing nutrients from dead or living matter.", eg: "mushroom, mould, yeast" },
-        { name: "Protists", blurb: "Mostly single-celled; a mixed bag that doesn't fit the others.", eg: "amoeba, algae" },
-        { name: "Monerans", blurb: "Single cells with no nucleus — the bacteria.", eg: "E. coli, cyanobacteria" },
+      kingdoms: Object.keys(this.KINGDOMS).map(key => {
+        const k = this.KINGDOMS[key];
+        const active = this.state.selKingdom === key;
+        return {
+          name: k.name, tag: k.tag, color: k.color,
+          rowBg: active ? "#2b2620" : "#fff",
+          rowFg: active ? "#faf6ef" : "#2b2620",
+          rowSub: active ? "#b8ab99" : "#a89d8e",
+          rowShadow: active ? "3px 3px 0 rgba(43,38,32,0.3)" : "none",
+          onSelect: () => this.setState({ selKingdom: key }),
+        };
+      }),
+      selName: sel.name,
+      selColor: sel.color,
+      selRows: [
+        { label: "CELLS", value: sel.cells },
+        { label: "FEEDING", value: sel.feeding },
+        { label: "MOVES?", value: sel.move },
+        { label: "FOUND IN", value: sel.found },
+        { label: "EXAMPLES", value: sel.eg },
       ],
     };
   }
