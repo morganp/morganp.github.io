@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Habitats">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / HABITATS</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — HOME, SWEET (HARSH) HOME — LEVEL L1</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">The right animal for the right place</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 760px;">A <strong>habitat</strong> is the place an animal or plant lives. Every habitat is a challenge — too hot, too cold, too dry — and the creatures that survive have special features called <strong>adaptations</strong> that fit them to it. Explore five habitats, then test yourself.</div>
+  </div>
+
+  <!-- habitat selector -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 4px; display: flex; gap: 8px; flex-wrap: wrap;">
+    <sc-for list="{{ habitatTabs }}" as="h" hint-placeholder-count="5">
+      <div onClick="{{ h.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 16px; border: 2px solid #2b2620; cursor: pointer; display: flex; align-items: center; gap: 7px; background: {{ h.bg }}; color: {{ h.fg }};"><span style="width: 11px; height: 11px; border-radius: 50%; background: {{ h.dot }}; border: 1.5px solid {{ h.fg }};"></span>{{ h.label }}</div>
+    </sc-for>
+  </div>
+
+  <!-- habitat detail -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 20px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: stretch;">
+
+    <!-- conditions card -->
+    <div style="border: 2px solid #2b2620; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 16px; background: {{ habBg }};">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620;">// FIG. 02 — CONDITIONS: {{ habName }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; line-height: 1.6; color: #2b2620;">{{ habDesc }}</div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <sc-for list="{{ gauges }}" as="g" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; color: #2b2620;"><span>{{ g.label }}</span><span>{{ g.value }}</span></div>
+            <div style="height: 10px; border: 1.5px solid #2b2620; background: rgba(255,255,255,0.5);">
+              <div style="height: 100%; width: {{ g.pct }}%; background: #2b2620;"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- resident + adaptations -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c;">MEET A LOCAL</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -0.01em;">{{ animalName }}</div>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156;">ITS SURVIVAL KIT — {{ adaptCount }} ADAPTATIONS</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <sc-for list="{{ adaptations }}" as="a" hint-placeholder-count="3">
+          <div style="border: 1.5px solid #2b2620; background: #faf6ef; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ a.feature }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">→ {{ a.why }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCH GAME -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #fcc419;">// CHALLENGE — WHICH HABITAT NEEDS THIS?</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">SCORE {{ score }} · STREAK {{ streak }}</div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: #d8cdbd;">An animal has this feature. Which habitat did it evolve to survive in?</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; line-height: 1.1; letter-spacing: -0.01em;">{{ quizFeature }}</div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <sc-for list="{{ quizOptions }}" as="q" hint-placeholder-count="5">
+          <div onClick="{{ q.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 12px 18px; border: 2px solid {{ q.border }}; cursor: pointer; background: {{ q.bg }}; color: {{ q.fg }};" style-hover="filter: brightness(1.1);">{{ q.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 600; color: {{ quizFbColor }}; min-height: 18px;">{{ quizFeedback }}</div>
+    </div>
+  </div>
+
+  <!-- concept -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 32px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// 01 — WHY DON'T POLAR BEARS LIVE IN THE DESERT?</div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Because a thick fur coat that saves your life in the Arctic would <strong>cook</strong> you in the desert. An adaptation is only useful in the habitat it fits. Move the animal and its survival kit becomes useless — which is exactly why each habitat has its own special cast of creatures, and why protecting habitats matters so much.</div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 0 40px 64px; display: flex; gap: 14px; flex-wrap: wrap;">
+    <a href="human-body.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Human Body Basics →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">← Back to the Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / HABITATS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  HABITATS = {
+    arctic: {
+      name: "Arctic tundra", dot: "#bfe0ea", bg: "#e8f1f5",
+      desc: "Freezing almost all year, whipped by wind, and dark for months. Snow and ice everywhere; food is scarce.",
+      gauges: [ ["Temperature", "Very cold", 12], ["Water available", "Frozen", 25], ["Plant food", "Scarce", 20] ],
+      animal: "Polar bear",
+      adaptations: [
+        { feature: "Thick fur + fat layer", why: "traps heat so it doesn't freeze in the cold." },
+        { feature: "White coat", why: "camouflages it against snow while hunting." },
+        { feature: "Wide, furry paws", why: "spread its weight on ice and grip without slipping." },
+      ],
+    },
+    desert: {
+      name: "Hot desert", dot: "#e8a13a", bg: "#f7ecd8",
+      desc: "Scorching by day, cold at night, and barely any rain for months. Water is the rarest thing here.",
+      gauges: [ ["Temperature", "Very hot (day)", 92], ["Water available", "Almost none", 8], ["Plant food", "Sparse", 25] ],
+      animal: "Camel",
+      adaptations: [
+        { feature: "Stores fat in its hump", why: "carries energy so it can go weeks without food." },
+        { feature: "Barely sweats, big kidneys", why: "loses very little water in the heat." },
+        { feature: "Long eyelashes + closable nostrils", why: "keep blowing sand out of eyes and nose." },
+      ],
+    },
+    rainforest: {
+      name: "Rainforest", dot: "#3f9c46", bg: "#e6f2e3",
+      desc: "Warm, wet and dripping all year. Bursting with life, but so crowded that every creature competes for light and space.",
+      gauges: [ ["Temperature", "Warm", 70], ["Water available", "Abundant", 95], ["Plant food", "Plentiful", 90] ],
+      animal: "Spider monkey",
+      adaptations: [
+        { feature: "Gripping tail + hands", why: "swings and holds branches high in the canopy." },
+        { feature: "Long arms", why: "reach between trees to travel without touching the ground." },
+        { feature: "Sharp colour vision", why: "spots ripe fruit among endless green leaves." },
+      ],
+    },
+    ocean: {
+      name: "Open ocean", dot: "#2a6fb0", bg: "#e2edf5",
+      desc: "Deep, salty and always moving. No place to hide and huge distances between meals.",
+      gauges: [ ["Temperature", "Cool", 40], ["Water available", "Everywhere (salty)", 100], ["Plant food", "Drifting", 55] ],
+      animal: "Dolphin",
+      adaptations: [
+        { feature: "Streamlined body + fins", why: "slips through water fast to chase fish." },
+        { feature: "Blowhole on top", why: "breathes air at the surface without stopping." },
+        { feature: "Echolocation clicks", why: "finds prey in dark water using sound." },
+      ],
+    },
+    grassland: {
+      name: "Grassland savanna", dot: "#c9a83a", bg: "#f2ecd6",
+      desc: "Wide, open plains of grass with few trees. A wet season and a long dry season, and nowhere to hide from predators.",
+      gauges: [ ["Temperature", "Warm", 68], ["Water available", "Seasonal", 45], ["Plant food", "Grass, lots", 75] ],
+      animal: "Cheetah",
+      adaptations: [
+        { feature: "Long legs + flexible spine", why: "sprint at 100 km/h to catch prey on the open plain." },
+        { feature: "Spotted coat", why: "blends into dry grass while stalking." },
+        { feature: "Big nostrils + lungs", why: "gulp air fast during an all-out chase." },
+      ],
+    },
+  };
+
+  // adaptation -> correct habitat key (for the quiz)
+  QUIZ = [
+    { feat: "A thick coat of blubber under white fur", key: "arctic" },
+    { feat: "The ability to survive a week without drinking", key: "desert" },
+    { feat: "A tail that grips like a fifth hand", key: "rainforest" },
+    { feat: "A streamlined body and a blowhole to breathe", key: "ocean" },
+    { feat: "Long legs built for sprinting across open ground", key: "grassland" },
+    { feat: "Wide furry paws that grip ice", key: "arctic" },
+    { feat: "Nostrils that close to keep out blowing sand", key: "desert" },
+    { feat: "Echolocation clicks to hunt in the dark", key: "ocean" },
+    { feat: "Long arms to swing between tall trees", key: "rainforest" },
+    { feat: "A spotted coat that blends into dry grass", key: "grassland" },
+  ];
+
+  state = { hab: "arctic", quizIdx: Math.floor(Math.random() * 10), score: 0, streak: 0, feedback: "", answered: false };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("habitats");
+  }
+
+  answer(key) {
+    if (this.state.answered) return;
+    const q = this.QUIZ[this.state.quizIdx];
+    const correct = key === q.key;
+    this.setState(s => ({
+      answered: true,
+      score: correct ? s.score + 1 : s.score,
+      streak: correct ? s.streak + 1 : 0,
+      feedback: correct
+        ? "CORRECT — that's a " + this.HABITATS[q.key].name + " adaptation."
+        : "Not this one — it belongs in the " + this.HABITATS[q.key].name + ".",
+      lastCorrect: correct,
+    }), () => {
+      if (this.state.score >= 4 && window.Progress) window.Progress.markCompleted("habitats");
+      setTimeout(() => this.nextQuiz(), 1300);
+    });
+  }
+
+  nextQuiz() {
+    let idx;
+    do { idx = Math.floor(Math.random() * this.QUIZ.length); }
+    while (idx === this.state.quizIdx);
+    this.setState({ quizIdx: idx, answered: false, feedback: "" });
+  }
+
+  renderVals() {
+    const hab = this.HABITATS[this.state.hab];
+
+    const habitatTabs = Object.keys(this.HABITATS).map(k => {
+      const h = this.HABITATS[k];
+      const active = this.state.hab === k;
+      return {
+        label: h.name.toUpperCase(),
+        dot: h.dot,
+        bg: active ? "#2b2620" : "#fff",
+        fg: active ? "#faf6ef" : "#2b2620",
+        onClick: () => this.setState({ hab: k }),
+      };
+    });
+
+    const gauges = hab.gauges.map(([label, value, pct]) => ({ label, value, pct }));
+
+    const q = this.QUIZ[this.state.quizIdx];
+    const quizOptions = Object.keys(this.HABITATS).map(k => {
+      const answered = this.state.answered;
+      const isCorrect = k === q.key;
+      let bg = "#faf6ef", fg = "#2b2620", border = "#2b2620";
+      if (answered) {
+        if (isCorrect) { bg = "#2f7d3a"; fg = "#fff"; border = "#2f7d3a"; }
+        else { bg = "#3a352e"; fg = "#8a8175"; border = "#574f45"; }
+      }
+      return { label: this.HABITATS[k].name, bg, fg, border, onClick: () => this.answer(k) };
+    });
+
+    return {
+      habitatTabs,
+      habName: hab.name, habDesc: hab.desc, habBg: hab.bg,
+      gauges,
+      animalName: hab.animal,
+      adaptCount: hab.adaptations.length,
+      adaptations: hab.adaptations,
+      quizFeature: q.feat,
+      quizOptions,
+      score: this.state.score, streak: this.state.streak,
+      quizFeedback: this.state.feedback,
+      quizFbColor: this.state.answered ? (this.state.lastCorrect ? "#7bd88f" : "#fcc419") : "#8a8175",
+    };
+  }
+}
+</script>
+</body>
+</html>

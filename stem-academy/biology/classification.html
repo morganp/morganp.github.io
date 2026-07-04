@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Classification">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / CLASSIFICATION</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE BRANCHING KEY — LEVEL L1–L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Name any living thing with yes/no questions</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 720px;">Scientists sort every living thing into groups by asking simple either/or questions — a <strong>dichotomous key</strong>. A mystery organism is waiting below. Answer each question and follow the branch until you've pinned down its group.</div>
+  </div>
+
+  <!-- game -->
+  <div style="max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 20px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); display: flex; flex-direction: column;">
+
+      <!-- scoreboard -->
+      <div style="background: #2b2620; color: #faf6ef; padding: 12px 20px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #fcc419;">MYSTERY ORGANISM</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px; letter-spacing: -0.01em;">{{ mysteryName }}</div>
+        <div style="flex: 1;"></div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">SOLVED {{ solved }} · STREAK {{ streak }}</div>
+      </div>
+
+      <!-- current step -->
+      <div style="padding: 26px 24px; display: flex; flex-direction: column; gap: 18px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">STEP {{ stepNo }}</div>
+
+        <sc-if value="{{ atLeaf }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 14px; align-items: flex-start;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: {{ resultColor }};">{{ resultTag }}</div>
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 34px; letter-spacing: -0.02em;">{{ leafGroup }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; line-height: 1.6; color: #554c42;">{{ leafBlurb }}</div>
+            <div onClick="{{ nextRound }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; cursor: pointer;">Next mystery →</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ atQuestion }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.15; letter-spacing: -0.01em;">{{ question }}</div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <div onClick="{{ answerYes }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 14px 30px; border: 2px solid #2b2620; box-shadow: 3px 3px 0 rgba(43,38,32,0.25); cursor: pointer;" style-hover="background: #2b2620; color: #faf6ef;">YES</div>
+              <div onClick="{{ answerNo }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 14px 30px; border: 2px solid #2b2620; box-shadow: 3px 3px 0 rgba(43,38,32,0.25); cursor: pointer;" style-hover="background: #2b2620; color: #faf6ef;">NO</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- trail -->
+        <sc-if value="{{ hasTrail }}" hint-placeholder-val="{{ false }}">
+          <div style="border-top: 1px solid #e6dfd2; padding-top: 14px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e;">YOUR PATH SO FAR</div>
+            <sc-for list="{{ trail }}" as="tr" hint-placeholder-count="2">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #6b6156;"><span style="color: #e8590c; font-weight: 600;">{{ tr.ans }}</span> — {{ tr.q }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- five kingdoms reference -->
+  <div style="max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 32px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// 01 — THE FIVE KINGDOMS OF LIFE</div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">The very first split biologists make is into five big <strong>kingdoms</strong>. Every organism belongs to exactly one:</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;">
+      <sc-for list="{{ kingdoms }}" as="k" hint-placeholder-count="5">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 18px;">{{ k.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ k.blurb }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #a89d8e; margin-top: 2px;">e.g. {{ k.eg }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #6b6156;">Within a kingdom, the sorting keeps going — phylum, class, order, family, genus, and finally <strong>species</strong>, the smallest group. Two organisms of the same species can breed and have fertile young.</div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 0 40px 64px; display: flex; gap: 14px; flex-wrap: wrap;">
+    <a href="cells.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Cells →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">← Back to the Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / CLASSIFICATION</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  // dichotomous key. Each node: question + yes/no -> next node id or a leaf group.
+  KEY = {
+    start:    { q: "Does it have a backbone (a spine)?", yes: "vert", no: "invert" },
+    vert:     { q: "Does it have feathers?", yes: "birds", no: "vert2" },
+    vert2:    { q: "Does it have scales and lay eggs on land?", yes: "reptiles", no: "vert3" },
+    vert3:    { q: "Does it live its whole life in water, breathing through gills?", yes: "fish", no: "vert4" },
+    vert4:    { q: "Does it have moist skin and start life in water as larvae?", yes: "amphibians", no: "mammals" },
+    invert:   { q: "Does it have a hard outer skeleton and jointed legs?", yes: "arthro", no: "invert2" },
+    arthro:   { q: "Does it have six legs and three body parts?", yes: "insects", no: "arachnids" },
+    invert2:  { q: "Is its body soft, often with a shell?", yes: "molluscs", no: "worms" },
+  };
+  LEAF = {
+    birds:      { group: "Birds", blurb: "Warm-blooded vertebrates with feathers, wings and beaks. They lay hard-shelled eggs." },
+    reptiles:   { group: "Reptiles", blurb: "Cold-blooded vertebrates with dry, scaly skin. They lay leathery eggs on land." },
+    fish:       { group: "Fish", blurb: "Cold-blooded vertebrates that live in water and breathe through gills all their lives." },
+    amphibians: { group: "Amphibians", blurb: "Vertebrates with moist skin that start as water-living larvae, then move to land." },
+    mammals:    { group: "Mammals", blurb: "Warm-blooded vertebrates with hair or fur that feed their young on milk." },
+    insects:    { group: "Insects", blurb: "Arthropods with six legs, three body sections and usually wings. The biggest animal group." },
+    arachnids:  { group: "Arachnids", blurb: "Arthropods with eight legs and two body sections — spiders, scorpions and their kin." },
+    molluscs:   { group: "Molluscs", blurb: "Soft-bodied invertebrates, often protected by a shell — snails, clams and octopuses." },
+    worms:      { group: "Worms", blurb: "Soft, long-bodied invertebrates with no legs and no shell." },
+  };
+  // organisms and the correct leaf they should key out to
+  ORGANISMS = [
+    { name: "Robin", leaf: "birds" },
+    { name: "Grass snake", leaf: "reptiles" },
+    { name: "Goldfish", leaf: "fish" },
+    { name: "Common frog", leaf: "amphibians" },
+    { name: "Red fox", leaf: "mammals" },
+    { name: "Honeybee", leaf: "insects" },
+    { name: "Garden spider", leaf: "arachnids" },
+    { name: "Garden snail", leaf: "molluscs" },
+    { name: "Earthworm", leaf: "worms" },
+    { name: "Bottlenose dolphin", leaf: "mammals" },
+    { name: "Emperor penguin", leaf: "birds" },
+  ];
+
+  state = {
+    mysteryIdx: Math.floor(Math.random() * 11),
+    node: "start",
+    trail: [],
+    solved: 0,
+    streak: 0,
+  };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("classification");
+  }
+
+  answer(ans) {
+    const node = this.KEY[this.state.node];
+    if (!node) return;
+    const next = ans === "yes" ? node.yes : node.no;
+    const trail = this.state.trail.concat([{ ans: ans.toUpperCase(), q: node.q }]);
+
+    if (this.LEAF[next]) {
+      // reached a leaf — check against the mystery's true group
+      const correct = this.ORGANISMS[this.state.mysteryIdx].leaf === next;
+      this.setState(s => ({
+        node: next,
+        trail,
+        solved: correct ? s.solved + 1 : s.solved,
+        streak: correct ? s.streak + 1 : 0,
+        wasCorrect: correct,
+      }), () => {
+        if (this.state.solved >= 3 && window.Progress) window.Progress.markCompleted("classification");
+      });
+    } else {
+      this.setState({ node: next, trail });
+    }
+  }
+
+  nextRound() {
+    let idx;
+    do { idx = Math.floor(Math.random() * this.ORGANISMS.length); }
+    while (idx === this.state.mysteryIdx);
+    this.setState({ mysteryIdx: idx, node: "start", trail: [] });
+  }
+
+  renderVals() {
+    const atLeaf = !!this.LEAF[this.state.node];
+    const node = this.KEY[this.state.node];
+    const leaf = this.LEAF[this.state.node];
+    const correct = this.state.wasCorrect;
+
+    return {
+      mysteryName: this.ORGANISMS[this.state.mysteryIdx].name,
+      solved: this.state.solved,
+      streak: this.state.streak,
+      stepNo: this.state.trail.length + 1,
+      atQuestion: !atLeaf,
+      atLeaf,
+      question: node ? node.q : "",
+      answerYes: () => this.answer("yes"),
+      answerNo: () => this.answer("no"),
+      leafGroup: leaf ? leaf.group : "",
+      leafBlurb: leaf ? leaf.blurb : "",
+      resultTag: correct ? "CORRECT — YOU KEYED IT OUT!" : "NICE TRY — THAT'S NOT THIS ORGANISM'S GROUP",
+      resultColor: correct ? "#2f7d3a" : "#e8590c",
+      nextRound: () => this.nextRound(),
+      hasTrail: this.state.trail.length > 0,
+      trail: this.state.trail,
+      kingdoms: [
+        { name: "Animals", blurb: "Many-celled, feed on other living things, usually move around.", eg: "fox, robin, worm" },
+        { name: "Plants", blurb: "Many-celled, make their own food from sunlight using chloroplasts.", eg: "oak, moss, fern" },
+        { name: "Fungi", blurb: "Feed by absorbing nutrients from dead or living matter.", eg: "mushroom, mould, yeast" },
+        { name: "Protists", blurb: "Mostly single-celled; a mixed bag that doesn't fit the others.", eg: "amoeba, algae" },
+        { name: "Monerans", blurb: "Single cells with no nucleus — the bacteria.", eg: "E. coli, cyanobacteria" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

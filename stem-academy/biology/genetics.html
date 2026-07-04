@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Genetics">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / GENETICS</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE PUNNETT SQUARE — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Cross two pea plants, predict their offspring</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 760px;">Every offspring gets one allele from each parent. Pick the parents' genotypes below and the Punnett square fills in every possible combination — then read the ratios straight off it.</div>
+  </div>
+
+  <!-- trait picker -->
+  <div style="max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 4px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156;">TRAIT:</span>
+    <sc-for list="{{ traitTabs }}" as="tt" hint-placeholder-count="3">
+      <div onClick="{{ tt.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; padding: 7px 14px; border: 2px solid #2b2620; cursor: pointer; background: {{ tt.bg }}; color: {{ tt.fg }};">{{ tt.label }}</div>
+    </sc-for>
+  </div>
+
+  <!-- parents + square -->
+  <div style="max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 20px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 24px; align-items: start;">
+
+    <!-- parent controls -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <sc-for list="{{ parents }}" as="p" hint-placeholder-count="2">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">{{ p.label }}</div>
+          <div style="display: flex; gap: 8px;">
+            <sc-for list="{{ p.options }}" as="o" hint-placeholder-count="3">
+              <div onClick="{{ o.onClick }}" style="flex: 1; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; padding: 12px 6px; border: 2px solid #2b2620; cursor: pointer; background: {{ o.bg }}; color: {{ o.fg }};">{{ o.geno }}</div>
+            </sc-for>
+          </div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #554c42;">{{ p.phenotype }}</div>
+        </div>
+      </sc-for>
+
+      <!-- allele key -->
+      <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">// ALLELE KEY — {{ traitName }}</div>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="width: 13px; height: 13px; background: {{ domColor }}; border: 1.5px solid #faf6ef; display: inline-block;"></span><strong>{{ domAllele }}</strong> = {{ domName }} (dominant)</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="width: 13px; height: 13px; background: {{ recColor }}; border: 1.5px solid #faf6ef; display: inline-block;"></span><strong>{{ recAllele }}</strong> = {{ recName }} (recessive)</span>
+        </div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #e8dfd0;">A single dominant allele is enough to show the dominant trait. The recessive trait only appears when both alleles are recessive.</div>
+      </div>
+    </div>
+
+    <!-- punnett square -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — THE CROSS: {{ crossLabel }}</div>
+      <div style="display: grid; grid-template-columns: 34px 1fr 1fr; grid-template-rows: 34px 1fr 1fr; gap: 6px; aspect-ratio: 1 / 0.92;">
+        <!-- corner -->
+        <div></div>
+        <!-- top alleles (parent 1) -->
+        <sc-for list="{{ topHeaders }}" as="h" hint-placeholder-count="2">
+          <div style="display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; color: {{ h.color }};">{{ h.allele }}</div>
+        </sc-for>
+        <!-- rows -->
+        <sc-for list="{{ cells }}" as="c" hint-placeholder-count="6">
+          <sc-if value="{{ c.isHeader }}" hint-placeholder-val="{{ false }}">
+            <div style="display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; color: {{ c.color }};">{{ c.allele }}</div>
+          </sc-if>
+          <sc-if value="{{ c.isCell }}" hint-placeholder-val="{{ true }}">
+            <div style="display: grid; place-items: center; gap: 2px; border: 2px solid #2b2620; background: {{ c.bg }}; color: {{ c.fg }};">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.02em;">{{ c.geno }}</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; opacity: 0.85;">{{ c.pheno }}</div>
+            </div>
+          </sc-if>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ratios -->
+  <div style="max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 4px 40px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">PHENOTYPE RATIO (WHAT THEY LOOK LIKE)</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px;">{{ phenoRatio }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: #554c42;">{{ phenoText }}</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">GENOTYPE RATIO (THEIR ALLELES)</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px;">{{ genoRatio }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: #554c42;">{{ genoText }}</div>
+    </div>
+  </div>
+
+  <!-- theory -->
+  <div style="max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 32px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// 01 — THE WORDS GENETICISTS USE</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+      <sc-for list="{{ glossary }}" as="g" hint-placeholder-count="4">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ g.term }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ g.def }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 0 40px 64px; display: flex; gap: 14px; flex-wrap: wrap;">
+    <a href="cells.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Cells →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">← Back to the Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / GENETICS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  TRAITS = {
+    flower: { name: "Pea flower colour", dom: "P", rec: "p", domName: "Purple", recName: "White", domColor: "#8a63d2", recColor: "#f4efe6" },
+    seed:   { name: "Pea seed shape", dom: "R", rec: "r", domName: "Round", recName: "Wrinkled", domColor: "#e8a13a", recColor: "#f4efe6" },
+    height: { name: "Plant height", dom: "T", rec: "t", domName: "Tall", recName: "Short", domColor: "#3f9c46", recColor: "#f4efe6" },
+  };
+
+  state = { trait: "flower", p1: "Pp", p2: "Pp" };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("genetics");
+  }
+
+  setTrait(key) {
+    const t = this.TRAITS[key];
+    // remap current genotypes to new letters, preserving hetero/homo pattern
+    const remap = (g) => g.split("").map((ch, i) => {
+      // determine if this char is dominant relative to OLD trait
+      const old = this.TRAITS[this.state.trait];
+      return ch === old.dom ? t.dom : t.rec;
+    }).join("");
+    this.setState({ trait: key, p1: remap(this.state.p1), p2: remap(this.state.p2) });
+  }
+
+  setParent(which, geno) {
+    this.setState({ [which]: geno }, () => {
+      if (window.Progress) window.Progress.markCompleted("genetics");
+    });
+  }
+
+  renderVals() {
+    const t = this.TRAITS[this.state.trait];
+    const D = t.dom, r = t.rec;
+    const genoOptions = [D + D, D + r, r + r];
+
+    const traitTabs = Object.keys(this.TRAITS).map(k => ({
+      label: this.TRAITS[k].name,
+      bg: this.state.trait === k ? "#2b2620" : "#fff",
+      fg: this.state.trait === k ? "#faf6ef" : "#2b2620",
+      onClick: () => this.setTrait(k),
+    }));
+
+    const phenoOf = (g) => g.includes(D) ? t.domName : t.recName;
+    const normGeno = (g) => {
+      // always put dominant first for display consistency
+      const a = g.split("").sort((x, y) => (x === D ? -1 : 1));
+      return a.join("");
+    };
+
+    const mkParent = (which, label) => {
+      const cur = this.state[which];
+      return {
+        label,
+        phenotype: "Genotype " + cur + " → shows " + phenoOf(cur).toLowerCase() + " " + t.name.toLowerCase().replace("pea ", "").replace("plant ", "") + ".",
+        options: genoOptions.map(g => ({
+          geno: g,
+          bg: cur === g ? "#e8590c" : "#faf6ef",
+          fg: cur === g ? "#faf6ef" : "#2b2620",
+          onClick: () => this.setParent(which, g),
+        })),
+      };
+    };
+
+    const parents = [mkParent("p1", "PARENT 1 GENOTYPE"), mkParent("p2", "PARENT 2 GENOTYPE")];
+
+    // gametes: each parent contributes one allele
+    const g1 = this.state.p1.split(""); // columns
+    const g2 = this.state.p2.split(""); // rows
+
+    const colorOf = (allele) => allele === D ? t.domColor : t.recColor;
+
+    const topHeaders = g1.map(a => ({ allele: a, color: "#2b2620" }));
+
+    // build grid cells row-major including the row-header cells
+    const cells = [];
+    const counts = { pheno: {}, geno: {} };
+    g2.forEach((rowAllele, ri) => {
+      // row header
+      cells.push({ isHeader: true, isCell: false, allele: rowAllele, color: "#2b2620" });
+      g1.forEach((colAllele) => {
+        const geno = normGeno(colAllele + rowAllele);
+        const ph = phenoOf(geno);
+        counts.pheno[ph] = (counts.pheno[ph] || 0) + 1;
+        counts.geno[geno] = (counts.geno[geno] || 0) + 1;
+        const isDom = ph === t.domName;
+        cells.push({
+          isHeader: false, isCell: true,
+          geno,
+          pheno: ph.toUpperCase(),
+          bg: isDom ? "#fbe4d0" : "#eef3ee",
+          fg: "#2b2620",
+        });
+      });
+    });
+
+    // ratios
+    const ratioStr = (obj, order) => {
+      const keys = order.filter(k => obj[k]);
+      return keys.map(k => obj[k]).join(" : ") + "  " + keys.join(" : ");
+    };
+    const phenoOrder = [t.domName, t.recName];
+    const phenoParts = phenoOrder.filter(k => counts.pheno[k]);
+    const phenoRatio = phenoParts.map(k => counts.pheno[k]).join(" : ") + "  " + phenoParts.map(k => k.toLowerCase()).join(" : ");
+
+    const genoOrder = [D + D, normGeno(D + r), r + r];
+    const genoParts = genoOrder.filter(k => counts.geno[k]);
+    const genoRatio = genoParts.map(k => counts.geno[k]).join(" : ") + "  " + genoParts.join(" : ");
+
+    const domN = counts.pheno[t.domName] || 0;
+    const phenoText = domN === 4 ? "Every offspring shows the dominant " + t.domName.toLowerCase() + " trait." :
+      domN === 0 ? "Every offspring shows the recessive " + t.recName.toLowerCase() + " trait." :
+      "Out of every 4 offspring, " + domN + " look " + t.domName.toLowerCase() + " and " + (4 - domN) + " look " + t.recName.toLowerCase() + ".";
+
+    return {
+      traitTabs, parents,
+      traitName: t.name,
+      domAllele: D, recAllele: r, domName: t.domName, recName: t.recName,
+      domColor: t.domColor, recColor: t.recColor,
+      crossLabel: this.state.p1 + " × " + this.state.p2,
+      topHeaders, cells,
+      phenoRatio, phenoText,
+      genoRatio,
+      genoText: "The letters describe the alleles each offspring carries — two the same is homozygous, one of each is heterozygous.",
+      glossary: [
+        { term: "Gene", def: "A section of DNA that codes for one feature, like flower colour." },
+        { term: "Allele", def: "A version of a gene. Here P (purple) and p (white) are two alleles of the same gene." },
+        { term: "Genotype", def: "The pair of alleles an organism carries — e.g. Pp." },
+        { term: "Phenotype", def: "The feature you actually see, decided by the genotype — e.g. purple flowers." },
+        { term: "Homozygous", def: "Both alleles the same (PP or pp)." },
+        { term: "Heterozygous", def: "Two different alleles (Pp) — the dominant one wins." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

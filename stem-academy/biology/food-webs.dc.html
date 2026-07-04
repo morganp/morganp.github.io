@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Food Webs">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / FOOD WEBS</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — A WOODLAND FOOD WEB — LEVEL L2–L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Pull one thread and the whole web moves</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 760px;">Arrows point the way energy flows — from the thing being eaten to the thing eating it. Click any organism to <strong>remove it</strong> from this woodland, and watch how everything connected to it is pushed up or down.</div>
+  </div>
+
+  <!-- web -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — ENERGY FLOW: ARROW POINTS TO THE EATER</div>
+        <div onClick="{{ reset }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 6px 12px; cursor: pointer; background: #faf6ef;" style-hover="background: #2b2620; color: #faf6ef;">RESET WEB</div>
+      </div>
+
+      <div style="position: relative; width: 100%; height: 420px;">
+        <svg viewBox="0 0 980 420" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+          <defs>
+            <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a7f70"></path></marker>
+          </defs>
+          <sc-for list="{{ arrows }}" as="a" hint-placeholder-count="10">
+            <line x1="{{ a.x1 }}" y1="{{ a.y1 }}" x2="{{ a.x2 }}" y2="{{ a.y2 }}" stroke="{{ a.stroke }}" stroke-width="1.8" marker-end="url(#arrow)" opacity="{{ a.opacity }}"></line>
+          </sc-for>
+        </svg>
+        <sc-for list="{{ species }}" as="s" hint-placeholder-count="8">
+          <div onClick="{{ s.onClick }}" style="position: absolute; left: {{ s.xPct }}%; top: {{ s.yPct }}%; transform: translate(-50%, -50%); width: {{ s.w }}px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; opacity: {{ s.opacity }};">
+            <div style="width: 100%; padding: 8px 6px; border: 2px solid #2b2620; background: {{ s.bg }}; color: {{ s.fg }}; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; box-shadow: {{ s.shadow }};">{{ s.name }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: {{ s.trendColor }}; min-height: 15px;">{{ s.trend }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- legend -->
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156; border-top: 1px solid #e6dfd2; padding-top: 10px;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #3f9c46; border: 1.5px solid #2b2620; display: inline-block;"></span>PRODUCER (makes its own food)</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #cfe6d2; border: 1.5px solid #2b2620; display: inline-block;"></span>PRIMARY CONSUMER (herbivore)</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #f2a65a; border: 1.5px solid #2b2620; display: inline-block;"></span>SECONDARY CONSUMER</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #e8590c; border: 1.5px solid #2b2620; display: inline-block;"></span>APEX PREDATOR</span>
+        <span>▲ MORE · ▼ FEWER · ✕ REMOVED</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- readout -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; min-height: 44px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">{{ readoutTag }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; line-height: 1.55;">{{ readout }}</div>
+    </div>
+  </div>
+
+  <!-- trophic pyramid + text -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// 01 — WHY BIG PREDATORS ARE RARE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; line-height: 1.6;">Only about <strong>10%</strong> of the energy at each level passes up to the next — the rest is lost as heat, movement and waste. So there's far less energy to go around at the top, which is why one wood holds thousands of plants but only a handful of foxes.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c; align-self: flex-start;">// FIG. 03 — PYRAMID OF ENERGY (kJ per m² per year)</div>
+      <sc-for list="{{ pyramid }}" as="py" hint-placeholder-count="4">
+        <div style="width: {{ py.w }}%; background: {{ py.bg }}; color: {{ py.fg }}; border: 2px solid #2b2620; border-bottom: none; padding: 8px 6px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600;">{{ py.label }} · {{ py.energy }}</div>
+      </sc-for>
+      <div style="width: 100%; border-top: 2px solid #2b2620;"></div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e; margin-top: 4px;">WIDTH = ENERGY AVAILABLE · ÷10 EACH STEP UP</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 0 40px 64px; display: flex; gap: 14px; flex-wrap: wrap;">
+    <a href="classification.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Classification →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">← Back to the Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / FOOD WEBS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  // trophic: 0 producer, 1 primary, 2 secondary, 3 apex
+  NODES = {
+    oak:     { name: "Oak / grass", x: 130, y: 360, troph: 0 },
+    berries: { name: "Berries", x: 400, y: 360, troph: 0 },
+    seeds:   { name: "Seeds", x: 670, y: 360, troph: 0 },
+    rabbit:  { name: "Rabbit", x: 250, y: 235, troph: 1 },
+    mouse:   { name: "Mouse", x: 540, y: 235, troph: 1 },
+    caterpillar: { name: "Caterpillar", x: 820, y: 235, troph: 1 },
+    thrush:  { name: "Thrush", x: 690, y: 120, troph: 2 },
+    weasel:  { name: "Weasel", x: 400, y: 120, troph: 2 },
+    fox:     { name: "Fox", x: 250, y: 45, troph: 3 },
+    owl:     { name: "Owl", x: 620, y: 45, troph: 3 },
+  };
+  // edges: from (eaten) -> to (eater)
+  EDGES = [
+    ["oak", "rabbit"], ["oak", "caterpillar"], ["berries", "mouse"], ["berries", "thrush"],
+    ["seeds", "mouse"], ["caterpillar", "thrush"], ["rabbit", "fox"], ["rabbit", "weasel"],
+    ["mouse", "weasel"], ["mouse", "owl"], ["mouse", "fox"], ["weasel", "fox"], ["thrush", "owl"],
+  ];
+  TROPH = {
+    0: { bg: "#3f9c46", fg: "#fff" },
+    1: { bg: "#cfe6d2", fg: "#2b2620" },
+    2: { bg: "#f2a65a", fg: "#2b2620" },
+    3: { bg: "#e8590c", fg: "#fff" },
+  };
+
+  state = { removed: null };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("food-webs");
+  }
+
+  // compute up/down effect of removing `rid`
+  effects(rid) {
+    if (!rid) return {};
+    const eff = {}; // id -> 'up' | 'down'
+    // things the removed one ATE (its prey) lose a predator -> increase
+    this.EDGES.forEach(([from, to]) => {
+      if (to === rid) eff[from] = "up";     // prey booms
+      if (from === rid) eff[to] = "down";   // predator loses food
+    });
+    return eff;
+  }
+
+  remove(id) {
+    this.setState(s => ({ removed: s.removed === id ? null : id }), () => {
+      if (window.Progress) window.Progress.markCompleted("food-webs");
+    });
+  }
+
+  renderVals() {
+    const removed = this.state.removed;
+    const eff = this.effects(removed);
+
+    const species = Object.keys(this.NODES).map(id => {
+      const n = this.NODES[id];
+      const t = this.TROPH[n.troph];
+      const isRemoved = removed === id;
+      const e = eff[id];
+      return {
+        name: n.name, x: n.x, y: n.y, xPct: n.x / 980 * 100, yPct: n.y / 420 * 100, w: 96,
+        bg: isRemoved ? "#efe7da" : t.bg,
+        fg: isRemoved ? "#a89d8e" : t.fg,
+        opacity: isRemoved ? 0.4 : 1,
+        shadow: (removed === id) ? "none" : "2px 2px 0 rgba(43,38,32,0.18)",
+        trend: isRemoved ? "✕" : (e === "up" ? "▲" : e === "down" ? "▼" : ""),
+        trendColor: e === "up" ? "#2f7d3a" : e === "down" ? "#c0392b" : "#a89d8e",
+        onClick: () => this.remove(id),
+      };
+    });
+
+    const arrows = this.EDGES.map(([from, to]) => {
+      const a = this.NODES[from], b = this.NODES[to];
+      const dim = removed === from || removed === to;
+      // shorten line so arrowhead sits at box edge
+      const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+      const pad = 34;
+      return {
+        x1: a.x + dx / len * pad, y1: a.y + dy / len * pad,
+        x2: b.x - dx / len * pad, y2: b.y - dy / len * pad,
+        stroke: "#8a7f70",
+        opacity: dim ? 0.18 : 0.75,
+      };
+    });
+
+    let readoutTag = "TAP AN ORGANISM TO REMOVE IT";
+    let readout = "In a food web, nothing is on its own. Every producer feeds a chain of consumers above it. Remove a species and see who benefits and who goes hungry.";
+    if (removed) {
+      const n = this.NODES[removed];
+      const ups = Object.keys(eff).filter(k => eff[k] === "up").map(k => this.NODES[k].name);
+      const downs = Object.keys(eff).filter(k => eff[k] === "down").map(k => this.NODES[k].name);
+      readoutTag = "REMOVED: " + n.name.toUpperCase();
+      const upTxt = ups.length ? ups.join(", ") + " boom without a predator eating them" : "nothing it ate is left to recover";
+      const downTxt = downs.length ? downs.join(", ") + " lose a food source and decline" : "nothing above it depended on it alone";
+      readout = "Take out the " + n.name.toLowerCase() + " and the web reshuffles: " + upTxt + "; meanwhile " + downTxt + ". Real ecosystems ripple like this after every change.";
+    }
+
+    const pyramid = [
+      { label: "APEX", energy: "10", w: 32, bg: "#e8590c", fg: "#fff" },
+      { label: "SECONDARY", energy: "100", w: 55, bg: "#f2a65a", fg: "#2b2620" },
+      { label: "PRIMARY", energy: "1,000", w: 78, bg: "#cfe6d2", fg: "#2b2620" },
+      { label: "PRODUCERS", energy: "10,000", w: 100, bg: "#3f9c46", fg: "#fff" },
+    ];
+
+    return { species, arrows, readout, readoutTag, pyramid, reset: () => this.setState({ removed: null }) };
+  }
+}
+</script>
+</body>
+</html>

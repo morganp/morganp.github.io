@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Life Cycles">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / LIFE CYCLES</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE CIRCLE OF A LIFE — LEVEL L1</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Every living thing goes round and round</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 760px;">A life cycle is the journey from a new life to a grown-up that makes new life of its own — then it all begins again. Pick a creature, press play to watch the cycle turn, then click any stage to learn about it.</div>
+  </div>
+
+  <!-- organism tabs -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 4px; display: flex; gap: 8px; flex-wrap: wrap;">
+    <sc-for list="{{ organismTabs }}" as="o" hint-placeholder-count="4">
+      <div onClick="{{ o.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 16px; border: 2px solid #2b2620; cursor: pointer; background: {{ o.bg }}; color: {{ o.fg }};">{{ o.label }}</div>
+    </sc-for>
+  </div>
+
+  <!-- cycle + detail -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 20px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; align-items: stretch;">
+
+    <!-- the wheel -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — {{ organismName }} LIFE CYCLE</div>
+        <div onClick="{{ togglePlay }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #faf6ef; background: {{ playBg }}; border: 1.5px solid #2b2620; padding: 6px 14px; cursor: pointer;">{{ playLabel }}</div>
+      </div>
+      <div style="position: relative; width: 100%; aspect-ratio: 1 / 0.82;">
+        <svg viewBox="0 0 460 380" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+          <circle cx="230" cy="190" r="132" fill="none" stroke="#e6dfd2" stroke-width="2" stroke-dasharray="4 6"></circle>
+          <sc-for list="{{ arrowheads }}" as="ah" hint-placeholder-count="4">
+            <path d="M 0 -6 L 11 0 L 0 6 Z" fill="#e8590c" transform="{{ ah.t }}"></path>
+          </sc-for>
+        </svg>
+        <sc-for list="{{ stageNodes }}" as="n" hint-placeholder-count="4">
+          <div onClick="{{ n.onClick }}" style="position: absolute; left: {{ n.xPct }}%; top: {{ n.yPct }}%; width: 21%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; border: {{ n.border }}; background: {{ n.bg }}; color: {{ n.fg }}; box-shadow: {{ n.shadow }}; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4px;" style-hover="filter: brightness(0.96);">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; opacity: 0.7;">{{ n.num }}</div>
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 12.5px; line-height: 1.05;">{{ n.label }}</div>
+          </div>
+        </sc-for>
+        <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e; width: 40%;">↻ then it<br>starts again</div>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e; text-align: center;">{{ cycleType }}</div>
+    </div>
+
+    <!-- stage detail -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">STAGE {{ selNum }} OF {{ stageCount }}</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -0.01em;">{{ selLabel }}</div>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; line-height: 1.6;">{{ selDesc }}</div>
+        <div style="margin-top: auto; display: flex; gap: 10px;">
+          <div onClick="{{ prevStage }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; border: 1.5px solid #574f45; padding: 9px 16px; cursor: pointer; color: #faf6ef;" style-hover="background: #574f45;">← PREV</div>
+          <div onClick="{{ nextStage }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; background: #e8590c; border: 1.5px solid #e8590c; padding: 9px 16px; cursor: pointer; color: #faf6ef;">NEXT STAGE →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER GAME -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// CHALLENGE — PUT THE STAGES IN ORDER</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{ gameMsgColor }};">{{ gameMsg }}</div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: #554c42;">Click the stages of the <strong>{{ organismName }}</strong> in the right order, starting from the very beginning.</div>
+
+      <!-- your sequence so far -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; min-height: 40px; padding: 8px; border: 1.5px dashed #d8d0c4; background: #faf6ef;">
+        <sc-for list="{{ picked }}" as="p" hint-placeholder-count="2">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 14px; border: 2px solid #2b2620; background: {{ p.bg }}; color: {{ p.fg }};">{{ p.n }}. {{ p.label }}</div>
+        </sc-for>
+        <sc-if value="{{ nonePicked }}" hint-placeholder-val="{{ true }}">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #a89d8e; align-self: center;">your sequence appears here…</div>
+        </sc-if>
+      </div>
+
+      <!-- shuffled choices -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ choices }}" as="c" hint-placeholder-count="4">
+          <div onClick="{{ c.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 16px; border: 2px solid #2b2620; cursor: {{ c.cursor }}; background: {{ c.bg }}; color: {{ c.fg }}; opacity: {{ c.opacity }};" style-hover="box-shadow: 2px 2px 0 rgba(43,38,32,0.25);">{{ c.label }}</div>
+        </sc-for>
+      </div>
+      <div onClick="{{ resetGame }}" style="align-self: flex-start; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; cursor: pointer; background: #faf6ef;" style-hover="background: #2b2620; color: #faf6ef;">SHUFFLE & RESET</div>
+    </div>
+  </div>
+
+  <!-- metamorphosis note -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px;">Complete metamorphosis</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">The young looks nothing like the adult and changes completely inside a case. A <strong>caterpillar</strong> becomes a butterfly; a <strong>tadpole</strong> becomes a frog. Four very different stages.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px;">Growing up gradually</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">Other young are just small versions of their parents and slowly get bigger — a <strong>chick</strong> into a hen, a seed into a plant. Same body plan the whole way through.</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 0 40px 64px; display: flex; gap: 14px; flex-wrap: wrap;">
+    <a href="habitats.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Habitats & Adaptation →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">← Back to the Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / LIFE CYCLES</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  ORGANISMS = {
+    butterfly: {
+      name: "Butterfly", type: "COMPLETE METAMORPHOSIS — 4 very different stages",
+      stages: [
+        { label: "Egg", desc: "A tiny egg is laid on a leaf — usually the exact plant the caterpillar will want to eat when it hatches." },
+        { label: "Caterpillar", desc: "The larva. It does one job: eat. It munches leaves non-stop and grows fast, shedding its skin as it gets bigger." },
+        { label: "Chrysalis", desc: "The pupa. The caterpillar wraps itself in a hard case and, hidden inside, completely rebuilds its body." },
+        { label: "Butterfly", desc: "The adult breaks out with wings, sips nectar, finds a mate, and lays the next batch of eggs. The circle closes." },
+      ],
+    },
+    frog: {
+      name: "Frog", type: "COMPLETE METAMORPHOSIS — starts in water, ends on land",
+      stages: [
+        { label: "Frogspawn", desc: "A jelly-like clump of eggs floats in the pond. Each dark dot is a frog waiting to begin." },
+        { label: "Tadpole", desc: "A tiny swimmer hatches with a tail and gills, breathing underwater just like a fish." },
+        { label: "Froglet", desc: "Legs sprout, the tail shrinks, and lungs grow in. It can now hop out of the water for short trips." },
+        { label: "Adult frog", desc: "A fully grown frog breathes air, lives on land and water, and returns to the pond to lay new spawn." },
+      ],
+    },
+    plant: {
+      name: "Flowering plant", type: "GRADUAL GROWTH — the same plant, getting bigger",
+      stages: [
+        { label: "Seed", desc: "A seed holds a tiny plant and a food store, waiting for water and warmth to wake it up." },
+        { label: "Seedling", desc: "A root pushes down for water and a shoot pushes up for light. The first leaves unfurl." },
+        { label: "Mature plant", desc: "The plant grows tall and strong, its leaves catching sunlight to make its own food." },
+        { label: "Flower & seed", desc: "Flowers bloom, get pollinated, and make new seeds — which drop and start the whole cycle again." },
+      ],
+    },
+    chicken: {
+      name: "Chicken", type: "GRADUAL GROWTH — a small version grows up",
+      stages: [
+        { label: "Egg", desc: "A hen lays an egg. Inside its shell, a chick develops over about three weeks, fed by the yolk." },
+        { label: "Chick", desc: "A fluffy chick pecks its way out. It already looks like a tiny hen and can walk and feed almost at once." },
+        { label: "Pullet", desc: "The young bird grows real feathers and gets steadily bigger over a few months." },
+        { label: "Adult hen", desc: "Fully grown, the hen can lay eggs of her own — and the cycle begins again." },
+      ],
+    },
+  };
+
+  state = { org: "butterfly", sel: 0, playing: false, picked: [], gameMsg: "", gameDone: false, shuffleSeed: 0 };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("life-cycles");
+  }
+  componentWillUnmount() { clearInterval(this._timer); }
+
+  setOrg(key) {
+    clearInterval(this._timer);
+    this.setState({ org: key, sel: 0, playing: false, picked: [], gameMsg: "", gameDone: false, shuffleSeed: this.state.shuffleSeed + 1 });
+  }
+
+  togglePlay() {
+    if (this.state.playing) {
+      clearInterval(this._timer);
+      this.setState({ playing: false });
+    } else {
+      this.setState({ playing: true });
+      this._timer = setInterval(() => {
+        this.setState(s => ({ sel: (s.sel + 1) % this.ORGANISMS[s.org].stages.length }));
+      }, 1400);
+    }
+  }
+
+  step(d) {
+    const n = this.ORGANISMS[this.state.org].stages.length;
+    clearInterval(this._timer);
+    this.setState(s => ({ sel: (s.sel + d + n) % n, playing: false }));
+  }
+
+  pickChoice(idx) {
+    if (this.state.gameDone || this.state.picked.includes(idx)) return;
+    const picked = this.state.picked.concat([idx]);
+    const correctSoFar = picked.every((p, i) => p === i);
+    if (!correctSoFar) {
+      this.setState({ gameMsg: "Not quite — that's out of order. Reshuffling.", gameDone: false });
+      setTimeout(() => this.resetGame(), 1100);
+      return;
+    }
+    const n = this.ORGANISMS[this.state.org].stages.length;
+    if (picked.length === n) {
+      this.setState({ picked, gameMsg: "PERFECT — you sequenced the whole cycle!", gameDone: true });
+      if (window.Progress) window.Progress.markCompleted("life-cycles");
+    } else {
+      this.setState({ picked, gameMsg: "Good — keep going." });
+    }
+  }
+
+  resetGame() {
+    this.setState(s => ({ picked: [], gameMsg: "", gameDone: false, shuffleSeed: s.shuffleSeed + 1 }));
+  }
+
+  // deterministic shuffle from seed
+  shuffled(n, seed) {
+    const arr = Array.from({ length: n }, (_, i) => i);
+    let s = seed * 9301 + 49297;
+    for (let i = n - 1; i > 0; i--) {
+      s = (s * 9301 + 49297) % 233280;
+      const j = Math.floor((s / 233280) * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  renderVals() {
+    const org = this.ORGANISMS[this.state.org];
+    const stages = org.stages;
+    const n = stages.length;
+    const cx = 230, cy = 190, R = 132, VW = 460, VH = 380;
+
+    const organismTabs = Object.keys(this.ORGANISMS).map(k => ({
+      label: this.ORGANISMS[k].name.toUpperCase(),
+      bg: this.state.org === k ? "#2b2620" : "#fff",
+      fg: this.state.org === k ? "#faf6ef" : "#2b2620",
+      onClick: () => this.setOrg(k),
+    }));
+
+    const cols = ["#e8590c", "#3f9c46", "#8a63d2", "#e8a13a"];
+    const angleOf = (i) => (-90 + i * 360 / n) * Math.PI / 180;
+    const stageNodes = stages.map((st, i) => {
+      const ang = angleOf(i);
+      const x = cx + R * Math.cos(ang), y = cy + R * Math.sin(ang);
+      const isSel = i === this.state.sel;
+      return {
+        num: "STAGE " + (i + 1), label: st.label,
+        xPct: x / VW * 100, yPct: y / VH * 100,
+        bg: isSel ? cols[i % cols.length] : "#fff",
+        fg: isSel ? "#fff" : "#2b2620",
+        border: isSel ? "2.5px solid #2b2620" : "2px solid #2b2620",
+        shadow: isSel ? "0 0 0 4px rgba(232,89,12,0.25)" : "2px 2px 0 rgba(43,38,32,0.15)",
+        onClick: () => { clearInterval(this._timer); this.setState({ sel: i, playing: false }); },
+      };
+    });
+
+    // arrowheads at midpoint angles, pointing clockwise
+    const arrowheads = stages.map((_, i) => {
+      const midDeg = -90 + (i + 0.5) * 360 / n;
+      const ang = midDeg * Math.PI / 180;
+      const x = cx + R * Math.cos(ang), y = cy + R * Math.sin(ang);
+      const rot = midDeg + 90; // tangent, clockwise
+      return { t: "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ") rotate(" + rot.toFixed(1) + ")" };
+    });
+
+    const sel = stages[this.state.sel];
+
+    // order game choices (shuffled), disabled if already picked
+    const order = this.shuffled(n, this.state.shuffleSeed + 1);
+    const choices = order.map(idx => {
+      const used = this.state.picked.includes(idx);
+      return {
+        label: stages[idx].label,
+        bg: used ? "#efe7da" : "#faf6ef",
+        fg: used ? "#a89d8e" : "#2b2620",
+        opacity: used ? 0.5 : 1,
+        cursor: used || this.state.gameDone ? "default" : "pointer",
+        onClick: () => this.pickChoice(idx),
+      };
+    });
+    const picked = this.state.picked.map((idx, i) => ({
+      n: i + 1, label: stages[idx].label,
+      bg: "#cfe6d2", fg: "#2b2620",
+    }));
+
+    return {
+      organismTabs, organismName: org.name, cycleType: org.type,
+      stageNodes, arrowheads,
+      selNum: this.state.sel + 1, stageCount: n, selLabel: sel.label, selDesc: sel.desc,
+      prevStage: () => this.step(-1), nextStage: () => this.step(1),
+      togglePlay: () => this.togglePlay(),
+      playLabel: this.state.playing ? "❚❚ PAUSE" : "▶ PLAY CYCLE",
+      playBg: this.state.playing ? "#c0392b" : "#e8590c",
+      choices, picked, nonePicked: picked.length === 0,
+      gameMsg: this.state.gameMsg, gameMsgColor: this.state.gameDone ? "#2f7d3a" : (this.state.gameMsg.includes("Not quite") ? "#c0392b" : "#6b6156"),
+      resetGame: () => this.resetGame(),
+    };
+  }
+}
+</script>
+</body>
+</html>

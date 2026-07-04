@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Human Body">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / HUMAN BODY</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE MACHINE YOU LIVE IN — LEVEL L1</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">A tour of your own body</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 760px;">Under your skin, dozens of parts work together every second to keep you alive. Switch between the <strong>organs</strong> and the <strong>skeleton</strong>, then click any part to find out its job.</div>
+  </div>
+
+  <!-- view toggle -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 4px;">
+    <div style="display: flex; border: 2px solid #2b2620; width: fit-content; background: #fff;">
+      <sc-for list="{{ viewTabs }}" as="v" hint-placeholder-count="2">
+        <div onClick="{{ v.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 10px 22px; cursor: pointer; background: {{ v.bg }}; color: {{ v.fg }}; border-left: {{ v.bl }};">{{ v.label }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- body + panel -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 24px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 20px; align-items: stretch;">
+
+    <!-- the figure -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — {{ viewCaption }} (CLICK A PART)</div>
+      <div style="position: relative; width: 100%; aspect-ratio: 1 / 1.6; margin: 0 auto; max-width: 300px;">
+        <!-- silhouette -->
+        <sc-for list="{{ silhouette }}" as="sil" hint-placeholder-count="6">
+          <div style="position: absolute; left: {{ sil.x }}%; top: {{ sil.y }}%; width: {{ sil.w }}%; height: {{ sil.h }}%; transform: translate(-50%, -50%) rotate({{ sil.rot }}deg); background: #efe3d6; border: 2px solid #d8c9b6; border-radius: {{ sil.radius }}; z-index: 1;"></div>
+        </sc-for>
+        <!-- parts -->
+        <sc-for list="{{ parts }}" as="p" hint-placeholder-count="6">
+          <div onClick="{{ p.onClick }}" title="{{ p.name }}" style="position: absolute; left: {{ p.x }}%; top: {{ p.y }}%; width: {{ p.w }}%; height: {{ p.h }}%; transform: translate(-50%, -50%) rotate({{ p.rot }}deg); background: {{ p.bg }}; border: {{ p.border }}; border-radius: {{ p.radius }}; box-shadow: {{ p.shadow }}; cursor: pointer; z-index: {{ p.z }};" style-hover="filter: brightness(0.93);"></div>
+        </sc-for>
+        <!-- labels -->
+        <sc-for list="{{ partLabels }}" as="pl" hint-placeholder-count="6">
+          <div onClick="{{ pl.onClick }}" style="position: absolute; left: {{ pl.x }}%; top: {{ pl.y }}%; transform: translate(-50%, -50%); font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; color: {{ pl.color }}; background: rgba(255,255,255,0.85); padding: 1px 4px; border: 1px solid {{ pl.border }}; cursor: pointer; white-space: nowrap; z-index: 30;">{{ pl.label }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156; border-top: 1px solid #e6dfd2; padding-top: 10px;">
+        <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="4">
+          <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: {{ lg.bg }}; border: 1.5px solid #2b2620; display: inline-block;"></span>{{ lg.name }}</span>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- info panel -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">// {{ selSystem }}</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -0.01em;">{{ selName }}</div>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419; margin-bottom: 4px;">WHAT IT DOES</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; line-height: 1.6;">{{ selJob }}</div>
+        </div>
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419; margin-bottom: 4px;">DID YOU KNOW</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.55; color: #e8dfd0;">{{ selFact }}</div>
+        </div>
+        <div style="margin-top: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #b8ab99;">EXPLORED {{ seenCount }} OF {{ totalParts }} PARTS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SENSES GAME -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// CHALLENGE — MATCH THE SENSE TO ITS ORGAN</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;">SCORE {{ sScore }} · STREAK {{ sStreak }}</div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: #554c42;">Which body part gives you this sense?</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 32px; letter-spacing: -0.01em; color: #e8590c;">{{ senseName }}</div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <sc-for list="{{ senseOptions }}" as="so" hint-placeholder-count="5">
+          <div onClick="{{ so.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 12px 18px; border: 2px solid #2b2620; cursor: pointer; background: {{ so.bg }}; color: {{ so.fg }};" style-hover="box-shadow: 2px 2px 0 rgba(43,38,32,0.25);">{{ so.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 600; color: {{ sFbColor }}; min-height: 18px;">{{ senseFeedback }}</div>
+    </div>
+  </div>
+
+  <!-- healthy eating -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 32px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// 01 — FUELLING THE MACHINE: A BALANCED PLATE</div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; line-height: 1.6;">All this machinery needs the right fuel. A balanced diet mixes these groups — no single food does everything:</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+      <sc-for list="{{ foodGroups }}" as="f" hint-placeholder-count="5">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 14px; height: 14px; background: {{ f.bg }}; border: 1.5px solid #2b2620; display: inline-block;"></span>
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ f.name }}</span>
+          </div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.45; color: #554c42;">{{ f.job }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 0 40px 64px; display: flex; gap: 14px; flex-wrap: wrap;">
+    <a href="plants.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Plants →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">← Back to the Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / HUMAN BODY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  // shared silhouette (drawn behind both views)
+  SIL = [
+    { x: 50, y: 8, w: 26, h: 15, radius: "50%", rot: 0 },      // head
+    { x: 50, y: 17, w: 9, h: 5, radius: "3px", rot: 0 },        // neck
+    { x: 50, y: 38, w: 46, h: 40, radius: "26px 26px 18px 18px", rot: 0 }, // torso
+    { x: 22, y: 40, w: 11, h: 34, radius: "12px", rot: 10 },    // left arm
+    { x: 78, y: 40, w: 11, h: 34, radius: "12px", rot: -10 },   // right arm
+    { x: 40, y: 78, w: 13, h: 40, radius: "12px", rot: 3 },     // left leg
+    { x: 60, y: 78, w: 13, h: 40, radius: "12px", rot: -3 },    // right leg
+  ];
+
+  ORGANS = {
+    view: "ORGAN SYSTEMS",
+    legend: [ ["#8a63d2", "Brain"], ["#e79bb0", "Lungs"], ["#c0392b", "Heart"], ["#e8a13a", "Stomach"], ["#b5895a", "Intestines"] ],
+    parts: {
+      brain:  { name: "Brain", system: "NERVOUS SYSTEM", color: "#8a63d2", x: 50, y: 8, w: 17, h: 10, radius: "50%", rot: 0, lx: 50, ly: -1,
+        job: "Your control centre. It takes in everything your senses report, makes decisions, and sends orders to the rest of the body — all in a flash.",
+        fact: "It never switches off — even in deep sleep it's busy sorting the day's memories." },
+      lungs:  { name: "Lungs", system: "RESPIRATORY SYSTEM", color: "#e79bb0", x: 50, y: 33, w: 30, h: 15, radius: "40% 40% 45% 45%", rot: 0, lx: 82, ly: 30,
+        job: "A pair of spongy bags that pull in air. They pass oxygen into your blood and push out the waste gas, carbon dioxide, when you breathe out.",
+        fact: "Spread flat, the inside of your lungs would cover about half a tennis court." },
+      heart:  { name: "Heart", system: "CIRCULATORY SYSTEM", color: "#c0392b", x: 47, y: 34, w: 11, h: 11, radius: "45% 45% 50% 50%", rot: 0, lx: 24, ly: 33,
+        job: "A muscle the size of your fist that pumps blood everywhere, delivering oxygen and food and carrying waste away. It never takes a break.",
+        fact: "It beats around 100,000 times a day — over 2.5 billion times in a lifetime." },
+      stomach:{ name: "Stomach", system: "DIGESTIVE SYSTEM", color: "#e8a13a", x: 46, y: 45, w: 15, h: 11, radius: "45% 55% 55% 40%", rot: 0, lx: 22, ly: 46,
+        job: "A stretchy bag that churns your food and soaks it in strong acid, breaking it into a soupy mush your body can absorb.",
+        fact: "Its acid is strong enough to dissolve metal — a fresh lining stops it digesting itself." },
+      intestines:{ name: "Intestines", system: "DIGESTIVE SYSTEM", color: "#b5895a", x: 50, y: 55, w: 30, h: 16, radius: "16px", rot: 0, lx: 81, ly: 57,
+        job: "Long, coiled tubes that finish the job — soaking up nutrients from your food into the blood, then packing away what's left as waste.",
+        fact: "Unravelled, your intestines would stretch about 7.5 metres — longer than a bus." },
+    },
+  };
+  SKELETON = {
+    view: "THE SKELETON",
+    legend: [ ["#f2ede3", "Bone"], ["#d8cdbd", "Joint / spine"] ],
+    parts: {
+      skull:   { name: "Skull", system: "SKELETON", color: "#f2ede3", x: 50, y: 8, w: 20, h: 12, radius: "50%", rot: 0, lx: 50, ly: -1,
+        job: "A hard bony helmet that surrounds and protects your brain — the most important and most delicate organ you have.",
+        fact: "It's not one bone but 22 fused together, locked along wiggly seams." },
+      ribcage: { name: "Ribcage", system: "SKELETON", color: "#f2ede3", x: 50, y: 34, w: 34, h: 20, radius: "40% 40% 45% 45%", rot: 0, lx: 82, ly: 32,
+        job: "A cage of curved bones that shields your heart and lungs while still flexing so you can breathe in and out.",
+        fact: "Most people have 12 pairs of ribs — the bottom two 'float', joined only at the back." },
+      spine:   { name: "Spine", system: "SKELETON", color: "#d8cdbd", x: 50, y: 45, w: 5, h: 34, radius: "4px", rot: 0, lx: 24, ly: 45,
+        job: "A stack of small bones running down your back. It holds you upright, lets you bend and twist, and protects the nerve cord inside.",
+        fact: "It has 33 bones as a baby, but some fuse, so adults end up with 26." },
+      pelvis:  { name: "Pelvis", system: "SKELETON", color: "#f2ede3", x: 50, y: 62, w: 26, h: 12, radius: "30% 30% 45% 45%", rot: 0, lx: 79, ly: 63,
+        job: "A sturdy bowl of bone at your hips. It carries the weight of your upper body and anchors your leg bones so you can walk.",
+        fact: "It's the strongest ring of bone in the body — built to take your whole weight." },
+      legbone: { name: "Femur (thigh bone)", system: "SKELETON", color: "#f2ede3", x: 41, y: 80, w: 7, h: 34, radius: "8px", rot: 3, lx: 20, ly: 82,
+        job: "The long thigh bone — the longest, strongest bone you own. It bears your weight every step you take.",
+        fact: "A healthy femur is stronger than concrete of the same weight." },
+    },
+  };
+
+  SENSES = [
+    { sense: "Sight", organ: "Eyes" },
+    { sense: "Hearing", organ: "Ears" },
+    { sense: "Smell", organ: "Nose" },
+    { sense: "Taste", organ: "Tongue" },
+    { sense: "Touch", organ: "Skin" },
+  ];
+
+  state = {
+    view: "organs", sel: "brain", seen: { brain: true },
+    senseIdx: Math.floor(Math.random() * 5), sScore: 0, sStreak: 0, senseFeedback: "", sAnswered: false,
+  };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("human-body");
+  }
+
+  setView(v) {
+    const first = v === "organs" ? "brain" : "skull";
+    this.setState(s => ({ view: v, sel: first, seen: { ...s.seen, [first]: true } }));
+  }
+
+  selectPart(id) {
+    this.setState(s => ({ sel: id, seen: { ...s.seen, [id]: true } }), () => {
+      if (Object.keys(this.state.seen).length >= 6 && window.Progress) window.Progress.markCompleted("human-body");
+    });
+  }
+
+  answerSense(organ) {
+    if (this.state.sAnswered) return;
+    const q = this.SENSES[this.state.senseIdx];
+    const correct = organ === q.organ;
+    this.setState(s => ({
+      sAnswered: true,
+      sScore: correct ? s.sScore + 1 : s.sScore,
+      sStreak: correct ? s.sStreak + 1 : 0,
+      senseFeedback: correct ? "CORRECT — " + q.sense.toLowerCase() + " comes from your " + q.organ.toLowerCase() + "." : "Not quite — " + q.sense.toLowerCase() + " comes from your " + q.organ.toLowerCase() + ".",
+      sLastCorrect: correct,
+    }), () => setTimeout(() => this.nextSense(), 1200));
+  }
+  nextSense() {
+    let idx; do { idx = Math.floor(Math.random() * this.SENSES.length); } while (idx === this.state.senseIdx);
+    this.setState({ senseIdx: idx, sAnswered: false, senseFeedback: "" });
+  }
+
+  renderVals() {
+    const set = this.state.view === "organs" ? this.ORGANS : this.SKELETON;
+    const partKeys = Object.keys(set.parts);
+
+    const viewTabs = [
+      { key: "organs", label: "ORGANS" },
+      { key: "skeleton", label: "SKELETON" },
+    ].map((t, i) => ({
+      label: t.label,
+      bg: this.state.view === t.key ? "#2b2620" : "#fff",
+      fg: this.state.view === t.key ? "#faf6ef" : "#2b2620",
+      bl: i === 0 ? "none" : "2px solid #2b2620",
+      onClick: () => this.setView(t.key),
+    }));
+
+    const silhouette = this.SIL.map(s => ({ ...s }));
+
+    const parts = partKeys.map(k => {
+      const p = set.parts[k];
+      const isSel = this.state.sel === k;
+      return {
+        name: p.name, x: p.x, y: p.y, w: p.w, h: p.h, rot: p.rot, radius: p.radius,
+        bg: p.color,
+        border: isSel ? "2.5px solid #e8590c" : "1.5px solid rgba(43,38,32,0.5)",
+        shadow: isSel ? "0 0 0 3px rgba(232,89,12,0.3)" : "none",
+        z: isSel ? 20 : 10,
+        onClick: () => this.selectPart(k),
+      };
+    });
+    const partLabels = partKeys.map(k => {
+      const p = set.parts[k];
+      const isSel = this.state.sel === k;
+      return { label: p.name, x: p.lx, y: p.ly, color: isSel ? "#e8590c" : "#2b2620", border: isSel ? "#e8590c" : "#d8d0c4", onClick: () => this.selectPart(k) };
+    });
+
+    const legend = set.legend.map(([bg, name]) => ({ bg, name }));
+    const sel = set.parts[this.state.sel];
+
+    const q = this.SENSES[this.state.senseIdx];
+    const senseOptions = this.SENSES.map(s => {
+      const answered = this.state.sAnswered;
+      const isCorrect = s.organ === q.organ;
+      let bg = "#faf6ef", fg = "#2b2620";
+      if (answered) { if (isCorrect) { bg = "#2f7d3a"; fg = "#fff"; } else { bg = "#efe7da"; fg = "#a89d8e"; } }
+      return { label: s.organ, bg, fg, onClick: () => this.answerSense(s.organ) };
+    });
+
+    return {
+      viewTabs, viewCaption: set.view,
+      silhouette, parts, partLabels, legend,
+      selName: sel.name, selSystem: sel.system, selJob: sel.job, selFact: sel.fact,
+      seenCount: Object.keys(this.state.seen).length, totalParts: partKeys.length,
+      senseName: q.sense, senseOptions,
+      sScore: this.state.sScore, sStreak: this.state.sStreak,
+      senseFeedback: this.state.senseFeedback,
+      sFbColor: this.state.sAnswered ? (this.state.sLastCorrect ? "#2f7d3a" : "#c0392b") : "#6b6156",
+      foodGroups: [
+        { name: "Carbohydrates", bg: "#e8a13a", job: "Bread, rice, pasta — your main energy fuel." },
+        { name: "Proteins", bg: "#c0392b", job: "Meat, beans, eggs — build and repair your body." },
+        { name: "Fruit & veg", bg: "#3f9c46", job: "Vitamins and fibre to keep everything working." },
+        { name: "Dairy", bg: "#bfe0ea", job: "Milk, cheese — calcium for strong bones and teeth." },
+        { name: "Fats & sugars", bg: "#8a63d2", job: "Energy-dense — needed only in small amounts." },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

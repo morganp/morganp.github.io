@@ -162,6 +162,14 @@
     "radioactivity": { label: "Radioactivity", level: "L3" },
     "pressure": { label: "Particle Model & Pressure", level: "L3" },
     "space": { label: "Space Physics", level: "L2-L3" },
+    "cells": { label: "Cells", level: "L2-L3" },
+    "classification": { label: "Classification & Variation", level: "L1-L2" },
+    "life-cycles": { label: "Life Cycles", level: "L1" },
+    "habitats": { label: "Habitats & Adaptation", level: "L1" },
+    "human-body": { label: "Human Body Basics", level: "L1" },
+    "plants": { label: "Plants", level: "L1" },
+    "food-webs": { label: "Ecosystems & Food Webs", level: "L2-L3" },
+    "genetics": { label: "Inheritance & Genetics", level: "L3" },
   };
 
   const Progress = {

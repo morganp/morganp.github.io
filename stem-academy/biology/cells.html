@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Cells">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / CELLS</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE CELL, PART BY PART — LEVEL L2–L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Every living thing is built from cells</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 720px;">A cell is the smallest thing that counts as alive. Flip between an animal cell and a plant cell below, then click any part to find out what it does. Watch which parts appear in only one of them.</div>
+  </div>
+
+  <!-- cell switcher -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px;">
+    <div style="display: flex; gap: 0; border: 2px solid #2b2620; width: fit-content; background: #fff;">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+        <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 10px 22px; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}; border-left: {{ t.bl }};">{{ t.label }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- diagram + panel -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 32px; display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; align-items: stretch;">
+
+    <!-- the cell -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — {{ cellCaption }} (CLICK A LABELLED PART)</div>
+      <div style="position: relative; width: 100%; aspect-ratio: 1 / 0.82; {{ cellShape }}">
+        <sc-for list="{{ parts }}" as="p" hint-placeholder-count="6">
+          <div onClick="{{ p.onClick }}" title="{{ p.name }}" style="position: absolute; left: {{ p.x }}%; top: {{ p.y }}%; width: {{ p.w }}%; height: {{ p.h }}%; transform: translate(-50%, -50%); background: {{ p.bg }}; border: {{ p.border }}; border-radius: {{ p.radius }}; cursor: pointer; box-shadow: {{ p.shadow }}; z-index: {{ p.z }};" style-hover="filter: brightness(0.94);"></div>
+        </sc-for>
+        <sc-for list="{{ partLabels }}" as="pl" hint-placeholder-count="6">
+          <div onClick="{{ pl.onClick }}" style="position: absolute; left: {{ pl.x }}%; top: {{ pl.y }}%; transform: translate(-50%, -50%); font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; color: {{ pl.color }}; background: rgba(255,255,255,0.82); padding: 1px 4px; border: 1px solid {{ pl.border }}; cursor: pointer; white-space: nowrap; z-index: 20; pointer-events: auto;">{{ pl.label }}</div>
+        </sc-for>
+      </div>
+      <!-- legend -->
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156; border-top: 1px solid #e6dfd2; padding-top: 10px;">
+        <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="6">
+          <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: {{ lg.bg }}; border: 1.5px solid #2b2620; display: inline-block;"></span>{{ lg.name }}</span>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- info panel -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">// SELECTED PART</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; letter-spacing: -0.01em;">{{ selName }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #b8ab99;">{{ selWhere }}</div>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419; margin-bottom: 4px;">WHAT IT DOES</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.55;">{{ selJob }}</div>
+        </div>
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419; margin-bottom: 4px;">THINK OF IT AS</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.55; color: #e8dfd0;">{{ selAnalogy }}</div>
+        </div>
+        <div style="margin-top: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #b8ab99;">INSPECTED {{ seenCount }} OF {{ totalParts }} PARTS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- plant vs animal summary -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 32px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// 01 — PLANT vs ANIMAL: SPOT THE DIFFERENCE</div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; line-height: 1.65;">Both cells share a nucleus, cytoplasm, cell membrane, mitochondria and ribosomes. But a <strong>plant cell</strong> has three extras an animal cell never has — the parts that let it stand tall and make its own food:</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+      <sc-for list="{{ plantOnly }}" as="po" hint-placeholder-count="3">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 14px; height: 14px; background: {{ po.bg }}; border: 1.5px solid #2b2620; display: inline-block;"></span>
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px;">{{ po.name }}</span>
+          </div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.5; color: #554c42;">{{ po.job }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 0 40px 64px; display: flex; gap: 14px; flex-wrap: wrap;">
+    <a href="genetics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Inheritance & Genetics →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">← Back to the Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / CELLS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { cell: "animal", sel: "nucleus", seen: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("cells");
+  }
+
+  // organelle data. present: which cell types have it. pos per cell type {x,y,w,h}
+  ORG = {
+    membrane:   { name: "Cell membrane", color: "#e8590c", radius: "0", where: "Both cells — the outer edge", job: "A thin, flexible skin around the whole cell. It controls what gets in and out — food and oxygen in, waste out.", analogy: "the ticket gate of the cell: nothing passes without permission." },
+    cytoplasm:  { name: "Cytoplasm", color: "#cfe6d2", radius: "0", where: "Both cells — the jelly filling", job: "A watery jelly that fills the cell. Most of the chemical reactions of life happen here, floating everything in place.", analogy: "the water in an aquarium — everything lives suspended in it." },
+    nucleus:    { name: "Nucleus", color: "#8a63d2", radius: "50%", where: "Both cells", job: "The control centre. It holds the DNA — the full instruction book for building and running the whole organism.", analogy: "the manager's office, holding the master rulebook." },
+    mito:       { name: "Mitochondria", color: "#f2a65a", radius: "40% / 60%", where: "Both cells (lots of them)", job: "Where respiration happens: they release energy from food so the cell can use it. Busy cells like muscle have loads.", analogy: "the power stations of the cell." },
+    ribosome:   { name: "Ribosomes", color: "#2b2620", radius: "50%", where: "Both cells (tiny dots)", job: "Tiny factories that read instructions from the nucleus and build proteins out of them.", analogy: "the 3D printers making the cell's parts." },
+    wall:       { name: "Cell wall", color: "#b5895a", radius: "0", where: "Plant cells only", job: "A tough layer of cellulose outside the membrane. It gives the plant cell a fixed box shape and stops it bursting.", analogy: "a cardboard box around a plastic bag." },
+    chloro:     { name: "Chloroplast", color: "#3f9c46", radius: "40% / 60%", where: "Plant cells only", job: "Green discs packed with chlorophyll. They trap sunlight and use it to make food in photosynthesis.", analogy: "tiny solar panels that also cook lunch." },
+    vacuole:    { name: "Vacuole", color: "#bfe0ea", radius: "16px", where: "Plant cells (one big one)", job: "A large sac of cell sap. Filled with water it presses outward and keeps the plant firm and upright.", analogy: "a water balloon holding the cell rigid." },
+  };
+
+  // layouts as % positions inside the cell box
+  ANIMAL = [
+    { id: "membrane", x: 50, y: 50, w: 96, h: 96, z: 1 },
+    { id: "cytoplasm", x: 50, y: 50, w: 90, h: 90, z: 2 },
+    { id: "nucleus", x: 42, y: 46, w: 26, h: 30, z: 6 },
+    { id: "mito", x: 70, y: 62, w: 20, h: 12, z: 5 },
+    { id: "mito2", org: "mito", x: 30, y: 74, w: 18, h: 11, z: 5 },
+    { id: "ribosome", x: 66, y: 34, w: 5, h: 6, z: 7 },
+    { id: "ribosome2", org: "ribosome", x: 58, y: 70, w: 5, h: 6, z: 7 },
+  ];
+  PLANT = [
+    { id: "wall", x: 50, y: 50, w: 98, h: 98, z: 1 },
+    { id: "membrane", x: 50, y: 50, w: 92, h: 92, z: 2 },
+    { id: "cytoplasm", x: 50, y: 50, w: 86, h: 86, z: 3 },
+    { id: "vacuole", x: 52, y: 52, w: 52, h: 54, z: 4 },
+    { id: "nucleus", x: 26, y: 32, w: 22, h: 26, z: 7 },
+    { id: "chloro", x: 74, y: 26, w: 16, h: 10, z: 6 },
+    { id: "chloro2", org: "chloro", x: 22, y: 72, w: 16, h: 10, z: 6 },
+    { id: "chloro3", org: "chloro", x: 78, y: 74, w: 16, h: 10, z: 6 },
+    { id: "mito", x: 70, y: 58, w: 16, h: 10, z: 6 },
+    { id: "ribosome", x: 40, y: 68, w: 4.5, h: 5.5, z: 8 },
+  ];
+
+  select(orgId) {
+    this.setState(s => ({ sel: orgId, seen: { ...s.seen, [orgId]: true } }), () => {
+      if (Object.keys(this.state.seen).length >= 6 && window.Progress) {
+        window.Progress.markCompleted("cells");
+      }
+    });
+  }
+
+  renderVals() {
+    const isPlant = this.state.cell === "plant";
+    const layout = isPlant ? this.PLANT : this.ANIMAL;
+
+    const tabs = [
+      { key: "animal", label: "ANIMAL CELL" },
+      { key: "plant", label: "PLANT CELL" },
+    ].map((t, i) => ({
+      label: t.label,
+      bg: this.state.cell === t.key ? "#2b2620" : "#fff",
+      fg: this.state.cell === t.key ? "#faf6ef" : "#2b2620",
+      bl: i === 0 ? "none" : "2px solid #2b2620",
+      onClick: () => this.setState({ cell: t.key }),
+    }));
+
+    const parts = layout.map(p => {
+      const org = this.ORG[p.org || p.id];
+      const isSel = this.state.sel === (p.org || p.id);
+      return {
+        name: org.name,
+        x: p.x, y: p.y, w: p.w, h: p.h, z: p.z,
+        bg: org.color,
+        radius: org.radius,
+        border: isSel ? "2.5px solid #e8590c" : (p.id === "cytoplasm" ? "none" : "1.5px solid rgba(43,38,32,0.55)"),
+        shadow: isSel ? "0 0 0 3px rgba(232,89,12,0.35)" : "none",
+        onClick: () => this.select(p.org || p.id),
+      };
+    });
+
+    // one label per distinct organelle, placed at its first instance
+    const seenOrg = {};
+    const partLabels = [];
+    layout.forEach(p => {
+      const key = p.org || p.id;
+      if (seenOrg[key] || key === "cytoplasm" || key === "membrane") return;
+      seenOrg[key] = true;
+      const org = this.ORG[key];
+      const isSel = this.state.sel === key;
+      partLabels.push({
+        label: org.name, x: p.x, y: p.y - (p.h / 2) - 4,
+        color: isSel ? "#e8590c" : "#2b2620",
+        border: isSel ? "#e8590c" : "#d8d0c4",
+        onClick: () => this.select(key),
+      });
+    });
+
+    // distinct organelles present in this cell for the legend
+    const distinct = [];
+    const dseen = {};
+    layout.forEach(p => { const k = p.org || p.id; if (!dseen[k]) { dseen[k] = true; distinct.push(k); } });
+    const legend = distinct.map(k => ({ bg: this.ORG[k].color, name: this.ORG[k].name }));
+
+    const sel = this.ORG[this.state.sel];
+
+    const plantOnly = ["wall", "chloro", "vacuole"].map(k => ({ name: this.ORG[k].name, bg: this.ORG[k].color, job: this.ORG[k].job }));
+
+    return {
+      tabs, parts, partLabels, legend,
+      cellCaption: isPlant ? "PLANT CELL" : "ANIMAL CELL",
+      cellShape: isPlant
+        ? "background: #eef6ef; border: 3px solid #b5895a; border-radius: 6px;"
+        : "background: #fdefe3; border: none; border-radius: 46% 54% 52% 48% / 50% 46% 54% 50%;",
+      selName: sel.name, selWhere: sel.where, selJob: sel.job, selAnalogy: sel.analogy,
+      seenCount: Object.keys(this.state.seen).length,
+      totalParts: 8,
+      plantOnly,
+    };
+  }
+}
+</script>
+</body>
+</html>
