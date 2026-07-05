@@ -44,9 +44,9 @@
         // arrowhead mid
         const mx = (x1 + x2) / 2, my = (y1 + y2) / 2; const a = Math.atan2(y2 - y1, x2 - x1);
         ctx.fillStyle = col; ctx.beginPath();
-        ctx.moveTo(mx + Math.cos(a) * 8, my + Math.sin(a) * 8);
-        ctx.lineTo(mx + Math.cos(a + 2.5) * 8, my + Math.sin(a + 2.5) * 8);
-        ctx.lineTo(mx + Math.cos(a - 2.5) * 8, my + Math.sin(a - 2.5) * 8);
+        ctx.moveTo(mx + Math.cos(a) * 11, my + Math.sin(a) * 11);
+        ctx.lineTo(mx + Math.cos(a + 2.5) * 11, my + Math.sin(a + 2.5) * 11);
+        ctx.lineTo(mx + Math.cos(a - 2.5) * 11, my + Math.sin(a - 2.5) * 11);
         ctx.closePath(); ctx.fill();
       };
       drawRay(ix, iy, cx, cy, "#ffd43b", 3);

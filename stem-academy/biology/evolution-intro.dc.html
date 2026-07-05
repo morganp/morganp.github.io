@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Evolution Intro">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / EVOLUTION INTRO</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// SURVIVAL OF THE BEST-HIDDEN — LEVEL L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Watch a species change, one generation at a time</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 780px;">Evolution isn't a single creature transforming — it's a whole population slowly shifting because the best-suited individuals survive to breed. These moths rest on tree bark. Birds spot the ones that stand out and eat them. Run a few generations and see which colour wins.</div>
+  </div>
+
+  <!-- SIM -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 20px; display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; align-items: stretch;">
+
+    <!-- bark scene -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — PEPPERED MOTHS ON TREE BARK</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">GENERATION <strong style="color: #2b2620;">{{ gen }}</strong></div>
+      </div>
+
+      <!-- bark habitat toggle -->
+      <div style="display: flex; gap: 8px;">
+        <sc-for list="{{ barkTabs }}" as="b" hint-placeholder-count="2">
+          <div onClick="{{ b.onClick }}" style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 9px 8px; border: 2px solid #2b2620; text-align: center; cursor: pointer; background: {{ b.bg }}; color: {{ b.fg }};">{{ b.label }}</div>
+        </sc-for>
+      </div>
+
+      <!-- the scene -->
+      <div style="position: relative; width: 100%; aspect-ratio: 1 / 0.72; border: 2px solid #2b2620; overflow: hidden; background: {{ barkBase }}; background-image: {{ barkStripes }};">
+        <sc-for list="{{ moths }}" as="m" hint-placeholder-count="24">
+          <div style="position: absolute; left: {{ m.x }}%; top: {{ m.y }}%; width: 24px; height: 15px; transform: translate(-50%,-50%); border-radius: 60% 60% 55% 55%; background: {{ m.color }}; border: 1.5px solid rgba(0,0,0,0.35); opacity: {{ m.opacity }};">
+            <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px; transform: translateX(-50%); background: rgba(0,0,0,0.35);"></div>
+            <sc-if value="{{ m.eaten }}" hint-placeholder-val="{{ false }}">
+              <div style="position: absolute; inset: -8px; display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; color: #e8143a;">✕</div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <div style="position: absolute; left: 8px; bottom: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: {{ sceneNote }}; background: rgba(250,246,239,0.75); padding: 2px 6px;">{{ phaseNote }}</div>
+      </div>
+
+      <!-- legend -->
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156; align-items: center; border-top: 1px dashed #e6dfd2; padding-top: 8px;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 14px; height: 11px; border-radius: 55%; background: #ece0cc; border: 1.5px solid #2b2620; display: inline-block;"></span>PALE MOTH</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 14px; height: 11px; border-radius: 55%; background: #2b2620; border: 1.5px solid #2b2620; display: inline-block;"></span>DARK MOTH</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="color: #e8143a; font-weight: 700;">✕</span> EATEN BY A BIRD (STOOD OUT)</span>
+      </div>
+
+      <!-- controls -->
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div onClick="{{ runGen }}" style="flex: 1; min-width: 200px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 13px; text-align: center; cursor: {{ runCursor }}; background: {{ runBg }}; color: #faf6ef; border: 2px solid #2b2620; box-shadow: 3px 3px 0 #2b2620; min-height: 44px; box-sizing: border-box;">{{ runLabel }}</div>
+        <div onClick="{{ reset }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 13px 18px; text-align: center; cursor: pointer; background: #faf6ef; color: #2b2620; border: 2px solid #2b2620; min-height: 44px; box-sizing: border-box;">RESET</div>
+      </div>
+    </div>
+
+    <!-- readout + graph -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <!-- population bar -->
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// POPULATION MIX NOW</div>
+        <div style="display: flex; height: 34px; border: 2px solid #2b2620;">
+          <div style="width: {{ palePct }}%; background: #ece0cc; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2b2620; transition: width 0.5s ease;">{{ palePctLabel }}</div>
+          <div style="width: {{ darkPct }}%; background: #2b2620; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #faf6ef; transition: width 0.5s ease;">{{ darkPctLabel }}</div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;"><span>◀ PALE</span><span>DARK ▶</span></div>
+      </div>
+
+      <!-- graph -->
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 01 — DARK MOTHS OVER TIME</div>
+        <div style="position: relative; width: 100%; aspect-ratio: 1 / 0.72;">
+          <svg viewBox="0 0 300 216" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+            <!-- axes -->
+            <line x1="40" y1="12" x2="40" y2="182" stroke="#2b2620" stroke-width="2"></line>
+            <line x1="40" y1="182" x2="288" y2="182" stroke="#2b2620" stroke-width="2"></line>
+            <!-- gridlines -->
+            <line x1="40" y1="97" x2="288" y2="97" stroke="#e6dfd2" stroke-width="1"></line>
+            <text x="34" y="16" text-anchor="end" font-family="'IBM Plex Mono', monospace" font-size="9" fill="#6b6156">100</text>
+            <text x="34" y="100" text-anchor="end" font-family="'IBM Plex Mono', monospace" font-size="9" fill="#6b6156">50</text>
+            <text x="34" y="185" text-anchor="end" font-family="'IBM Plex Mono', monospace" font-size="9" fill="#6b6156">0</text>
+            <polyline points="{{ graphPts }}" fill="none" stroke="#e8590c" stroke-width="2.5"></polyline>
+            <sc-for list="{{ graphDots }}" as="d" hint-placeholder-count="6">
+              <circle cx="{{ d.cx }}" cy="{{ d.cy }}" r="3.5" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></circle>
+            </sc-for>
+            <text x="164" y="210" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9" fill="#2b2620">GENERATION →</text>
+            <text x="12" y="97" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9" fill="#2b2620" transform="rotate(-90 12 97)">% DARK MOTHS</text>
+          </svg>
+        </div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156; line-height: 1.5;">{{ verdict }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- how it works -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 02 — THE FOUR STEPS OF NATURAL SELECTION</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+      <sc-for list="{{ nsSteps }}" as="s" hint-placeholder-count="4">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px; color: #e8590c;">{{ s.num }}</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; line-height: 1.1;">{{ s.title }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">{{ s.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42; border: 2px solid #2b2620; background: #fff; padding: 14px 16px;">This really happened. In the 1800s, soot from British factories blackened tree trunks. Pale peppered moths that had always been well hidden now stood out and were eaten, while rare dark moths thrived. Within decades most peppered moths near industrial cities were dark — a change first explained by <strong>Charles Darwin</strong> and <strong>Alfred Russel Wallace</strong>.</div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Natural_selection" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Natural selection ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Peppered_moth_evolution" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Peppered moth evolution ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/subjects/zs6hvcw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Science (evolution &amp; inheritance) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="body-systems.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Body Systems →</a>
+    <a href="genetics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Inheritance &amp; Genetics (L3) →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">← Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / EVOLUTION INTRO</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  N = 26;
+
+  makeMoths(darkFrac) {
+    const arr = [];
+    for (let i = 0; i < this.N; i++) {
+      arr.push({
+        id: Math.random().toString(36).slice(2),
+        dark: Math.random() < darkFrac,
+        x: 6 + Math.random() * 88,
+        y: 8 + Math.random() * 84,
+        eaten: false,
+      });
+    }
+    return arr;
+  }
+
+  state = { bark: "light", moths: [], gen: 0, phase: "idle", history: [], msg: "" };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("evolution-intro");
+    const moths = this.makeMoths(0.5);
+    this.setState({ moths, history: [this.pctDark(moths)] });
+  }
+  componentWillUnmount() { clearTimeout(this._t); }
+
+  pctDark(moths) { return Math.round(moths.filter(m => m.dark).length / moths.length * 100); }
+
+  setBark(b) {
+    if (this.state.phase !== "idle") return;
+    this.setState({ bark: b });
+  }
+
+  reset() {
+    clearTimeout(this._t);
+    const moths = this.makeMoths(0.5);
+    this.setState({ moths, gen: 0, phase: "idle", history: [this.pctDark(moths)] });
+  }
+
+  runGen() {
+    if (this.state.phase !== "idle") return;
+    const bark = this.state.bark;
+    // step 1: birds eat the moths that stand out
+    const marked = this.state.moths.map(m => {
+      const visible = (bark === "light" && m.dark) || (bark === "dark" && !m.dark);
+      const survives = Math.random() < (visible ? 0.35 : 0.85);
+      return { ...m, eaten: !survives };
+    });
+    this.setState({ moths: marked, phase: "eaten" });
+    this._t = setTimeout(() => {
+      const survivors = marked.filter(m => !m.eaten);
+      const pool = survivors.length ? survivors : marked; // avoid extinction
+      const darkFrac = pool.filter(m => m.dark).length / pool.length;
+      const next = this.makeMoths(darkFrac);
+      const gen = this.state.gen + 1;
+      const history = this.state.history.concat([this.pctDark(next)]);
+      if (gen >= 5 && window.Progress) window.Progress.markCompleted("evolution-intro", { via: "sim", gen });
+      this.setState({ moths: next, gen, phase: "idle", history });
+    }, 1200);
+  }
+
+  renderVals() {
+    const bark = this.state.bark;
+    const moths = this.state.moths.map(m => ({
+      x: m.x.toFixed(1), y: m.y.toFixed(1),
+      color: m.dark ? "#2b2620" : "#ece0cc",
+      opacity: m.eaten ? 0.28 : 1,
+      eaten: m.eaten,
+    }));
+
+    const darkCount = this.state.moths.filter(m => m.dark).length;
+    const total = this.state.moths.length || 1;
+    const darkPct = Math.round(darkCount / total * 100);
+    const palePct = 100 - darkPct;
+
+    const barkTabs = [
+      { key: "light", label: "CLEAN BARK (pale)" },
+      { key: "dark", label: "SOOTY BARK (dark)" },
+    ].map(t => ({
+      label: t.label,
+      bg: bark === t.key ? "#2b2620" : "#fff",
+      fg: bark === t.key ? "#faf6ef" : "#2b2620",
+      onClick: () => this.setBark(t.key),
+    }));
+
+    // graph geometry (viewBox 300x216, plot area x:40..288, y:12..182)
+    const H = this.state.history;
+    const x0 = 40, x1 = 288, yTop = 12, yBot = 182;
+    const denom = Math.max(1, H.length - 1);
+    const px = (i) => x0 + (x1 - x0) * (i / denom);
+    const py = (v) => yBot - (yBot - yTop) * (v / 100);
+    const graphPts = H.map((v, i) => px(i).toFixed(1) + "," + py(v).toFixed(1)).join(" ");
+    const graphDots = H.map((v, i) => ({ cx: px(i).toFixed(1), cy: py(v).toFixed(1) }));
+
+    const phaseNote = this.state.phase === "eaten" ? "A hungry bird visits… the ✕ moths were too easy to spot." : "Moths resting. Press \u201cbirds hunt\u201d to run a generation.";
+
+    let verdict;
+    if (this.state.gen === 0) verdict = "Start 50/50. Pick a bark colour, then run generations and watch the line climb or fall.";
+    else if (bark === "dark" && darkPct > 60) verdict = "On sooty bark, dark moths hide best — so the population is turning dark. That's natural selection.";
+    else if (bark === "light" && palePct > 60) verdict = "On clean bark, pale moths hide best — so pale is taking over the population.";
+    else verdict = "The population is shifting toward whichever colour is best camouflaged on this bark.";
+
+    const nsSteps = [
+      { num: "01", title: "Variation", desc: "Individuals differ — here, some moths are pale and some are dark." },
+      { num: "02", title: "Selection", desc: "The environment favours some. Birds eat the moths that stand out." },
+      { num: "03", title: "Inheritance", desc: "Survivors breed and pass their colour on to their offspring." },
+      { num: "04", title: "Change", desc: "Over many generations the whole population shifts colour." },
+    ];
+
+    return {
+      gen: this.state.gen,
+      barkTabs,
+      barkBase: bark === "light" ? "#b8a081" : "#3a322a",
+      barkStripes: bark === "light"
+        ? "repeating-linear-gradient(90deg, rgba(90,72,50,0.35) 0 2px, transparent 2px 22px)"
+        : "repeating-linear-gradient(90deg, rgba(0,0,0,0.5) 0 2px, transparent 2px 22px)",
+      moths,
+      phaseNote, sceneNote: bark === "light" ? "#4a3d2a" : "#cbb9a0",
+      palePct, darkPct,
+      palePctLabel: palePct >= 12 ? palePct + "%" : "",
+      darkPctLabel: darkPct >= 12 ? darkPct + "%" : "",
+      graphPts, graphDots, verdict,
+      runGen: () => this.runGen(),
+      runLabel: this.state.phase === "eaten" ? "…BIRDS HUNTING" : "▶ BIRDS HUNT · NEXT GENERATION",
+      runBg: this.state.phase === "eaten" ? "#8a7f70" : "#e8590c",
+      runCursor: this.state.phase === "eaten" ? "default" : "pointer",
+      reset: () => this.reset(),
+      nsSteps,
+    };
+  }
+}
+</script>
+</body>
+</html>

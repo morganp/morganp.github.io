@@ -100,7 +100,7 @@
         // bent water molecule: O + two H
         c.beginPath(); c.arc(x, y, 7, 0, 7); c.fillStyle = WO; c.fill(); c.lineWidth = 1.5; c.strokeStyle = INK; c.stroke();
         [[-8, -6], [8, -6]].forEach(([dx, dy]) => { c.beginPath(); c.arc(x + dx, y + dy, 4, 0, 7); c.fillStyle = "#fff"; c.fill(); c.lineWidth = 1.2; c.strokeStyle = INK; c.stroke(); });
-        c.font = "700 7px 'IBM Plex Mono', monospace"; c.fillStyle = INK; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("H\u2082O", x, y + 13);
+        c.font = "700 9px 'IBM Plex Mono', monospace"; c.fillStyle = INK; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("H\u2082O", x, y + 14);
       }
     }
   }

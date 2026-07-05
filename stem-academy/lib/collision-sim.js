@@ -79,7 +79,7 @@
           ctx.strokeStyle = col; ctx.lineWidth = 3;
           ctx.beginPath(); ctx.moveTo(x, trackY - r - 14); ctx.lineTo(x + dir * len, trackY - r - 14); ctx.stroke();
           ctx.fillStyle = col; ctx.beginPath();
-          ctx.moveTo(x + dir * len + dir * 8, trackY - r - 14); ctx.lineTo(x + dir * len, trackY - r - 19); ctx.lineTo(x + dir * len, trackY - r - 9); ctx.closePath(); ctx.fill();
+          ctx.moveTo(x + dir * len + dir * 12, trackY - r - 14); ctx.lineTo(x + dir * len, trackY - r - 20); ctx.lineTo(x + dir * len, trackY - r - 8); ctx.closePath(); ctx.fill();
         }
         ctx.fillStyle = INK; ctx.font = "11px 'IBM Plex Mono', monospace"; ctx.textAlign = "center";
         ctx.fillText(label + " v=" + v.toFixed(1), x, trackY - r - 24);

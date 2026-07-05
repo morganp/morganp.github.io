@@ -60,7 +60,7 @@
         const half = 90, pw = 46;
         const p1 = [cx + half - 20, cy], p2 = [cx - half + 20, cy]; // N right(+), S left(-)
         // field lines
-        ctx.strokeStyle = "rgba(43,38,32,0.35)"; ctx.lineWidth = 1.3;
+        ctx.strokeStyle = "rgba(43,38,32,0.4)"; ctx.lineWidth = 2;
         const seeds = 9;
         for (let i = 0; i < seeds; i++) {
           const ang = -Math.PI / 2 + (Math.PI) * (i / (seeds - 1));
@@ -107,7 +107,7 @@
         }
         // field lines strength -> number & spread
         const lines = Math.max(0, Math.min(6, Math.round(strength / 18)));
-        ctx.strokeStyle = "rgba(232,89,12,0.5)"; ctx.lineWidth = 1.4;
+        ctx.strokeStyle = "rgba(232,89,12,0.6)"; ctx.lineWidth = 2;
         for (let k = 1; k <= lines; k++) {
           const off = k * 16;
           ctx.beginPath();

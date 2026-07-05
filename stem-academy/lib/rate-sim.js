@@ -102,7 +102,7 @@
       // mini rate history sparkline
       const gx = 250, gw = w - gx - 10, gy = h - 56, gh = 46;
       ctx.strokeStyle = ink; ctx.lineWidth = 1; ctx.strokeRect(gx, gy, gw, gh);
-      ctx.font = "500 8.5px 'IBM Plex Mono', monospace"; ctx.fillStyle = grey; ctx.textAlign = "left";
+      ctx.font = "500 9px 'IBM Plex Mono', monospace"; ctx.fillStyle = grey; ctx.textAlign = "left";
       ctx.fillText("RATE OVER TIME", gx + 4, gy + 10);
       const maxR = Math.max(3, ...this._hist);
       ctx.strokeStyle = accent; ctx.lineWidth = 1.5;

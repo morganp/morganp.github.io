@@ -73,8 +73,8 @@
       const ang = Math.atan2(y2 - y1, x2 - x1);
       ctx.beginPath();
       ctx.moveTo(x2, y2);
-      ctx.lineTo(x2 - 9 * Math.cos(ang - 0.45), y2 - 9 * Math.sin(ang - 0.45));
-      ctx.lineTo(x2 - 9 * Math.cos(ang + 0.45), y2 - 9 * Math.sin(ang + 0.45));
+      ctx.lineTo(x2 - 12 * Math.cos(ang - 0.45), y2 - 12 * Math.sin(ang - 0.45));
+      ctx.lineTo(x2 - 12 * Math.cos(ang + 0.45), y2 - 12 * Math.sin(ang + 0.45));
       ctx.fill();
       if (label) {
         ctx.font = "600 10px 'IBM Plex Mono', monospace";

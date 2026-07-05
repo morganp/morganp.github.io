@@ -170,6 +170,10 @@
     "plants": { label: "Plants", level: "L1" },
     "food-webs": { label: "Ecosystems & Food Webs", level: "L2-L3" },
     "genetics": { label: "Inheritance & Genetics", level: "L3" },
+    "digestion": { label: "Nutrition & Digestion", level: "L2" },
+    "reproduction": { label: "Reproduction Basics", level: "L2" },
+    "evolution-intro": { label: "Evolution Intro", level: "L2" },
+    "body-systems": { label: "Body Systems", level: "L2" },
   };
 
   const Progress = {

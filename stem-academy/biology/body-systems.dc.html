@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Body Systems">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / BODY SYSTEMS</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// A TEAM OF SYSTEMS — LEVEL L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Your body runs on cooperating organ systems</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 780px;">No organ works alone. Each <strong>organ system</strong> is a group of organs doing one big job — and the systems depend on each other. Pick a system to light up its organs, then see how a single cell scales all the way up to a whole organism.</div>
+  </div>
+
+  <!-- system selector -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 4px; display: flex; gap: 8px; flex-wrap: wrap;">
+    <sc-for list="{{ systemTabs }}" as="t" hint-placeholder-count="6">
+      <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 9px 15px; border: 2px solid #2b2620; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ t.label }}</div>
+    </sc-for>
+  </div>
+
+  <!-- body + detail -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 20px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 20px; align-items: stretch;">
+
+    <!-- body figure -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — {{ selName }} SYSTEM</div>
+      <div style="position: relative; width: 100%; aspect-ratio: 1 / 1.35; align-self: center;">
+        <svg viewBox="0 0 300 400" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          <!-- grey body silhouette -->
+          <g fill="#ece3d4" stroke="#cabfae" stroke-width="2">
+            <circle cx="150" cy="42" r="30"></circle>
+            <rect x="140" y="68" width="20" height="18"></rect>
+            <path d="M 108 86 Q 150 78 192 86 L 200 210 L 176 214 L 170 250 L 130 250 L 124 214 L 100 210 Z"></path>
+            <rect x="78" y="90" width="22" height="120" rx="11"></rect>
+            <rect x="200" y="90" width="22" height="120" rx="11"></rect>
+            <rect x="120" y="248" width="26" height="140" rx="12"></rect>
+            <rect x="154" y="248" width="26" height="140" rx="12"></rect>
+          </g>
+          <!-- active system organs -->
+          <sc-for list="{{ ellipses }}" as="e" hint-placeholder-count="3">
+            <ellipse cx="{{ e.cx }}" cy="{{ e.cy }}" rx="{{ e.rx }}" ry="{{ e.ry }}" fill="{{ e.fill }}" stroke="#2b2620" stroke-width="2"></ellipse>
+          </sc-for>
+          <sc-for list="{{ rects }}" as="r" hint-placeholder-count="3">
+            <rect x="{{ r.x }}" y="{{ r.y }}" width="{{ r.w }}" height="{{ r.h }}" rx="{{ r.rx }}" fill="{{ r.fill }}" stroke="#2b2620" stroke-width="2"></rect>
+          </sc-for>
+          <sc-for list="{{ lines }}" as="l" hint-placeholder-count="4">
+            <line x1="{{ l.x1 }}" y1="{{ l.y1 }}" x2="{{ l.x2 }}" y2="{{ l.y2 }}" stroke="#e8590c" stroke-width="2.5" stroke-linecap="round"></line>
+          </sc-for>
+        </svg>
+        <sc-for list="{{ labels }}" as="lb" hint-placeholder-count="4">
+          <div style="position: absolute; left: {{ lb.x }}%; top: {{ lb.y }}%; transform: translate(-50%,-50%); font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; padding: 3px 7px; border: 1.5px solid #2b2620; background: #fff; color: #2b2620; white-space: nowrap; box-shadow: 1.5px 1.5px 0 rgba(43,38,32,0.2);">{{ lb.text }}</div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- system detail -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">ORGAN SYSTEM</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -0.01em;">{{ selName }}</div>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; flex: 1;">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; line-height: 1.6;">{{ selDesc }}</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;">MAIN ORGANS</div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <sc-for list="{{ selOrgans }}" as="o" hint-placeholder-count="3">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 5px 10px; border: 1.5px solid #e8590c; color: #fcc419;">{{ o }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="margin-top: auto; border: 1.5px solid #574f45; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;">WORKS CLOSELY WITH</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: #faf6ef;">{{ selPartner }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- levels of organisation -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 02 — LEVELS OF ORGANISATION (SMALL → LARGE)</div>
+    <div style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap;">
+      <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="5">
+        <div style="flex: 1; min-width: 150px; border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 4px; position: relative;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c;">{{ lv.step }}</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ lv.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.45; color: #554c42;">{{ lv.what }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156; margin-top: auto; padding-top: 6px;">e.g. {{ lv.eg }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #6b6156;">Each level is built from the one before it: similar cells form a tissue, tissues form an organ, organs form a system, and the systems together make the whole organism.</div>
+  </div>
+
+  <!-- match game -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// CHALLENGE — WHICH SYSTEM DOES THIS JOB?</div>
+        <div style="display: flex; gap: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">
+          <span>SCORE <strong style="color: #2b2620;">{{ score }}</strong></span>
+          <span>STREAK <strong style="color: #e8590c;">{{ streak }}</strong></span>
+        </div>
+      </div>
+      <div style="border: 1.5px dashed #d8d0c4; background: #faf6ef; padding: 18px; text-align: center;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 19px; line-height: 1.25;">{{ clueText }}</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px;">
+        <sc-for list="{{ answerButtons }}" as="a" hint-placeholder-count="6">
+          <div onClick="{{ a.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px 10px; border: 2px solid #2b2620; text-align: center; cursor: pointer; background: #faf6ef; color: #2b2620; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;" style-hover="box-shadow: 2px 2px 0 rgba(43,38,32,0.25);">{{ a.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{ msgColor }}; min-height: 18px;">{{ gameMsg }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Organ_system" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Organ system ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Biological_organisation" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Biological organisation ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/subjects/zs6hvcw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Science (organ systems) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="cells.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Cells (L2–L3) →</a>
+    <a href="genetics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Inheritance &amp; Genetics (L3) →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">← Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / BODY SYSTEMS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  SYSTEMS = {
+    circulatory: {
+      name: "Circulatory",
+      desc: "Delivers oxygen, food and warmth to every cell and carries waste away. The heart pumps blood through a huge network of vessels — arteries, veins and tiny capillaries.",
+      organs: ["Heart", "Blood vessels", "Blood"],
+      partner: "The respiratory system — it collects the oxygen the blood carries.",
+      draw: {
+        ellipses: [{ cx: 138, cy: 150, rx: 16, ry: 18 }],
+        rects: [],
+        lines: [
+          { x1: 138, y1: 134, x2: 150, y2: 60 },
+          { x1: 138, y1: 168, x2: 132, y2: 250 },
+          { x1: 138, y1: 168, x2: 168, y2: 250 },
+          { x1: 138, y1: 145, x2: 90, y2: 150 },
+          { x1: 138, y1: 145, x2: 210, y2: 150 },
+        ],
+      },
+      labels: [{ x: 34, y: 38, text: "Heart" }, { x: 74, y: 60, text: "Blood vessels" }],
+    },
+    respiratory: {
+      name: "Respiratory",
+      desc: "Takes in oxygen and gets rid of carbon dioxide. Air travels down the windpipe (trachea) into two lungs, where gases swap with the blood.",
+      organs: ["Lungs", "Trachea", "Diaphragm"],
+      partner: "The circulatory system — blood carries the oxygen onward.",
+      draw: {
+        ellipses: [{ cx: 128, cy: 155, rx: 16, ry: 26 }, { cx: 172, cy: 155, rx: 16, ry: 26 }],
+        rects: [{ x: 146, y: 88, w: 8, h: 45, rx: 4 }],
+        lines: [],
+      },
+      labels: [{ x: 30, y: 40, text: "Lungs" }, { x: 72, y: 22, text: "Trachea" }],
+    },
+    digestive: {
+      name: "Digestive",
+      desc: "Breaks food down into small molecules the blood can absorb. A long muscular tube from mouth to anus, helped by the stomach, intestines, liver and pancreas.",
+      organs: ["Stomach", "Intestines", "Liver"],
+      partner: "The circulatory system — it carries absorbed nutrients away.",
+      draw: {
+        ellipses: [{ cx: 132, cy: 172, rx: 18, ry: 15 }],
+        rects: [{ x: 118, y: 190, w: 64, h: 48, rx: 14 }, { x: 146, y: 90, w: 6, h: 70, rx: 3 }],
+        lines: [],
+      },
+      labels: [{ x: 30, y: 43, text: "Stomach" }, { x: 74, y: 60, text: "Intestines" }],
+    },
+    nervous: {
+      name: "Nervous",
+      desc: "The body's fast messaging network. The brain and spinal cord process information and fire electrical signals along nerves to and from every part of you.",
+      organs: ["Brain", "Spinal cord", "Nerves"],
+      partner: "The muscular system — nerves tell muscles when to contract.",
+      draw: {
+        ellipses: [{ cx: 150, cy: 40, rx: 24, ry: 26 }],
+        rects: [{ x: 146, y: 66, w: 7, h: 190, rx: 3 }],
+        lines: [
+          { x1: 150, y1: 120, x2: 88, y2: 150 },
+          { x1: 150, y1: 120, x2: 212, y2: 150 },
+          { x1: 150, y1: 250, x2: 130, y2: 340 },
+          { x1: 150, y1: 250, x2: 170, y2: 340 },
+        ],
+      },
+      labels: [{ x: 74, y: 8, text: "Brain" }, { x: 74, y: 48, text: "Spinal cord" }],
+    },
+    skeletal: {
+      name: "Skeletal",
+      desc: "The body's frame. 206 bones give you shape, let you stand, protect soft organs (the skull guards the brain, ribs guard the heart and lungs) and store minerals.",
+      organs: ["Skull", "Ribcage", "Spine", "Pelvis"],
+      partner: "The muscular system — muscles pull on bones to move you.",
+      draw: {
+        ellipses: [{ cx: 150, cy: 42, rx: 26, ry: 28 }],
+        rects: [
+          { x: 120, y: 108, w: 60, h: 66, rx: 10 },
+          { x: 146, y: 100, w: 8, h: 150, rx: 3 },
+          { x: 124, y: 244, w: 52, h: 26, rx: 8 },
+          { x: 126, y: 276, w: 14, h: 108, rx: 6 },
+          { x: 160, y: 276, w: 14, h: 108, rx: 6 },
+        ],
+        lines: [],
+      },
+      labels: [{ x: 74, y: 10, text: "Skull" }, { x: 30, y: 34, text: "Ribcage" }, { x: 74, y: 62, text: "Pelvis" }],
+    },
+    muscular: {
+      name: "Muscular",
+      desc: "Over 600 muscles that pull on bones to create movement, keep your posture, and pump the heart and gut. Muscles can only pull, so they work in opposing pairs.",
+      organs: ["Skeletal muscle", "Heart muscle", "Tendons"],
+      partner: "The skeletal system — bones are the levers muscles pull on.",
+      draw: {
+        ellipses: [
+          { cx: 89, cy: 150, rx: 11, ry: 24 },
+          { cx: 211, cy: 150, rx: 11, ry: 24 },
+          { cx: 132, cy: 300, rx: 13, ry: 30 },
+          { cx: 167, cy: 300, rx: 13, ry: 30 },
+        ],
+        rects: [{ x: 116, y: 100, w: 68, h: 42, rx: 12 }],
+        lines: [],
+      },
+      labels: [{ x: 24, y: 38, text: "Biceps" }, { x: 30, y: 74, text: "Thigh" }, { x: 78, y: 26, text: "Chest" }],
+    },
+  };
+
+  ITEMS = [
+    { clue: "Pumps blood to carry oxygen and food around the body.", sys: "circulatory" },
+    { clue: "Takes in oxygen and breathes out carbon dioxide.", sys: "respiratory" },
+    { clue: "Breaks food down into nutrients the blood can absorb.", sys: "digestive" },
+    { clue: "Carries fast electrical messages between the brain and body.", sys: "nervous" },
+    { clue: "Supports the body and protects the brain, heart and lungs.", sys: "skeletal" },
+    { clue: "Pulls on bones so that you can move.", sys: "muscular" },
+    { clue: "The lungs are the main organs of this system.", sys: "respiratory" },
+    { clue: "The brain and spinal cord run this system.", sys: "nervous" },
+  ];
+
+  LEVELS = [
+    { step: "01", name: "Cell", what: "The smallest unit of life.", eg: "a muscle cell" },
+    { step: "02", name: "Tissue", what: "A group of similar cells working together.", eg: "muscle tissue" },
+    { step: "03", name: "Organ", what: "Different tissues forming one structure.", eg: "the heart" },
+    { step: "04", name: "Organ system", what: "Organs cooperating on one big job.", eg: "circulatory system" },
+    { step: "05", name: "Organism", what: "All the systems making one living thing.", eg: "a human" },
+  ];
+
+  state = { sys: "circulatory", itemIdx: 0, score: 0, streak: 0, gameMsg: "", good: false, correctCount: 0 };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("body-systems");
+    this.setState({ itemIdx: Math.floor(Math.random() * this.ITEMS.length) });
+  }
+
+  answer(sys) {
+    const item = this.ITEMS[this.state.itemIdx];
+    const correct = item.sys === sys;
+    if (correct) {
+      const cc = this.state.correctCount + 1;
+      if (cc >= 4 && window.Progress) window.Progress.markCompleted("body-systems", { via: "match-game" });
+      let next = this.state.itemIdx;
+      while (next === this.state.itemIdx) next = Math.floor(Math.random() * this.ITEMS.length);
+      this.setState(s => ({ score: s.score + 1, streak: s.streak + 1, correctCount: cc, itemIdx: next,
+        gameMsg: cc >= 4 ? "Correct — that's 4! Topic complete ✓" : "Correct!", good: true }));
+    } else {
+      this.setState({ streak: 0, gameMsg: "Not quite — that's the " + this.SYSTEMS[item.sys].name.toLowerCase() + " system's job.", good: false });
+    }
+  }
+
+  renderVals() {
+    const sys = this.SYSTEMS[this.state.sys];
+    const ORG = "#e8590c";
+    const systemTabs = Object.keys(this.SYSTEMS).map(k => ({
+      label: this.SYSTEMS[k].name.toUpperCase(),
+      bg: this.state.sys === k ? "#2b2620" : "#fff",
+      fg: this.state.sys === k ? "#faf6ef" : "#2b2620",
+      onClick: () => this.setState({ sys: k }),
+    }));
+
+    const ellipses = sys.draw.ellipses.map(e => ({ ...e, fill: ORG }));
+    const rects = sys.draw.rects.map(r => ({ ...r, fill: ORG }));
+    const lines = sys.draw.lines;
+    const labels = sys.labels;
+
+    const item = this.ITEMS[this.state.itemIdx];
+    const answerButtons = Object.keys(this.SYSTEMS).map(k => ({
+      label: this.SYSTEMS[k].name.toUpperCase(),
+      onClick: () => this.answer(k),
+    }));
+
+    return {
+      systemTabs,
+      selName: sys.name, selDesc: sys.desc, selOrgans: sys.organs, selPartner: sys.partner,
+      ellipses, rects, lines, labels,
+      levels: this.LEVELS,
+      clueText: item.clue, answerButtons,
+      score: this.state.score, streak: this.state.streak,
+      gameMsg: this.state.gameMsg, msgColor: this.state.gameMsg ? (this.state.good ? "#2f7d3a" : "#c0392b") : "#6b6156",
+    };
+  }
+}
+</script>
+</body>
+</html>

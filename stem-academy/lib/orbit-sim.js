@@ -78,6 +78,12 @@
         ctx.strokeStyle = "#ffd43b"; ctx.lineWidth = 2;
         const vlen = 22 / Math.pow(radius, 0.5);
         ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - Math.sin(ang) * vlen, y + Math.cos(ang) * vlen); ctx.stroke();
+        // arrowhead on the velocity vector (>=10px per figure standard)
+        { const tx = x - Math.sin(ang) * vlen, ty = y + Math.cos(ang) * vlen; const va = Math.atan2(ty - y, tx - x);
+          ctx.fillStyle = "#ffd43b"; ctx.beginPath(); ctx.moveTo(tx, ty);
+          ctx.lineTo(tx - 12 * Math.cos(va - 0.45), ty - 12 * Math.sin(va - 0.45));
+          ctx.lineTo(tx - 12 * Math.cos(va + 0.45), ty - 12 * Math.sin(va + 0.45));
+          ctx.closePath(); ctx.fill(); }
         ctx.fillStyle = "#cfcfcf"; ctx.beginPath(); ctx.arc(x, y, 6, 0, 7); ctx.fill();
         ctx.fillStyle = "#8a93a8"; ctx.font = "10px 'IBM Plex Mono', monospace"; ctx.textAlign = "left";
         ctx.fillText("● satellite — yellow arrow = its speed", 12, H - 10);

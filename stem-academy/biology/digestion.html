@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Nutrition & Digestion">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / NUTRITION &amp; DIGESTION</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FROM PLATE TO CELL — LEVEL L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Follow your food on a nine-metre journey</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 760px;">Food is too big to enter your cells, so your gut has to break it down. Digestion is that break-down — a one-way trip through a long muscular tube where enzymes cut big molecules into small ones the blood can carry. Press play and travel with a mouthful.</div>
+  </div>
+
+  <!-- journey + detail -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 20px; display: grid; grid-template-columns: 1fr 1.05fr; gap: 20px; align-items: stretch;">
+
+    <!-- the gut map -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE DIGESTIVE SYSTEM</div>
+        <div onClick="{{ togglePlay }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #faf6ef; background: {{ playBg }}; border: 1.5px solid #2b2620; padding: 8px 14px; cursor: pointer;">{{ playLabel }}</div>
+      </div>
+      <div style="position: relative; width: 100%; aspect-ratio: 1 / 1.12;">
+        <svg viewBox="0 0 400 448" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+          <path d="{{ tubePath }}" fill="none" stroke="#e6dfd2" stroke-width="14" stroke-linecap="round"></path>
+          <path d="{{ tubePath }}" fill="none" stroke="#f3ede1" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 10"></path>
+        </svg>
+        <!-- moving food bolus -->
+        <div style="position: absolute; left: {{ foodX }}%; top: {{ foodY }}%; width: 26px; height: 26px; transform: translate(-50%,-50%); border-radius: 50%; background: #e8590c; border: 2px solid #2b2620; box-shadow: 0 0 0 5px rgba(232,89,12,0.2); transition: left 0.9s ease, top 0.9s ease; z-index: 3;"></div>
+        <sc-for list="{{ stations }}" as="s" hint-placeholder-count="6">
+          <div onClick="{{ s.onClick }}" style="position: absolute; left: {{ s.x }}%; top: {{ s.y }}%; transform: translate(-50%,-50%); min-width: 96px; padding: 7px 10px; border: {{ s.border }}; background: {{ s.bg }}; color: {{ s.fg }}; box-shadow: {{ s.shadow }}; cursor: pointer; text-align: center; z-index: 2;" style-hover="filter: brightness(0.97);">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; font-weight: 600; opacity: 0.72;">STOP {{ s.num }}</div>
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 12.5px; line-height: 1.05;">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156; align-items: center; border-top: 1px dashed #e6dfd2; padding-top: 8px;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 13px; height: 13px; border-radius: 50%; background: #e8590c; border: 1.5px solid #2b2620; display: inline-block;"></span>WHERE THE FOOD IS NOW</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 13px; height: 13px; background: #fff; border: 1.5px solid #2b2620; display: inline-block;"></span>STOP — CLICK TO INSPECT</span>
+      </div>
+    </div>
+
+    <!-- station detail -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">STOP {{ selNum }} OF {{ stopCount }} · {{ selTag }}</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -0.01em;">{{ selLabel }}</div>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; line-height: 1.6;">{{ selDesc }}</div>
+        <div style="border: 1.5px solid #574f45; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #a89d8e;">WHAT GETS BROKEN DOWN HERE</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: #fcc419;">{{ selWork }}</div>
+        </div>
+        <div style="margin-top: auto; display: flex; gap: 10px;">
+          <div onClick="{{ prevStop }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; border: 1.5px solid #574f45; padding: 10px 16px; cursor: pointer; color: #faf6ef;" style-hover="background: #574f45;">← BACK</div>
+          <div onClick="{{ nextStop }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; background: #e8590c; border: 1.5px solid #e8590c; padding: 10px 16px; cursor: pointer; color: #faf6ef;">NEXT STOP →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- enzymes table -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// TABLE 01 — THE THREE DIGESTIVE ENZYMES</div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); overflow: hidden;">
+      <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.1fr 1.3fr; background: #2b2620; color: #faf6ef;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 11px 14px;">ENZYME</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 11px 14px;">BREAKS DOWN</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 11px 14px;">INTO</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 11px 14px;">MADE WHERE</div>
+      </div>
+      <sc-for list="{{ enzymes }}" as="e" hint-placeholder-count="3">
+        <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.1fr 1.3fr; border-top: 1px solid #e6dfd2; background: {{ e.bg }};">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; padding: 12px 14px;">{{ e.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; padding: 12px 14px; color: #554c42;">{{ e.substrate }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; padding: 12px 14px; color: #554c42; font-weight: 600;">{{ e.product }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; padding: 12px 14px; color: #554c42;">{{ e.where }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #6b6156; line-height: 1.5;">The small molecules on the right are tiny enough to pass through the gut wall into the blood. <strong>Bile</strong> (made in the liver, stored in the gall bladder) isn't an enzyme — it breaks fat into droplets so lipase can work faster, and neutralises stomach acid.</div>
+  </div>
+
+  <!-- nutrient quiz -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// CHALLENGE — NAME THAT NUTRIENT</div>
+        <div style="display: flex; gap: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">
+          <span>SCORE <strong style="color: #2b2620;">{{ score }}</strong></span>
+          <span>STREAK <strong style="color: #e8590c;">{{ streak }}</strong></span>
+        </div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: #554c42;">A balanced diet needs seven groups. Read the clue and pick the nutrient it describes.</div>
+      <div style="border: 1.5px dashed #d8d0c4; background: #faf6ef; padding: 16px; display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e;">CLUE</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px; line-height: 1.2;">{{ clueText }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #6b6156;">Good source: {{ clueFood }}</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px;">
+        <sc-for list="{{ options }}" as="o" hint-placeholder-count="7">
+          <div onClick="{{ o.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px 10px; border: 2px solid #2b2620; text-align: center; cursor: pointer; background: {{ o.bg }}; color: {{ o.fg }}; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;" style-hover="box-shadow: 2px 2px 0 rgba(43,38,32,0.25);">{{ o.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{ quizMsgColor }}; min-height: 18px;">{{ quizMsg }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Human_digestive_system" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Human digestive system ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Digestive_enzyme" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Digestive enzyme ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/subjects/zs6hvcw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Science (nutrition &amp; digestion) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="reproduction.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Reproduction Basics →</a>
+    <a href="cells.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Cells (L2–L3) →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">← Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / NUTRITION &amp; DIGESTION</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  STATIONS = [
+    { label: "Mouth", tag: "MECHANICAL + CHEMICAL", x: 50, y: 6,
+      desc: "Teeth chop and grind food into a soft ball (a bolus) while saliva wets it. Saliva also carries the enzyme amylase, which starts breaking starch into sugar.",
+      work: "Starch → maltose (by amylase)" },
+    { label: "Oesophagus", tag: "TRANSPORT", x: 62, y: 22,
+      desc: "This muscular tube squeezes the bolus down to the stomach in waves called peristalsis. Nothing is broken down here — it is a one-way lift.",
+      work: "No digestion — muscles push food down" },
+    { label: "Stomach", tag: "CHEMICAL", x: 33, y: 40,
+      desc: "A muscular bag that churns food for hours. It makes hydrochloric acid — which kills most microbes — and the enzyme protease, which starts digesting protein.",
+      work: "Protein → amino acids (by protease, in acid)" },
+    { label: "Small intestine", tag: "DIGEST + ABSORB", x: 64, y: 58,
+      desc: "About 6 metres long. Enzymes from the pancreas and gut wall finish the job. Its lining is folded into millions of tiny villi that soak the small molecules into the blood.",
+      work: "Digestion finishes; nutrients absorbed into blood" },
+    { label: "Large intestine", tag: "ABSORB WATER", x: 33, y: 76,
+      desc: "The leftovers are mostly water and fibre your body can't digest. Here water is absorbed back into the body, leaving a solid waste.",
+      work: "Water absorbed; waste (faeces) formed" },
+    { label: "Rectum & anus", tag: "REMOVE WASTE", x: 52, y: 93,
+      desc: "The solid waste is stored in the rectum and pushed out through the anus. The journey — usually a day or two long — is complete.",
+      work: "Undigested waste stored and removed (egestion)" },
+  ];
+
+  NUTRIENTS = [
+    { name: "Carbohydrate", clue: "Your main quick-release fuel for energy.", food: "bread, pasta, rice" },
+    { name: "Protein", clue: "Used to grow and repair muscles, skin and cells.", food: "eggs, meat, beans" },
+    { name: "Fat", clue: "A store of energy and insulation; builds cell membranes.", food: "oils, butter, nuts" },
+    { name: "Fibre", clue: "Can't be digested, but keeps food moving through the gut.", food: "wholegrains, vegetables" },
+    { name: "Vitamins", clue: "Needed in tiny amounts to keep the body working — e.g. vitamin C.", food: "fruit, vegetables" },
+    { name: "Minerals", clue: "Elements like iron (for blood) and calcium (for bones).", food: "dairy, leafy greens" },
+    { name: "Water", clue: "Most of your body is made of it; every reaction happens in it.", food: "drinks, most foods" },
+  ];
+
+  state = { sel: 0, playing: false, quizIdx: 0, score: 0, streak: 0, quizMsg: "", quizGood: false, correctCount: 0, seed: 1 };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("digestion");
+    this.setState({ quizIdx: Math.floor(Math.random() * this.NUTRIENTS.length), seed: Math.floor(Math.random() * 9999) + 1 });
+  }
+  componentWillUnmount() { clearInterval(this._timer); }
+
+  togglePlay() {
+    if (this.state.playing) { clearInterval(this._timer); this.setState({ playing: false }); return; }
+    this.setState({ playing: true, sel: 0 });
+    this._timer = setInterval(() => {
+      this.setState(s => {
+        if (s.sel >= this.STATIONS.length - 1) { clearInterval(this._timer); return { playing: false }; }
+        return { sel: s.sel + 1 };
+      });
+    }, 1500);
+  }
+
+  step(d) {
+    clearInterval(this._timer);
+    const n = this.STATIONS.length;
+    this.setState(s => ({ sel: (s.sel + d + n) % n, playing: false }));
+  }
+
+  answer(name) {
+    const correct = this.NUTRIENTS[this.state.quizIdx].name === name;
+    if (correct) {
+      const cc = this.state.correctCount + 1;
+      if (cc >= 4 && window.Progress) window.Progress.markCompleted("digestion", { via: "nutrient-quiz" });
+      // pick a new question different from the current one
+      let next = this.state.quizIdx;
+      while (next === this.state.quizIdx) next = Math.floor(Math.random() * this.NUTRIENTS.length);
+      this.setState(s => ({ score: s.score + 1, streak: s.streak + 1, correctCount: cc, quizIdx: next, seed: s.seed + 7,
+        quizMsg: cc >= 4 ? "Correct — that's 4! Topic complete ✓" : "Correct!", quizGood: true }));
+    } else {
+      this.setState({ streak: 0, quizMsg: "Not that one — read the clue again.", quizGood: false });
+    }
+  }
+
+  shuffled(n, seed) {
+    const arr = Array.from({ length: n }, (_, i) => i);
+    let s = seed * 9301 + 49297;
+    for (let i = n - 1; i > 0; i--) {
+      s = (s * 9301 + 49297) % 233280;
+      const j = Math.floor((s / 233280) * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  renderVals() {
+    const sel = this.STATIONS[this.state.sel];
+    const stations = this.STATIONS.map((st, i) => {
+      const isSel = i === this.state.sel;
+      return {
+        num: i + 1, label: st.label, x: st.x, y: st.y,
+        bg: isSel ? "#e8590c" : "#fff",
+        fg: isSel ? "#faf6ef" : "#2b2620",
+        border: isSel ? "2.5px solid #2b2620" : "2px solid #2b2620",
+        shadow: isSel ? "3px 3px 0 rgba(43,38,32,0.3)" : "2px 2px 0 rgba(43,38,32,0.15)",
+        onClick: () => { clearInterval(this._timer); this.setState({ sel: i, playing: false }); },
+      };
+    });
+
+    // tube path through station centres (viewBox 400 x 448)
+    const pts = this.STATIONS.map(s => ({ x: s.x / 100 * 400, y: s.y / 100 * 448 }));
+    let tubePath = "M " + pts[0].x + " " + pts[0].y;
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      const my = (a.y + b.y) / 2;
+      tubePath += " C " + a.x + " " + my + ", " + b.x + " " + my + ", " + b.x + " " + b.y;
+    }
+
+    const q = this.NUTRIENTS[this.state.quizIdx];
+    const order = this.shuffled(this.NUTRIENTS.length, this.state.seed);
+    const options = order.map(i => ({
+      label: this.NUTRIENTS[i].name.toUpperCase(),
+      bg: "#faf6ef", fg: "#2b2620",
+      onClick: () => this.answer(this.NUTRIENTS[i].name),
+    }));
+
+    const enzymes = [
+      { name: "Amylase", substrate: "Starch (a carbohydrate)", product: "Sugars", where: "Mouth & pancreas", bg: "#fff" },
+      { name: "Protease", substrate: "Proteins", product: "Amino acids", where: "Stomach & pancreas", bg: "#faf6ef" },
+      { name: "Lipase", substrate: "Fats (lipids)", product: "Fatty acids + glycerol", where: "Pancreas & small intestine", bg: "#fff" },
+    ];
+
+    return {
+      stations, tubePath,
+      foodX: sel.x, foodY: sel.y,
+      selNum: this.state.sel + 1, stopCount: this.STATIONS.length,
+      selLabel: sel.label, selDesc: sel.desc, selWork: sel.work, selTag: sel.tag,
+      prevStop: () => this.step(-1), nextStop: () => this.step(1),
+      togglePlay: () => this.togglePlay(),
+      playLabel: this.state.playing ? "❚❚ PAUSE" : "▶ PLAY JOURNEY",
+      playBg: this.state.playing ? "#c0392b" : "#e8590c",
+      enzymes,
+      clueText: q.clue, clueFood: q.food, options,
+      score: this.state.score, streak: this.state.streak,
+      quizMsg: this.state.quizMsg,
+      quizMsgColor: this.state.quizMsg ? (this.state.quizGood ? "#2f7d3a" : "#c0392b") : "#6b6156",
+    };
+  }
+}
+</script>
+</body>
+</html>
