@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Natural Selection">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / NATURAL SELECTION</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// EVOLUTION IN ACTION — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Natural selection, watched one generation at a time</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 800px;">Evolution isn't a theory that only happened long ago — it's happening in hospitals now. Treat this dish of bacteria with antibiotics, let the survivors breed, and watch a resistant "superbug" population evolve in front of you.</div>
+  </div>
+
+  <!-- ANTIBIOTIC RESISTANCE SIM -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+
+    <!-- petri dish -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — BACTERIA POPULATION · GENERATION {{ gen }}</div>
+      <div style="position: relative; width: 100%; flex: 1; min-height: 300px;">
+        <svg viewBox="0 0 360 320" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          <circle cx="180" cy="160" r="150" fill="#f5efe4" stroke="#2b2620" stroke-width="2.5"></circle>
+          <sc-for list="{{ bugs }}" as="b" hint-placeholder-count="80">
+            <circle cx="{{ b.x }}" cy="{{ b.y }}" r="{{ b.r }}" fill="{{ b.fill }}" stroke="#2b2620" stroke-width="1" opacity="{{ b.op }}"></circle>
+          </sc-for>
+        </svg>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">
+        <span>SUSCEPTIBLE</span>
+        <div style="flex: 1; height: 12px; border: 1px solid #2b2620; background: linear-gradient(90deg, #f2d9c6, #e8590c, #7a2d06);"></div>
+        <span>RESISTANT</span>
+      </div>
+    </div>
+
+    <!-- controls -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e;">MEAN RESISTANCE</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 40px; color: #fcc419; line-height: 1.1;">{{ meanPct }}%</div>
+      </div>
+      <div style="padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1.5px solid #574f45;">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+            <span style="color: #e7ddcd;">{{ s.k }}</span><span style="color: {{ s.color }}; font-weight: 600;">{{ s.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div onClick="{{ onStep }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 14px; border: 2px solid #e8590c; background: #e8590c; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">{{ stepLabel }}</div>
+        <div onClick="{{ onReset }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px; border: 2px solid #faf6ef; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">RESET DISH</div>
+        <div style="margin-top: auto; border: 1.5px solid #574f45; padding: 10px 12px; font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #e7ddcd;">{{ simMsg }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- resistance graph -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 01 — MEAN RESISTANCE ACROSS GENERATIONS</div>
+      <svg viewBox="0 0 620 220" style="width: 100%; height: auto;">
+        <line x1="55" y1="185" x2="600" y2="185" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="55" y1="185" x2="55" y2="18" stroke="#2b2620" stroke-width="2"></line>
+        <sc-for list="{{ bars }}" as="b" hint-placeholder-count="6">
+          <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></rect>
+          <text x="{{ b.cx }}" y="199" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">{{ b.label }}</text>
+        </sc-for>
+        <text x="327" y="215" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620">Generation</text>
+        <text x="16" y="102" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620" transform="rotate(-90 16 102)">Mean resistance (%)</text>
+        <text x="48" y="24" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">100</text>
+        <text x="48" y="188" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">0</text>
+      </svg>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">Each treatment kills the susceptible bacteria and spares the naturally resistant ones. Those survivors breed, passing resistance on — so the whole population becomes resistant. This is why doctors say <strong>finish your antibiotics</strong> and don't overuse them.</div>
+    </div>
+  </div>
+
+  <!-- the four steps -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 02 — THE FOUR STEPS OF NATURAL SELECTION</div>
+    <div style="display: flex; gap: 6px; align-items: stretch; flex-wrap: wrap;">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+        <div style="flex: 1; min-width: 160px; border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c;">{{ s.n }}</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ s.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.45; color: #554c42;">{{ s.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- evidence -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 03 — EVIDENCE FOR EVOLUTION</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+      <sc-for list="{{ evidence }}" as="e" hint-placeholder-count="3">
+        <div style="border: 2px solid #2b2620; background: {{ e.bg }}; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ e.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.45; color: #554c42;">{{ e.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;"><strong>Selective breeding</strong> is the same process steered by humans (choosing which animals or crops reproduce). Over huge timescales, when populations become so different they can no longer interbreed, a <strong>new species</strong> forms — and species that can't adapt fast enough go <strong>extinct</strong>.</div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Natural_selection" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Natural selection ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Antimicrobial_resistance" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Antimicrobial resistance ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/subjects/zs6hvcw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Science (evolution) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="ecology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Ecology (L3) →</a>
+    <a href="genetics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Related: Inheritance &amp; Genetics (L3) →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">← Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / NATURAL SELECTION</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  N = 90;
+
+  state = { bugs: [], gen: 0, history: [], lastKilled: 0, completed: false };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("natural-selection");
+    this.reset();
+  }
+
+  randPos() {
+    // uniform point in circle r=150 centred (180,160), keep bugs off the rim
+    const a = Math.random() * Math.PI * 2;
+    const rad = Math.sqrt(Math.random()) * 132;
+    return { x: 180 + Math.cos(a) * rad, y: 160 + Math.sin(a) * rad };
+  }
+
+  makeBug(res) {
+    const p = this.randPos();
+    return { x: p.x.toFixed(1), y: p.y.toFixed(1), res };
+  }
+
+  reset() {
+    const bugs = [];
+    for (let i = 0; i < this.N; i++) bugs.push(this.makeBug(Math.max(0, Math.min(1, 0.12 + (Math.random() - 0.5) * 0.2))));
+    const mean = bugs.reduce((s, b) => s + b.res, 0) / bugs.length;
+    this.setState({ bugs, gen: 0, history: [mean], lastKilled: 0 });
+  }
+
+  step() {
+    const bugs = this.state.bugs;
+    // antibiotic: survival chance rises with resistance
+    const survivors = bugs.filter(b => Math.random() < 0.04 + 0.94 * b.res);
+    const killed = bugs.length - survivors.length;
+    // survivors breed back up to N; offspring inherit resistance + small mutation
+    const next = [];
+    const parents = survivors.length ? survivors : bugs; // avoid extinction edge
+    for (let i = 0; i < this.N; i++) {
+      const par = parents[Math.floor(Math.random() * parents.length)];
+      let r = par.res + (Math.random() - 0.5) * 0.14;
+      r = Math.max(0, Math.min(1, r));
+      next.push(this.makeBug(r));
+    }
+    const mean = next.reduce((s, b) => s + b.res, 0) / next.length;
+    const gen = this.state.gen + 1;
+    const history = [...this.state.history, mean].slice(-8);
+    if (gen >= 5 && !this.state.completed && window.Progress) {
+      this.setState({ completed: true });
+      window.Progress.markCompleted("natural-selection", { via: "evolved-resistance" });
+    }
+    this.setState({ bugs: next, gen, history, lastKilled: killed });
+  }
+
+  bugColor(res) {
+    // pale peach -> orange -> deep red
+    const stops = [[242, 217, 198], [232, 89, 12], [122, 45, 6]];
+    const t = res, seg = t < 0.5 ? 0 : 1, lt = t < 0.5 ? t / 0.5 : (t - 0.5) / 0.5;
+    const a = stops[seg], b = stops[seg + 1];
+    const c = a.map((v, i) => Math.round(v + (b[i] - v) * lt));
+    return "rgb(" + c.join(",") + ")";
+  }
+
+  renderVals() {
+    const bugs = this.state.bugs.map(b => ({ x: b.x, y: b.y, r: 5, fill: this.bugColor(b.res), op: 1 }));
+    const mean = this.state.history.length ? this.state.history[this.state.history.length - 1] : 0;
+    const meanPct = Math.round(mean * 100);
+    const resistantN = this.state.bugs.filter(b => b.res > 0.6).length;
+
+    const stats = [
+      { k: "POPULATION", v: this.state.bugs.length, color: "#faf6ef" },
+      { k: "KILLED LAST DOSE", v: this.state.lastKilled, color: "#ff8f6b" },
+      { k: "RESISTANT BUGS", v: resistantN, color: "#fcc419" },
+    ];
+
+    let simMsg;
+    if (this.state.gen === 0) simMsg = "A fresh infection: almost all these bacteria are susceptible. Give a dose of antibiotic.";
+    else if (meanPct >= 80) simMsg = "This is now a resistant superbug population — the antibiotic barely works anymore.";
+    else if (meanPct >= 45) simMsg = "Resistance is spreading fast. A few survivors from each dose are taking over.";
+    else simMsg = "Some resistant survivors bred through. Dose again and watch resistance climb.";
+
+    // bar graph of history
+    const X0 = 55, X1 = 600, Y0 = 185, Ytop = 22;
+    const n = this.state.history.length;
+    const slot = (X1 - X0) / Math.max(6, n);
+    const bw = Math.min(48, slot * 0.6);
+    const bars = this.state.history.map((v, i) => {
+      const cx = X0 + slot * i + slot / 2;
+      const h = v * (Y0 - Ytop);
+      return { x: (cx - bw / 2).toFixed(1), y: (Y0 - h).toFixed(1), w: bw.toFixed(1), h: h.toFixed(1), cx: cx.toFixed(1), label: "G" + i };
+    });
+
+    const steps = [
+      { n: "01 VARIATION", name: "Bugs differ", desc: "By chance, a few bacteria carry mutations that make them resistant." },
+      { n: "02 PRESSURE", name: "Antibiotic hits", desc: "The drug is a selection pressure — susceptible bacteria die." },
+      { n: "03 SURVIVAL", name: "Resistant survive", desc: "Only the resistant ones live to reproduce." },
+      { n: "04 INHERITANCE", name: "Passed on", desc: "Offspring inherit resistance, so the next generation is more resistant." },
+    ];
+
+    const evidence = [
+      { name: "Fossils", bg: "#fff", desc: "The fossil record shows how organisms have changed gradually over millions of years." },
+      { name: "Antibiotic resistance", bg: "#fdeee7", desc: "Resistant bacteria evolve within years — evolution we can measure right now." },
+      { name: "DNA & genetics", bg: "#fff", desc: "Species that share more DNA are more closely related — a family tree written in genes." },
+    ];
+
+    return {
+      gen: this.state.gen, bugs, meanPct, stats, simMsg,
+      onStep: () => this.step(), stepLabel: this.state.gen === 0 ? "GIVE ANTIBIOTIC ▶" : "DOSE AGAIN ▶ (GEN " + (this.state.gen + 1) + ")",
+      onReset: () => this.reset(),
+      bars, steps, evidence,
+    };
+  }
+}
+</script>
+</body>
+</html>

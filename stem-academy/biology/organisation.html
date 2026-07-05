@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Organisation">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / ORGANISATION</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// TISSUES, ORGANS &amp; ENZYMES — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Cells organise into systems — enzymes make them work</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 800px;">Life is built in layers: cells → tissues → organs → organ systems. And almost every reaction inside them is sped up by an <strong>enzyme</strong> — a protein with a precisely shaped <strong>active site</strong>. Run the enzyme bench below to see the lock-and-key fit, and what happens when you heat it too far or change the pH.</div>
+  </div>
+
+  <!-- ENZYME BENCH -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; align-items: stretch;">
+
+    <!-- animation stage -->
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — LOCK-AND-KEY: {{ enzName }}</div>
+      <div style="position: relative; width: 100%; flex: 1; min-height: 300px; background: {{ stageBg }}; border: 1.5px solid #e6dfd2;">
+        <svg viewBox="0 0 480 320" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          <!-- enzyme body with notch (active site) -->
+          <path d="{{ enzShape }}" fill="{{ enzFill }}" stroke="#2b2620" stroke-width="2.5"></path>
+          <text x="120" y="250" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#2b2620">enzyme</text>
+          <text x="120" y="266" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">active site ▲</text>
+          <!-- substrate (or products after reaction) -->
+          <sc-for list="{{ pieces }}" as="p" hint-placeholder-count="1">
+            <g transform="translate({{ p.x }} {{ p.y }})">
+              <path d="{{ p.shape }}" fill="{{ p.fill }}" stroke="#2b2620" stroke-width="2.5"></path>
+            </g>
+          </sc-for>
+          <text x="{{ subLabelX }}" y="60" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#2b2620">{{ subLabel }}</text>
+          <!-- status flash -->
+          <text x="240" y="300" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="{{ phaseColor }}">{{ phaseText }}</text>
+        </svg>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #6a8ec9; border: 1.5px solid #2b2620; display: inline-block;"></span>enzyme</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #e8590c; border: 1.5px solid #2b2620; display: inline-block;"></span>substrate</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #fcc419; border: 1.5px solid #2b2620; display: inline-block;"></span>products</span>
+      </div>
+    </div>
+
+    <!-- controls -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px;">Enzyme conditions</div>
+      </div>
+      <div style="padding: 12px 18px; display: flex; gap: 6px; border-bottom: 1.5px solid #574f45; flex-wrap: wrap;">
+        <sc-for list="{{ enzTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; padding: 8px 11px; border: 1.5px solid #e8590c; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}; min-height: 38px; box-sizing: border-box; display: flex; align-items: center;">{{ t.label }}</div>
+        </sc-for>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 18px; flex: 1;">
+        <div style="display: flex; flex-direction: column; gap: 7px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+            <span>TEMPERATURE</span><span style="color: #fcc419; font-weight: 600;">{{ temp }} °C</span>
+          </div>
+          <input type="range" min="0" max="80" step="1" value="{{ temp }}" onInput="{{ onTemp }}" style="width: 100%; accent-color: #e8590c; height: 24px;">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 7px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+            <span>pH</span><span style="color: #fcc419; font-weight: 600;">{{ ph }}</span>
+          </div>
+          <input type="range" min="1" max="14" step="1" value="{{ ph }}" onInput="{{ onPh }}" style="width: 100%; accent-color: #e8590c; height: 24px;">
+        </div>
+        <div style="border: 1.5px solid #574f45; padding: 12px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e;">ENZYME ACTIVITY</div>
+          <div style="height: 14px; border: 1.5px solid #faf6ef; position: relative; background: #1f1b16;">
+            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{ activityPct }}%; background: {{ activityColor }};"></div>
+          </div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: {{ activityColor }};">{{ activityLabel }}</div>
+        </div>
+        <div style="margin-top: auto; font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #e7ddcd;">{{ condMsg }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- enzyme activity graph -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 01 — HOW {{ enzName }} ACTIVITY CHANGES WITH TEMPERATURE</div>
+      <svg viewBox="0 0 620 250" style="width: 100%; height: auto;">
+        <line x1="60" y1="210" x2="600" y2="210" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="60" y1="210" x2="60" y2="20" stroke="#2b2620" stroke-width="2"></line>
+        <path d="{{ tempCurve }}" fill="none" stroke="#e8590c" stroke-width="3"></path>
+        <line x1="{{ optX }}" y1="210" x2="{{ optX }}" y2="30" stroke="#2f7d3a" stroke-width="1.5" stroke-dasharray="4 3"></line>
+        <text x="{{ optX }}" y="24" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" font-weight="600" fill="#2f7d3a">optimum {{ optTemp }}°C</text>
+        <line x1="{{ tX }}" y1="210" x2="{{ tX }}" y2="{{ tY }}" stroke="#2a6fb0" stroke-width="1.5" stroke-dasharray="4 3"></line>
+        <circle cx="{{ tX }}" cy="{{ tY }}" r="6" fill="#2a6fb0" stroke="#fff" stroke-width="2"></circle>
+        <text x="330" y="242" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620">Temperature (°C)</text>
+        <text x="20" y="115" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620" transform="rotate(-90 20 115)">Rate of reaction (relative)</text>
+        <text x="60" y="226" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">0</text>
+        <text x="600" y="226" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">80</text>
+      </svg>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">Activity rises with temperature (more collisions) up to the <strong>optimum</strong>, then falls off a cliff: past ~40 °C the enzyme's active site changes shape — it <strong>denatures</strong> — and the substrate no longer fits. Denaturing is permanent.</div>
+    </div>
+  </div>
+
+  <!-- levels of organisation ladder -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 02 — LEVELS OF ORGANISATION</div>
+    <div style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap;">
+      <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="5">
+        <div style="flex: 1; min-width: 150px; border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c;">{{ lv.step }}</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ lv.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.45; color: #554c42;">{{ lv.what }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156; margin-top: auto; padding-top: 6px;">e.g. {{ lv.eg }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- digestive enzymes table -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// TABLE 01 — THE DIGESTIVE ENZYMES</div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); overflow: hidden;">
+      <div style="display: grid; grid-template-columns: 1fr 1.2fr 1.2fr; background: #2b2620; color: #faf6ef; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;">
+        <div style="padding: 11px 14px;">ENZYME</div>
+        <div style="padding: 11px 14px; border-left: 1px solid #574f45;">BREAKS DOWN</div>
+        <div style="padding: 11px 14px; border-left: 1px solid #574f45;">INTO</div>
+      </div>
+      <sc-for list="{{ enzRows }}" as="r" hint-placeholder-count="3">
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr 1.2fr; border-top: 1px solid #e6dfd2; font-family: 'Space Grotesk', sans-serif; font-size: 13.5px;">
+          <div style="padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">{{ r.enz }}</div>
+          <div style="padding: 11px 14px; border-left: 1px solid #e6dfd2;">{{ r.from }}</div>
+          <div style="padding: 11px 14px; border-left: 1px solid #e6dfd2;">{{ r.to }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Enzyme" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Enzyme ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Biological_organisation" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Biological organisation ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/subjects/zs6hvcw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Science (organisation &amp; enzymes) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="infection.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Infection &amp; response (L3) →</a>
+    <a href="homeostasis.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Then: Homeostasis &amp; response (L3) →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">← Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / ORGANISATION</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  ENZYMES = {
+    amylase: { name: "AMYLASE", optTemp: 37, optPh: 7, phTol: 2.4, subLabel: "starch", prodLabel: "sugars" },
+    pepsin:  { name: "PEPSIN",  optTemp: 37, optPh: 2, phTol: 2.0, subLabel: "protein", prodLabel: "amino acids" },
+  };
+
+  state = { enz: "amylase", temp: 37, ph: 7, phase: 0, completed: false, seen: {} };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("organisation");
+    this._t = setInterval(() => {
+      this.setState(s => ({ phase: (s.phase + 1) % 240 }));
+    }, 40);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  activity(enz, temp, ph) {
+    const E = this.ENZYMES[enz];
+    // temperature response: rise to optimum, denature above
+    let tF;
+    if (temp <= E.optTemp) tF = temp / E.optTemp;
+    else tF = Math.max(0, 1 - (temp - E.optTemp) / 12); // sharp denature
+    // pH response: bell around optimum
+    const dp = (ph - E.optPh) / E.phTol;
+    const pF = Math.max(0, Math.exp(-dp * dp));
+    return Math.max(0, tF * pF); // 0..1
+  }
+
+  renderVals() {
+    const { enz, temp, ph, phase } = this.state;
+    const E = this.ENZYMES[enz];
+    const act = this.activity(enz, temp, ph);
+    const denatured = temp > E.optTemp + 8;
+
+    // completion: try both enzymes at reasonable activity
+    if (act > 0.6 && window.Progress) {
+      const seen = { ...this.state.seen, [enz]: true };
+      if (!this.state.seen[enz]) this.setState({ seen });
+      if (Object.keys(seen).length >= 2 && !this.state.completed) {
+        this.setState({ completed: true });
+        window.Progress.markCompleted("organisation", { via: "enzyme-bench" });
+      }
+    }
+
+    const enzTabs = Object.keys(this.ENZYMES).map(k => ({
+      label: this.ENZYMES[k].name,
+      bg: enz === k ? "#e8590c" : "transparent",
+      fg: enz === k ? "#faf6ef" : "#fcc419",
+      onClick: () => this.setState({ enz: k }),
+    }));
+
+    // enzyme shape: rounded blob with a V-notch active site at top-right; distorted if denatured
+    const notch = denatured
+      ? "M 60 220 Q 40 140 100 110 L 155 130 L 175 95 L 205 135 L 250 130 Q 300 150 275 220 Q 260 270 180 265 Q 90 270 60 220 Z"
+      : "M 60 220 Q 40 140 100 110 L 150 110 L 168 90 L 190 110 L 250 110 Q 300 140 275 220 Q 260 270 180 265 Q 90 270 60 220 Z";
+    const enzFill = denatured ? "#9aa7bd" : "#6a8ec9";
+
+    // substrate animation: slides in from right, sits in the site, then splits into two products
+    // cycle: 0-80 approach, 80-150 bound, 150-240 products drift away
+    let pieces = [], phaseText = "", phaseColor = "#6b6156", subLabel = E.subLabel, subLabelX = 300;
+    if (act < 0.12) {
+      // no reaction — substrate bounces off
+      const t = phase / 240;
+      const bx = 400 - Math.abs(Math.sin(t * Math.PI * 2)) * 120;
+      pieces = [{ x: bx, y: 90, fill: "#e8590c", shape: "M -22 0 L 22 0 L 22 20 L 6 20 L 0 6 L -6 20 L -22 20 Z" }];
+      phaseText = denatured ? "DENATURED — substrate no longer fits the active site" : "Too far from optimum — little or no reaction";
+      phaseColor = "#c0392b";
+      subLabelX = bx;
+    } else if (phase < 80) {
+      const p = phase / 80;
+      const bx = 400 - p * 232; // slide to x=168 area
+      pieces = [{ x: bx, y: 90, fill: "#e8590c", shape: "M -22 0 L 22 0 L 22 20 L 6 20 L 0 6 L -6 20 L -22 20 Z" }];
+      phaseText = "Substrate approaches the active site";
+      phaseColor = "#2b2620";
+      subLabelX = bx;
+    } else if (phase < 150) {
+      pieces = [{ x: 168, y: 90, fill: "#e8590c", shape: "M -22 0 L 22 0 L 22 20 L 6 20 L 0 6 L -6 20 L -22 20 Z" }];
+      phaseText = "Enzyme–substrate complex — the reaction happens";
+      phaseColor = "#2f7d3a";
+      subLabel = E.subLabel + " (bound)"; subLabelX = 168;
+    } else {
+      const p = (phase - 150) / 90;
+      pieces = [
+        { x: 168 - p * 90, y: 70 - p * 20, fill: "#fcc419", shape: "M -14 0 L 14 0 L 14 18 L 0 10 L -14 18 Z" },
+        { x: 168 + p * 90, y: 70 - p * 20, fill: "#fcc419", shape: "M -14 0 L 14 0 L 14 18 L 0 10 L -14 18 Z" },
+      ];
+      phaseText = "Products released — " + E.prodLabel + " drift away, enzyme is reused";
+      phaseColor = "#2f7d3a";
+      subLabel = E.prodLabel; subLabelX = 240;
+    }
+
+    // activity bar + label
+    const activityPct = Math.round(act * 100);
+    let activityLabel, activityColor, condMsg;
+    if (act > 0.75) { activityLabel = "HIGH — near optimum"; activityColor = "#8ce99a"; condMsg = "Great conditions: near this enzyme's optimum temperature and pH, so it works fast."; }
+    else if (act > 0.35) { activityLabel = "MODERATE"; activityColor = "#fcc419"; condMsg = "Working, but not at its best. Nudge the temperature and pH toward the optimum."; }
+    else if (denatured) { activityLabel = "DENATURED"; activityColor = "#ff8f6b"; condMsg = "Too hot — the active site has permanently changed shape. Cooling it back down will NOT fix it."; }
+    else { activityLabel = "VERY LOW"; activityColor = "#ff8f6b"; condMsg = act < 0.05 ? "Far from optimum — barely any reaction. Adjust the conditions." : "The conditions are wrong for this enzyme — activity is low."; }
+
+    const stageBg = denatured ? "#fbe9e2" : "#f3f7fc";
+
+    // temperature curve for graph (at current pH)
+    const X0 = 60, X1 = 600, Y0 = 210, Ytop = 30;
+    let tempCurve = "";
+    for (let T = 0; T <= 80; T += 2) {
+      const a = this.activity(enz, T, ph);
+      const px = X0 + (T / 80) * (X1 - X0);
+      const py = Y0 - a * (Y0 - Ytop);
+      tempCurve += (T === 0 ? "M " : "L ") + px.toFixed(1) + " " + py.toFixed(1) + " ";
+    }
+    const optX = X0 + (E.optTemp / 80) * (X1 - X0);
+    const tX = X0 + (temp / 80) * (X1 - X0);
+    const tY = Y0 - act * (Y0 - Ytop);
+
+    const levels = [
+      { step: "01", name: "Cell", what: "Smallest unit of life.", eg: "a gland cell" },
+      { step: "02", name: "Tissue", what: "Similar cells working together.", eg: "muscle tissue" },
+      { step: "03", name: "Organ", what: "Tissues forming one structure.", eg: "the stomach" },
+      { step: "04", name: "Organ system", what: "Organs on one big job.", eg: "digestive system" },
+      { step: "05", name: "Organism", what: "All systems, one living thing.", eg: "a human" },
+    ];
+
+    const enzRows = [
+      { enz: "Amylase", from: "Starch (carbohydrate)", to: "Simple sugars (maltose)" },
+      { enz: "Protease", from: "Proteins", to: "Amino acids" },
+      { enz: "Lipase", from: "Fats (lipids)", to: "Fatty acids + glycerol" },
+    ];
+
+    return {
+      enzName: E.name, enzTabs,
+      enzShape: notch, enzFill,
+      pieces, phaseText, phaseColor, subLabel, subLabelX,
+      temp, ph, onTemp: e => this.setState({ temp: +e.target.value }), onPh: e => this.setState({ ph: +e.target.value }),
+      activityPct, activityLabel, activityColor, condMsg,
+      stageBg,
+      tempCurve, optX, optTemp: E.optTemp, tX, tY,
+      levels, enzRows,
+    };
+  }
+}
+</script>
+</body>
+</html>

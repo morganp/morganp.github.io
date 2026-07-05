@@ -174,6 +174,12 @@
     "reproduction": { label: "Reproduction Basics", level: "L2" },
     "evolution-intro": { label: "Evolution Intro", level: "L2" },
     "body-systems": { label: "Body Systems", level: "L2" },
+    "bioenergetics": { label: "Bioenergetics", level: "L3" },
+    "organisation": { label: "Organisation & Enzymes", level: "L3" },
+    "infection": { label: "Infection & Response", level: "L3" },
+    "homeostasis": { label: "Homeostasis & Response", level: "L3" },
+    "natural-selection": { label: "Evolution & Natural Selection", level: "L3" },
+    "ecology": { label: "Ecology", level: "L3" },
   };
 
   const Progress = {

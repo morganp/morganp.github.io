@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Ecology">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / ECOLOGY</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// LIFE IN BALANCE — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Populations rise and fall together</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 800px;">An ecosystem is a web of living things and their environment, all connected. Run the meadow below and watch predators and prey chase each other up and down — then learn how ecologists actually count wild populations with a quadrat.</div>
+  </div>
+
+  <!-- PREDATOR-PREY SIM -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px; display: grid; grid-template-columns: 1fr 0.72fr; gap: 20px; align-items: stretch;">
+
+    <!-- meadow -->
+    <div style="border: 2px solid #2b2620; background: #eef6e6; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE MEADOW (RABBITS &amp; FOXES)</div>
+      <div style="position: relative; width: 100%; flex: 1; min-height: 260px; border: 1.5px solid #b7cba0; background: #f4faed;">
+        <svg viewBox="0 0 400 280" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          <sc-for list="{{ rabbitDots }}" as="d" hint-placeholder-count="30">
+            <circle cx="{{ d.x }}" cy="{{ d.y }}" r="4.5" fill="#e8590c" stroke="#2b2620" stroke-width="1"></circle>
+          </sc-for>
+          <sc-for list="{{ foxDots }}" as="d" hint-placeholder-count="10">
+            <rect x="{{ d.x }}" y="{{ d.y }}" width="9" height="9" fill="#2b2620" stroke="#000" stroke-width="1"></rect>
+          </sc-for>
+        </svg>
+      </div>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #e8590c; border: 1px solid #2b2620; display: inline-block;"></span>rabbit (prey) — each dot ≈ {{ perRabbit }}</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #2b2620; display: inline-block;"></span>fox (predator) — each ≈ {{ perFox }}</span>
+      </div>
+    </div>
+
+    <!-- controls -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 14px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #e8590c; display: inline-block;"></span>RABBITS</span>
+          <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: #e8590c;">{{ rabbitN }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="width: 10px; height: 10px; background: #fcc419; display: inline-block;"></span>FOXES</span>
+          <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: #fcc419;">{{ foxN }}</span>
+        </div>
+      </div>
+      <div style="padding: 14px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+          <span>PREDATION RATE</span><span style="color: #fcc419; font-weight: 600;">{{ effLabel }}</span>
+        </div>
+        <input type="range" min="8" max="28" step="1" value="{{ effRaw }}" onInput="{{ onEff }}" style="width: 100%; accent-color: #e8590c; height: 24px;">
+      </div>
+      <div style="padding: 14px 18px; display: flex; gap: 8px; flex: 1; align-items: flex-start;">
+        <div onClick="{{ onPlay }}" style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 13px; border: 2px solid #e8590c; background: #e8590c; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">{{ playLabel }}</div>
+        <div onClick="{{ onResetSim }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 13px 16px; border: 2px solid #faf6ef; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">RESET</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- population cycles graph -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 01 — PREDATOR &amp; PREY POPULATIONS OVER TIME</div>
+        <div style="display: flex; gap: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">
+          <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 16px; height: 3px; background: #e8590c; display: inline-block;"></span>rabbits</span>
+          <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 16px; height: 3px; background: #2a6fb0; display: inline-block;"></span>foxes</span>
+        </div>
+      </div>
+      <svg viewBox="0 0 620 240" style="width: 100%; height: auto;">
+        <line x1="55" y1="205" x2="600" y2="205" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="55" y1="205" x2="55" y2="18" stroke="#2b2620" stroke-width="2"></line>
+        <path d="{{ preyLine }}" fill="none" stroke="#e8590c" stroke-width="2.5"></path>
+        <path d="{{ predLine }}" fill="none" stroke="#2a6fb0" stroke-width="2.5"></path>
+        <text x="327" y="232" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620">Time (months)</text>
+        <text x="16" y="112" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620" transform="rotate(-90 16 112)">Number of animals</text>
+        <text x="48" y="24" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">{{ yMax }}</text>
+        <text x="48" y="208" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">0</text>
+      </svg>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">Notice the foxes' peak always comes <strong>just after</strong> the rabbits' peak: more rabbits → foxes have lots to eat → foxes increase → rabbits get eaten → rabbits crash → foxes starve → rabbits recover. The two cycles are locked together, slightly out of step.</div>
+    </div>
+  </div>
+
+  <!-- QUADRAT SAMPLING -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.8fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — QUADRAT SAMPLING: ESTIMATE A POPULATION</div>
+      <div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; aspect-ratio: 1;">
+        <sc-for list="{{ fieldCells }}" as="c" hint-placeholder-count="100">
+          <div style="aspect-ratio: 1; background: {{ c.bg }}; border: 1px solid {{ c.border }}; display: grid; place-items: center; font-size: 11px;">{{ c.mark }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">Green square = quadrat sampled · 🌼 = a daisy · field = 100 squares of 1 m²</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 20px;">Estimate the daisies</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #a89d8e; line-height: 1.4; margin-top: 4px;">Counting all 100 m² takes forever. Sample a few random 1 m² quadrats and scale up.</div>
+      </div>
+      <div style="padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1.5px solid #574f45;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: #e7ddcd;">SAMPLES TAKEN</span><span style="color: #fcc419; font-weight: 600;">{{ samplesN }}</span></div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: #e7ddcd;">MEAN PER m²</span><span style="color: #fcc419; font-weight: 600;">{{ meanDensity }}</span></div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: #e7ddcd;">ESTIMATE (× 100 m²)</span><span style="color: #8ce99a; font-weight: 700; font-size: 15px;">{{ estimate }}</span></div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: #e7ddcd;">TRUE TOTAL</span><span style="color: {{ trueColor }}; font-weight: 600;">{{ trueTotalDisplay }}</span></div>
+      </div>
+      <div style="padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1;">
+        <div onClick="{{ onSample }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 14px; border: 2px solid #e8590c; background: #e8590c; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">PLACE A RANDOM QUADRAT ▶</div>
+        <div onClick="{{ onRevealTrue }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 11px; border: 2px solid #faf6ef; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">REVEAL TRUE COUNT</div>
+        <div style="margin-top: auto; font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #e7ddcd;">{{ sampleMsg }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- carbon cycle -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 03 — THE CARBON CYCLE</div>
+    <div style="display: flex; gap: 6px; align-items: stretch; flex-wrap: wrap;">
+      <sc-for list="{{ carbon }}" as="c" hint-placeholder-count="4">
+        <div style="flex: 1; min-width: 150px; border: 2px solid #2b2620; background: {{ c.bg }}; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; color: #2f7d3a;">{{ c.tag }}</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px;">{{ c.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.4; color: #554c42;">{{ c.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Carbon cycles endlessly between air, living things and the ground. <strong>Biodiversity</strong> — the variety of species — makes an ecosystem more stable: the more connections in the web, the better it copes when one species struggles.</div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Predator–prey (Lotka–Volterra) ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Ecosystem" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Ecosystem ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/subjects/zs6hvcw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Science (ecology) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">KEEP EXPLORING</span>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Explore the Biology map →</a>
+    <a href="food-webs.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Revisit: Ecosystems &amp; Food Webs (L2–L3) →</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / ECOLOGY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    R: 180, F: 45, eff: 0.0016, running: false,
+    history: [],
+    // quadrat
+    field: [], samples: [], revealTrue: false, completed: false,
+  };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("ecology");
+    // fixed dot positions
+    this._rPos = Array.from({ length: 60 }, () => ({ x: (14 + Math.random() * 372).toFixed(1), y: (14 + Math.random() * 252).toFixed(1) }));
+    this._fPos = Array.from({ length: 30 }, () => ({ x: (12 + Math.random() * 376).toFixed(1), y: (12 + Math.random() * 256).toFixed(1) }));
+    // field: 100 cells, ~26 daisies in a clumped pattern
+    const field = [];
+    for (let i = 0; i < 100; i++) {
+      const r = Math.floor(i / 10), c = i % 10;
+      // clumps toward a couple of centres
+      const d1 = Math.hypot(r - 3, c - 2), d2 = Math.hypot(r - 7, c - 7);
+      const p = Math.max(0, 0.75 - Math.min(d1, d2) * 0.16);
+      field.push({ daisy: Math.random() < p });
+    }
+    this.setState({ field });
+    this._t = setInterval(() => this.tick(), 120);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  tick() {
+    if (!this.state.running) return;
+    let { R, F, eff } = this.state;
+    const a = 0.11, c = 0.00035, d = 0.10;
+    for (let k = 0; k < 3; k++) {
+      const dt = 0.16;
+      const dR = (a * R - eff * R * F) * dt;
+      const dF = (c * R * F - d * F) * dt;
+      R = Math.max(0, Math.min(720, R + dR));
+      F = Math.max(0, Math.min(400, F + dF));
+    }
+    const history = [...this.state.history, { R, F }].slice(-260);
+    this.setState({ R, F, history });
+  }
+
+  sample() {
+    // random 1x1 quadrat over the 100-cell field (GCSE: count in quadrat = density per m²)
+    const idx = Math.floor(Math.random() * 100);
+    const count = this.state.field[idx].daisy ? 1 : 0;
+    const samples = [...this.state.samples, { idx, count }];
+    if (samples.length >= 3 && !this.state.completed && window.Progress) {
+      this.setState({ completed: true });
+      window.Progress.markCompleted("ecology", { via: "quadrat-sampling" });
+    }
+    this.setState({ samples });
+  }
+
+  renderVals() {
+    const { R, F } = this.state;
+    const perRabbit = 8, perFox = 3;
+    const nR = Math.min(60, Math.round(R / perRabbit));
+    const nF = Math.min(30, Math.round(F / perFox));
+    const rabbitDots = this._rPos ? this._rPos.slice(0, nR) : [];
+    const foxDots = this._fPos ? this._fPos.slice(0, nF) : [];
+
+    // graph
+    const X0 = 55, X1 = 600, Y0 = 205, Ytop = 20;
+    const hist = this.state.history;
+    let yMax = 100;
+    hist.forEach(h => { yMax = Math.max(yMax, h.R, h.F); });
+    yMax = Math.ceil(yMax / 100) * 100;
+    const span = Math.max(60, hist.length);
+    const line = key => {
+      let p = "";
+      hist.forEach((h, i) => {
+        const px = X0 + (i / (span - 1)) * (X1 - X0);
+        const py = Y0 - (h[key] / yMax) * (Y0 - Ytop);
+        p += (i === 0 ? "M " : "L ") + px.toFixed(1) + " " + py.toFixed(1) + " ";
+      });
+      return p;
+    };
+
+    // quadrat field render
+    const sampledIdx = new Set(this.state.samples.map(s => s.idx));
+    const fieldCells = this.state.field.map((c, i) => ({
+      bg: sampledIdx.has(i) ? "#cde6b8" : "#f4faed",
+      border: sampledIdx.has(i) ? "#2f7d3a" : "#dfeacd",
+      mark: c.daisy ? "🌼" : "",
+    }));
+    const samplesN = this.state.samples.length;
+    const totalCount = this.state.samples.reduce((s, x) => s + x.count, 0);
+    const meanDensity = samplesN ? (totalCount / samplesN) : 0;
+    const estimate = samplesN ? Math.round(meanDensity * 100) : "—";
+    const trueTotal = this.state.field.filter(c => c.daisy).length;
+
+    let sampleMsg;
+    if (samplesN === 0) sampleMsg = "Place your first quadrat to start estimating.";
+    else if (samplesN < 3) sampleMsg = "Keep sampling — more quadrats give a more reliable mean.";
+    else if (!this.state.revealTrue) sampleMsg = "Good — with " + samplesN + " samples your estimate is " + estimate + ". Reveal the true count to check.";
+    else sampleMsg = Math.abs(estimate - trueTotal) <= 10 ? "Close! Random sampling gives a good estimate without counting everything." : "A bit off — the daisies are clumped, so more (or larger) quadrats would help.";
+
+    const carbon = [
+      { tag: "OUT OF AIR", name: "Photosynthesis", bg: "#eef7ee", desc: "Plants take CO₂ from the air and lock carbon into glucose." },
+      { tag: "ALONG THE WEB", name: "Feeding", bg: "#fff", desc: "Animals eat plants (and each other), moving carbon through the food chain." },
+      { tag: "BACK TO AIR", name: "Respiration", bg: "#fdeee7", desc: "All living things respire, releasing CO₂ back into the air." },
+      { tag: "RECYCLED", name: "Decay & combustion", bg: "#fff", desc: "Decomposers and burning fuels return the rest of the carbon to the air." },
+    ];
+
+    return {
+      rabbitDots, foxDots, perRabbit, perFox,
+      rabbitN: Math.round(R), foxN: Math.round(F),
+      effRaw: Math.round(this.state.eff * 10000), effLabel: (this.state.eff * 1000).toFixed(1),
+      onEff: e => this.setState({ eff: +e.target.value / 10000 }),
+      onPlay: () => this.setState(s => ({ running: !s.running })), playLabel: this.state.running ? "❚❚ PAUSE" : "▶ PLAY",
+      onResetSim: () => this.setState({ R: 180, F: 45, history: [], running: false }),
+      preyLine: line("R"), predLine: line("F"), yMax,
+      fieldCells, samplesN, meanDensity: meanDensity.toFixed(2), estimate,
+      trueTotalDisplay: this.state.revealTrue ? trueTotal : "hidden",
+      trueColor: this.state.revealTrue ? "#8ce99a" : "#a89d8e",
+      onSample: () => this.sample(), onRevealTrue: () => this.setState({ revealTrue: true }),
+      sampleMsg, carbon,
+    };
+  }
+}
+</script>
+</body>
+</html>

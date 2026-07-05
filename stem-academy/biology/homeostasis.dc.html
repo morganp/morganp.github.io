@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Homeostasis">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / HOMEOSTASIS</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// KEEPING THE INSIDE STEADY — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Your body holds itself steady with negative feedback</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 800px;">Homeostasis keeps conditions inside you — temperature, water, blood sugar — within a narrow safe range, whatever the outside world does. Drag the weather from freezing to scorching and watch the body fight to hold <strong>37 °C</strong>. Then switch the control off and see what happens.</div>
+  </div>
+
+  <!-- THERMOSTAT SIM -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px; display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 20px; align-items: stretch;">
+
+    <!-- body state -->
+    <div style="border: 2px solid #2b2620; background: {{ bodyBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — CORE BODY TEMPERATURE</div>
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">SET POINT 37.0 °C</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 62px; line-height: 1; color: {{ coreColor }};">{{ coreTemp }}°</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 5px 12px; border: 1.5px solid #2b2620; background: {{ statusBg }}; color: {{ statusFg }};">{{ statusLabel }}</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1.5px solid #e6dfd2; padding-top: 12px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">BODY'S RESPONSE RIGHT NOW</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; line-height: 1.4; color: #2b2620;">{{ response }}</div>
+      </div>
+    </div>
+
+    <!-- controls + loop diagram -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+          <span>OUTSIDE TEMPERATURE</span><span style="color: #fcc419; font-weight: 600;">{{ env }} °C</span>
+        </div>
+        <input type="range" min="-10" max="45" step="1" value="{{ env }}" onInput="{{ onEnv }}" style="width: 100%; accent-color: #e8590c; height: 24px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #a89d8e;"><span>freezing</span><span>comfortable</span><span>scorching</span></div>
+      </div>
+      <div style="padding: 14px 18px; border-bottom: 1.5px solid #574f45; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">HOMEOSTASIS CONTROL</span>
+        <div onClick="{{ onToggle }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 9px 16px; border: 1.5px solid {{ toggleBorder }}; background: {{ toggleBg }}; color: {{ toggleFg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ toggleLabel }}</div>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e;">THE NEGATIVE-FEEDBACK LOOP</div>
+        <sc-for list="{{ loop }}" as="l" hint-placeholder-count="4">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 24px; height: 24px; border: 1.5px solid #e8590c; color: #fcc419; display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; flex-shrink: 0;">{{ l.n }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.35; color: #e7ddcd;">{{ l.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- temperature graph -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 01 — CORE TEMPERATURE OVER TIME</div>
+      <svg viewBox="0 0 620 220" style="width: 100%; height: auto;">
+        <!-- danger bands -->
+        <rect x="55" y="18" width="545" height="{{ hotBandH }}" fill="rgba(232,89,12,0.08)"></rect>
+        <rect x="55" y="{{ coldBandY }}" width="545" height="{{ coldBandH }}" fill="rgba(42,111,176,0.08)"></rect>
+        <line x1="55" y1="185" x2="600" y2="185" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="55" y1="185" x2="55" y2="18" stroke="#2b2620" stroke-width="2"></line>
+        <!-- set point 37 -->
+        <line x1="55" y1="{{ setY }}" x2="600" y2="{{ setY }}" stroke="#2f7d3a" stroke-width="1.5" stroke-dasharray="5 4"></line>
+        <text x="596" y="{{ setLabelY }}" text-anchor="end" font-family="IBM Plex Mono" font-size="9" font-weight="600" fill="#2f7d3a">set point 37 °C</text>
+        <path d="{{ tempLine }}" fill="none" stroke="#e8590c" stroke-width="2.5"></path>
+        <text x="327" y="212" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620">Time (seconds)</text>
+        <text x="16" y="102" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620" transform="rotate(-90 16 102)">Core temperature (°C)</text>
+        <text x="48" y="{{ setY }}" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">37</text>
+        <text x="48" y="30" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">42</text>
+        <text x="48" y="183" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">32</text>
+      </svg>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">With control <strong>ON</strong>, the line clings to 37 °C no matter how extreme the weather — that's negative feedback correcting any drift. Switch it <strong>OFF</strong> and core temperature slides toward the outside, into the danger bands. This is why extreme heat or cold is deadly.</div>
+    </div>
+  </div>
+
+  <!-- reflex arc -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 02 — THE REFLEX ARC (AUTOMATIC, NO THINKING NEEDED)</div>
+    <div style="display: flex; gap: 6px; align-items: stretch; flex-wrap: wrap;">
+      <sc-for list="{{ reflex }}" as="r" hint-placeholder-count="6">
+        <div style="flex: 1; min-width: 130px; border: 2px solid #2b2620; background: {{ r.bg }}; padding: 12px; display: flex; flex-direction: column; gap: 4px; position: relative;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; color: #e8590c;">{{ r.tag }}</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px;">{{ r.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12px; line-height: 1.4; color: #554c42;">{{ r.eg }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">A reflex skips the conscious brain, so it's fast and protective (e.g. pulling your hand off something hot). The relay neuron is in the <strong>spinal cord</strong>.</div>
+  </div>
+
+  <!-- blood glucose control -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 03 — HORMONES CONTROL BLOOD SUGAR</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div style="border: 2px solid #2b2620; background: #fdeee7; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #e8590c;">BLOOD SUGAR TOO HIGH ▲</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">Pancreas releases insulin</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.45; color: #554c42;">Insulin tells the liver and muscles to take glucose out of the blood and store it as glycogen. Blood sugar falls back to normal.</div>
+      </div>
+      <div style="border: 2px solid #2b2620; background: #dcecf7; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #2a6fb0;">BLOOD SUGAR TOO LOW ▼</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">Pancreas releases glucagon</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.45; color: #554c42;">Glucagon tells the liver to break glycogen back down into glucose and release it. Blood sugar rises back to normal.</div>
+      </div>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Same negative-feedback idea as temperature: a change is detected and reversed. In <strong>Type 1 diabetes</strong> the pancreas can't make insulin, so it must be injected.</div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Homeostasis" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Homeostasis ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Reflex_arc" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Reflex arc ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/subjects/zs6hvcw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Science (homeostasis) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="natural-selection.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Evolution &amp; natural selection (L3) →</a>
+    <a href="ecology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Then: Ecology (L3) →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">← Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / HOMEOSTASIS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { env: 22, core: 37, homeo: true, history: [], seenHot: false, seenCold: false, completed: false };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("homeostasis");
+    this._t = setInterval(() => this.tick(), 140);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  tick() {
+    this.setState(s => {
+      const target = s.homeo ? 37 + (s.env - 37) * 0.03 : s.env; // control holds ~37; off = drift to env
+      const core = s.core + (target - s.core) * 0.14;
+      const history = [...s.history, core].slice(-160);
+      return { core, history };
+    });
+  }
+
+  renderVals() {
+    const { env, core, homeo } = this.state;
+
+    // completion: experienced both extremes
+    let seenHot = this.state.seenHot || env >= 40;
+    let seenCold = this.state.seenCold || env <= 5;
+    if ((seenHot !== this.state.seenHot) || (seenCold !== this.state.seenCold)) this.setState({ seenHot, seenCold });
+    if (seenHot && seenCold && !this.state.completed && window.Progress) {
+      this.setState({ completed: true });
+      window.Progress.markCompleted("homeostasis", { via: "thermoregulation" });
+    }
+
+    const coreTemp = core.toFixed(1);
+    const safe = core >= 36.4 && core <= 37.6;
+    const coreColor = safe ? "#2f7d3a" : (core > 37.6 ? "#e8590c" : "#2a6fb0");
+
+    let statusLabel, statusBg, statusFg, response, bodyBg;
+    if (!homeo) {
+      statusLabel = core > 39 ? "OVERHEATING" : core < 35 ? "HYPOTHERMIA" : "NO CONTROL";
+      statusBg = "#2b2620"; statusFg = "#ff8f6b";
+      response = "Control is OFF — nothing is correcting the drift. Core temperature is following the environment toward a dangerous level.";
+      bodyBg = core > 39 || core < 35 ? "#fbe9e2" : "#fff";
+    } else if (env >= 30) {
+      statusLabel = "COOLING DOWN"; statusBg = "#fdeee7"; statusFg = "#e8590c";
+      response = "Too warm outside → you SWEAT (evaporation cools you) and blood vessels near the skin WIDEN (vasodilation) to lose heat.";
+      bodyBg = "#fff";
+    } else if (env <= 15) {
+      statusLabel = "WARMING UP"; statusBg = "#dcecf7"; statusFg = "#2a6fb0";
+      response = "Too cold outside → you SHIVER (muscles release heat) and skin blood vessels NARROW (vasoconstriction) to keep heat in.";
+      bodyBg = "#fff";
+    } else {
+      statusLabel = "COMFORTABLE"; statusBg = "#eef7ee"; statusFg = "#2f7d3a";
+      response = "Conditions are comfortable — only small adjustments are needed to stay at 37 °C.";
+      bodyBg = "#fff";
+    }
+
+    const loop = [
+      { n: "1", text: "RECEPTOR detects the change (skin & brain sense temperature)" },
+      { n: "2", text: "COORDINATION centre (the brain's hypothalamus) processes it" },
+      { n: "3", text: "EFFECTORS act (sweat glands, muscles, blood vessels)" },
+      { n: "4", text: "The change is REVERSED — back toward the set point" },
+    ];
+
+    // graph mapping: y 18(=42) .. 185(=32), 10 degrees over 167px
+    const tY = t => 18 + (42 - t) / (42 - 32) * (185 - 18);
+    const setY = tY(37);
+    const hist = this.state.history;
+    const span = Math.max(40, hist.length);
+    let tempLine = "";
+    hist.forEach((v, i) => {
+      const px = 55 + (i / (span - 1)) * (600 - 55);
+      const py = Math.max(18, Math.min(185, tY(v)));
+      tempLine += (i === 0 ? "M " : "L ") + px.toFixed(1) + " " + py.toFixed(1) + " ";
+    });
+    const hotBandH = tY(40) - 18;       // above 40 danger
+    const coldBandY = tY(35);           // below 35 danger
+    const coldBandH = 185 - coldBandY;
+
+    const reflex = [
+      { tag: "STIMULUS", name: "Sharp pain", eg: "Hand touches a hot pan", bg: "#fff" },
+      { tag: "RECEPTOR", name: "Skin receptor", eg: "Detects heat & pain", bg: "#fff" },
+      { tag: "SENSORY", name: "Sensory neuron", eg: "Carries signal to spinal cord", bg: "#fff" },
+      { tag: "RELAY", name: "Relay neuron", eg: "In the spinal cord — skips the brain", bg: "#eef7ee" },
+      { tag: "MOTOR", name: "Motor neuron", eg: "Carries signal to the muscle", bg: "#fff" },
+      { tag: "EFFECTOR", name: "Muscle acts", eg: "Hand pulls away — fast!", bg: "#fdeee7" },
+    ];
+
+    return {
+      env, onEnv: e => this.setState({ env: +e.target.value }),
+      onToggle: () => this.setState(s => ({ homeo: !s.homeo })),
+      toggleLabel: homeo ? "ON" : "OFF",
+      toggleBg: homeo ? "#2f7d3a" : "#e8590c", toggleFg: "#faf6ef", toggleBorder: homeo ? "#2f7d3a" : "#e8590c",
+      coreTemp, coreColor, statusLabel, statusBg, statusFg, response, bodyBg, loop,
+      tempLine, setY, setLabelY: setY - 4, hotBandH, coldBandY, coldBandH,
+      reflex,
+    };
+  }
+}
+</script>
+</body>
+</html>
