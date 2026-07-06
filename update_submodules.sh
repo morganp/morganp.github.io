@@ -47,20 +47,55 @@ if [ ${#selected[@]} -eq 0 ]; then
     exit 0
 fi
 
+committed=()
+dirty_inner=()
+
 for path in "${selected[@]}"; do
     echo
     echo "== Updating $path =="
     git submodule update --remote --init "$path"
 
+    if ! git -C "$path" status --porcelain | grep -q .; then
+        :
+    else
+        dirty_inner+=("$path")
+        echo "WARNING: $path has uncommitted/untracked content inside its own repo."
+        echo "         Commit (and push) that inside $path first, or it won't be captured by this bump."
+    fi
+
     if git diff --quiet -- "$path"; then
-        echo "No changes for $path."
+        echo "No pointer change for $path."
         continue
     fi
 
     git add "$path"
     git commit -m "Update $(basename "$path") submodule"
+    committed+=("$path")
     echo "Committed update for $path."
 done
 
 echo
-echo "Done. Review with 'git log' / 'git status' before pushing."
+echo "== Summary =="
+if [ ${#committed[@]} -eq 0 ]; then
+    echo "No submodule pointer commits made."
+else
+    echo "Committed pointer bumps for:"
+    for path in "${committed[@]}"; do
+        echo "  - $path"
+    done
+fi
+
+if [ ${#dirty_inner[@]} -gt 0 ]; then
+    echo
+    echo "Needs attention (uncommitted content inside submodule, not covered by pointer bump):"
+    for path in "${dirty_inner[@]}"; do
+        echo "  - $path"
+    done
+fi
+
+echo
+echo "Outstanding changes in this repo to push:"
+git status --short -- "${selected[@]}"
+
+echo
+echo "Review with 'git log' / 'git status' before pushing."
