@@ -1,5 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Engineering</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-06-03T00:00:00+01:00</updated><entry><title>SoC Article 10: The SoC design flow - From specification to silicon</title><link href="http://lizard-spock.co.uk/soc-article-10-design-flow.html" rel="alternate"></link><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/soc-article-10-design-flow.html</id><summary type="html">&lt;p&gt;A complete walkthrough of the SoC design flow, from specification and architecture through RTL coding, functional verification, synthesis, physical design, and sign-off to tape-out and fabrication.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 10 of 11&lt;/em&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Engineering</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-07-06T00:00:00+01:00</updated><entry><title>SoC Article 11: HW/SW co-design, bridging software and silicon</title><link href="http://lizard-spock.co.uk/soc-article-11-hw-sw-co-design.html" rel="alternate"></link><published>2026-07-06T00:00:00+01:00</published><updated>2026-07-06T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-07-06:/soc-article-11-hw-sw-co-design.html</id><summary type="html">&lt;p&gt;How hardware and software are designed together on a SoC: the boot process from reset to running OS, device drivers, the HW/SW partitioning decision, virtual platforms, and the RTOS vs Linux choice.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 11 of 11&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/hw-sw-co-design-HQ.png"&gt;&lt;img alt="HW/SW Co-Design header illustration" src="http://lizard-spock.co.uk/hw-sw-co-design-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Throughout this series, we have focused primarily on the hardware side of SoC design: the processors, memory, buses, and physical implementation. But a SoC without software is inert. The firmware that boots it, the operating system that manages its resources, the drivers that talk to its peripherals, and the applications that use it are just as important as the hardware itself.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;HW/SW Co-Design&lt;/strong&gt; is the discipline of designing hardware and software together, recognising that they are inseparable aspects of the same system. This article brings together the software side of the SoC story, covering the boot process, device drivers, the OS interface, and the co-design trade-offs that shape every product decision.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The HW/SW interface: where they meet&lt;/h2&gt;
+&lt;p&gt;Hardware and software communicate through a small number of well-defined mechanisms:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/hwsw-interface-HQ.png"&gt;&lt;img alt="HW/SW Interface Mechanisms diagram" src="http://lizard-spock.co.uk/hwsw-interface-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;Memory-Mapped Registers&lt;/h3&gt;
+&lt;p&gt;The primary interface between software and hardware on a SoC is &lt;strong&gt;memory-mapped I/O&lt;/strong&gt;: every hardware block exposes a set of control and status registers (CSRs) at fixed addresses in the physical address space.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;Typical&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;UART&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Register&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Map&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;base&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;address&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;0x4000&lt;/span&gt;&lt;span class="nx"&gt;_0000&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Offset&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Register&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Access&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Description&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;--------------------------------------------------------&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x00&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;THR&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;WO&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Transmit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Holding&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Register&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x00&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;RBR&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;RO&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Receive&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Buffer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Register&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x04&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;IER&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;RW&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Interrupt&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Register&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x08&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;IIR&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;RO&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Interrupt&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Identification&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x0C&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;LCR&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;RW&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Line&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Control&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;baud&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;parity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x10&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;MCR&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;RW&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Modem&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Control&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x14&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;LSR&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;RO&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Line&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Status&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;TX&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;ready&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;RX&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x18&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;MSR&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;RO&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Modem&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Status&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mh"&gt;0x1C&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;SCR&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nx"&gt;RW&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="nx"&gt;Scratch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;Register&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To send a byte over UART, firmware:
+1. Read LSR to check that the TX FIFO is not full.
+2. Write the byte to THR.
+3. Hardware takes over and drives the UART TX pin.&lt;/p&gt;
+&lt;p&gt;This read-modify-write register interface is the universal pattern for SoC firmware.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The Software Stack&lt;/h2&gt;
+&lt;p&gt;The software on a SoC is organised in layers, each depending on the layer below it:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/software-stack-HQ.png"&gt;&lt;img alt="Software stack layers diagram" src="http://lizard-spock.co.uk/software-stack-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The Boot Process&lt;/h2&gt;
+&lt;p&gt;Bringing a SoC from cold power-up to a running operating system is a multi-stage process, each stage loading and executing the next:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_819c53f62250209c99e94d71fd94ad95.svg"&gt;&lt;/p&gt;
+&lt;h3&gt;DDR initialisation: a hardware-SW co-design example&lt;/h3&gt;
+&lt;p&gt;One of the most hardware-specific firmware tasks is &lt;strong&gt;DDR initialisation&lt;/strong&gt;. Modern LPDDR5 DRAM requires a training sequence: a complex set of calibration steps that establishes the optimal timing relationships between the SoC and the DRAM:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_1fad7251bc2bc79150338cd35f537451.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The FSBL writes a sequence of magic values to the DDR controller and DRAM mode registers, then reads test patterns back to calibrate write and read timing. Only after this sequence completes successfully can the rest of the software stack use DRAM.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Device Drivers&lt;/h2&gt;
+&lt;p&gt;A &lt;strong&gt;device driver&lt;/strong&gt; is the software module responsible for managing a specific hardware peripheral. Drivers abstract the hardware details, presenting a clean, standardised interface to higher software layers.&lt;/p&gt;
+&lt;p&gt;In Linux, a character device driver for a simple UART might look like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cm"&gt;/* Simplified UART platform driver skeleton */&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;linux/platform_device.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;linux/serial_core.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;linux/io.h&amp;gt;&lt;/span&gt;
+
+&lt;span class="cp"&gt;#define UART_THR  0x00&lt;/span&gt;
+&lt;span class="cp"&gt;#define UART_LSR  0x14&lt;/span&gt;
+&lt;span class="cp"&gt;#define LSR_THRE  BIT(5)   &lt;/span&gt;&lt;span class="cm"&gt;/* TX holding register empty */&lt;/span&gt;
+
+&lt;span class="k"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;uart_write_char&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;uart_port&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;unsigned&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="cm"&gt;/* Wait until TX FIFO has space */&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;while&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;readl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;membase&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UART_LSR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;LSR_THRE&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;cpu_relax&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="cm"&gt;/* Write character to hardware register */&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;writel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;membase&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UART_THR&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;uart_probe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;platform_device&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;pdev&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;resource&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;__iomem&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="cm"&gt;/* Get MMIO base address from device tree */&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;platform_get_resource&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pdev&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;IORESOURCE_MEM&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;devm_ioremap_resource&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;pdev&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="cm"&gt;/* Register with Linux serial framework */&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="cm"&gt;/* ... uart_add_one_port() ... */&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;strong&gt;Device Tree&lt;/strong&gt; (DTS) is the mechanism by which Linux discovers what hardware is present without hard-coding it in the kernel:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cm"&gt;/* Device Tree fragment for a UART */&lt;/span&gt;
+&lt;span class="nl"&gt;uart0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;serial&lt;/span&gt;&lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="mi"&gt;40000000&lt;/span&gt;&lt;span class="cm"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kr"&gt;compatible&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;myvendor,uart-v1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kr"&gt;reg&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x40000000&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;0x100&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="cm"&gt;/* MMIO base, size */&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;interrupts&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="na"&gt;GIC_SPI&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;IRQ_TYPE_LEVEL_HIGH&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;clocks&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;amp;&lt;/span&gt;&lt;span class="na"&gt;clk_periph&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;clock-names&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;uartclk&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kr"&gt;status&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;okay&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;When Linux boots, it reads the Device Tree, matches &lt;code&gt;compatible&lt;/code&gt; strings to registered drivers, and calls the driver's &lt;code&gt;probe()&lt;/code&gt; function for each matching node.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;HW/SW Partitioning&lt;/h2&gt;
+&lt;p&gt;The most important architectural decision in co-design is &lt;strong&gt;which functions to implement in hardware and which in software&lt;/strong&gt;. This partitioning determines performance, power, flexibility, and development cost.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/hwsw-partitioning-HQ.png"&gt;&lt;img alt="HW/SW partitioning decision matrix" src="http://lizard-spock.co.uk/hwsw-partitioning-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;Real trade-off examples&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;AES Encryption:&lt;/strong&gt;
+- Software (Cortex-A, 1 core): ~300 MB/s, ~200 mW
+- Hardware accelerator: ~10 GB/s, ~5 mW
+- Decision: hardware, because encryption happens on every packet, latency is critical, and the algorithm is stable&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;JSON Parsing:&lt;/strong&gt;
+- Software (optimised C): ~500 MB/s
+- Hardware: would require custom finite-state machine; format evolves
+- Decision: software, because flexibility matters more than raw speed&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Video Decode (H.265):&lt;/strong&gt;
+- Software (4 CPU cores): ~720p@30fps, ~2 W
+- Hardware codec: ~8K@120fps, ~50 mW
+- Decision: always hardware in a mobile SoC&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Co-Simulation and Co-Verification&lt;/h2&gt;
+&lt;p&gt;HW/SW co-design requires testing both halves together before silicon exists. There are several approaches:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Virtual platform and virtual prototype&lt;/strong&gt;: a software model of the SoC, typically written in SystemC/Transaction-Level Modelling (TLM), that runs on a host workstation. The firmware binary is compiled for the target ISA and runs on an instruction-set simulator (ISS). This allows firmware development to begin before RTL is complete.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/virtual-platform-HQ.png"&gt;&lt;img alt="Virtual platform architecture diagram" src="http://lizard-spock.co.uk/virtual-platform-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;FPGA prototyping&lt;/strong&gt;: the RTL is synthesised onto one or more large FPGAs, running at 5-50 MHz. Real firmware and software run on the FPGA, providing a cycle-accurate model that can run full Linux. FPGA prototyping boards (Xilinx VCU118, Intel Stratix 10) are essential tools for pre-silicon software development.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Hardware emulation&lt;/strong&gt;: as discussed in Article 10, emulators compile the RTL into custom FPGAs that run at MHz speeds, supporting real-time testing with actual peripherals.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The RTOS vs Linux choice&lt;/h2&gt;
+&lt;p&gt;For the CPU running on a SoC, a fundamental software decision is operating system choice:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;OS Type&lt;/th&gt;
+&lt;th&gt;Examples&lt;/th&gt;
+&lt;th&gt;Best For&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Bare Metal&lt;/td&gt;
+&lt;td&gt;None&lt;/td&gt;
+&lt;td&gt;Ultra-simple, few ms startup, max performance&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;RTOS&lt;/td&gt;
+&lt;td&gt;FreeRTOS, Zephyr, ThreadX&lt;/td&gt;
+&lt;td&gt;Hard real-time, &amp;lt; 1ms interrupt latency&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Linux&lt;/td&gt;
+&lt;td&gt;Linux, Android&lt;/td&gt;
+&lt;td&gt;Feature-rich, large driver ecosystem, networking&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Hypervisor&lt;/td&gt;
+&lt;td&gt;Xen, KVM&lt;/td&gt;
+&lt;td&gt;Running multiple OSes simultaneously (automotive, industrial)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Many SoCs run &lt;strong&gt;both&lt;/strong&gt;: a Cortex-M managing power and safety-critical functions runs an RTOS (real-time operating system) or bare metal, while a Cortex-A cluster running Linux or Android handles the application layer. This heterogeneous multi-OS configuration is increasingly common.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;IP Management and Reuse&lt;/h2&gt;
+&lt;p&gt;As noted in Article 02, IP reuse is central to managing SoC complexity. Co-design extends this to include &lt;strong&gt;software deliverables&lt;/strong&gt; alongside hardware IP:&lt;/p&gt;
+&lt;p&gt;A well-packaged IP block delivers:
+- RTL source (encrypted or open)
+- Testbench and UVM verification environment
+- &lt;strong&gt;Device driver&lt;/strong&gt; (Linux kernel module or RTOS driver)
+- &lt;strong&gt;Register description file&lt;/strong&gt; (IP-XACT, SystemRDL) for automatic header/driver generation
+- &lt;strong&gt;Reference firmware&lt;/strong&gt; (bare-metal startup, peripheral init code)
+- &lt;strong&gt;Documentation&lt;/strong&gt; (Technical Reference Manual, integration guide)&lt;/p&gt;
+&lt;p&gt;Increasingly, EDA tools automatically generate C header files and Linux device tree bindings from the hardware register descriptions, reducing the human effort and error risk in the software-hardware interface.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Looking back: the complete picture&lt;/h2&gt;
+&lt;p&gt;We have now traversed the entire SoC landscape:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-01-from-room-to-silicon.html"&gt;Article 01: From room to silicon&lt;/a&gt;: integration, motivation, anatomy&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-02-anatomy-and-motivation.html"&gt;Article 02: What is a System on Chip&lt;/a&gt;: anatomy, motivation, IP cores&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-03-design-stack.html"&gt;Article 03: The SoC design stack&lt;/a&gt;: abstraction layers, IP cores, Y-chart&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-04-processor-cores.html"&gt;Article 04: Processor cores&lt;/a&gt;: CPU, DSP, GPU, NPU, big.LITTLE&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-05-memory-architecture.html"&gt;Article 05: Memory architecture&lt;/a&gt;: cache hierarchy, DRAM, MMU&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-06-interconnects-and-bus-protocols.html"&gt;Article 06: Interconnects and bus protocols&lt;/a&gt;: AXI, AHB, APB, crossbar, NoC&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-07-clocking-reset-and-power-domains.html"&gt;Article 07: Clocking, reset, and power domains&lt;/a&gt;: PLL, CDC, DVFS, power gating&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-08-peripherals-and-io.html"&gt;Article 08: Peripherals and I/O&lt;/a&gt;: UART, SPI, I2C, USB, DMA, IRQ&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-09-hardware-description-languages-rtl-design.html"&gt;Article 09: HDL and RTL design&lt;/a&gt;: SystemVerilog, FSM, simulation&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://lizard-spock.co.uk/soc-article-10-design-flow.html"&gt;Article 10: The SoC design flow&lt;/a&gt;: spec to RTL to synthesis to P&amp;amp;R to tape-out&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2&gt;Where to Go Next&lt;/h2&gt;
+&lt;p&gt;With the introductory series complete, you are ready to explore the intermediate topics. These build directly on the foundations laid here:&lt;/p&gt;
+&lt;h3&gt;Intermediate series (10 articles)&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;AXI4 Protocol Deep Dive&lt;/strong&gt;: burst types, out-of-order, QoS, debug&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Cache Coherency Protocols&lt;/strong&gt;: MESI in hardware, multi-core coherency&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pipeline Design and Hazards&lt;/strong&gt;: forwarding, stalling, branch prediction basics&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RTL Synthesis and Timing Closure&lt;/strong&gt;: SDC, STA, ECO flows&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Clock Domain Crossing Techniques&lt;/strong&gt;: synchronisers, async FIFOs, CDC analysis tools&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SoC Verification with UVM&lt;/strong&gt;: agents, sequences, scoreboards, coverage&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DMA Controller Architecture&lt;/strong&gt;: descriptor chains, scatter-gather, QoS&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Interrupt Controllers in Depth&lt;/strong&gt;: GIC, NVIC, priority, virtualization extensions&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Memory-Mapped I/O and Linux Device Drivers&lt;/strong&gt;: writing real kernel drivers&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SoC Power Management Techniques&lt;/strong&gt;: DVFS governors, CPUIdle, power domains in Linux&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Advanced series (10 articles)&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Out-of-Order Execution Architecture&lt;/strong&gt;: Tomasulo, ROB, reservation stations&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Network-on-Chip Design&lt;/strong&gt;: topology, routing, flow control, virtual channels&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DRAM Subsystem Timing&lt;/strong&gt;: LPDDR5 protocol, refresh, power states, thermal throttle&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Physical Design: Floorplanning and P&amp;amp;R&lt;/strong&gt;: CTS, ECO, IR drop, antenna effects&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Hardware Security in SoC&lt;/strong&gt;: TrustZone, secure boot, side-channel attacks&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AI/ML Accelerator Architecture&lt;/strong&gt;: systolic arrays, dataflow, memory bandwidth analysis&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Formal Verification Methods&lt;/strong&gt;: model checking, SVA, property specification languages&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Post-Silicon Debug and Validation&lt;/strong&gt;: JTAG, CoreSight ETM, scan chains&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FPGA-Based SoC Design&lt;/strong&gt;: Zynq-7000, Cyclone V HPS, PetaLinux&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Heterogeneous SoC Partitioning&lt;/strong&gt;: HW/SW co-exploration, automated co-design tools&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;HW/SW co-design recognises that hardware and software are two facets of the same system: neither is meaningful without the other. The boot process takes a SoC from silicon power-on to a running application through several carefully orchestrated stages. Device drivers form the critical interface between the operating system and hardware registers. The partitioning of function between hardware and software is the most impactful architectural decision. Virtual platforms, FPGA prototypes, and emulators allow software development to proceed before silicon is available. Mastering co-design is what separates SoC systems engineers from specialists who know only one half of the system.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/soc-article-10-design-flow.html"&gt;Article 10: The SoC design flow&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Computer Architecture"></category><category term="Electronics"></category><category term="Embedded Systems"></category><category term="Linux"></category><category term="Firmware"></category><category term="Boot"></category><category term="Device Drivers"></category><category term="RTOS"></category></entry><entry><title>SoC Article 10: The SoC design flow - From specification to silicon</title><link href="http://lizard-spock.co.uk/soc-article-10-design-flow.html" rel="alternate"></link><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/soc-article-10-design-flow.html</id><summary type="html">&lt;p&gt;A complete walkthrough of the SoC design flow, from specification and architecture through RTL coding, functional verification, synthesis, physical design, and sign-off to tape-out and fabrication.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Series: Introduction to SoC Design | Article 10 of 11&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Designing a System-on-Chip (SoC) is not a single act of creation. It is a disciplined, iterative engineering process. A team of hundreds, sometimes thousands, of engineers spends one to three years completing it. The &lt;strong&gt;design flow&lt;/strong&gt; is the structured sequence of phases, tools, and verification checkpoints that transforms an initial concept into a physical chip ready for manufacture.&lt;/p&gt;
@@ -233,7 +445,7 @@
 &lt;li&gt;&lt;em&gt;Post-Silicon Debug and Validation:&lt;/em&gt; What happens when the chip comes back from the foundry&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/soc-article-09-hardware-description-languages-rtl-design.html"&gt;Article 09 -- Hardware Description Languages&lt;/a&gt;&lt;/em&gt; | &lt;em&gt;Next: &lt;a href="http://lizard-spock.co.uk/drafts/soc-article-11-hw-sw-co-design.html"&gt;Article 11 -- HW/SW Co-Design&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Computer Architecture"></category><category term="Electronics"></category><category term="Embedded Systems"></category><category term="RTL"></category><category term="Verification"></category><category term="Synthesis"></category><category term="Physical Design"></category><category term="Tape-out"></category><category term="VLSI"></category></entry><entry><title>AMBA low power interface: Q-Channel and P-Channel explained</title><link href="http://lizard-spock.co.uk/amba-lpi-q-channel-p-channel.html" rel="alternate"></link><published>2026-05-19T00:00:00+01:00</published><updated>2026-05-19T00:00:00+01:00</updated><author><name>Morgan Prior</name></author><id>tag:lizard-spock.co.uk,2026-05-19:/amba-lpi-q-channel-p-channel.html</id><summary type="html">&lt;p&gt;A practical guide to AMBA Low Power Interface handshake protocols: Q-Channel and P-Channel signal tables, state machines, timing diagrams, and design rules from ARM IHI0068.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/lpi-hero-HQ.png"&gt;&lt;img alt="SoC power domain management with PMU controlling gated and active domains" src="http://lizard-spock.co.uk/lpi-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/soc-article-09-hardware-description-languages-rtl-design.html"&gt;Article 09 -- Hardware Description Languages&lt;/a&gt;&lt;/em&gt; | &lt;em&gt;Next: &lt;a href="http://lizard-spock.co.uk/soc-article-11-hw-sw-co-design.html"&gt;Article 11 -- HW/SW Co-Design&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Computer Architecture"></category><category term="Electronics"></category><category term="Embedded Systems"></category><category term="RTL"></category><category term="Verification"></category><category term="Synthesis"></category><category term="Physical Design"></category><category term="Tape-out"></category><category term="VLSI"></category></entry><entry><title>AMBA low power interface: Q-Channel and P-Channel explained</title><link href="http://lizard-spock.co.uk/amba-lpi-q-channel-p-channel.html" rel="alternate"></link><published>2026-05-19T00:00:00+01:00</published><updated>2026-05-19T00:00:00+01:00</updated><author><name>Morgan Prior</name></author><id>tag:lizard-spock.co.uk,2026-05-19:/amba-lpi-q-channel-p-channel.html</id><summary type="html">&lt;p&gt;A practical guide to AMBA Low Power Interface handshake protocols: Q-Channel and P-Channel signal tables, state machines, timing diagrams, and design rules from ARM IHI0068.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/lpi-hero-HQ.png"&gt;&lt;img alt="SoC power domain management with PMU controlling gated and active domains" src="http://lizard-spock.co.uk/lpi-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Modern System on Chip (SoC) designs contain dozens of independent IP blocks, each drawing power even when inactive. The AMBA (Advanced Microcontroller Bus Architecture) Low Power Interface (LPI) provides every block with a standardized handshake protocol to coordinate safe clock and power removal. This post covers both LPI interface types, Q-Channel and P-Channel, with timing diagrams and state machines drawn from the ARM IHI0068 specification.&lt;/p&gt;
 &lt;h2&gt;Why low-power handshaking matters&lt;/h2&gt;
 &lt;p&gt;Every IP block on a System on Chip (SoC) draws power even when it sits idle. Clock gating and power gating are the primary tools for reducing that static power drain. Clock gating stops the clock to a block without removing its power rail. Power gating removes the power rail entirely for deeper power savings. Both techniques corrupt internal state if the controller applies them while the block has outstanding transactions or unflushed pipelines. A handshake protocol requires the block to signal that it has finished all activity before the controller removes its clock or power. Without this handshake, the controller has no reliable way to determine whether gating is safe.&lt;/p&gt;
