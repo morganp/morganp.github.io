@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Weather & Climate">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="earth-science.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">EARTH SCIENCE</a> / WEATHER &amp; CLIMATE</span>
+      <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← EARTH SCIENCE MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// WATER, WIND &amp; THE LONG VIEW — LEVEL L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Weather is a mood; climate is a personality</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 840px;">The same water has been recycled for billions of years — evaporating, raining, flowing back to the sea. That endless loop drives our weather. Run the water cycle below, then learn to tell today's <strong>weather</strong> from a place's long-term <strong>climate</strong>, and tour the world's climate zones.</div>
+  </div>
+
+  <!-- FIG 01 — water cycle -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.6fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #cfe4f2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #1c5a86;">// FIG. 01 — THE WATER CYCLE</div>
+        <div onClick="{{ onPlay }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 16px; border: 2px solid #2b2620; background: {{ playBg }}; color: {{ playFg }}; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ playLabel }}</div>
+      </div>
+      <svg viewBox="0 0 480 320" style="width: 100%; height: auto; border: 1.5px solid #7fb0d0; background: linear-gradient(#bfe0f2 0 62%, #dff0d4 62% 100%);">
+        <!-- sun -->
+        <circle cx="60" cy="52" r="26" fill="#ffd43b" stroke="#f59f00" stroke-width="2"></circle>
+        <!-- sea -->
+        <rect x="0" y="230" width="230" height="90" fill="#4a92c4"></rect>
+        <!-- mountain -->
+        <polygon points="300,320 400,150 480,320" fill="#8a9a6b" stroke="#5f6b48" stroke-width="1.5"></polygon>
+        <polygon points="376,200 400,150 424,200" fill="#e9eef2"></polygon>
+        <!-- cloud -->
+        <g>
+          <ellipse cx="300" cy="86" rx="58" ry="26" fill="#f4f7fa"></ellipse>
+          <ellipse cx="262" cy="94" rx="34" ry="20" fill="#eef2f6"></ellipse>
+          <ellipse cx="342" cy="96" rx="34" ry="20" fill="#eef2f6"></ellipse>
+        </g>
+        <!-- droplets -->
+        <sc-for list="{{ drops }}" as="d" hint-placeholder-count="12">
+          <circle cx="{{ d.x }}" cy="{{ d.y }}" r="4" fill="{{ d.color }}" stroke="#1c5a86" stroke-width="1"></circle>
+        </sc-for>
+        <!-- river -->
+        <path d="M 400 300 Q 320 300 230 285" fill="none" stroke="#4a92c4" stroke-width="6"></path>
+        <!-- stage arrows/labels handled below in html -->
+      </svg>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #1c5a86;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #4a92c4; display: inline-block;"></span>liquid water</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #cfe4f2; border:1px solid #1c5a86; display: inline-block;"></span>water vapour (gas)</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <sc-for list="{{ stages }}" as="s" hint-placeholder-count="4">
+        <div onClick="{{ s.onPick }}" style="border: 2px solid #2b2620; background: {{ s.bg }}; padding: 12px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; min-height: 44px; box-sizing: border-box;" style-hover="box-shadow: 3px 3px 0 rgba(43,38,32,0.2);">
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 20px; height: 20px; border-radius: 50%; background: {{ s.dot }}; color: #fff; display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;">{{ s.n }}</span><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; color: {{ s.fg }};">{{ s.name }}</span></div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.45; color: {{ s.descFg }};">{{ s.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- FIG 02 — weather vs climate -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.8fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — WEATHER OR CLIMATE?</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 17px; line-height: 1.5; min-height: 52px; color: #2b2620;">"{{ statement }}"</div>
+      <div style="display: flex; gap: 10px;">
+        <div onClick="{{ onWeather }}" style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 14px; border: 2px solid #2b2620; background: {{ wBg }}; color: {{ wFg }}; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">WEATHER</div>
+        <div onClick="{{ onClimate }}" style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 14px; border: 2px solid #2b2620; background: {{ cBg }}; color: {{ cFg }}; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">CLIMATE</div>
+      </div>
+      <div style="min-height: 22px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ sortColor }};">{{ sortFeedback }}</div>
+      <div onClick="{{ onNextStatement }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px; border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">NEXT STATEMENT →</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">SCORE</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; color: #e8590c;">{{ score }} / {{ attempts }}</span></div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e8590c; border-top: 1.5px solid #d8d0c4; padding-top: 12px;">THE DIFFERENCE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;"><strong>Weather</strong> is what the atmosphere is doing <em>right now, here</em> — it changes hour to hour. <strong>Climate</strong> is the <em>average</em> weather of a place measured over many years (usually 30+). One rainy day doesn't change a desert's climate.</div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — climate zones -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 0.75fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 03 — CLIMATE ZONES (EQUATOR → POLE)</div>
+      <div style="display: flex; flex-direction: column; border: 2px solid #2b2620;">
+        <sc-for list="{{ zones }}" as="z" hint-placeholder-count="5">
+          <div onClick="{{ z.onPick }}" style="padding: 12px 14px; background: {{ z.bg }}; border-bottom: 1.5px solid #2b2620; cursor: pointer; display: flex; justify-content: space-between; align-items: center; outline: {{ z.outline }}; outline-offset: -3px;" style-hover="filter: brightness(1.05);">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px; color: {{ z.ink }};">{{ z.name }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: {{ z.ink }};">{{ z.lat }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">Warmest at the equator (direct Sun), coldest at the poles (slanted Sun).</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: {{ zoneBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 22px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: {{ zoneInk }};">{{ zoneName }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: {{ zoneInk }};">{{ zoneDesc }}</div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{ zoneInk }}; border-top: 1.5px solid rgba(43,38,32,0.2); padding-top: 12px; margin-top: auto;">
+        <span>TYPICAL: {{ zoneTemp }}</span><span>EXAMPLE: {{ zoneEg }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zmw6wxs" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Weather and climate ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Water_cycle" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Water cycle ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Climate" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Climate ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="earths-structure.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Earth's Structure (L2) →</a>
+    <a href="../chemistry/atmosphere-climate.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Atmosphere &amp; Climate Change (L3) →</a>
+    <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Earth Science map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>EARTH SCIENCE / WEATHER &amp; CLIMATE</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { playing: true, phase: 0, stage: 0, zone: 0, si: 0, picked: null, score: 0, attempts: 0 };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("weather-climate");
+    this._statements = this._shuffle([
+      { t: "It is 24 °C and pouring with rain outside right now.", a: "weather" },
+      { t: "This desert gets less than 25 mm of rain in a typical year.", a: "climate" },
+      { t: "A cold wind is gusting from the north this afternoon.", a: "weather" },
+      { t: "British summers are mild and often cloudy.", a: "climate" },
+      { t: "There's a thunderstorm forecast for tonight.", a: "weather" },
+      { t: "The Amazon is hot and wet all year round.", a: "climate" },
+      { t: "It snowed here for the first time this winter.", a: "weather" },
+      { t: "The Sahara has been getting hotter over the last 50 years.", a: "climate" },
+    ]);
+    this._t = setInterval(() => { if (this.state.playing) this.setState(s => ({ phase: (s.phase + 0.012) % 1 })); }, 40);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+  _shuffle(a){ a=a.slice(); for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];} return a; }
+
+  pick(ans) {
+    if (this.state.picked) return;
+    const st = this._statements[this.state.si % this._statements.length];
+    const correct = ans === st.a;
+    const attempts = this.state.attempts + 1, score = this.state.score + (correct ? 1 : 0);
+    if (score >= 5 && window.Progress) window.Progress.markCompleted("weather-climate", { via: "weather-vs-climate" });
+    this.setState({ picked: ans, attempts, score });
+  }
+
+  renderVals() {
+    // water cycle loop waypoints (evap up, condense, rain down mountain, collect back to sea)
+    const way = [
+      { x: 120, y: 250 }, { x: 100, y: 150 }, { x: 130, y: 92 },  // evaporate up into cloud
+      { x: 300, y: 88 },                                            // drift to cloud over mountain
+      { x: 400, y: 160 }, { x: 380, y: 250 }, { x: 300, y: 292 },  // rain down mountainside
+      { x: 230, y: 278 }, { x: 175, y: 255 },                      // river back to sea
+    ];
+    const segLen = [];
+    let total = 0;
+    for (let i = 0; i < way.length; i++) {
+      const a = way[i], b = way[(i + 1) % way.length];
+      const l = Math.hypot(b.x - a.x, b.y - a.y); segLen.push(l); total += l;
+    }
+    const posAt = (t) => {
+      let d = t * total;
+      for (let i = 0; i < way.length; i++) {
+        if (d <= segLen[i]) {
+          const a = way[i], b = way[(i + 1) % way.length];
+          const f = segLen[i] ? d / segLen[i] : 0;
+          return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, seg: i };
+        }
+        d -= segLen[i];
+      }
+      return way[0];
+    };
+    const drops = Array.from({ length: 11 }, (_, k) => {
+      const t = (this.state.phase + k / 11) % 1;
+      const p = posAt(t);
+      // vapour (gas) while going up / in cloud (segments 0,1,2,3), liquid otherwise
+      const vapour = p.seg <= 3;
+      return { x: p.x.toFixed(1), y: p.y.toFixed(1), color: vapour ? "#cfe4f2" : "#4a92c4" };
+    });
+
+    const stageData = [
+      { name: "1 · Evaporation", dot: "#e8590c", desc: "The Sun heats the sea, lakes and rivers. Liquid water turns into invisible water vapour (a gas) and rises into the air." },
+      { name: "2 · Condensation", dot: "#2a6fb0", desc: "High up it's colder, so the vapour cools and turns back into tiny liquid droplets. Billions of them together make a cloud." },
+      { name: "3 · Precipitation", dot: "#7048a8", desc: "Droplets join until they're too heavy to float and fall as rain, snow, sleet or hail — often over hills and mountains." },
+      { name: "4 · Collection", dot: "#2f7d3a", desc: "Water flows downhill in streams and rivers (run-off), soaks into the ground, and eventually returns to the sea. Then it starts again." },
+    ];
+    const stages = stageData.map((s, i) => ({
+      n: i + 1, name: s.name.split(" · ")[1], dot: s.dot, desc: s.desc,
+      bg: this.state.stage === i ? "#fff3df" : "#fff",
+      fg: "#2b2620", descFg: "#554c42",
+      onPick: () => this.setState({ stage: i }),
+    }));
+
+    const st = this._statements ? this._statements[this.state.si % this._statements.length] : { t: "", a: "weather" };
+    const picked = this.state.picked;
+    const mk = (which) => {
+      if (!picked) return { bg: "#faf6ef", fg: "#2b2620" };
+      if (which === st.a) return { bg: "#2f7d3a", fg: "#faf6ef" };
+      if (which === picked) return { bg: "#c0392b", fg: "#faf6ef" };
+      return { bg: "#faf6ef", fg: "#2b2620" };
+    };
+    const w = mk("weather"), c = mk("climate");
+    let sortFeedback = "", sortColor = "#2b2620";
+    if (picked) {
+      const right = picked === st.a;
+      sortColor = right ? "#2f7d3a" : "#c0392b";
+      sortFeedback = right ? "Correct — that's " + st.a + "." : "Actually that's " + st.a + " — the long-term average, not one moment.";
+    }
+
+    const zoneData = [
+      { name: "Polar", lat: "60–90°", bg: "#e8f0f8", ink: "#2b2620", desc: "Freezing all year. The Sun sits low, so its heat is spread thin — and in winter it barely rises at all.", temp: "−40 to 0 °C", eg: "Antarctica, Arctic" },
+      { name: "Cold / boreal", lat: "50–60°", bg: "#dfe9de", ink: "#2b2620", desc: "Cold, snowy winters and short, cool summers. Home to vast pine forests (taiga).", temp: "−20 to 20 °C", eg: "Canada, Siberia" },
+      { name: "Temperate", lat: "30–50°", bg: "#d7e8c8", ink: "#2b2620", desc: "Mild, with four distinct seasons and rain spread through the year. Where the UK sits.", temp: "0 to 25 °C", eg: "UK, France, NZ" },
+      { name: "Arid (desert)", lat: "15–30°", bg: "#f0dcae", ink: "#2b2620", desc: "Very dry — hot days, cold nights. Sinking dry air here means almost no rain falls.", temp: "10 to 45 °C", eg: "Sahara, Australia" },
+      { name: "Tropical", lat: "0–15°", bg: "#c7e2a8", ink: "#2b2620", desc: "Hot and wet all year. Direct overhead Sun and rising moist air bring heavy rain and rainforests.", temp: "25 to 35 °C", eg: "Amazon, Congo" },
+    ];
+    const zones = zoneData.map((z, i) => ({
+      name: z.name, lat: z.lat, bg: z.bg, ink: z.ink,
+      outline: this.state.zone === i ? "3px solid #e8590c" : "none",
+      onPick: () => this.setState({ zone: i }),
+    }));
+    const z = zoneData[this.state.zone];
+
+    return {
+      drops, stages,
+      onPlay: () => this.setState(s => ({ playing: !s.playing })),
+      playLabel: this.state.playing ? "❚❚ PAUSE" : "▶ PLAY",
+      playBg: this.state.playing ? "#2b2620" : "#e8590c", playFg: "#faf6ef",
+      statement: st.t, wBg: w.bg, wFg: w.fg, cBg: c.bg, cFg: c.fg,
+      onWeather: () => this.pick("weather"), onClimate: () => this.pick("climate"),
+      onNextStatement: () => this.setState(s => ({ si: s.si + 1, picked: null })),
+      sortFeedback, sortColor, score: this.state.score, attempts: this.state.attempts,
+      zones, zoneName: z.name, zoneDesc: z.desc, zoneTemp: z.temp, zoneEg: z.eg, zoneBg: z.bg, zoneInk: z.ink,
+    };
+  }
+}
+</script>
+</body>
+</html>

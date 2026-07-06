@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Earth's Structure">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="earth-science.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">EARTH SCIENCE</a> / EARTH'S STRUCTURE</span>
+      <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← EARTH SCIENCE MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// A JOURNEY TO THE CENTRE — LEVEL L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Cut the planet in half</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 840px;">We live on a wafer-thin crust floating on a planet that's mostly hot rock and molten metal. No one has ever drilled through the crust — we know the inside from earthquake waves. Click each layer to explore how deep, how hot, and what it's made of.</div>
+  </div>
+
+  <!-- FIG 01 — cross section -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 0.95fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #0e1119; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// FIG. 01 — INSIDE THE EARTH (CLICK A LAYER)</div>
+      <svg viewBox="0 0 360 360" style="width: 100%; height: auto;">
+        <sc-for list="{{ rings }}" as="r" hint-placeholder-count="4">
+          <circle cx="180" cy="180" r="{{ r.r }}" fill="{{ r.fill }}" stroke="{{ r.stroke }}" stroke-width="{{ r.sw }}" style="cursor: pointer;" onClick="{{ r.onPick }}"></circle>
+        </sc-for>
+        <!-- leader lines + labels -->
+        <sc-for list="{{ leaders }}" as="l" hint-placeholder-count="4">
+          <line x1="{{ l.x1 }}" y1="{{ l.y1 }}" x2="{{ l.x2 }}" y2="{{ l.y2 }}" stroke="{{ l.color }}" stroke-width="2"></line>
+          <circle cx="{{ l.x1 }}" cy="{{ l.y1 }}" r="3" fill="{{ l.color }}"></circle>
+          <text x="{{ l.tx }}" y="{{ l.ty }}" text-anchor="{{ l.anchor }}" font-family="IBM Plex Mono" font-size="10.5" font-weight="600" fill="{{ l.color }}" style="cursor: pointer;" onClick="{{ l.onPick }}">{{ l.label }}</text>
+        </sc-for>
+      </svg>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #8a94b4;">Layers drawn roughly to scale. The crust is so thin it's just the outline.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: {{ selBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 22px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 20px; height: 20px; background: {{ selSwatch }}; border: 2px solid #2b2620; display: inline-block;"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 8px; border: 1.5px solid #2b2620; background: #e8590c; color: #faf6ef;">LAYER {{ selNum }} OF 4</span></div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; line-height: 1.02;">{{ selName }}</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="border: 1.5px solid #2b2620; background: rgba(255,255,255,0.6); padding: 10px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">DEPTH</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ selDepth }}</div></div>
+        <div style="border: 1.5px solid #2b2620; background: rgba(255,255,255,0.6); padding: 10px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">TEMPERATURE</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ selTemp }}</div></div>
+        <div style="border: 1.5px solid #2b2620; background: rgba(255,255,255,0.6); padding: 10px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">STATE</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ selState }}</div></div>
+        <div style="border: 1.5px solid #2b2620; background: rgba(255,255,255,0.6); padding: 10px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">MADE OF</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ selMade }}</div></div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #3a3229;">{{ selBody }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — depth ladder -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.9fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — HOW DEEP IS EACH LAYER? (0 km = SURFACE)</div>
+      <div style="display: flex; flex-direction: column; border: 2px solid #2b2620;">
+        <sc-for list="{{ ladder }}" as="d" hint-placeholder-count="4">
+          <div style="height: {{ d.h }}px; background: {{ d.bg }}; border-bottom: 1.5px solid #2b2620; display: flex; align-items: center; justify-content: space-between; padding: 0 14px;">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px; color: {{ d.ink }};">{{ d.name }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ d.ink }};">{{ d.range }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">Bar heights ∝ layer thickness. Total radius ≈ 6371 km.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// THINNER THAN AN APPLE SKIN</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #554c42;">If the whole Earth were shrunk to the size of an apple, the crust we live on would be thinner than the apple's skin. Everything you've ever seen — every mountain, ocean and forest — sits on that skin.</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #d8d0c4; padding-top: 12px;">HOW WE KNOW</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #554c42;">Earthquakes send <strong>seismic waves</strong> through the planet. The waves bend, speed up, slow down and even stop at each boundary — some waves can't pass through the liquid outer core at all. By timing them all over the world, scientists mapped the layers without ever digging down.</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/articles/z9k3jfr" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — The structure of the Earth ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Structure_of_Earth" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Structure of Earth ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Earth%27s_inner_core" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Earth's inner core ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="plate-tectonics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Level up: Plate Tectonics (L3) →</a>
+    <a href="rock-cycle.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also at L2: The Rock Cycle →</a>
+    <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Earth Science map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>EARTH SCIENCE / EARTH'S STRUCTURE</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sel: 0, seen: {} };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("earths-structure"); }
+
+  _layers() {
+    return [
+      { name: "Crust", swatch: "#8a9a6b", fill: "none", ringStroke: "#c7d1a0",
+        depth: "0–70 km", temp: "Up to ~400 °C", state: "Solid", made: "Rock (granite, basalt)",
+        body: "The thin, brittle skin we live on. Oceanic crust is only ~7 km thick; continental crust up to ~70 km. It's cracked into the tectonic plates that drift around the surface." },
+      { name: "Mantle", swatch: "#c45c2a", fill: "#c45c2a", ringStroke: "#7a3818",
+        depth: "70–2890 km", temp: "~500–4000 °C", state: "Solid, but flows",
+        made: "Silicate rock",
+        body: "By far the biggest layer — most of the planet. It's solid rock, but so hot that over millions of years it creeps like thick putty. Slow churning currents here (convection) drag the plates above and drive earthquakes and volcanoes." },
+      { name: "Outer core", swatch: "#e8a020", fill: "#e8a020", ringStroke: "#a86e10",
+        depth: "2890–5150 km", temp: "~4000–5000 °C", state: "Liquid",
+        made: "Iron & nickel",
+        body: "A vast ocean of molten metal. As the Earth spins, this swirling liquid iron acts like a giant dynamo — it generates our planet's magnetic field, which shields us from harmful solar radiation and points every compass north." },
+      { name: "Inner core", swatch: "#ffe08a", fill: "#ffe08a", ringStroke: "#c9a83e",
+        depth: "5150–6371 km", temp: "~5200 °C", state: "Solid",
+        made: "Iron & nickel",
+        body: "As hot as the surface of the Sun — yet solid. The crushing pressure of the whole planet pressing inward squeezes the iron so hard it can't melt, even at 5200 °C. It's a metal ball about 70% the size of the Moon." },
+    ];
+  }
+
+  pick(i) {
+    const seen = { ...this.state.seen, [i]: true };
+    if (Object.keys(seen).length >= 4 && window.Progress) window.Progress.markCompleted("earths-structure", { via: "explore-layers" });
+    this.setState({ sel: i, seen });
+  }
+
+  renderVals() {
+    const L = this._layers();
+    // concentric radii (scaled to real proportions), outer -> inner
+    const radii = [150, 148, 82.5, 28.7]; // crust ring is essentially the outline
+    const rings = L.map((l, i) => ({
+      r: radii[i], fill: i === 0 ? "#7d8a5c" : l.fill,
+      stroke: this.state.sel === i ? "#fff" : l.ringStroke,
+      sw: this.state.sel === i ? 4 : 2,
+      onPick: () => this.pick(i),
+    }));
+
+    // leader labels pointing to a point in each ring, out to the side
+    const midR = [150, 118, 56, 14];
+    const angles = [-140, -35, 30, 120]; // degrees
+    const leaders = L.map((l, i) => {
+      const a = angles[i] * Math.PI / 180;
+      const x1 = 180 + midR[i] * Math.cos(a), y1 = 180 + midR[i] * Math.sin(a);
+      const outR = 172;
+      const x2 = 180 + outR * Math.cos(a), y2 = 180 + outR * Math.sin(a);
+      const right = Math.cos(a) >= 0;
+      return {
+        x1: x1.toFixed(1), y1: y1.toFixed(1), x2: x2.toFixed(1), y2: y2.toFixed(1),
+        tx: (x2 + (right ? 5 : -5)).toFixed(1), ty: (y2 + 4).toFixed(1),
+        anchor: right ? "start" : "end", label: l.name,
+        color: this.state.sel === i ? "#fcc419" : "#cfd4c0",
+        onPick: () => this.pick(i),
+      };
+    });
+
+    const ladder = [
+      { name: "Crust", range: "0–70 km", h: 24, bg: "#7d8a5c", ink: "#faf6ef" },
+      { name: "Mantle", range: "70–2890 km", h: 120, bg: "#c45c2a", ink: "#faf6ef" },
+      { name: "Outer core", range: "2890–5150 km", h: 78, bg: "#e8a020", ink: "#2b2620" },
+      { name: "Inner core", range: "5150–6371 km", h: 42, bg: "#ffe08a", ink: "#2b2620" },
+    ];
+
+    const s = L[this.state.sel];
+    return {
+      rings, leaders, ladder,
+      selNum: this.state.sel + 1, selName: s.name, selDepth: s.depth, selTemp: s.temp,
+      selState: s.state, selMade: s.made, selBody: s.body, selSwatch: s.swatch,
+      selBg: this.state.sel === 3 ? "#fff8e6" : this.state.sel === 2 ? "#fdf2dc" : this.state.sel === 1 ? "#fbe7d6" : "#eef1e4",
+    };
+  }
+}
+</script>
+</body>
+</html>

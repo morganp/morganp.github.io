@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Algebra & the Balance">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / ALGEBRA &amp; THE BALANCE</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #7048a8;">// KEEP IT BALANCED — LEVEL L2 · NUMBER &amp; ALGEBRA</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">An equation is a balanced scale</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 820px;">The equals sign means both sides weigh exactly the same. Solving for <em>x</em> is just tidying up — and the one golden rule is: <strong>whatever you do to one side, you must do to the other</strong>, or the scale tips. Solve equations on a real balance below, then feed numbers through a function machine.</div>
+  </div>
+
+  <!-- FIG 01 — balance solver -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.66fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// FIG. 01 — BALANCE-SCALES SOLVER</div>
+        <div style="display: flex; gap: 6px;">
+          <sc-for list="{{ tierBtns }}" as="t" hint-placeholder-count="3">
+            <div onClick="{{ t.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 8px 10px; border: 1.5px solid #2b2620; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ t.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; text-align: center; letter-spacing: 0.01em;">{{ eqText }}</div>
+
+      <!-- beam -->
+      <svg viewBox="0 0 440 220" style="width: 100%; height: auto;">
+        <!-- pivot -->
+        <polygon points="220,150 200,205 240,205" fill="#2b2620"></polygon>
+        <!-- beam group rotates -->
+        <g transform="rotate({{ tilt }} 220 150)">
+          <rect x="40" y="145" width="360" height="8" rx="2" fill="#7048a8"></rect>
+          <!-- left pan -->
+          <line x1="90" y1="149" x2="90" y2="108" stroke="#2b2620" stroke-width="2"></line>
+          <rect x="30" y="88" width="120" height="22" rx="3" fill="#efe9f5" stroke="#2b2620" stroke-width="1.5"></rect>
+          <text x="90" y="103" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#4a2f78">{{ leftLabel }}</text>
+          <!-- right pan -->
+          <line x1="350" y1="149" x2="350" y2="108" stroke="#2b2620" stroke-width="2"></line>
+          <rect x="290" y="88" width="120" height="22" rx="3" fill="#f6efe2" stroke="#2b2620" stroke-width="1.5"></rect>
+          <text x="350" y="103" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#2b2620">{{ rightLabel }}</text>
+        </g>
+      </svg>
+
+      <div style="min-height: 22px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ msgColor }}; text-align: center;">{{ msg }}</div>
+
+      <!-- operation controls -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">DO TO BOTH SIDES:</span>
+          <div onClick="{{ onSub }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 10px 14px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">− {{ stepN }}</div>
+          <div onClick="{{ onAdd }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 10px 14px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">+ {{ stepN }}</div>
+          <div onClick="{{ onDiv }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 10px 14px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">÷ {{ coef }}</div>
+          <div onClick="{{ onSubX }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 10px 14px; border: 2px solid #2b2620; background: {{ subXbg }}; color: {{ subXfg }}; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">− {{ rx }}x</div>
+        </div>
+        <div onClick="{{ onCheat }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 12px; border: 2px dashed #c0392b; color: #c0392b; cursor: pointer; text-align: center; min-height: 40px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">⚠ try removing from ONE side only (breaks the rule)</div>
+        <div onClick="{{ onNew }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px; border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">NEW EQUATION ↻</div>
+      </div>
+    </div>
+
+    <!-- working log -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #cbb9e8;">WORKING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+        <sc-for list="{{ history }}" as="h" hint-placeholder-count="4">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; gap: 10px;"><span>{{ h.eq }}</span><span style="color: #a78bd0; font-size: 11px;">{{ h.op }}</span></div>
+        </sc-for>
+      </div>
+      <div style="border-top: 1.5px solid #574f45; padding-top: 12px; display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #cbb9e8;">SOLVED</span>
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 34px; color: #fcc419;">{{ solvedCount }}</span>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #cbb9e8;">{{ logHint }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — function machine -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// FIG. 02 — FUNCTION MACHINE</div>
+        <div onClick="{{ onFlip }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 9px 14px; border: 2px solid #2b2620; background: {{ flipBg }}; color: {{ flipFg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ flipLabel }}</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">INPUT</div>
+          <div style="width: 64px; height: 64px; border: 2px solid #2b2620; background: #efe9f5; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px;">{{ fmIn }}</div>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: #7048a8;">{{ arrow }}</div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">STEP 1</div>
+          <div style="padding: 20px 18px; border: 2px solid #2b2620; background: #7048a8; color: #faf6ef; font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px;">{{ op1 }}</div>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: #7048a8;">{{ arrow }}</div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">STEP 2</div>
+          <div style="padding: 20px 18px; border: 2px solid #2b2620; background: #7048a8; color: #faf6ef; font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px;">{{ op2 }}</div>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: #7048a8;">{{ arrow }}</div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">OUTPUT</div>
+          <div style="width: 64px; height: 64px; border: 2px solid #2b2620; background: #fff3df; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px; color: #e8590c;">{{ fmOut }}</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">INPUT:</span>
+        <input type="range" min="0" max="12" step="1" value="{{ fmInRaw }}" onInput="{{ onFmIn }}" style="width: 220px; accent-color: #7048a8; height: 26px;">
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #554c42;">{{ fmExplain }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- theory -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// THE GOLDEN RULE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">To undo what's happening to <em>x</em>, do the <strong>inverse</strong> operation — and do it to <strong>both sides</strong>. Undo + with −, × with ÷. Work in reverse order: peel off the +/− first, then the ×/÷, like taking off shoes before socks.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// CHECK YOUR ANSWER</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">Always substitute your answer back into the original equation. If <em>x</em> = 3 turns 3x + 2 into 3(3) + 2 = 11 ✓, you're right. This one habit catches almost every slip.</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #7048a8;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/z9dbsg8" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Solving equations ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Equation" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Equation ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="coordinates.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Coordinates &amp; Straight Lines (L2) →</a>
+    <a href="quadratics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Quadratics &amp; Graphs (L3) →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / ALGEBRA &amp; THE BALANCE</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tier: 0, a: 3, b: 2, c: 11, rc: 0, rx: 0, solved: 0, tilt: 0, msg: "", msgColor: "#2b2620", history: [], fmIn: 4, inverse: false };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("algebra-basics");
+    this._newEquation(0);
+  }
+
+  _newEquation(tier) {
+    // model: left = a·x + b   right = rx·x + rc   (solved when a=1, b=0, rx=0)
+    const x = this._rnd(2, 6);
+    let a, b, rx, rc;
+    if (tier === 0) { a = 1; b = this._rnd(2, 9); rx = 0; rc = x + b; }
+    else if (tier === 1) { a = this._rnd(2, 5); b = this._rnd(2, 9); rx = 0; rc = a * x + b; }
+    else { a = this._rnd(3, 6); rx = this._rnd(1, 2); b = this._rnd(2, 8); rc = (a - rx) * x + b; }
+    this.setState({ tier, a, b, rx, rc, tilt: 0, msg: "", history: [] });
+  }
+  _rnd(lo, hi) { return Math.floor(Math.random() * (hi - lo + 1)) + lo; }
+
+  // We model state as: leftA·x + leftB  =  rightX·x + rightB
+  // stored in a,b (left) and rx,rc (right). Solved when leftA=1, leftB=0, rightX=0 (x = rc)
+  _apply(kind) {
+    let { a, b, rx, rc, tier } = this.state;
+    let op = "";
+    const n = Math.abs(b) || 1;
+    if (kind === "sub") { b -= n; rc -= n; op = "− " + n; }
+    else if (kind === "add") { b += n; rc += n; op = "+ " + n; }
+    else if (kind === "div") { if (a <= 1) { this._flash("Nothing to divide — the x-coefficient is already 1.", "#c0392b"); return; } if (b !== 0) { this._flash("Clear the constant first: get x on its own before dividing.", "#c0392b"); return; } const d = a; a = a / d; b = b / d; rx = rx / d; rc = rc / d; op = "÷ " + d; }
+    else if (kind === "subx") { if (rx <= 0) { this._flash("No x on the right to remove.", "#c0392b"); return; } const m = rx; a -= m; rx -= m; op = "− " + m + "x"; }
+    const hist = [...this.state.history, { eq: this._fmt(a, b, rx, rc), op }];
+    const solved = (a === 1 && b === 0 && rx === 0);
+    let msg = "", msgColor = "#2b2620", solvedCount = this.state.solved;
+    if (solved) {
+      msg = "Solved! x = " + rc + ". Substitute back to check.";
+      msgColor = "#2f7d3a";
+      solvedCount = this.state.solved + 1;
+      if (solvedCount >= 3 && window.Progress) window.Progress.markCompleted("algebra-basics", { via: "balance-solver" });
+    }
+    this.setState({ a, b, rx, rc, history: hist, msg, msgColor, solved: solvedCount, tilt: 0 });
+  }
+  _flash(msg, color) {
+    this.setState({ msg, msgColor: color, tilt: 8 });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ tilt: 0 }), 700);
+  }
+  _fmt(a, b, rx, rc) {
+    const L = (a === 1 ? "x" : a + "x") + (b > 0 ? " + " + b : b < 0 ? " − " + (-b) : "");
+    const R = (rx === 0 ? "" : (rx === 1 ? "x" : rx + "x")) + (rx !== 0 && rc > 0 ? " + " + rc : rx === 0 ? rc : rc < 0 ? " − " + (-rc) : (rc > 0 ? " + " + rc : ""));
+    return L + " = " + (R === "" ? "0" : R);
+  }
+
+  renderVals() {
+    const { a, b, rx, rc, tier } = this.state;
+    const tiers = ["x + a = b", "ax + b = c", "ax + b = cx + d"];
+    const tierBtns = tiers.map((label, i) => ({ label: "TIER " + (i + 1), bg: tier === i ? "#7048a8" : "#faf6ef", fg: tier === i ? "#faf6ef" : "#2b2620", onPick: () => this._newEquation(i) }));
+
+    const leftLabel = (a === 1 ? "x" : a + "x") + (b > 0 ? " + " + b : b < 0 ? " − " + (-b) : "");
+    const rightLabel = (rx === 0 ? "" : (rx === 1 ? "x" : rx + "x") + (rc !== 0 ? (rc > 0 ? " + " + rc : " − " + (-rc)) : "")) || (rc + "");
+    const rightPlain = rx === 0 ? (rc + "") : rightLabel;
+
+    // function machine
+    const fmIn = this.state.fmIn;
+    const inv = this.state.inverse;
+    const op1 = inv ? "− 2" : "× 3";
+    const op2 = inv ? "÷ 3" : "+ 2";
+    const fmOut = inv ? (fmIn - 2) / 3 : fmIn * 3 + 2;
+    const fmOutTxt = inv ? ((fmIn - 2) % 3 === 0 ? String((fmIn - 2) / 3) : ((fmIn - 2) / 3).toFixed(2)) : String(fmOut);
+    const fmExplain = inv
+      ? "Inverse machine: it undoes the steps in reverse order. Feed the output back in and you get the original."
+      : "Forward machine: " + fmIn + " × 3 = " + (fmIn * 3) + ", then + 2 = " + (fmIn * 3 + 2) + ".";
+
+    return {
+      tierBtns, eqText: this._fmt(a, b, rx, rc),
+      tilt: this.state.tilt, leftLabel, rightLabel: rightPlain,
+      msg: this.state.msg || "Use the buttons to isolate x. Keep the scale level!", msgColor: this.state.msgColor,
+      stepN: b !== 0 ? Math.abs(b) : 5, coef: a, rx: rx || 1,
+      subXbg: rx > 0 ? "#efe9f5" : "#eee7da", subXfg: rx > 0 ? "#2b2620" : "#b0a898",
+      onSub: () => this._apply("sub"), onAdd: () => this._apply("add"), onDiv: () => this._apply("div"), onSubX: () => this._apply("subx"),
+      onCheat: () => this._flash("The scale tips! Change one side and the two sides stop being equal — that's not allowed.", "#c0392b"),
+      onNew: () => this._newEquation(this.state.tier),
+      history: this.state.history.length ? this.state.history : [{ eq: this._fmt(a, b, rx, rc), op: "start" }],
+      solvedCount: this.state.solved,
+      logHint: this.state.solved >= 3 ? "Great algebra — you kept every step balanced. Try a harder tier!" : "Solve 3 equations to complete this topic. Try each tier.",
+      arrow: inv ? "←" : "→", op1, op2, fmIn, fmOut: fmOutTxt,
+      fmInRaw: fmIn, onFmIn: e => this.setState({ fmIn: +e.target.value }),
+      onFlip: () => this.setState({ inverse: !inv }),
+      flipLabel: inv ? "◀ INVERSE MODE" : "FORWARD MODE ▶", flipBg: inv ? "#7048a8" : "#faf6ef", flipFg: inv ? "#faf6ef" : "#2b2620",
+      fmExplain,
+    };
+  }
+}
+</script>
+</body>
+</html>

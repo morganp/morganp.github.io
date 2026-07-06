@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Weather & Seasons">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="earth-science.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">EARTH SCIENCE</a> / WEATHER &amp; SEASONS</span>
+      <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← EARTH SCIENCE MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// A TILTED PLANET — LEVEL L1</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Why the seasons change</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 800px;">The Earth is tilted, and it stays tilted the same way all year as it orbits the Sun. That single tilt is the reason we get summer and winter. Drag the Earth around its orbit and watch the seasons flip between the two halves of the planet — then explore what makes each day's weather.</div>
+  </div>
+
+  <!-- FIG 01 — orbit / seasons sim -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.62fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #0e1428; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// FIG. 01 — EARTH'S ORBIT &amp; THE SEASONS</div>
+      <svg viewBox="0 0 460 300" style="width: 100%; height: auto;">
+        <ellipse cx="230" cy="150" rx="200" ry="118" fill="none" stroke="#3a4468" stroke-width="1.5" stroke-dasharray="4 5"></ellipse>
+        <!-- sun -->
+        <circle cx="230" cy="150" r="26" fill="#ffd43b"></circle>
+        <circle cx="230" cy="150" r="26" fill="none" stroke="#f59f00" stroke-width="2"></circle>
+        <text x="230" y="154" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#7a5c00">SUN</text>
+        <!-- sun-to-earth ray -->
+        <line x1="{{ rayX1 }}" y1="{{ rayY1 }}" x2="{{ rayX2 }}" y2="{{ rayY2 }}" stroke="#ffe08a" stroke-width="2" stroke-dasharray="3 3"></line>
+        <!-- season markers -->
+        <sc-for list="{{ orbitMarks }}" as="m" hint-placeholder-count="4">
+          <circle cx="{{ m.x }}" cy="{{ m.y }}" r="3" fill="#6b7594"></circle>
+          <text x="{{ m.lx }}" y="{{ m.ly }}" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" fill="#8a94b4">{{ m.label }}</text>
+        </sc-for>
+        <!-- earth -->
+        <circle cx="{{ eX }}" cy="{{ eY }}" r="22" fill="#2a6fb0"></circle>
+        <path d="{{ litPath }}" fill="#ffe08a" opacity="0.55"></path>
+        <circle cx="{{ eX }}" cy="{{ eY }}" r="22" fill="none" stroke="#cfe0f5" stroke-width="1.5"></circle>
+        <!-- equator -->
+        <line x1="{{ eqX1 }}" y1="{{ eqY1 }}" x2="{{ eqX2 }}" y2="{{ eqY2 }}" stroke="#cfe0f5" stroke-width="1" opacity="0.6"></line>
+        <!-- tilted axis (always same screen direction) -->
+        <line x1="{{ axX1 }}" y1="{{ axY1 }}" x2="{{ axX2 }}" y2="{{ axY2 }}" stroke="#fff" stroke-width="2.5"></line>
+        <circle cx="{{ axNx }}" cy="{{ axNy }}" r="3.5" fill="#e8590c"></circle>
+        <text x="{{ axLx }}" y="{{ axLy }}" font-family="IBM Plex Mono" font-size="8.5" fill="#e8590c">N</text>
+      </svg>
+      <input type="range" min="0" max="12" step="0.25" value="{{ month }}" onInput="{{ onMonth }}" style="width: 100%; accent-color: #fcc419; height: 26px;">
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <sc-for list="{{ seasonBtns }}" as="b" hint-placeholder-count="4">
+          <div onClick="{{ b.onPick }}" style="flex: 1; min-width: 70px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; padding: 10px 6px; border: 1.5px solid {{ b.border }}; background: {{ b.bg }}; color: {{ b.fg }}; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">{{ b.label }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #8a94b4;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; background: #ffe08a; display: inline-block;"></span>side lit by Sun (daytime)</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 3px; background: #fff; display: inline-block;"></span>tilted axis — always points the same way</span>
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #2b2620; background: {{ nBg }};">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">MONTH: {{ monthName }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #2b2620; margin-top: 8px;">NORTHERN HEMISPHERE (e.g. UK)</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; color: {{ nColor }};">{{ nSeason }}</div>
+      </div>
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #d8d0c4; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #2b2620;">SOUTHERN HEMISPHERE (e.g. Australia)</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px; color: {{ sColor }};">{{ sSeason }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; color: #6b6156;">Always the opposite season to the north!</div>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: #6b6156;">DAYLIGHT (UK)</span><span style="font-weight: 600; color: #e8590c;">{{ daylight }} hrs</span></div>
+        <div style="height: 12px; border: 1.5px solid #2b2620; background: #f0e9db;"><div style="height: 100%; width: {{ daylightPct }}%; background: #fcc419;"></div></div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: #6b6156;">MIDDAY SUN</span><span style="font-weight: 600; color: #e8590c;">{{ sunHeight }}</span></div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.45; color: #554c42;">{{ seasonNote }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — ray angle -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 02 — WHY TILT MEANS WARMTH: DIRECT vs SLANTED SUNLIGHT</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: #e8590c;">Summer — direct rays</div>
+        <svg viewBox="0 0 300 150" style="width: 100%; height: auto;">
+          <line x1="60" y1="10" x2="120" y2="120" stroke="#fcc419" stroke-width="3"></line>
+          <line x1="90" y1="10" x2="150" y2="120" stroke="#fcc419" stroke-width="3"></line>
+          <line x1="120" y1="10" x2="180" y2="120" stroke="#fcc419" stroke-width="3"></line>
+          <rect x="118" y="120" width="64" height="14" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></rect>
+          <line x1="30" y1="134" x2="270" y2="134" stroke="#2b2620" stroke-width="2"></line>
+          <text x="150" y="148" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#2b2620">energy packed into a SMALL area → hot</text>
+        </svg>
+      </div>
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: #2a6fb0;">Winter — slanted rays</div>
+        <svg viewBox="0 0 300 150" style="width: 100%; height: auto;">
+          <line x1="30" y1="10" x2="150" y2="120" stroke="#9db4d0" stroke-width="3"></line>
+          <line x1="70" y1="10" x2="190" y2="120" stroke="#9db4d0" stroke-width="3"></line>
+          <line x1="110" y1="10" x2="230" y2="120" stroke="#9db4d0" stroke-width="3"></line>
+          <rect x="148" y="120" width="84" height="14" fill="#2a6fb0" stroke="#2b2620" stroke-width="1.5"></rect>
+          <line x1="30" y1="134" x2="270" y2="134" stroke="#2b2620" stroke-width="2"></line>
+          <text x="150" y="148" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#2b2620">same energy SPREAD over a big area → cool</text>
+        </svg>
+      </div>
+    </div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42; max-width: 900px;">When your hemisphere tilts <strong>toward</strong> the Sun, its rays hit almost straight down — the same bundle of energy is concentrated on a small patch, so it warms up fast. Tilt <strong>away</strong> and the rays arrive at a shallow angle, smeared over a wider patch, so each spot gets less warmth. Tilt also changes how long the Sun is up: longer days in summer, shorter in winter.</div>
+  </div>
+
+  <!-- FIG 03 — weather explorer -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 0.85fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 03 — TODAY'S WEATHER</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+        <sc-for list="{{ weatherTypes }}" as="w" hint-placeholder-count="6">
+          <div onClick="{{ w.onPick }}" style="border: 2px solid #2b2620; background: {{ w.bg }}; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; min-height: 66px; box-sizing: border-box;" style-hover="box-shadow: 3px 3px 0 rgba(43,38,32,0.25);">
+            <div style="font-size: 22px; line-height: 1;">{{ w.glyph }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; color: {{ w.fg }};">{{ w.name }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">Weather = what the sky is doing right now. It changes hour to hour.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: {{ wDetailBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 22px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-size: 44px; line-height: 1;">{{ wGlyph }}</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px;">{{ wName }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #3a3229;">{{ wDesc }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid rgba(43,38,32,0.2); padding-top: 10px;">CAUSED BY: {{ wCause }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zn2mhcw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Earth, Sun and Moon ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Season" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Season ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Weather" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Weather ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="weather-climate.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Level up: Weather &amp; Climate (L2) →</a>
+    <a href="rocks-soil.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also at L1: Rocks &amp; Soil →</a>
+    <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Earth Science map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>EARTH SCIENCE / WEATHER &amp; SEASONS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { month: 6, weather: "sunny", seen: {} };
+
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("weather"); }
+
+  setMonth(m) {
+    const season = this._nSeason(m);
+    const seen = { ...this.state.seen, [season]: true };
+    if (Object.keys(seen).length >= 4 && window.Progress) window.Progress.markCompleted("weather", { via: "seasons" });
+    this.setState({ month: m, seen });
+  }
+  _nSeason(m) {
+    const mm = ((m % 12) + 12) % 12;
+    if (mm >= 3 && mm < 6) return "Spring";
+    if (mm >= 6 && mm < 9) return "Summer";
+    if (mm >= 9 && mm < 12) return "Autumn";
+    return "Winter";
+  }
+
+  renderVals() {
+    const m = this.state.month;
+    const theta = (m / 12) * 2 * Math.PI - Math.PI / 2; // month 0 (Jan) near top-ish; keep continuous
+    const cx = 230, cy = 150, rx = 200, ry = 118;
+    const eX = cx + rx * Math.cos(theta), eY = cy + ry * Math.sin(theta);
+
+    // sun -> earth ray
+    const sunEdgeX = cx + 26 * Math.cos(theta), sunEdgeY = cy + 26 * Math.sin(theta);
+    const earthEdgeX = eX - 22 * Math.cos(theta), earthEdgeY = eY - 22 * Math.sin(theta);
+
+    // fixed axis direction in screen space (always points up-right) -> tilt ~23deg
+    const ax = Math.cos(-1.9), ay = Math.sin(-1.9); // north pole direction (up and slightly left)
+    const axLen = 30;
+    const axNx = eX + ax * axLen, axNy = eY + ay * axLen;
+    const axSx = eX - ax * axLen, axSy = eY - ay * axLen;
+
+    // equator perpendicular to axis
+    const px = -ay, py = ax;
+    const eqLen = 22;
+
+    // lit hemisphere: half of earth facing sun. sun direction from earth:
+    const sdx = (cx - eX), sdy = (cy - eY);
+    const sdl = Math.hypot(sdx, sdy);
+    const sux = sdx / sdl, suy = sdy / sdl;
+    // lit semicircle path facing the sun
+    const r = 22;
+    const a0 = Math.atan2(suy, sux) - Math.PI / 2;
+    const a1 = Math.atan2(suy, sux) + Math.PI / 2;
+    const lp = (ang) => (eX + r * Math.cos(ang)).toFixed(1) + " " + (eY + r * Math.sin(ang)).toFixed(1);
+    const litPath = "M " + lp(a0) + " A " + r + " " + r + " 0 0 1 " + lp(a1) + " Z";
+
+    // which hemisphere tilts to sun -> N summer intensity = dot(axisNorth, sunDir)
+    const nSummerDot = ax * sux + ay * suy;
+
+    const nSeason = this._nSeason(m);
+    const opp = { Spring: "Autumn", Summer: "Winter", Autumn: "Spring", Winter: "Summer" };
+    const sSeason = opp[nSeason];
+    const sColor = { Spring: "#2f7d3a", Summer: "#e8590c", Autumn: "#b45309", Winter: "#2a6fb0" };
+    const nColor = sColor[nSeason];
+
+    const daylight = (12 + 4.6 * Math.cos((m - 6) / 12 * 2 * Math.PI)).toFixed(1);
+    const daylightPct = (daylight / 24 * 100).toFixed(0);
+    const sunHeight = nSummerDot > 0.4 ? "HIGH — near overhead" : nSummerDot > -0.1 ? "MEDIUM" : "LOW — skims the horizon";
+    const seasonNotes = {
+      Summer: "The north pole leans toward the Sun: long days, a high midday Sun, and lots of concentrated warmth.",
+      Winter: "The north pole leans away from the Sun: short days, a low Sun, and its heat spread thinly. Cold.",
+      Spring: "The tilt is sideways-on: days and nights are roughly equal and warming as summer approaches.",
+      Autumn: "Sideways-on again: equal-ish days and nights, cooling down toward winter.",
+    };
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const monthName = monthNames[Math.floor(((m % 12) + 12) % 12)];
+
+    const orbitMarks = [
+      { mo: 0, label: "Dec/Jan" }, { mo: 3, label: "Mar" }, { mo: 6, label: "Jun" }, { mo: 9, label: "Sep" },
+    ].map(o => {
+      const t = (o.mo / 12) * 2 * Math.PI - Math.PI / 2;
+      const x = cx + rx * Math.cos(t), y = cy + ry * Math.sin(t);
+      const lx = cx + (rx + 22) * Math.cos(t), ly = cy + (ry + 18) * Math.sin(t) + 3;
+      return { x: x.toFixed(1), y: y.toFixed(1), lx: lx.toFixed(1), ly: ly.toFixed(1), label: o.label };
+    });
+
+    const seasons = [
+      { label: "☀ SUMMER", mo: 6, key: "Summer" }, { label: "🍂 AUTUMN", mo: 9, key: "Autumn" },
+      { label: "❄ WINTER", mo: 0, key: "Winter" }, { label: "🌱 SPRING", mo: 3, key: "Spring" },
+    ];
+    const seasonBtns = seasons.map(b => {
+      const on = nSeason === b.key;
+      return { label: b.label, bg: on ? "#e8590c" : "#141b33", fg: on ? "#faf6ef" : "#cfe0f5", border: on ? "#e8590c" : "#3a4468", onPick: () => this.setMonth(b.mo) };
+    });
+
+    const wData = {
+      sunny: { name: "Sunny", glyph: "☀️", desc: "Clear skies, few or no clouds. The Sun's warmth reaches the ground directly, so sunny days are usually the warmest.", cause: "high pressure keeping clouds away", bg: "#fff6e0" },
+      cloudy: { name: "Cloudy", glyph: "☁️", desc: "A grey blanket of cloud covers the sky. Clouds are billions of tiny water droplets floating high up. They block some sunlight, keeping days cooler.", cause: "moist air rising and its water vapour condensing", bg: "#eef1f4" },
+      rainy: { name: "Rainy", glyph: "🌧️", desc: "Water droplets in clouds join together until they are heavy enough to fall. Rain waters plants and fills rivers.", cause: "cloud droplets merging and growing too heavy to float", bg: "#e4edf5" },
+      windy: { name: "Windy", glyph: "🌬️", desc: "Moving air. Wind blows from where air is high-pressure toward where it is low-pressure — the bigger the difference, the stronger the wind.", cause: "air moving from high to low pressure", bg: "#eaf3ef" },
+      snowy: { name: "Snowy", glyph: "❄️", desc: "When it's cold enough, water vapour freezes into ice crystals that clump into snowflakes and fall instead of rain.", cause: "water freezing in very cold cloud", bg: "#eef4fa" },
+      stormy: { name: "Stormy", glyph: "⛈️", desc: "Towering thunderclouds bring heavy rain, gusty wind, lightning and thunder — a lot of energy released at once.", cause: "warm, moist air rising very fast into tall clouds", bg: "#e6e8ef" },
+    };
+    const wKeys = ["sunny","cloudy","rainy","windy","snowy","stormy"];
+    const weatherTypes = wKeys.map(k => ({ name: wData[k].name.toUpperCase(), glyph: wData[k].glyph, bg: this.state.weather === k ? "#e8590c" : "#faf6ef", fg: this.state.weather === k ? "#faf6ef" : "#2b2620", onPick: () => this.setState({ weather: k }) }));
+    const w = wData[this.state.weather];
+
+    return {
+      month: m, monthName, onMonth: e => this.setMonth(+e.target.value),
+      eX: eX.toFixed(1), eY: eY.toFixed(1),
+      rayX1: sunEdgeX.toFixed(1), rayY1: sunEdgeY.toFixed(1), rayX2: earthEdgeX.toFixed(1), rayY2: earthEdgeY.toFixed(1),
+      litPath,
+      axX1: axSx.toFixed(1), axY1: axSy.toFixed(1), axX2: axNx.toFixed(1), axY2: axNy.toFixed(1),
+      axNx: axNx.toFixed(1), axNy: axNy.toFixed(1), axLx: (axNx + 5).toFixed(1), axLy: (axNy - 4).toFixed(1),
+      eqX1: (eX + px * eqLen).toFixed(1), eqY1: (eY + py * eqLen).toFixed(1), eqX2: (eX - px * eqLen).toFixed(1), eqY2: (eY - py * eqLen).toFixed(1),
+      orbitMarks,
+      nSeason, sSeason, nColor, sColor: sColor[sSeason], nBg: nSeason === "Summer" ? "#fff3df" : nSeason === "Winter" ? "#e8f0f8" : "#f3f0e6",
+      daylight, daylightPct, sunHeight, seasonNote: seasonNotes[nSeason],
+      seasonBtns,
+      weatherTypes, wGlyph: w.glyph, wName: w.name, wDesc: w.desc, wCause: w.cause, wDetailBg: w.bg,
+    };
+  }
+}
+</script>
+</body>
+</html>

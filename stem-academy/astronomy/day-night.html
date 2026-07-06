@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Day, Night & the Moon">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="astronomy.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">ASTRONOMY</a> / DAY, NIGHT &amp; THE MOON</span>
+      <a href="astronomy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← ASTRONOMY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// SPIN &amp; ORBIT — LEVEL L1</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">The sky keeps time</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 840px;">The Earth spins once a day — that's why the Sun rises and sets. The Moon takes about a month to circle us, and as it goes we see different slices of its sunlit side. Spin the Earth to make day and night, then walk the Moon around its orbit to build every phase.</div>
+  </div>
+
+  <!-- FIG 01 — day & night -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.55fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #0a0e1a; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// FIG. 01 — WHY WE GET DAY &amp; NIGHT</div>
+        <div onClick="{{ onSpin }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 16px; border: 2px solid #e8590c; background: {{ spinBg }}; color: #faf6ef; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ spinLabel }}</div>
+      </div>
+      <svg viewBox="0 0 460 260" style="width: 100%; height: auto;">
+        <!-- sun -->
+        <circle cx="40" cy="130" r="26" fill="#ffd43b" stroke="#f59f00" stroke-width="2"></circle>
+        <text x="40" y="134" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" font-weight="600" fill="#7a5c00">SUN</text>
+        <sc-for list="{{ sunRays }}" as="r" hint-placeholder-count="5">
+          <line x1="{{ r.x1 }}" y1="{{ r.y1 }}" x2="{{ r.x2 }}" y2="{{ r.y2 }}" stroke="#ffe08a" stroke-width="2" stroke-dasharray="3 4"></line>
+        </sc-for>
+        <!-- earth: night base + day half facing sun (left) -->
+        <circle cx="300" cy="130" r="80" fill="#1a2438"></circle>
+        <path d="M 300 50 A 80 80 0 0 0 300 210 Z" fill="#2a6fb0"></path>
+        <circle cx="300" cy="130" r="80" fill="none" stroke="#cfe0f5" stroke-width="1.5"></circle>
+        <text x="250" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#cfe0f5">DAY</text>
+        <text x="352" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b7594">NIGHT</text>
+        <!-- rotation arrow -->
+        <path d="M 300 40 A 90 90 0 0 1 360 66" fill="none" stroke="#fff" stroke-width="2"></path>
+        <polygon points="{{ spinHead }}" fill="#fff"></polygon>
+        <!-- you dot -->
+        <circle cx="{{ youX }}" cy="{{ youY }}" r="6" fill="#e8590c" stroke="#fff" stroke-width="1.5"></circle>
+        <text x="{{ youLx }}" y="{{ youLy }}" font-family="IBM Plex Mono" font-size="9" font-weight="600" fill="#e8590c">you</text>
+      </svg>
+      <input type="range" min="0" max="360" step="1" value="{{ spinAngle }}" onInput="{{ onSpinSlide }}" style="width: 100%; accent-color: #fcc419; height: 26px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #8a94b4;">Earth spins once every 24 hours. Half always faces the Sun (day); the other half is in shadow (night).</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: {{ timeBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ timeInk }};">AT YOUR SPOT IT IS...</div>
+      <div style="font-size: 42px; line-height: 1;">{{ timeGlyph }}</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 34px; color: {{ timeInk }};">{{ timeName }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: {{ timeInk }};">≈ {{ localTime }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: {{ timeInk }}; margin-top: auto;">{{ timeNote }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — moon phases -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.55fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #0a0e1a; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// FIG. 02 — WALK THE MOON AROUND ITS ORBIT</div>
+        <div onClick="{{ onMoonPlay }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 16px; border: 2px solid #e8590c; background: {{ moonPlayBg }}; color: #faf6ef; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ moonPlayLabel }}</div>
+      </div>
+      <svg viewBox="0 0 460 240" style="width: 100%; height: auto;">
+        <!-- sunlight direction -->
+        <sc-for list="{{ moonRays }}" as="r" hint-placeholder-count="4">
+          <line x1="{{ r.x1 }}" y1="{{ r.y1 }}" x2="{{ r.x2 }}" y2="{{ r.y2 }}" stroke="#ffe08a" stroke-width="2" stroke-dasharray="3 4"></line>
+        </sc-for>
+        <text x="446" y="20" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#ffe08a">← sunlight</text>
+        <!-- orbit -->
+        <circle cx="150" cy="120" r="86" fill="none" stroke="#2a3350" stroke-width="1"></circle>
+        <!-- earth -->
+        <circle cx="150" cy="120" r="22" fill="#2a6fb0" stroke="#cfe0f5" stroke-width="1.5"></circle>
+        <path d="M 150 98 A 22 22 0 0 0 150 142 Z" fill="#12203a"></path>
+        <!-- moon in orbit: dark base + lit half facing sun (right) -->
+        <circle cx="{{ moonX }}" cy="{{ moonY }}" r="13" fill="#3a4152"></circle>
+        <path d="{{ moonLitOrbit }}" fill="#e9e4d0"></path>
+        <circle cx="{{ moonX }}" cy="{{ moonY }}" r="13" fill="none" stroke="#8a94b4" stroke-width="1"></circle>
+        <text x="150" y="230" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8a94b4">top-down view · the Moon's right side is always lit</text>
+      </svg>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #10131c; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8a94b4; align-self: flex-start;">WHAT YOU SEE FROM EARTH</div>
+      <svg viewBox="0 0 160 160" style="width: 150px; height: 150px;">
+        <circle cx="80" cy="80" r="62" fill="#22262f" stroke="#3a4152" stroke-width="1.5"></circle>
+        <path d="{{ phaseDisc }}" fill="#f4efdc"></path>
+        <circle cx="80" cy="80" r="62" fill="none" stroke="#4a5262" stroke-width="1.5"></circle>
+      </svg>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 20px; color: #f4efdc; text-align: center; line-height: 1.1;">{{ phaseName }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #fcc419;">{{ illumPct }}% lit</div>
+      <input type="range" min="0" max="100" step="1" value="{{ moonRaw }}" onInput="{{ onMoonSlide }}" style="width: 100%; accent-color: #fcc419; height: 26px;">
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.5; color: #b8bccb; text-align: center;">{{ phaseNote }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — eclipses -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 03 — ECLIPSES: WHEN THEY LINE UP</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div style="border: 2px solid #2b2620; background: #0a0e1a; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: #fcc419;">Solar eclipse</div>
+        <svg viewBox="0 0 320 90" style="width: 100%; height: auto;">
+          <circle cx="30" cy="45" r="20" fill="#ffd43b"></circle>
+          <text x="30" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#8a94b4">Sun</text>
+          <circle cx="170" cy="45" r="6" fill="#c9c0b2"></circle>
+          <text x="170" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#8a94b4">Moon</text>
+          <circle cx="270" cy="45" r="16" fill="#2a6fb0"></circle>
+          <text x="270" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#8a94b4">Earth</text>
+          <polygon points="176,42 264,36 264,54 176,48" fill="#3a4152" opacity="0.7"></polygon>
+        </svg>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #b8bccb;">The <strong>Moon</strong> passes between the Sun and Earth, casting a shadow on us. For a few minutes, day turns to twilight. Only happens at new moon.</div>
+      </div>
+      <div style="border: 2px solid #2b2620; background: #0a0e1a; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: #fcc419;">Lunar eclipse</div>
+        <svg viewBox="0 0 320 90" style="width: 100%; height: auto;">
+          <circle cx="30" cy="45" r="20" fill="#ffd43b"></circle>
+          <text x="30" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#8a94b4">Sun</text>
+          <circle cx="180" cy="45" r="16" fill="#2a6fb0"></circle>
+          <text x="180" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#8a94b4">Earth</text>
+          <circle cx="285" cy="45" r="6" fill="#8a4a3a"></circle>
+          <text x="285" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#8a94b4">Moon</text>
+          <polygon points="192,40 280,34 280,56 192,50" fill="#3a4152" opacity="0.7"></polygon>
+        </svg>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #b8bccb;">The <strong>Earth</strong> passes between the Sun and Moon, so our shadow falls on the Moon. It glows dim red — a "blood moon". Only at full moon.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zkbg87h" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Earth, Sun and Moon ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Lunar_phase" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Lunar phase ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Eclipse" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Eclipse ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="scale-orbits.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Level up: Scale &amp; Orbits (L2) →</a>
+    <a href="solar-system.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also at L1: Solar System Tour →</a>
+    <a href="astronomy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Astronomy map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>ASTRONOMY / DAY, NIGHT &amp; THE MOON</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { spin: 200, spinning: false, moon: 0, moonPlaying: false, seen: {} };
+  _seen = {};
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("day-night");
+    this._t = setInterval(() => {
+      if (this.state.spinning) this.setState(s => ({ spin: (s.spin + 2) % 360 }));
+      if (this.state.moonPlaying) this.setState(s => ({ moon: (s.moon + 0.7) % 100 }));
+    }, 45);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  _mark(key) {
+    this._seen[key] = true;
+    if (this._seen.day && this._seen.night && this._seen.newmoon && this._seen.full && !this._done && window.Progress) {
+      this._done = true;
+      window.Progress.markCompleted("day-night", { via: "spin-and-phases" });
+    }
+  }
+
+  renderVals() {
+    // DAY/NIGHT: you-dot on equator, angle = spin. Sun to the left (-x). Lit half = left.
+    const ex = 300, ey = 130, eR = 80;
+    const a = this.state.spin * Math.PI / 180;
+    const youX = ex + eR * Math.cos(a), youY = ey + eR * Math.sin(a);
+    // dot is in daylight when on the left half (cos < 0 => x < ex)
+    const dayside = Math.cos(a) < 0;
+    // local time: noon when facing sun (angle=180, cos=-1). Map angle to 24h.
+    // define hour: at cos=-1 (facing sun) -> 12:00; cos=1 (away) -> 00:00
+    const hourFloat = (this.state.spin / 360) * 24;
+    const hh = Math.floor(hourFloat), mm = Math.floor((hourFloat - hh) * 60);
+    const localTime = String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
+    // phase of day
+    let timeName, timeGlyph, timeNote, timeBg, timeInk;
+    const sunAlt = -Math.cos(a); // -1 (midnight) .. +1 (noon)
+    if (sunAlt > 0.35) { timeName = "Daytime"; timeGlyph = "☀️"; timeNote = "Your side of the Earth is facing the Sun. It's high in the sky."; timeBg = "#fff6e0"; timeInk = "#2b2620"; }
+    else if (sunAlt > -0.15) { timeName = hourFloat < 12 ? "Sunrise" : "Sunset"; timeGlyph = "🌅"; timeNote = "You're rotating across the line between day and night — the Sun sits on the horizon."; timeBg = "#fbe0c8"; timeInk = "#2b2620"; }
+    else { timeName = "Night"; timeGlyph = "🌙"; timeNote = "Your side has turned away from the Sun into Earth's shadow. The stars come out."; timeBg = "#161c2e"; timeInk = "#e6e9f2"; }
+
+    const sunRays = [30, 65, 100, 130, 160].map((y, i) => ({ x1: 66, y1: 130, x2: 210, y2: 40 + i * 45 }));
+    // spin arrow head
+    const spinHead = "356,60 366,60 361,70";
+
+    // update seen for day/night
+    if (dayside) this._mark("day"); else this._mark("night");
+
+    // MOON PHASES: orbit fraction f (0..1), 0 = new moon (between Earth & Sun, sun on right so moon on right at new)
+    const f = this.state.moon / 100;
+    const orbA = f * 2 * Math.PI; // 0 = new (right side, toward sun)
+    const mox = 150 + 86 * Math.cos(orbA), moy = 120 - 86 * Math.sin(orbA);
+    // lit half of moon in orbit faces sun (right, +x). Lit = right semicircle of the small moon.
+    const mr = 13;
+    const moonLitOrbit = "M " + mox.toFixed(1) + " " + (moy - mr).toFixed(1) +
+      " A " + mr + " " + mr + " 0 0 1 " + mox.toFixed(1) + " " + (moy + mr).toFixed(1) + " Z";
+
+    // illuminated fraction as seen from Earth
+    const illum = (1 - Math.cos(orbA)) / 2;
+    const illumPct = Math.round(illum * 100);
+    // phase disc: r=62 centered 80,80. Waxing when sin(orbA)>0 (f in 0..0.5): lit on RIGHT.
+    const R = 62, cx = 80, cy = 80;
+    const waxing = Math.sin(orbA) >= 0; // f in (0,0.5)
+    const tx = R * Math.cos(orbA); // terminator x-radius (signed)
+    const rxAbs = Math.abs(tx).toFixed(2);
+    let phaseDisc;
+    if (waxing) {
+      // lit on right: outer right limb top->bottom, then terminator back up
+      const sweep = tx > 0 ? 0 : 1;
+      phaseDisc = "M " + cx + " " + (cy - R) +
+        " A " + R + " " + R + " 0 0 1 " + cx + " " + (cy + R) +
+        " A " + rxAbs + " " + R + " 0 0 " + sweep + " " + cx + " " + (cy - R) + " Z";
+    } else {
+      // lit on left: outer left limb top->bottom (sweep 0), then terminator back up
+      const sweep = tx > 0 ? 1 : 0;
+      phaseDisc = "M " + cx + " " + (cy - R) +
+        " A " + R + " " + R + " 0 0 0 " + cx + " " + (cy + R) +
+        " A " + rxAbs + " " + R + " 0 0 " + sweep + " " + cx + " " + (cy - R) + " Z";
+    }
+
+    // phase name (8 phases)
+    const names = ["New Moon","Waxing Crescent","First Quarter","Waxing Gibbous","Full Moon","Waning Gibbous","Last Quarter","Waning Crescent"];
+    const idx = Math.round(f * 8) % 8;
+    const phaseName = names[idx];
+    const notes = {
+      "New Moon": "The lit side faces away from us — the Moon is nearly invisible, lost in the Sun's glare.",
+      "Waxing Crescent": "A sliver of light on the right, growing each night as the Moon moves round.",
+      "First Quarter": "Half lit (the right half). We're seeing the side of the lit hemisphere.",
+      "Waxing Gibbous": "More than half and still growing toward full.",
+      "Full Moon": "The lit side faces us completely — a bright full disc, opposite the Sun in the sky.",
+      "Waning Gibbous": "Past full, the lit part shrinking from the right.",
+      "Last Quarter": "Half lit again — but now the left half.",
+      "Waning Crescent": "A thin left-hand sliver, fading toward the next new moon.",
+    };
+    if (idx === 0) this._mark("newmoon");
+    if (idx === 4) this._mark("full");
+
+    const moonRays = [30, 70, 110, 150].map(y => ({ x1: 446, y1: y, x2: 340, y2: y }));
+
+    return {
+      spinAngle: this.state.spin, onSpinSlide: e => this.setState({ spin: +e.target.value }),
+      onSpin: () => this.setState(s => ({ spinning: !s.spinning })), spinLabel: this.state.spinning ? "❚❚ PAUSE" : "▶ SPIN", spinBg: this.state.spinning ? "#2b2620" : "#e8590c",
+      youX: youX.toFixed(1), youY: youY.toFixed(1), youLx: (youX + 8).toFixed(1), youLy: (youY - 8).toFixed(1),
+      sunRays, spinHead,
+      timeName, timeGlyph, timeNote, timeBg, timeInk, localTime,
+      moonX: mox.toFixed(1), moonY: moy.toFixed(1), moonLitOrbit, moonRays,
+      phaseDisc, phaseName, illumPct, phaseNote: notes[phaseName],
+      moonRaw: Math.round(this.state.moon), onMoonSlide: e => this.setState({ moon: +e.target.value }),
+      onMoonPlay: () => this.setState(s => ({ moonPlaying: !s.moonPlaying })), moonPlayLabel: this.state.moonPlaying ? "❚❚ PAUSE" : "▶ PLAY", moonPlayBg: this.state.moonPlaying ? "#2b2620" : "#e8590c",
+    };
+  }
+}
+</script>
+</body>
+</html>

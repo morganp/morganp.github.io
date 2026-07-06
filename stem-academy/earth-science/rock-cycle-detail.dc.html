@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Rock Cycle Detail & Dating">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="earth-science.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">EARTH SCIENCE</a> / ROCK CYCLE DETAIL</span>
+      <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← EARTH SCIENCE MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// READING THE ROCK RECORD — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Rocks keep a diary</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">Layers of rock stack up like pages in a book — and geologists have learned to read them. Order the events in a cliff face using simple rules, then use radioactive atoms as a ticking clock to put real ages on the rocks.</div>
+  </div>
+
+  <!-- FIG 01 — relative dating puzzle -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 0.72fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — A CLIFF FACE (CLICK EVENTS OLDEST → YOUNGEST)</div>
+      <svg viewBox="0 0 300 320" style="width: 100%; height: auto; border: 1.5px solid #2b2620;">
+        <sc-for list="{{ beds }}" as="b" hint-placeholder-count="6">
+          <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.fill }}" stroke="#2b2620" stroke-width="1.5" style="cursor: pointer;" onClick="{{ b.onPick }}"></rect>
+          <text x="{{ b.lx }}" y="{{ b.ly }}" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="{{ b.ink }}" style="pointer-events: none;">{{ b.tag }}</text>
+        </sc-for>
+        <!-- intrusion -->
+        <polygon points="{{ intr.points }}" fill="{{ intr.fill }}" stroke="#2b2620" stroke-width="1.5" style="cursor: pointer;" onClick="{{ intr.onPick }}"></polygon>
+        <text x="{{ intr.lx }}" y="{{ intr.ly }}" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#faf6ef" style="pointer-events: none;">I</text>
+      </svg>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #6b6156;">
+        <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; background: #c99a2e; border:1px solid #2b2620; display: inline-block;"></span>sedimentary bed</span>
+        <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; background: #b0472e; border:1px solid #2b2620; display: inline-block;"></span>igneous intrusion (I)</span>
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #574f45;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #e7ddcd;">YOUR ORDER — OLDEST FIRST</div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; min-height: 34px;">
+          <sc-for list="{{ picks }}" as="p" hint-placeholder-count="3">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 15px; width: 30px; height: 30px; display: grid; place-items: center; border: 2px solid {{ p.border }}; background: {{ p.bg }}; color: {{ p.fg }};">{{ p.tag }}</span>
+          </sc-for>
+          <span style="font-family: 'Space Grotesk', sans-serif; font-size: 12px; color: #8a7f70; align-self: center;">{{ pickHint }}</span>
+        </div>
+      </div>
+      <div style="padding: 14px 18px; border-bottom: 1.5px solid #574f45; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fcc419;">THE RULES</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #e7ddcd;"><strong>Superposition:</strong> in undisturbed layers, the oldest is at the bottom, youngest on top.</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #e7ddcd;"><strong>Cross-cutting:</strong> anything that cuts across layers (like intrusion I) must be younger than the layers it cuts.</div>
+      </div>
+      <div style="padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div style="min-height: 22px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ puzzleColor }};">{{ puzzleMsg }}</div>
+        <div onClick="{{ onResetPuzzle }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px; border: 2px solid #faf6ef; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; margin-top: auto;">↺ RESET</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — radiometric dating -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — RADIOACTIVE CLOCK: DATE THE ROCK</div>
+      <div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px;">
+        <sc-for list="{{ atoms }}" as="a" hint-placeholder-count="100">
+          <div style="aspect-ratio: 1; background: {{ a.bg }}; border: 1px solid #2b2620;"></div>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; background: #e8590c; border:1px solid #2b2620; display: inline-block;"></span>parent isotope (undecayed)</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; background: #c9c0b2; border:1px solid #2b2620; display: inline-block;"></span>daughter (decayed)</span>
+      </div>
+      <input type="range" min="0" max="6" step="0.1" value="{{ hlRaw }}" onInput="{{ onHL }}" style="width: 100%; accent-color: #e8590c; height: 26px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">← drag to add half-lives · {{ halfLivesLabel }} half-lives elapsed</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); display: flex; flex-direction: column;">
+      <div style="padding: 14px 18px; border-bottom: 1.5px solid #d8d0c4;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">ISOTOPE CLOCK</div>
+        <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+          <sc-for list="{{ isoBtns }}" as="b" hint-placeholder-count="3">
+            <div onClick="{{ b.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 8px 10px; border: 1.5px solid #2b2620; background: {{ b.bg }}; color: {{ b.fg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ b.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">PARENT LEFT</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: #e8590c;">{{ parentPct }}%</span></div>
+        <div style="height: 14px; border: 1.5px solid #2b2620; background: #c9c0b2; display: flex;"><div style="height: 100%; width: {{ parentPct }}%; background: #e8590c;"></div></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1.5px solid #d8d0c4; padding-top: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">HALF-LIFE</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;">{{ halfLifeLabel }}</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">ROCK'S AGE</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 20px; color: #2f7d3a;">{{ ageLabel }}</span></div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42; margin-top: auto;">{{ isoNote }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — formation processes -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 03 — HOW GRAIN SIZE &amp; TYPE RECORD FORMATION</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px;">
+      <sc-for list="{{ processes }}" as="p" hint-placeholder-count="4">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; color: {{ p.color }};">{{ p.tag }}</div>
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ p.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.45; color: #554c42;">{{ p.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Law_of_superposition" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Law of superposition ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Radiometric_dating" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Radiometric dating ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/topics/z9bg87h" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Rocks and the rock cycle ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">KEEP EXPLORING</span>
+    <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Explore the Earth Science map →</a>
+    <a href="../chemistry/atmosphere-climate.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Related: Atmosphere &amp; Climate Change (L3) →</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>EARTH SCIENCE / ROCK CYCLE DETAIL</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { picks: [], done: false, wrong: false, iso: "u238", hl: 0 };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("rock-cycle-detail"); }
+
+  // correct oldest->youngest: L1,L2,L3,I,L4,L5  (I cuts L1-L3, so younger than L3, older than L4)
+  _correct() { return ["L1","L2","L3","I","L4","L5"]; }
+
+  pickEvent(tag) {
+    if (this.state.done) return;
+    if (this.state.picks.includes(tag)) return;
+    const picks = [...this.state.picks, tag];
+    const correct = this._correct();
+    // check prefix correctness
+    const ok = picks.every((t, i) => t === correct[i]);
+    if (!ok) { this.setState({ picks, wrong: true }); return; }
+    const done = picks.length === correct.length;
+    if (done && window.Progress) window.Progress.markCompleted("rock-cycle-detail", { via: "relative-dating" });
+    this.setState({ picks, wrong: false, done });
+  }
+
+  renderVals() {
+    // beds bottom (oldest) to top (youngest). y grows downward, so bottom = large y.
+    const bedDefs = [
+      { tag: "L5", y: 22, h: 40, fill: "#e3c99a" },
+      { tag: "L4", y: 62, h: 44, fill: "#d8b878" },
+      { tag: "L3", y: 106, h: 46, fill: "#c99a2e" },
+      { tag: "L2", y: 152, h: 60, fill: "#bd8f3c" },
+      { tag: "L1", y: 212, h: 86, fill: "#a8792c" },
+    ];
+    const beds = bedDefs.map(b => ({
+      tag: b.tag, x: 10, y: b.y, w: 280, h: b.h, fill: b.fill,
+      lx: 20, ly: b.y + b.h / 2 + 4, ink: "#2b2620",
+      onPick: () => this.pickEvent(b.tag),
+    }));
+    // intrusion: a dyke cutting up through L1-L3 (from bottom into the middle beds), stops below L4
+    const intr = {
+      points: "150,298 176,298 168,106 158,106", fill: "#b0472e",
+      lx: 159, ly: 200, onPick: () => this.pickEvent("I"),
+    };
+
+    const correct = this._correct();
+    const picks = this.state.picks.map((tag, i) => ({
+      tag, bg: "#2f7d3a", fg: "#faf6ef", border: "#8ce99a",
+    }));
+    let puzzleMsg = "", puzzleColor = "#e7ddcd";
+    if (this.state.wrong) { puzzleMsg = "That can't be next — remember: oldest at the bottom, and I is younger than the beds it cuts (L1–L3). Reset and retry."; puzzleColor = "#ff9b7a"; }
+    else if (this.state.done) { puzzleMsg = "Perfect! L1→L2→L3 were laid down, then intrusion I forced up through them, then L4 and L5 settled on top."; puzzleColor = "#8ce99a"; }
+    else if (this.state.picks.length) { puzzleMsg = "Good so far — keep going, youngest last."; puzzleColor = "#fcc419"; }
+    else { puzzleMsg = "Click the events in the order they happened, oldest first."; puzzleColor = "#e7ddcd"; }
+    const pickHint = this.state.picks.length ? "" : "(nothing picked yet)";
+
+    // radiometric
+    const isos = {
+      c14: { label: "Carbon-14", hl: 5730, unit: "yr", hlLabel: "5,730 years", note: "Used to date once-living things — wood, bone, cloth — up to ~50,000 years old. No use for ancient rocks: too little C-14 is left." },
+      k40: { label: "Potassium-40", hl: 1.25e9, unit: "yr", hlLabel: "1.25 billion years", note: "Decays to argon gas. Great for dating volcanic rocks and, famously, the ash layers around early-human fossils." },
+      u238: { label: "Uranium-238", hl: 4.5e9, unit: "yr", hlLabel: "4.5 billion years", note: "Decays (in many steps) to lead. Its enormous half-life lets us date the oldest rocks — and the age of the Earth itself: 4.54 billion years." },
+    };
+    const iso = isos[this.state.iso];
+    const n = this.state.hl;
+    const parent = Math.pow(0.5, n);
+    const parentPct = (parent * 100).toFixed(1);
+    // atom grid: 100 atoms, first round(parent*100) parent
+    const nParent = Math.round(parent * 100);
+    const atoms = Array.from({ length: 100 }, (_, i) => ({ bg: i < nParent ? "#e8590c" : "#c9c0b2" }));
+    const ageYears = n * iso.hl;
+    let ageLabel;
+    if (ageYears >= 1e9) ageLabel = (ageYears / 1e9).toFixed(2) + " billion yr";
+    else if (ageYears >= 1e6) ageLabel = (ageYears / 1e6).toFixed(1) + " million yr";
+    else if (ageYears >= 1000) ageLabel = Math.round(ageYears).toLocaleString() + " yr";
+    else ageLabel = Math.round(ageYears) + " yr";
+
+    const isoBtns = ["c14","k40","u238"].map(k => ({
+      label: isos[k].label, onPick: () => this.setState({ iso: k }),
+      bg: this.state.iso === k ? "#e8590c" : "#faf6ef", fg: this.state.iso === k ? "#faf6ef" : "#2b2620",
+    }));
+
+    const processes = [
+      { tag: "IGNEOUS", color: "#e8590c", name: "Crystal size = cooling speed", desc: "Slow cooling deep underground grows big interlocking crystals (granite). Fast cooling at the surface freezes tiny ones (basalt). So texture reveals where it formed." },
+      { tag: "SEDIMENTARY", color: "#c99a2e", name: "Clastic, chemical & organic", desc: "Clastic rock is cemented fragments (sandstone); chemical rock precipitates from water (rock salt); organic rock is built from remains (limestone, coal, chalk)." },
+      { tag: "METAMORPHIC", color: "#7048a8", name: "Contact vs regional", desc: "Contact metamorphism bakes rock near hot magma. Regional metamorphism squeezes vast areas at plate boundaries, forming banded rocks like schist and gneiss." },
+      { tag: "FOSSILS", color: "#2f7d3a", name: "Index fossils", desc: "Some species lived only briefly but everywhere. Finding one instantly dates the layer — and matches rock layers on different continents." },
+    ];
+
+    return {
+      beds, intr, picks, pickHint, puzzleMsg, puzzleColor,
+      onResetPuzzle: () => this.setState({ picks: [], done: false, wrong: false }),
+      atoms, parentPct, hlRaw: this.state.hl, onHL: e => this.setState({ hl: +e.target.value }),
+      halfLivesLabel: n.toFixed(1), halfLifeLabel: iso.hlLabel, ageLabel, isoNote: iso.note, isoBtns,
+      processes,
+    };
+  }
+}
+</script>
+</body>
+</html>

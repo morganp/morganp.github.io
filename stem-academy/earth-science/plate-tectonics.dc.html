@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Plate Tectonics">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="earth-science.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">EARTH SCIENCE</a> / PLATE TECTONICS</span>
+      <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← EARTH SCIENCE MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// THE RESTLESS SURFACE — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Continents on the move</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">The crust is broken into giant slabs — tectonic plates — that drift a few centimetres a year on the churning mantle below. Everything dramatic in geology happens where two plates meet. Pick a boundary type, then press play and watch the plates move to build the trench, ridge, volcano or fault they create.</div>
+  </div>
+
+  <!-- FIG 01 — boundary sandbox -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.62fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #0e1119; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// FIG. 01 — PLATE BOUNDARY SANDBOX · {{ viewLabel }}</div>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <sc-for list="{{ typeBtns }}" as="b" hint-placeholder-count="3">
+          <div onClick="{{ b.onPick }}" style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 10px 4px; border: 1.5px solid {{ b.border }}; background: {{ b.bg }}; color: {{ b.fg }}; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">{{ b.label }}</div>
+        </sc-for>
+      </div>
+      <svg viewBox="0 0 480 300" style="width: 100%; height: auto; border: 1.5px solid #3a4468;">
+        <defs></defs>
+        <!-- background sky / space -->
+        <rect x="0" y="0" width="480" height="300" fill="{{ bgFill }}"></rect>
+        <!-- mantle -->
+        <rect x="0" y="150" width="480" height="150" fill="#c45c2a"></rect>
+        <rect x="0" y="220" width="480" height="80" fill="#a8471c"></rect>
+        <!-- dynamic shapes -->
+        <sc-for list="{{ shapes }}" as="s" hint-placeholder-count="6">
+          <polygon points="{{ s.points }}" fill="{{ s.fill }}" stroke="{{ s.stroke }}" stroke-width="{{ s.sw }}"></polygon>
+        </sc-for>
+        <!-- magma conduits / lines -->
+        <sc-for list="{{ lines }}" as="l" hint-placeholder-count="2">
+          <line x1="{{ l.x1 }}" y1="{{ l.y1 }}" x2="{{ l.x2 }}" y2="{{ l.y2 }}" stroke="{{ l.stroke }}" stroke-width="{{ l.w }}" stroke-dasharray="{{ l.dash }}"></line>
+        </sc-for>
+        <!-- motion arrows -->
+        <sc-for list="{{ arrows }}" as="a" hint-placeholder-count="2">
+          <line x1="{{ a.x1 }}" y1="{{ a.y1 }}" x2="{{ a.x2 }}" y2="{{ a.y2 }}" stroke="#fff" stroke-width="3"></line>
+          <polygon points="{{ a.head }}" fill="#fff"></polygon>
+        </sc-for>
+        <!-- earthquake markers -->
+        <sc-for list="{{ quakes }}" as="q" hint-placeholder-count="3">
+          <text x="{{ q.x }}" y="{{ q.y }}" text-anchor="middle" font-size="{{ q.size }}" fill="#fcc419">✦</text>
+        </sc-for>
+        <!-- labels -->
+        <sc-for list="{{ svgLabels }}" as="t" hint-placeholder-count="3">
+          <rect x="{{ t.bx }}" y="{{ t.by }}" width="{{ t.bw }}" height="16" rx="2" fill="#0e1119" opacity="0.7"></rect>
+          <text x="{{ t.x }}" y="{{ t.y }}" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" font-weight="600" fill="{{ t.color }}">{{ t.label }}</text>
+        </sc-for>
+      </svg>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <div onClick="{{ onPlay }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 18px; border: 2px solid #e8590c; background: #e8590c; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ playLabel }}</div>
+        <input type="range" min="0" max="100" step="1" value="{{ pRaw }}" onInput="{{ onP }}" style="flex: 1; accent-color: #fcc419; height: 26px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8a94b4; white-space: nowrap;">MOVE →</span>
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); display: flex; flex-direction: column;">
+      <div style="padding: 16px 18px; border-bottom: 1.5px solid #2b2620; background: {{ headBg }};">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">{{ boundaryAlias }}</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px; line-height: 1.05; margin-top: 4px;">{{ boundaryName }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #554c42; margin-top: 4px;">Plates {{ motionWord }}</div>
+      </div>
+      <div style="padding: 14px 18px; border-bottom: 1.5px solid #d8d0c4; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #e8590c;">LANDFORMS &amp; FEATURES</div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <sc-for list="{{ features }}" as="f" hint-placeholder-count="3">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 4px 8px; border: 1.5px solid #2b2620; background: #f6efe2;">{{ f }}</span>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 14px 18px; border-bottom: 1.5px solid #d8d0c4; display: flex; gap: 12px;">
+        <div style="flex: 1;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">EARTHQUAKES</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; color: {{ quakeColor }};">{{ quakeRisk }}</div></div>
+        <div style="flex: 1;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">VOLCANOES</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; color: {{ volcColor }};">{{ volcRisk }}</div></div>
+      </div>
+      <div style="padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1;">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #3a3229;">{{ boundaryBody }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid #d8d0c4; padding-top: 10px; margin-top: auto;">REAL EXAMPLE: {{ boundaryExample }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- legend -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 0; display: flex; gap: 16px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">
+    <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; background: #7d8a5c; border:1px solid #2b2620; display: inline-block;"></span>continental crust</span>
+    <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; background: #3a5566; border:1px solid #2b2620; display: inline-block;"></span>oceanic crust</span>
+    <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; background: #c45c2a; border:1px solid #2b2620; display: inline-block;"></span>mantle</span>
+    <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; background: #e8412a; border:1px solid #2b2620; display: inline-block;"></span>magma</span>
+    <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="color: #d19a00;">✦</span>earthquake focus</span>
+  </div>
+
+  <!-- FIG 02 — plate driver + ring of fire -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// WHAT DRIVES THE PLATES?</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">Heat from the core keeps the mantle churning in slow <strong>convection currents</strong>: hot rock rises, cools near the surface, and sinks again. These currents drag the plates riding on top — and at subduction zones, the cold sinking slab pulls the rest of the plate along behind it. A few centimetres a year, but unstoppable over millions of years.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// THE RING OF FIRE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">Around the edge of the Pacific Ocean, plates collide in a horseshoe of subduction zones. This <strong>Ring of Fire</strong> hosts about 75% of the world's volcanoes and 90% of its earthquakes — from the Andes to Japan to New Zealand. Boundaries aren't random: earthquakes and volcanoes cluster exactly where plates meet.</div>
+    </div>
+  </div>
+
+  <!-- Wegener note -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px;">
+    <div style="border-left: 4px solid #e8590c; background: #fff; padding: 14px 18px; font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;"><strong>A rejected idea.</strong> In 1912 Alfred Wegener noticed the continents fit together like a jigsaw, with matching fossils and rocks on opposite coasts. He proposed they had once been joined as "Pangaea" and had drifted apart. Scientists mocked him — he couldn't explain <em>how</em>. Only decades later, when sea-floor spreading revealed the mantle's convection engine, was he proved right.</div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/articles/zcx8scw" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Plate tectonics ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Plate_tectonics" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Plate tectonics ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Ring_of_Fire" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Ring of Fire ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="rock-cycle-detail.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Rock Cycle Detail &amp; Dating (L3) →</a>
+    <a href="../chemistry/atmosphere-climate.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also at L3: Atmosphere &amp; Climate Change →</a>
+    <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Earth Science map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>EARTH SCIENCE / PLATE TECTONICS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { type: "convergent", p: 0, playing: false, seen: { convergent: true } };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("plate-tectonics"); }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  play() {
+    if (this.state.playing) { clearInterval(this._t); this.setState({ playing: false }); return; }
+    if (this.state.p >= 100) this.setState({ p: 0 });
+    this.setState({ playing: true });
+    this._t = setInterval(() => {
+      this.setState(s => {
+        const np = Math.min(100, s.p + 2);
+        if (np >= 100) { clearInterval(this._t); return { p: 100, playing: false }; }
+        return { p: np };
+      });
+    }, 45);
+  }
+  setType(t) {
+    const seen = { ...this.state.seen, [t]: true };
+    if (Object.keys(seen).length >= 3 && window.Progress) window.Progress.markCompleted("plate-tectonics", { via: "boundary-sandbox" });
+    clearInterval(this._t);
+    this.setState({ type: t, p: 0, playing: false, seen });
+  }
+
+  _arrow(x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy) || 1;
+    const ux = dx / d, uy = dy / d, hl = 14, hw = 7;
+    const bx = x2 - ux * hl, by = y2 - uy * hl, px = -uy, py = ux;
+    return { x1: x1.toFixed(1), y1: y1.toFixed(1), x2: x2.toFixed(1), y2: y2.toFixed(1),
+      head: [x2.toFixed(1)+","+y2.toFixed(1), (bx+px*hw).toFixed(1)+","+(by+py*hw).toFixed(1), (bx-px*hw).toFixed(1)+","+(by-py*hw).toFixed(1)].join(" ") };
+  }
+
+  renderVals() {
+    const t = this.state.type, p = this.state.p / 100;
+    let shapes = [], lines = [], arrows = [], quakes = [], svgLabels = [];
+    let bgFill = "#bfe0f2";
+    const OC = "#3a5566", CC = "#7d8a5c", MAG = "#e8412a";
+
+    if (t === "divergent") {
+      const sep = p * 55;
+      const lL = 200 - sep, rL = 280 + sep;
+      // sea
+      shapes.push({ points: "0,120 480,120 480,150 0,150", fill: "#4a92c4", stroke: "none", sw: 0 });
+      // left plate (oceanic)
+      shapes.push({ points: `0,120 ${lL},120 ${lL},172 0,172`, fill: OC, stroke: "#22333d", sw: 1.5 });
+      // right plate
+      shapes.push({ points: `${rL},120 480,120 480,172 ${rL},172`, fill: OC, stroke: "#22333d", sw: 1.5 });
+      // magma wedge filling the gap
+      shapes.push({ points: `${lL},172 ${rL},172 ${(lL+rL)/2},${172 - p*4} ${240},300 ${240},300`, fill: MAG, stroke: "none", sw: 0 });
+      shapes.push({ points: `${lL},172 ${rL},172 240,240`, fill: MAG, stroke: "none", sw: 0 });
+      // new ridge volcano at centre
+      const rh = 8 + p * 20;
+      shapes.push({ points: `${240-14},120 ${240+14},120 240,${120-rh}`, fill: "#5a3320", stroke: "#2b2620", sw: 1.5 });
+      shapes.push({ points: `${240-5},${120-rh+4} ${240+5},${120-rh+4} 240,${120-rh}`, fill: MAG, stroke: "none", sw: 0 });
+      arrows.push(this._arrow(150, 146, 110, 146));
+      arrows.push(this._arrow(330, 146, 370, 146));
+      svgLabels.push({ label: "mid-ocean ridge", cx: 240, y: 108, wpx: 90 });
+      svgLabels.push({ label: "new crust forms", cx: 240, y: 200, wpx: 90 });
+    } else if (t === "convergent") {
+      const push = p * 60;
+      // continental plate (right, thick, land)
+      shapes.push({ points: "300,110 480,110 480,168 300,168", fill: CC, stroke: "#3f4a2c", sw: 1.5 });
+      // mountains on continental edge
+      const mh = 6 + p * 22;
+      shapes.push({ points: `305,110 335,${110-mh} 360,110`, fill: "#6b5335", stroke: "#2b2620", sw: 1.5 });
+      // sea on the left
+      shapes.push({ points: "0,120 300,120 300,168 0,168", fill: "#4a92c4", stroke: "none", sw: 0 });
+      // oceanic plate (left, thin) moving right & subducting under continental
+      const tip = 250 + push;
+      shapes.push({ points: `0,132 ${230+push*0.4},132 ${tip},210 ${tip-24},214 ${210+push*0.4},152 0,152`, fill: OC, stroke: "#22333d", sw: 1.5 });
+      // trench notch
+      shapes.push({ points: `${292},120 ${300},120 ${296},138`, fill: "#0e1119", stroke: "none", sw: 0 });
+      // magma conduit + volcano on continent
+      const vh = 14 + p * 42;
+      const vx = 340;
+      shapes.push({ points: `${vx-20},110 ${vx+20},110 ${vx},${110-vh}`, fill: "#5a3320", stroke: "#2b2620", sw: 1.5 });
+      shapes.push({ points: `${vx-6},${110-vh+6} ${vx+6},${110-vh+6} ${vx},${110-vh}`, fill: MAG, stroke: "none", sw: 0 });
+      lines.push({ x1: tip-8, y1: 205, x2: vx, y2: 110-vh+6, stroke: MAG, w: 3, dash: "4 3" });
+      arrows.push(this._arrow(150, 142, 210, 142));
+      quakes.push({ x: tip-16, y: 190, size: 15 - 0 }, { x: tip-40, y: 168, size: 12 }, { x: 296, y: 132, size: 13 });
+      svgLabels.push({ label: "trench", cx: 296, y: 112, wpx: 42 });
+      svgLabels.push({ label: "volcano", cx: vx, y: 108-vh, wpx: 52 });
+      svgLabels.push({ label: "subducting plate", cx: tip-40, y: 226, wpx: 96 });
+    } else {
+      // transform — MAP VIEW (from above)
+      bgFill = "#cbe0b8";
+      const off = p * 34;
+      // two plates split by vertical fault at x=240
+      shapes.push({ points: "0,0 236,0 236,300 0,300", fill: "#b8d29a", stroke: "none", sw: 0 });
+      shapes.push({ points: "244,0 480,0 480,300 244,300", fill: "#a9c78a", stroke: "none", sw: 0 });
+      // fault line
+      lines.push({ x1: 240, y1: 0, x2: 240, y2: 300, stroke: "#2b2620", w: 3, dash: "0" });
+      // a road crossing the fault, offset by the slip
+      shapes.push({ points: `40,${148+off} 236,${148+off} 236,${152+off} 40,${152+off}`, fill: "#5a4a33", stroke: "none", sw: 0 });
+      shapes.push({ points: `244,${148-off} 440,${148-off} 440,${152-off} 244,${152-off}`, fill: "#5a4a33", stroke: "none", sw: 0 });
+      // half arrows along fault (opposite directions)
+      arrows.push(this._arrow(160, 90, 160, 40));
+      arrows.push(this._arrow(320, 210, 320, 260));
+      quakes.push({ x: 240, y: 120, size: 15 }, { x: 240, y: 175, size: 13 }, { x: 240, y: 60, size: 12 });
+      svgLabels.push({ label: "fault line", cx: 240, y: 292, wpx: 60 });
+      svgLabels.push({ label: "road offset by slip", cx: 130, y: 130, wpx: 108 });
+    }
+
+    const svgLabels2 = svgLabels.map(l => ({
+      label: l.label, x: l.cx, y: l.y, bx: l.cx - l.wpx / 2, by: l.y - 12, bw: l.wpx,
+      color: "#fcc419",
+    }));
+
+    const info = {
+      divergent: {
+        alias: "CONSTRUCTIVE BOUNDARY", name: "Divergent", motion: "pull apart", view: "SIDE VIEW",
+        features: ["Mid-ocean ridge", "Rift valley", "Gentle volcanoes", "New crust"],
+        quakeRisk: "Small, shallow", quakeColor: "#c99a2e", volcRisk: "Yes — runny lava", volcColor: "#e8590c",
+        body: "The plates move apart. Magma rises to fill the gap, cools, and forms brand-new crust — so the sea floor slowly spreads. On land this can tear open a rift valley.",
+        example: "Mid-Atlantic Ridge; East African Rift", headBg: "#eef4ea",
+      },
+      convergent: {
+        alias: "DESTRUCTIVE BOUNDARY", name: "Convergent", motion: "collide", view: "SIDE VIEW",
+        features: ["Ocean trench", "Volcanoes", "Fold mountains", "Subduction zone"],
+        quakeRisk: "Strong, deep", quakeColor: "#c0392b", volcRisk: "Yes — explosive", volcColor: "#c0392b",
+        body: "The plates crash together. The denser oceanic plate is forced down (subducted) under the continent, forming a deep trench. It melts, and that magma rises to erupt as explosive volcanoes while the crust crumples into mountains.",
+        example: "Andes; Japan; Cascades", headBg: "#fbe7d6",
+      },
+      transform: {
+        alias: "CONSERVATIVE BOUNDARY", name: "Transform", motion: "slide past each other", view: "MAP VIEW (FROM ABOVE)",
+        features: ["Fault line", "Offset features", "No new crust"],
+        quakeRisk: "Sudden, violent", quakeColor: "#c0392b", volcRisk: "None", volcColor: "#2f7d3a",
+        body: "The plates grind past one another sideways. No crust is made or destroyed. They snag, build up huge stress, then suddenly jerk free — releasing that energy as a powerful earthquake. No volcanoes form here.",
+        example: "San Andreas Fault, California", headBg: "#eef1e4",
+      },
+    }[t];
+
+    const typeBtns = [
+      { key: "divergent", label: "DIVERGENT" }, { key: "convergent", label: "CONVERGENT" }, { key: "transform", label: "TRANSFORM" },
+    ].map(b => ({ label: b.label, onPick: () => this.setType(b.key),
+      bg: t === b.key ? "#e8590c" : "#141b33", fg: t === b.key ? "#faf6ef" : "#cfe0f5", border: t === b.key ? "#e8590c" : "#3a4468" }));
+
+    return {
+      shapes, lines, arrows, quakes, svgLabels: svgLabels2, bgFill,
+      typeBtns, viewLabel: info.view,
+      pRaw: this.state.p, onP: e => this.setState({ p: +e.target.value }),
+      onPlay: () => this.play(), playLabel: this.state.playing ? "❚❚ PAUSE" : (this.state.p >= 100 ? "↺ REPLAY" : "▶ PLAY"),
+      boundaryAlias: info.alias, boundaryName: info.name + " boundary", motionWord: info.motion,
+      features: info.features, quakeRisk: info.quakeRisk, quakeColor: info.quakeColor,
+      volcRisk: info.volcRisk, volcColor: info.volcColor, boundaryBody: info.body, boundaryExample: info.example, headBg: info.headBg,
+    };
+  }
+}
+</script>
+</body>
+</html>

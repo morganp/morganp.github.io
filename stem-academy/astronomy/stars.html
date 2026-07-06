@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Stars & Constellations">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="astronomy.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">ASTRONOMY</a> / STARS &amp; CONSTELLATIONS</span>
+      <a href="astronomy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← ASTRONOMY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// SUNS BY THE BILLION — LEVEL L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Join the dots, read the light</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">Every star is a distant sun. For thousands of years people have joined them into patterns — constellations — to find their way and tell stories. Trace four famous ones, then discover the surprising truth a star's colour tells you: blue stars are the hottest, red ones the coolest.</div>
+  </div>
+
+  <!-- FIG 01 — constellations -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.55fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #070a14; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// FIG. 01 — TRACE A CONSTELLATION</div>
+      <svg viewBox="0 0 100 78" style="width: 100%; height: auto; background: radial-gradient(circle at 30% 20%, #101736, #070a14);">
+        <sc-for list="{{ bgStars }}" as="s" hint-placeholder-count="60">
+          <circle cx="{{ s.x }}" cy="{{ s.y }}" r="{{ s.r }}" fill="#8a94b4" opacity="{{ s.o }}"></circle>
+        </sc-for>
+        <sc-for list="{{ lines }}" as="l" hint-placeholder-count="7">
+          <line x1="{{ l.x1 }}" y1="{{ l.y1 }}" x2="{{ l.x2 }}" y2="{{ l.y2 }}" stroke="#5a8fd6" stroke-width="0.7"></line>
+        </sc-for>
+        <sc-for list="{{ starDots }}" as="s" hint-placeholder-count="7">
+          <circle cx="{{ s.x }}" cy="{{ s.y }}" r="{{ s.r }}" fill="{{ s.color }}"></circle>
+        </sc-for>
+      </svg>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <sc-for list="{{ conBtns }}" as="b" hint-placeholder-count="4">
+          <div onClick="{{ b.onPick }}" style="flex: 1; min-width: 90px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 10px 4px; border: 1.5px solid {{ b.border }}; background: {{ b.bg }}; color: {{ b.fg }}; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">{{ b.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">{{ conMeaning }}</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; line-height: 1.05;">{{ conName }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #3a3229;">{{ conBody }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e8590c; border-top: 1.5px solid #d8d0c4; padding-top: 10px; margin-top: auto;">FIND IT: {{ conFind }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — star colour & temperature -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 0.85fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #070a14; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 14px; align-items: center;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419; align-self: flex-start;">// FIG. 02 — A STAR'S COLOUR = ITS TEMPERATURE</div>
+      <svg viewBox="0 0 160 160" style="width: 160px; height: 160px;">
+        <circle cx="80" cy="80" r="{{ starR }}" fill="{{ starColor }}"></circle>
+        <circle cx="80" cy="80" r="{{ starGlow }}" fill="{{ starColor }}" opacity="0.25"></circle>
+      </svg>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px; color: {{ starColor }};">{{ starTemp }} °C</div>
+      <input type="range" min="0" max="100" step="1" value="{{ tempRaw }}" onInput="{{ onTemp }}" style="width: 100%; accent-color: #e8590c; height: 26px;">
+      <div style="display: flex; justify-content: space-between; width: 100%; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #8a94b4;"><span>← COOLER (red)</span><span>HOTTER (blue) →</span></div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 8px; border: 1.5px solid #2b2620; background: {{ classBg }}; color: {{ classFg }};">CLASS {{ starClass }}</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px;">{{ starLabel }}</span></div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #3a3229;">{{ starDesc }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">THE SEQUENCE — HOTTEST TO COOLEST</div>
+      <div style="display: flex; gap: 3px;">
+        <sc-for list="{{ classStrip }}" as="c" hint-placeholder-count="7">
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border: 1.5px solid {{ c.border }}; background: {{ c.bg }};">
+            <span style="width: 14px; height: 14px; border-radius: 50%; background: {{ c.color }}; border: 1px solid #2b2620; display: inline-block;"></span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: {{ c.textColor }};">{{ c.letter }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.5; color: #6b6156;">Astronomers label these classes <strong>O B A F G K M</strong>. Our Sun is a middle-of-the-road yellow <strong>G</strong> star at about 5,500 °C — comfortably ordinary.</div>
+    </div>
+  </div>
+
+  <!-- brightness note -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <div style="border: 2px solid #2b2620; background: #fff; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// WHY SOME STARS LOOK BRIGHTER</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">A star can look bright for two reasons: it's genuinely giving out huge amounts of light, or it's simply <strong>closer</strong> to us. A dim nearby star can outshine a giant one far away — just like a nearby candle looks brighter than a distant floodlight.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// LIGHT FROM THE PAST</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">Stars are so far away we measure their distance in <strong>light-years</strong> — how far light travels in a year (about 9.5 trillion km). The nearest star beyond the Sun is 4.2 light-years away, so its light left before you were born. Look up and you're seeing the past.</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Constellation" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Constellation ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Stellar_classification" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Stellar classification ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/topics/zkbg87h" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Earth and space ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="the-universe.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Level up: The Universe &amp; Big Bang (L3) →</a>
+    <a href="../physics/space.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Related: Space Physics — life cycle of stars →</a>
+    <a href="astronomy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Astronomy map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>ASTRONOMY / STARS &amp; CONSTELLATIONS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { con: "plough", temp: 45, seen: {} };
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("stars");
+    this._bg = Array.from({ length: 60 }, () => ({ x: (Math.random() * 100).toFixed(1), y: (Math.random() * 78).toFixed(1), r: (Math.random() * 0.5 + 0.2).toFixed(2), o: (Math.random() * 0.6 + 0.2).toFixed(2) }));
+  }
+
+  _cons() {
+    return {
+      plough: { name: "The Plough", meaning: "PART OF URSA MAJOR — THE GREAT BEAR",
+        stars: [[20,55],[38,58],[42,40],[24,37],[56,42],[72,34],[88,42]],
+        lines: [[3,0],[0,1],[1,2],[2,3],[2,4],[4,5],[5,6]],
+        body: "Seven bright stars in the shape of a saucepan or plough. It's one of the easiest patterns to spot and never sets in UK skies.",
+        find: "The two stars at the end of the 'pan' point straight to the Pole Star (north)." },
+      orion: { name: "Orion", meaning: "THE HUNTER",
+        stars: [[30,18],[64,22],[42,42],[50,44],[58,46],[34,72],[70,70]],
+        lines: [[0,1],[0,2],[1,4],[2,3],[3,4],[2,5],[4,6]],
+        body: "A mighty hunter with a glittering three-star belt. Red Betelgeuse marks one shoulder; blue-white Rigel one foot — two very different stars side by side.",
+        find: "Look south on winter evenings. The three evenly-spaced belt stars are unmistakable." },
+      cassiopeia: { name: "Cassiopeia", meaning: "THE QUEEN",
+        stars: [[14,38],[33,58],[50,36],[67,58],[86,40]],
+        lines: [[0,1],[1,2],[2,3],[3,4]],
+        body: "Five stars in a giant letter W (or M, depending on the season). Named after a boastful queen in Greek myth.",
+        find: "On the opposite side of the Pole Star from the Plough — so when one is low, the other is high." },
+      cygnus: { name: "Cygnus", meaning: "THE SWAN / NORTHERN CROSS",
+        stars: [[50,14],[50,44],[50,72],[24,44],[76,44]],
+        lines: [[0,1],[1,2],[3,1],[1,4]],
+        body: "A swan flying along the Milky Way, its wings outstretched — also called the Northern Cross. Bright Deneb marks its tail.",
+        find: "High overhead on summer evenings, gliding down the misty band of the Milky Way." },
+    };
+  }
+
+  pick(id) {
+    const seen = { ...this.state.seen, [id]: true };
+    this._checkDone(seen, this.state.temp);
+    this.setState({ con: id, seen });
+  }
+  _checkDone(seen, temp) {
+    const enoughCon = Object.keys(seen).length >= 3;
+    if (enoughCon && (temp < 15 || temp > 85 || this._tempSwept) && window.Progress && !this._done) {
+      // require some temperature exploration too
+    }
+    if (enoughCon && this._tempSwept && window.Progress && !this._done) { this._done = true; window.Progress.markCompleted("stars", { via: "constellations-and-colour" }); }
+  }
+
+  renderVals() {
+    const C = this._cons()[this.state.con];
+    // map 0..100 x, 0..78 y directly
+    const starDots = C.stars.map((s, i) => ({ x: s[0], y: s[1], r: 1.6, color: "#fff" }));
+    const lines = C.lines.map(([a, b]) => ({ x1: C.stars[a][0], y1: C.stars[a][1], x2: C.stars[b][0], y2: C.stars[b][1] }));
+
+    const conBtns = [
+      { id: "plough", label: "THE PLOUGH" }, { id: "orion", label: "ORION" },
+      { id: "cassiopeia", label: "CASSIOPEIA" }, { id: "cygnus", label: "CYGNUS" },
+    ].map(b => ({ label: b.label, onPick: () => this.pick(b.id),
+      bg: this.state.con === b.id ? "#e8590c" : "#101736", fg: this.state.con === b.id ? "#faf6ef" : "#cfe0f5", border: this.state.con === b.id ? "#e8590c" : "#2a3350" }));
+
+    // star colour: temp 0..100 -> 2500..30000 C, red->blue
+    const t = this.state.temp;
+    if (t < 12 || t > 88) this._tempSwept = true;
+    const tempC = Math.round(2500 + (t / 100) * 27500);
+    // colour ramp
+    let starColor;
+    if (t < 20) starColor = "#ff6b3d";
+    else if (t < 38) starColor = "#ffb060";
+    else if (t < 52) starColor = "#ffe08a";
+    else if (t < 64) starColor = "#fbf5e6";
+    else if (t < 78) starColor = "#cfe0ff";
+    else starColor = "#9db8ff";
+    const starR = 34 + t * 0.18;
+
+    const classes = [
+      { letter: "O", color: "#9db8ff", label: "Blue supergiant", min: 88, desc: "The hottest, rarest and most massive stars — over 25,000 °C, blazing blue-white and burning through their fuel fast." },
+      { letter: "B", color: "#bcd0ff", label: "Blue-white star", min: 78, desc: "Very hot blue-white stars, like Rigel in Orion — thousands of times brighter than the Sun." },
+      { letter: "A", color: "#eef2ff", label: "White star", min: 64, desc: "Hot white stars such as Sirius, the brightest star in our night sky." },
+      { letter: "F", color: "#fbf5e6", label: "Yellow-white star", min: 52, desc: "Slightly hotter and whiter than the Sun." },
+      { letter: "G", color: "#ffe08a", label: "Yellow star (like our Sun)", min: 38, desc: "Steady yellow stars around 5,500 °C. Our Sun is a G star — perfect for warming a planet of life." },
+      { letter: "K", color: "#ffb060", label: "Orange star", min: 20, desc: "Cooler orange stars, long-lived and common." },
+      { letter: "M", color: "#ff6b3d", label: "Red dwarf / red giant", min: 0, desc: "The coolest stars, glowing red at ~3,000 °C. Red dwarfs are the most common stars in the galaxy." },
+    ];
+    let cls = classes[classes.length - 1];
+    for (const c of classes) { if (t >= c.min) { cls = c; break; } }
+    const classStrip = classes.map(c => ({ letter: c.letter, color: c.color,
+      bg: cls.letter === c.letter ? "#2b2620" : "#faf6ef", border: cls.letter === c.letter ? "#e8590c" : "#d8d0c4",
+      textColor: cls.letter === c.letter ? "#fcc419" : "#2b2620" }));
+
+    return {
+      bgStars: this._bg || [], starDots, lines, conBtns,
+      conName: C.name, conMeaning: C.meaning, conBody: C.body, conFind: C.find,
+      tempRaw: t, onTemp: e => { const v = +e.target.value; if (v < 12 || v > 88) this._tempSwept = true; this._checkDone(this.state.seen, v); this.setState({ temp: v }); },
+      starColor, starR: starR.toFixed(1), starGlow: (starR + 18).toFixed(1), starTemp: tempC.toLocaleString(),
+      starClass: cls.letter, starLabel: cls.label, starDesc: cls.desc, classBg: cls.color, classFg: "#2b2620",
+      classStrip,
+    };
+  }
+}
+</script>
+</body>
+</html>

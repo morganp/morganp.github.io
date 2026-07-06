@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="The Rock Cycle">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="earth-science.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">EARTH SCIENCE</a> / THE ROCK CYCLE</span>
+      <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← EARTH SCIENCE MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// ROCK NEVER RESTS — LEVEL L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">The rock cycle turns forever</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 820px;">No rock lasts forever. Over millions of years, mountains crumble into sand, sand is buried and squeezed into rock, rock is cooked and folded, and deep down some of it melts back into magma — which cools into fresh rock and starts again. Click any stage or process to explore it, then send a single grain all the way around.</div>
+  </div>
+
+  <!-- FIG 01 — the cycle -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.72fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE ROCK CYCLE (CLICK A STAGE OR PROCESS)</div>
+      <svg viewBox="0 0 420 400" style="width: 100%; height: auto;">
+        <!-- process arrows -->
+        <sc-for list="{{ arrows }}" as="a" hint-placeholder-count="5">
+          <line x1="{{ a.x1 }}" y1="{{ a.y1 }}" x2="{{ a.x2 }}" y2="{{ a.y2 }}" stroke="{{ a.stroke }}" stroke-width="{{ a.w }}"></line>
+          <polygon points="{{ a.head }}" fill="{{ a.stroke }}"></polygon>
+          <rect x="{{ a.lx }}" y="{{ a.ly }}" width="{{ a.lw }}" height="20" rx="3" fill="{{ a.labelBg }}" stroke="#2b2620" stroke-width="1" style="cursor: pointer;" onClick="{{ a.onPick }}"></rect>
+          <text x="{{ a.tx }}" y="{{ a.ty }}" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" font-weight="600" fill="{{ a.labelFg }}" style="cursor: pointer; pointer-events: none;">{{ a.label }}</text>
+        </sc-for>
+        <!-- nodes -->
+        <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="5">
+          <circle cx="{{ n.x }}" cy="{{ n.y }}" r="40" fill="{{ n.fill }}" stroke="#2b2620" stroke-width="{{ n.sw }}" style="cursor: pointer;" onClick="{{ n.onPick }}"></circle>
+          <text x="{{ n.x }}" y="{{ n.ty1 }}" text-anchor="middle" font-family="Archivo" font-size="11.5" font-weight="800" fill="{{ n.fg }}" style="pointer-events: none;">{{ n.l1 }}</text>
+          <text x="{{ n.x }}" y="{{ n.ty2 }}" text-anchor="middle" font-family="Archivo" font-size="11.5" font-weight="800" fill="{{ n.fg }}" style="pointer-events: none;">{{ n.l2 }}</text>
+        </sc-for>
+      </svg>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #e8590c; border: 1px solid #2b2620; display: inline-block;"></span>igneous</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #c99a2e; border: 1px solid #2b2620; display: inline-block;"></span>sediment / sedimentary</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #7048a8; border: 1px solid #2b2620; display: inline-block;"></span>metamorphic</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #b0472e; border: 1px solid #2b2620; display: inline-block;"></span>magma</span>
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: {{ detailBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 8px; border: 1.5px solid #2b2620; background: {{ detailTagBg }}; color: {{ detailTagFg }}; align-self: flex-start;">{{ detailKind }}</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; line-height: 1.05;">{{ detailTitle }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #3a3229;">{{ detailBody }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid rgba(43,38,32,0.15); padding-top: 10px; margin-top: auto;">{{ detailFoot }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — follow a grain -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// FIG. 02 — FOLLOW ONE GRAIN AROUND THE CYCLE</div>
+        <div style="display: flex; gap: 8px;">
+          <div onClick="{{ onPlay }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 18px; border: 2px solid #e8590c; background: #e8590c; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ playLabel }}</div>
+          <div onClick="{{ onStep }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 18px; border: 2px solid #faf6ef; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">STEP →</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 4px; align-items: stretch; flex-wrap: wrap;">
+        <sc-for list="{{ track }}" as="t" hint-placeholder-count="5">
+          <div style="flex: 1; min-width: 120px; border: 2px solid {{ t.border }}; background: {{ t.bg }}; padding: 12px 10px; display: flex; flex-direction: column; gap: 3px;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: {{ t.tagFg }};">{{ t.step }}</div>
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px; color: {{ t.fg }};">{{ t.name }}</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 11.5px; line-height: 1.35; color: {{ t.descFg }};">{{ t.desc }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #e7ddcd;">{{ grainMsg }}</div>
+    </div>
+  </div>
+
+  <!-- shortcuts note -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// NOTE — THE CYCLE HAS SHORTCUTS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">The loop above is the classic path, but rock can jump the queue. <strong>Any</strong> rock at the surface can be weathered into sediment; <strong>any</strong> buried rock can be cooked into metamorphic rock; and <strong>any</strong> rock dragged deep enough can melt into magma. There's no fixed order — just a web of processes powered by the Sun (weathering, erosion) and the Earth's inner heat (melting, pressure).</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/z9bg87h" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Rocks, soils and fossils ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Rock_cycle" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Rock cycle ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Igneous_rock" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Igneous, sedimentary &amp; metamorphic rock ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="earths-structure.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Earth's Structure (L2) →</a>
+    <a href="rock-cycle-detail.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Rock Cycle Detail &amp; Dating (L3) →</a>
+    <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Earth Science map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>EARTH SCIENCE / THE ROCK CYCLE</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sel: { type: "node", i: 0 }, grain: 0, playing: false, seen: {} };
+
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("rock-cycle"); }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  _nodes() {
+    return [
+      { l1: "Magma", l2: "", kind: "MOLTEN ROCK", fill: "#b0472e", fg: "#faf6ef",
+        title: "Magma", body: "Molten (melted) rock, so hot it flows. It sits deep underground, or erupts from a volcano as lava. When it cools, it hardens into igneous rock.", foot: "Powered by: the Earth's internal heat" },
+      { l1: "Igneous", l2: "rock", kind: "ROCK FAMILY", fill: "#e8590c", fg: "#faf6ef",
+        title: "Igneous rock", body: "Formed when magma or lava cools and crystallises. Cool it slowly underground for big crystals (granite); cool it fast on the surface for tiny ones (basalt).", foot: "Made by: cooling & crystallising" },
+      { l1: "Sediment", l2: "", kind: "LOOSE BITS", fill: "#e3c99a", fg: "#2b2620",
+        title: "Sediment", body: "Loose bits — sand, mud, pebbles, shell fragments — worn off rocks and carried away by wind, water and ice. It settles in layers, often on a river bed or sea floor.", foot: "Made by: weathering & erosion" },
+      { l1: "Sedimentary", l2: "rock", kind: "ROCK FAMILY", fill: "#c99a2e", fg: "#2b2620",
+        title: "Sedimentary rock", body: "Layers of sediment buried and pressed together over ages, with minerals gluing the grains. It often holds fossils and visible layers (sandstone, limestone).", foot: "Made by: burial, compaction & cementing" },
+      { l1: "Metamorphic", l2: "rock", kind: "ROCK FAMILY", fill: "#7048a8", fg: "#faf6ef",
+        title: "Metamorphic rock", body: "Any rock changed by intense heat and pressure — without melting. Its minerals recrystallise into new bands and textures (marble from limestone, slate from mudstone).", foot: "Made by: heat & pressure" },
+    ];
+  }
+  _processes() {
+    return [
+      { label: "cool & crystallise", from: 0, to: 1, color: "#e8590c",
+        title: "Cooling & crystallising", body: "As magma or lava loses heat, its atoms lock into crystals and it turns solid. Slow cooling deep down grows large crystals; fast cooling at the surface gives tiny ones.", foot: "Magma → Igneous rock" },
+      { label: "weather & erode", from: 1, to: 2, color: "#c99a2e",
+        title: "Weathering & erosion", body: "At the surface, rock is broken down by rain, frost, wind and living things (weathering), and the loose bits are carried away by rivers, ice and wind (erosion).", foot: "Igneous rock → Sediment" },
+      { label: "compact & cement", from: 2, to: 3, color: "#c99a2e",
+        title: "Compaction & cementing", body: "Buried under more and more layers, sediment is squashed (compacted) and natural mineral 'glue' cements the grains together into solid sedimentary rock.", foot: "Sediment → Sedimentary rock" },
+      { label: "heat & pressure", from: 3, to: 4, color: "#7048a8",
+        title: "Heat & pressure", body: "Pushed deep or squeezed by moving plates, rock is cooked and crushed. Its minerals recrystallise into new forms — but it stays solid. This is metamorphism.", foot: "Sedimentary rock → Metamorphic rock" },
+      { label: "melt", from: 4, to: 0, color: "#b0472e",
+        title: "Melting", body: "Drag rock deep enough — or near enough to a heat source — and it finally melts back into magma, ready to cool into fresh igneous rock and start the cycle over.", foot: "Metamorphic rock → Magma" },
+    ];
+  }
+
+  play() {
+    if (this.state.playing) { clearInterval(this._t); this.setState({ playing: false }); return; }
+    this.setState({ playing: true });
+    this._t = setInterval(() => this.step(), 1400);
+  }
+  step() {
+    const g = (this.state.grain + 1) % 5;
+    const seen = { ...this.state.seen, [g]: true };
+    if (Object.keys(seen).length >= 5 && window.Progress) window.Progress.markCompleted("rock-cycle", { via: "follow-grain" });
+    this.setState({ grain: g, seen });
+  }
+
+  renderVals() {
+    const cx = 210, cy = 195, R = 128, nodeR = 40;
+    const nd = this._nodes();
+    const proc = this._processes();
+    const ang = i => (-90 + i * 72) * Math.PI / 180;
+    const pt = i => ({ x: cx + R * Math.cos(ang(i)), y: cy + R * Math.sin(ang(i)) });
+
+    const sel = this.state.sel;
+    const nodes = nd.map((n, i) => {
+      const p = pt(i);
+      const active = (sel.type === "node" && sel.i === i) || this.state.grain === i;
+      return { ...n, x: p.x.toFixed(1), y: p.y.toFixed(1), ty1: (p.y - (n.l2 ? 3 : 4)).toFixed(1), ty2: (p.y + 12).toFixed(1),
+        sw: active ? 4 : 2, fill: this.state.grain === i ? "#2f7d3a" : n.fill, fg: this.state.grain === i ? "#faf6ef" : n.fg,
+        onPick: () => this.setState({ sel: { type: "node", i } }) };
+    });
+
+    const arrows = proc.map((pr, i) => {
+      const a = pt(pr.from), b = pt(pr.to);
+      const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+      const ux = dx / d, uy = dy / d;
+      const x1 = a.x + ux * (nodeR + 4), y1 = a.y + uy * (nodeR + 4);
+      const x2 = b.x - ux * (nodeR + 10), y2 = b.y - uy * (nodeR + 10);
+      // arrowhead (>=14px)
+      const hl = 14, hw = 8;
+      const bx = x2 - ux * hl, by = y2 - uy * hl;
+      const px = -uy, py = ux;
+      const head = [x2.toFixed(1) + "," + y2.toFixed(1), (bx + px * hw).toFixed(1) + "," + (by + py * hw).toFixed(1), (bx - px * hw).toFixed(1) + "," + (by - py * hw).toFixed(1)].join(" ");
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const lw = pr.label.length * 5.6 + 10;
+      const active = sel.type === "proc" && sel.i === i;
+      return { x1: x1.toFixed(1), y1: y1.toFixed(1), x2: x2.toFixed(1), y2: y2.toFixed(1), head,
+        stroke: active ? "#2b2620" : pr.color, w: active ? 3.5 : 2.4,
+        lx: (mx - lw / 2).toFixed(1), ly: (my - 10).toFixed(1), lw: lw.toFixed(0), tx: mx.toFixed(1), ty: (my + 4).toFixed(1),
+        label: pr.label, labelBg: active ? "#2b2620" : "#faf6ef", labelFg: active ? "#faf6ef" : "#2b2620",
+        onPick: () => this.setState({ sel: { type: "proc", i } }) };
+    });
+
+    let detail;
+    if (sel.type === "node") { const n = nd[sel.i]; detail = { kind: n.kind, title: n.title, body: n.body, foot: n.foot, bg: "#fff", tagBg: n.fill, tagFg: n.fg }; }
+    else { const p = proc[sel.i]; detail = { kind: "PROCESS", title: p.title, body: p.body, foot: p.foot, bg: "#f6efe2", tagBg: p.color, tagFg: "#faf6ef" }; }
+
+    const track = nd.map((n, i) => {
+      const on = this.state.grain === i;
+      return { step: "STEP " + (i + 1), name: n.title, desc: n.foot,
+        border: on ? "#fcc419" : "#574f45", bg: on ? "#3a3327" : "#241f1a",
+        fg: on ? "#fcc419" : "#e7ddcd", descFg: on ? "#e7ddcd" : "#a89d8e", tagFg: on ? "#fcc419" : "#8a7f70" };
+    });
+    const grainMsg = "Right now this grain is: " + nd[this.state.grain].title + ". " + proc[this.state.grain].title + " will turn it into " + nd[(this.state.grain + 1) % 5].title.toLowerCase() + ".";
+
+    return {
+      nodes, arrows,
+      detailKind: detail.kind, detailTitle: detail.title, detailBody: detail.body, detailFoot: detail.foot,
+      detailBg: detail.bg, detailTagBg: detail.tagBg, detailTagFg: detail.tagFg,
+      track, grainMsg,
+      playLabel: this.state.playing ? "❚❚ PAUSE" : "▶ PLAY",
+      onPlay: () => this.play(), onStep: () => this.step(),
+    };
+  }
+}
+</script>
+</body>
+</html>

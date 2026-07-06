@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Scale & Orbits">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="astronomy.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">ASTRONOMY</a> / SCALE &amp; ORBITS</span>
+      <a href="astronomy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← ASTRONOMY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// SPACE IS MOSTLY... SPACE — LEVEL L2</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">How far, and how fast?</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">Textbook pictures squeeze the planets together to fit the page — but the real solar system is almost entirely empty space. Fly a rocket out from the Sun to feel the true distances, then find out why the far-out planets take so long to go round.</div>
+  </div>
+
+  <!-- FIG 01 — true-scale rocket -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #0a0e1a; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// FIG. 01 — FLY OUT FROM THE SUN (TRUE DISTANCE SCALE, 1 AU = 150M km)</div>
+      <svg viewBox="0 0 900 130" style="width: 100%; min-width: 820px; height: auto;">
+        <!-- scale line -->
+        <line x1="40" y1="80" x2="880" y2="80" stroke="#3a4468" stroke-width="2"></line>
+        <!-- sun -->
+        <circle cx="40" cy="80" r="14" fill="#ffd43b"></circle>
+        <!-- planets at true AU positions -->
+        <sc-for list="{{ scalePlanets }}" as="p" hint-placeholder-count="8">
+          <circle cx="{{ p.x }}" cy="80" r="{{ p.r }}" fill="{{ p.color }}" stroke="#0a0e1a" stroke-width="1"></circle>
+          <text x="{{ p.x }}" y="{{ p.ly }}" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" fill="{{ p.labelColor }}">{{ p.name }}</text>
+        </sc-for>
+        <!-- rocket marker -->
+        <line x1="{{ rocketX }}" y1="52" x2="{{ rocketX }}" y2="104" stroke="#e8590c" stroke-width="2"></line>
+        <polygon points="{{ rocketX }},44 {{ rocketXL }},54 {{ rocketXR }},54" fill="#e8590c"></polygon>
+        <!-- AU ticks -->
+        <sc-for list="{{ auTicks }}" as="t" hint-placeholder-count="7">
+          <line x1="{{ t.x }}" y1="76" x2="{{ t.x }}" y2="84" stroke="#5a6488" stroke-width="1"></line>
+          <text x="{{ t.x }}" y="100" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#6b7594">{{ t.label }}</text>
+        </sc-for>
+      </svg>
+      <input type="range" min="0" max="100" step="0.2" value="{{ rocketRaw }}" onInput="{{ onRocket }}" style="width: 100%; accent-color: #e8590c; height: 26px;">
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+        <div style="border: 1.5px solid #2a3350; padding: 8px 10px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #6b7594;">DISTANCE FROM SUN</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; color: #fcc419;">{{ distAU }} AU</div></div>
+        <div style="border: 1.5px solid #2a3350; padding: 8px 10px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #6b7594;">IN KILOMETRES</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; color: #e6e9f2;">{{ distKm }}</div></div>
+        <div style="border: 1.5px solid #2a3350; padding: 8px 10px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #6b7594;">LIGHT TAKES</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; color: #e6e9f2;">{{ lightTime }}</div></div>
+        <div style="border: 1.5px solid #2a3350; padding: 8px 10px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #6b7594;">NEAREST PLANET</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; color: #8ce99a;">{{ nearestPlanet }}</div></div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #b8bccb;">{{ rocketMsg }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — orbital speed graph -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.6fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 01 — ORBITAL SPEED vs DISTANCE (CLICK A PLANET)</div>
+      <svg viewBox="0 0 560 300" style="width: 100%; height: auto;">
+        <line x1="60" y1="255" x2="540" y2="255" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="60" y1="255" x2="60" y2="20" stroke="#2b2620" stroke-width="2"></line>
+        <!-- curve -->
+        <path d="{{ speedCurve }}" fill="none" stroke="#d8d0c4" stroke-width="2" stroke-dasharray="4 4"></path>
+        <sc-for list="{{ speedDots }}" as="d" hint-placeholder-count="8">
+          <circle cx="{{ d.x }}" cy="{{ d.y }}" r="{{ d.r }}" fill="{{ d.fill }}" stroke="#2b2620" stroke-width="1.5" style="cursor: pointer;" onClick="{{ d.onPick }}"></circle>
+          <text x="{{ d.x }}" y="{{ d.ly }}" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#6b6156" style="pointer-events: none;">{{ d.abbr }}</text>
+        </sc-for>
+        <text x="300" y="288" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620">Distance from Sun (AU)</text>
+        <text x="20" y="140" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2b2620" transform="rotate(-90 20 140)">Orbital speed (km/s)</text>
+        <text x="54" y="30" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">50</text>
+        <text x="54" y="258" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">0</text>
+      </svg>
+    </div>
+    <div style="border: 2px solid #2b2620; background: {{ selHeadBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 22px; height: 22px; border-radius: 50%; background: {{ selColor }}; border: 2px solid #2b2620; display: inline-block;"></span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px;">{{ selName }}</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="color: #6b6156;">DISTANCE</span><span style="font-weight: 600;">{{ selDist }} AU</span></div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="color: #6b6156;">ORBITAL SPEED</span><span style="font-weight: 600; color: #e8590c;">{{ selSpeed }} km/s</span></div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 12px;"><span style="color: #6b6156;">ONE ORBIT (YEAR)</span><span style="font-weight: 600;">{{ selYear }}</span></div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42; border-top: 1.5px solid rgba(43,38,32,0.15); padding-top: 12px; margin-top: auto;">The further out a planet is, the <strong>slower</strong> it moves <em>and</em> the longer its path — so its year is much longer. Neptune crawls at 5 km/s and takes 165 Earth years to go round once. The Sun's gravity is weaker far away, so less speed is needed to stay in orbit.</div>
+    </div>
+  </div>
+
+  <!-- AU explainer -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px;">
+    <div style="border-left: 4px solid #e8590c; background: #fff; padding: 14px 18px; font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;"><strong>The astronomical unit (AU).</strong> Distances in space are so huge that kilometres get silly. So astronomers measure in AU — the distance from the Earth to the Sun, about 150 million km. Neptune is 30 AU out. Light, the fastest thing there is, still takes over 4 hours to reach it.</div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://en.wikipedia.org/wiki/Astronomical_unit" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Astronomical unit ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Orbital_speed" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Orbital speed ↗</a>
+        <a href="https://www.bbc.co.uk/bitesize/topics/zkbg87h" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Earth and space ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="stars.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Stars &amp; Constellations (L2) →</a>
+    <a href="../physics/space.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Space Physics — orbits &amp; stars (L2–L3) →</a>
+    <a href="astronomy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Astronomy map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>ASTRONOMY / SCALE &amp; ORBITS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { rocket: 3, sel: "earth" };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("scale-orbits"); }
+
+  _planets() {
+    return [
+      { id: "mercury", name: "Mercury", abbr: "Me", au: 0.39, r: 3, speed: 47.9, year: "88 days", color: "#9a8c7a" },
+      { id: "venus", name: "Venus", abbr: "V", au: 0.72, r: 5, speed: 35.0, year: "225 days", color: "#d9b26a" },
+      { id: "earth", name: "Earth", abbr: "E", au: 1.0, r: 5, speed: 29.8, year: "365 days", color: "#3a7bd5" },
+      { id: "mars", name: "Mars", abbr: "Ma", au: 1.52, r: 4, speed: 24.1, year: "687 days", color: "#c1502e" },
+      { id: "jupiter", name: "Jupiter", abbr: "J", au: 5.2, r: 11, speed: 13.1, year: "12 years", color: "#c9a06a" },
+      { id: "saturn", name: "Saturn", abbr: "Sa", au: 9.54, r: 9, speed: 9.7, year: "29 years", color: "#d9c48a" },
+      { id: "uranus", name: "Uranus", abbr: "U", au: 19.2, r: 7, speed: 6.8, year: "84 years", color: "#a6d8d8" },
+      { id: "neptune", name: "Neptune", abbr: "N", au: 30.1, r: 7, speed: 5.4, year: "165 years", color: "#3b62c4" },
+    ];
+  }
+
+  renderVals() {
+    const P = this._planets();
+    const X0 = 40, X1 = 880, AUmax = 31;
+    const auToX = au => X0 + (au / AUmax) * (X1 - X0);
+
+    const scalePlanets = P.map((p, i) => ({
+      name: p.name, x: auToX(p.au).toFixed(1), r: Math.max(3, p.r * 0.7),
+      color: p.color, ly: i % 2 === 0 ? 66 : 122, labelColor: "#b8bccb",
+    }));
+    const auTicks = [0, 5, 10, 15, 20, 25, 30].map(a => ({ x: auToX(a).toFixed(1), label: a + (a === 0 ? "" : "") }));
+
+    // rocket: slider 0..100 maps non-linearly? keep linear over AU for honesty
+    const rAU = (this.state.rocket / 100) * AUmax;
+    const rocketX = auToX(rAU);
+    const distKm = (rAU * 149.6).toFixed(0) + "M km";
+    const lightMin = rAU * 8.317; // minutes (1 AU ~ 8.317 light-min)
+    let lightTime;
+    if (lightMin < 1) lightTime = Math.round(lightMin * 60) + " s";
+    else if (lightMin < 60) lightTime = lightMin.toFixed(1) + " min";
+    else lightTime = (lightMin / 60).toFixed(1) + " hr";
+    // nearest planet
+    let nearest = P[0], best = 1e9;
+    P.forEach(p => { const d = Math.abs(p.au - rAU); if (d < best) { best = d; nearest = p; } });
+    if (rAU > 0.1 && window.Progress && this.state.rocket >= 95 && !this._done) { this._done = true; window.Progress.markCompleted("scale-orbits", { via: "distance-rocket" }); }
+
+    let rocketMsg;
+    if (rAU < 0.35) rocketMsg = "Just leaving the Sun. The four rocky planets are all crammed into the first inch of this scale.";
+    else if (rAU < 2) rocketMsg = "You're in the inner solar system — Mercury, Venus, Earth and Mars all huddle close to the Sun's warmth.";
+    else if (rAU < 6) rocketMsg = "Crossing the huge, empty asteroid gap toward Jupiter. Notice how the giants are spread far apart.";
+    else if (rAU < 20) rocketMsg = "Out among the giant planets now — each one is billions of km from the next. Mostly empty space.";
+    else rocketMsg = "The cold outer edge. Neptune is 30× further from the Sun than Earth. Drag all the way out to complete the flight.";
+
+    // speed graph
+    const gX0 = 60, gX1 = 540, gY0 = 255, gYtop = 25;
+    const spMax = 50;
+    const gx = au => gX0 + (Math.sqrt(au) / Math.sqrt(AUmax)) * (gX1 - gX0); // sqrt scale so inner planets readable
+    const gy = sp => gY0 - (sp / spMax) * (gY0 - gYtop);
+    const speedDots = P.map(p => ({
+      x: gx(p.au).toFixed(1), y: gy(p.speed).toFixed(1),
+      r: this.state.sel === p.id ? 8 : 5.5, fill: this.state.sel === p.id ? "#e8590c" : p.color,
+      ly: (gy(p.speed) - 12).toFixed(1), abbr: p.abbr, onPick: () => this.setState({ sel: p.id }),
+    }));
+    let curve = "";
+    P.forEach((p, i) => { curve += (i === 0 ? "M " : "L ") + gx(p.au).toFixed(1) + " " + gy(p.speed).toFixed(1) + " "; });
+
+    const s = P.find(p => p.id === this.state.sel);
+    return {
+      scalePlanets, auTicks,
+      rocketRaw: this.state.rocket, onRocket: e => this.setState({ rocket: +e.target.value }),
+      rocketX: rocketX.toFixed(1), rocketXL: (rocketX - 6).toFixed(1), rocketXR: (rocketX + 6).toFixed(1),
+      distAU: rAU.toFixed(1), distKm, lightTime, nearestPlanet: nearest.name + (best < 0.3 ? " (here!)" : ""),
+      rocketMsg,
+      speedCurve: curve, speedDots,
+      selName: s.name, selColor: s.color, selDist: s.au, selSpeed: s.speed, selYear: s.year,
+      selHeadBg: "#fff",
+    };
+  }
+}
+</script>
+</body>
+</html>

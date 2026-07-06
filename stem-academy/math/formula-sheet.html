@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Math Formula Sheet">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / FORMULA SHEET</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <div style="max-width: 1180px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// THE FORMULA SHEET — WHAT YOU GET GIVEN vs WHAT YOU MUST KNOW</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">The sheet gives you the recipe — you still have to cook</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">In the exam you're given some formulas and expected to know the rest by heart — and <strong>which is which depends on your course</strong>. Pick your course below. Every formula shows whether it's handed to you or must be memorised, what its symbols mean, when to reach for it — and which topic page teaches it properly.</div>
+    <div style="border-left: 4px solid #e8590c; background: #fff; padding: 12px 16px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42; max-width: 860px;">This is our own plain-English version of the official lists (2026 rules: England's GCSE exam aid is now provided for the lifetime of the current courses; SQA gives a formulae list; A-level gives a formulae booklet). Always download your board's official copy to practise with — boards publish them each September.</div>
+  </div>
+
+  <!-- controls -->
+  <div style="max-width: 1180px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 4px; display: flex; flex-direction: column; gap: 10px;">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156;">YOUR COURSE:</span>
+      <sc-for list="{{ trackBtns }}" as="t" hint-placeholder-count="4">
+        <div onClick="{{ t.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 11px 14px; border: 2px solid #2b2620; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ t.label }}</div>
+      </sc-for>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156;">SHOW:</span>
+      <sc-for list="{{ statusBtns }}" as="s" hint-placeholder-count="4">
+        <div onClick="{{ s.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 11px 14px; border: 2px solid #2b2620; background: {{ s.bg }}; color: {{ s.fg }}; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ s.label }}</div>
+      </sc-for>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; margin-left: 12px;">STRAND:</span>
+      <sc-for list="{{ strandBtns }}" as="s" hint-placeholder-count="6">
+        <div onClick="{{ s.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 10px 10px; border: 2px solid #2b2620; border-left: 6px solid {{ s.swatch }}; background: {{ s.bg }}; color: {{ s.fg }}; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ s.label }}</div>
+      </sc-for>
+    </div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">{{ countLine }}</div>
+  </div>
+
+  <!-- cards -->
+  <div style="max-width: 1180px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; align-items: stretch;">
+    <sc-for list="{{ cards }}" as="c" hint-placeholder-count="12">
+      <div style="border: 2px solid #2b2620; border-left: 6px solid {{ c.strandColor }}; background: #fff; box-shadow: 3px 3px 0 rgba(43,38,32,0.12); padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; flex: 1;">{{ c.name }}</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; padding: 4px 8px; border: 1.5px solid #2b2620; background: {{ c.badgeBg }}; color: {{ c.badgeFg }}; white-space: nowrap;">{{ c.badge }}</span>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; line-height: 1.6; background: #f6efe2; border: 1.5px solid #e6dfd2; padding: 10px 12px; color: #2b2620; white-space: pre-line;">{{ c.formula }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; color: #6b6156;">{{ c.symbols }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;"><strong>Use it when:</strong> {{ c.when }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e; border-top: 1.5px solid #eee7da; padding-top: 8px; margin-top: auto;">EXPLAINED IN: <span style="color: {{ c.strandColor }}; font-weight: 600;">{{ c.topicLabel }}</span> <span style="color: #c9c0b2;">(coming soon)</span></div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- how to use -->
+  <div style="max-width: 1180px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// THE TRAP</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">The most common revision mistake is memorising formulas you'd be given anyway — and skipping the ones you wouldn't. The exam never says "use the cosine rule": the real skill is <strong>recognising which formula a question wants</strong>. That's what each topic page trains.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// PRACTISE WITH THE REAL SHEET</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #554c42;">Print your board's official sheet and keep it beside you for every past paper, so on exam day you know its layout by heart. Watch for board quirks: the sheet gives the cosine rule for finding a <em>side</em> — finding an <em>angle</em> means rearranging it yourself.</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1180px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; OFFICIAL SHEETS</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.aqa.org.uk/news/gcse-maths-and-gcse-sciences-formulae-and-equation-sheets-for-2025-2027" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">AQA — GCSE Maths &amp; Sciences formulae sheets ↗</a>
+        <a href="https://qualifications.pearson.com/en/news-policy/subject-updates/mathematics/important-information-on-the-provision-of-formulae-in-gcse-mathematics.html" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Pearson Edexcel — provision of formulae in GCSE Mathematics ↗</a>
+        <a href="https://www.ocr.org.uk/administration/support-and-tools/subject-updates/formulae-equation-sheets-742053/" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">OCR — formulae &amp; equation sheets for 2026 ↗</a>
+        <a href="https://www.sqa.org.uk/sqa/45750.html" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">SQA — Mathematics (National 5 / Higher formulae lists) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification and current-year sheet (AQA, Edexcel, OCR, SQA) — provision can change between series.</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1180px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">KEEP EXPLORING</span>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Explore the Math map →</a>
+    <a href="../physics/physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Physics has an equations sheet too →</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / FORMULA SHEET</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { track: "gcse", status: "all", strand: "all" };
+
+  _strands() {
+    return { alg: "#7048a8", geo: "#2a6fb0", gc: "#b0472e", stat: "#2f7d3a", mech: "#c99a2e" };
+  }
+
+  // status per track: sheet (printed on the exam aid), list (SQA formulae list), booklet (A-level booklet),
+  // question (given in the question when needed), memorise, na (not in this course)
+  _formulas() {
+    return [
+      { name: "The quadratic formula", strand: "gc", topic: "Quadratics & Graphs",
+        formula: "x = ( −b ± √(b² − 4ac) ) / 2a",
+        symbols: "a, b, c = coefficients of ax² + bx + c = 0",
+        when: "a quadratic won't factorise and you need exact solutions (roots).",
+        st: { gcse: "sheet", n5: "list", alevel: "memorise", higher: "memorise" } },
+      { name: "Pythagoras' theorem", strand: "geo", topic: "Pythagoras & Trigonometry",
+        formula: "a² + b² = c²",
+        symbols: "c = hypotenuse (longest side) · a, b = the other two sides",
+        when: "you know two sides of a RIGHT-angled triangle and want the third.",
+        st: { gcse: "sheet", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Trig ratios (SOH-CAH-TOA)", strand: "geo", topic: "Pythagoras & Trigonometry",
+        formula: "sin θ = opp / hyp\ncos θ = adj / hyp\ntan θ = opp / adj",
+        symbols: "θ = angle · opp/adj/hyp = sides relative to θ",
+        when: "a right-angled triangle mixes a known angle with sides (or vice versa).",
+        st: { gcse: "sheet", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Sine rule", strand: "geo", topic: "Pythagoras & Trigonometry",
+        formula: "a/sin A = b/sin B = c/sin C",
+        symbols: "each side paired with its OPPOSITE angle",
+        when: "any triangle (not just right-angled) where you know an opposite side–angle pair.",
+        st: { gcse: "sheet", n5: "list", alevel: "memorise", higher: "memorise" } },
+      { name: "Cosine rule", strand: "geo", topic: "Pythagoras & Trigonometry",
+        formula: "a² = b² + c² − 2bc·cos A",
+        symbols: "A = the angle BETWEEN sides b and c",
+        when: "two sides + the included angle (find the 3rd side), or all three sides (rearrange to find an angle — the rearranged form is NOT given).",
+        st: { gcse: "sheet", n5: "list", alevel: "memorise", higher: "memorise" } },
+      { name: "Area of a triangle (trig)", strand: "geo", topic: "Pythagoras & Trigonometry",
+        formula: "A = ½ ab·sin C",
+        symbols: "a, b = two sides · C = the angle between them",
+        when: "you know two sides and the included angle but no height.",
+        st: { gcse: "sheet", n5: "list", alevel: "memorise", higher: "memorise" } },
+      { name: "Area of a triangle (base × height)", strand: "geo", topic: "Shapes & Angles",
+        formula: "A = ½ b h",
+        symbols: "b = base · h = PERPENDICULAR height",
+        when: "you know the base and its perpendicular height. Counted as basic — never given.",
+        st: { gcse: "memorise", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Area of a trapezium", strand: "geo", topic: "Angles, Area & Perimeter",
+        formula: "A = ½ (a + b) h",
+        symbols: "a, b = the two parallel sides · h = distance between them",
+        when: "any four-sided shape with one pair of parallel sides.",
+        st: { gcse: "sheet", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Circle: circumference", strand: "geo", topic: "Angles, Area & Perimeter",
+        formula: "C = πd = 2πr",
+        symbols: "d = diameter · r = radius",
+        when: "any distance around a circle — including arc lengths as fractions of it.",
+        st: { gcse: "sheet", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Circle: area", strand: "geo", topic: "Angles, Area & Perimeter",
+        formula: "A = πr²",
+        symbols: "r = radius (HALVE the diameter first — classic error)",
+        when: "any circle area — including sectors as fractions of it.",
+        st: { gcse: "sheet", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Arc length & sector area", strand: "geo", topic: "Angles, Area & Perimeter",
+        formula: "arc = (θ/360) · 2πr\nsector = (θ/360) · πr²",
+        symbols: "θ = angle at the centre in degrees (radian versions arc = rθ, sector = ½r²θ come at A-level/Higher)",
+        when: "a 'slice' of a circle — the angle tells you what fraction of the whole you have.",
+        st: { gcse: "memorise", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Volume of a prism / cylinder", strand: "geo", topic: "Angles, Area & Perimeter",
+        formula: "V = area of cross-section × length\ncylinder: V = πr²h",
+        symbols: "a prism is any shape with the same cross-section all the way through",
+        when: "the solid has a constant cross-section — find that area, multiply by length.",
+        st: { gcse: "sheet", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Volume of a sphere", strand: "geo", topic: "Angles, Area & Perimeter",
+        formula: "V = (4/3) πr³",
+        symbols: "r = radius · CUBE it before multiplying",
+        when: "spheres and hemispheres (halve it). England: printed in the question if needed.",
+        st: { gcse: "question", n5: "list", alevel: "memorise", higher: "memorise" } },
+      { name: "Volume of a cone / pyramid", strand: "geo", topic: "Angles, Area & Perimeter",
+        formula: "cone: V = (1/3) πr²h\npyramid: V = (1/3) × base area × h",
+        symbols: "h = PERPENDICULAR height, not the slant",
+        when: "anything that tapers to a point — a third of the matching prism/cylinder.",
+        st: { gcse: "question", n5: "list", alevel: "memorise", higher: "memorise" } },
+      { name: "Curved surface areas", strand: "geo", topic: "Angles, Area & Perimeter",
+        formula: "cone: A = πrl\nsphere: A = 4πr²",
+        symbols: "l = SLANT height of the cone",
+        when: "surface (not volume!) of cones and spheres. England: printed in the question if needed.",
+        st: { gcse: "question", n5: "na", alevel: "memorise", higher: "memorise" } },
+      { name: "Compound interest / growth & decay", strand: "alg", topic: "Fractions, Decimals & %",
+        formula: "Total = P (1 + r/100)ⁿ",
+        symbols: "P = starting amount · r = % rate per period · n = number of periods",
+        when: "repeated percentage change — savings, appreciation/depreciation, populations.",
+        st: { gcse: "sheet", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Probability: OR rule", strand: "stat", topic: "Probability",
+        formula: "P(A or B) = P(A) + P(B) − P(A and B)",
+        symbols: "subtract the overlap so it isn't counted twice",
+        when: "the chance of at least one of two events happening.",
+        st: { gcse: "sheet", n5: "na", alevel: "booklet", higher: "na" } },
+      { name: "Probability: AND rule", strand: "stat", topic: "Probability",
+        formula: "P(A and B) = P(A given B) × P(B)",
+        symbols: "'given' = conditional — B has already happened",
+        when: "the chance of both events happening, including without-replacement problems.",
+        st: { gcse: "sheet", n5: "na", alevel: "booklet", higher: "na" } },
+      { name: "Straight line & gradient", strand: "gc", topic: "Coordinates & Straight Lines",
+        formula: "y = mx + c\nm = (y₂ − y₁) / (x₂ − x₁)",
+        symbols: "m = gradient (steepness) · c = y-intercept",
+        when: "everything linear — never given, and examiners know students assume it is.",
+        st: { gcse: "memorise", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Compound measures", strand: "mech", topic: "Mechanics: Kinematics",
+        formula: "speed = distance / time\ndensity = mass / volume\npressure = force / area",
+        symbols: "all three share the same triangle pattern",
+        when: "rates — how much of one quantity per unit of another. Not given at GCSE.",
+        st: { gcse: "memorise", n5: "memorise", alevel: "memorise", higher: "memorise" } },
+      { name: "Constant acceleration (suvat)", strand: "mech", topic: "Mechanics: Kinematics",
+        formula: "v = u + at\ns = ut + ½at²\nv² = u² + 2as",
+        symbols: "s = displacement · u/v = start/end velocity · a = acceleration · t = time",
+        when: "motion with steady acceleration. England GCSE: printed in the question if needed; A-level: check your board's booklet — Edexcel expects them memorised.",
+        st: { gcse: "question", n5: "na", alevel: "memorise", higher: "memorise" } },
+      { name: "Standard deviation", strand: "stat", topic: "Statistics",
+        formula: "s = √( Σ(x − x̄)² / (n − 1) )",
+        symbols: "x̄ = mean · n = sample size · Σ = 'sum of'",
+        when: "measuring how spread out data is around its mean.",
+        st: { gcse: "na", n5: "list", alevel: "booklet", higher: "na" } },
+      { name: "Arithmetic & geometric series", strand: "alg", topic: "Sequences & Series",
+        formula: "arithmetic: Sₙ = (n/2)(2a + (n−1)d)\ngeometric: Sₙ = a(1−rⁿ) / (1−r)\nto infinity: S∞ = a / (1−r)",
+        symbols: "a = first term · d = common difference · r = common ratio (|r| < 1 for S∞)",
+        when: "summing sequences — constant step (arithmetic) or constant multiplier (geometric).",
+        st: { gcse: "na", n5: "na", alevel: "booklet", higher: "na" } },
+      { name: "Binomial expansion", strand: "alg", topic: "Sequences & Series",
+        formula: "(a + b)ⁿ = aⁿ + nC₁aⁿ⁻¹b + nC₂aⁿ⁻²b² + …",
+        symbols: "nCᵣ = ways of choosing r from n",
+        when: "expanding powers of brackets without multiplying out n times.",
+        st: { gcse: "na", n5: "na", alevel: "booklet", higher: "na" } },
+      { name: "Trig identities", strand: "geo", topic: "Radians & Trig Identities",
+        formula: "sin²θ + cos²θ = 1\ntan θ = sin θ / cos θ",
+        symbols: "true for EVERY angle — that's what makes them identities",
+        when: "rewriting trig expressions and solving trig equations. These two are never given; the exotic ones (sec², addition formulae) are in the A-level booklet / SQA Higher list.",
+        st: { gcse: "na", n5: "na", alevel: "memorise", higher: "memorise" } },
+      { name: "Addition & double-angle formulae", strand: "geo", topic: "Radians & Trig Identities",
+        formula: "sin(A±B) = sinA cosB ± cosA sinB\ncos 2A = 1 − 2sin²A …",
+        symbols: "each has several printed forms — learn to CHOOSE, not recall",
+        when: "combining or splitting angles inside trig functions.",
+        st: { gcse: "na", n5: "na", alevel: "booklet", higher: "list" } },
+      { name: "Equation of a circle", strand: "gc", topic: "Coordinates & Straight Lines",
+        formula: "(x − a)² + (y − b)² = r²",
+        symbols: "(a, b) = centre · r = radius",
+        when: "circles on coordinate axes — complete the square to read off centre & radius.",
+        st: { gcse: "na", n5: "na", alevel: "memorise", higher: "list" } },
+      { name: "Scalar (dot) product", strand: "geo", topic: "Vectors",
+        formula: "a·b = |a||b| cos θ\na·b = a₁b₁ + a₂b₂ + a₃b₃",
+        symbols: "θ = angle between the vectors · equal forms — equate them to find θ",
+        when: "finding the angle between vectors, or testing for perpendicularity (a·b = 0).",
+        st: { gcse: "na", n5: "na", alevel: "memorise", higher: "list" } },
+      { name: "Standard derivatives & integrals", strand: "gc", topic: "Functions & Differentiation",
+        formula: "d/dx (sin ax) = a cos ax\n∫ cos ax dx = (1/a) sin ax + c",
+        symbols: "the basics (xⁿ, sin, cos, eˣ, ln x) must be memorised; longer tables are in the A-level booklet / SQA Higher list",
+        when: "all of calculus — these are the alphabet.",
+        st: { gcse: "na", n5: "na", alevel: "memorise", higher: "list" } },
+      { name: "Integration by parts", strand: "gc", topic: "Integration & Differential Equations",
+        formula: "∫u (dv/dx) dx = uv − ∫v (du/dx) dx",
+        symbols: "choose u to get SIMPLER when differentiated",
+        when: "integrating a product of two different kinds of function (e.g. x·eˣ).",
+        st: { gcse: "na", n5: "na", alevel: "booklet", higher: "na" } },
+      { name: "Trapezium rule", strand: "gc", topic: "Numerical Methods",
+        formula: "∫y dx ≈ (h/2)[y₀ + 2(y₁ + … + yₙ₋₁) + yₙ]",
+        symbols: "h = strip width · y = heights at each boundary",
+        when: "estimating an area you can't integrate exactly.",
+        st: { gcse: "na", n5: "na", alevel: "booklet", higher: "na" } },
+      { name: "Newton-Raphson", strand: "gc", topic: "Numerical Methods",
+        formula: "xₙ₊₁ = xₙ − f(xₙ) / f′(xₙ)",
+        symbols: "each step hops along the tangent to a better root estimate",
+        when: "solving equations no algebra can — iterating toward a root.",
+        st: { gcse: "na", n5: "na", alevel: "booklet", higher: "na" } },
+      { name: "Binomial distribution", strand: "stat", topic: "Sampling & Distributions",
+        formula: "P(X = r) = nCᵣ pʳ (1−p)ⁿ⁻ʳ",
+        symbols: "n = trials · p = P(success) · r = number of successes",
+        when: "counting successes in repeated identical yes/no trials.",
+        st: { gcse: "na", n5: "na", alevel: "booklet", higher: "na" } },
+    ];
+  }
+
+  renderVals() {
+    const STRAND = this._strands();
+    const tracks = [
+      { key: "gcse", label: "GCSE (AQA · EDEXCEL · OCR)" },
+      { key: "n5", label: "SQA NATIONAL 5" },
+      { key: "alevel", label: "A-LEVEL" },
+      { key: "higher", label: "SQA HIGHER" },
+    ];
+    const trackBtns = tracks.map(t => ({
+      label: t.label, onPick: () => this.setState({ track: t.key }),
+      bg: this.state.track === t.key ? "#e8590c" : "#faf6ef", fg: this.state.track === t.key ? "#faf6ef" : "#2b2620",
+    }));
+
+    const statuses = [
+      { key: "all", label: "EVERYTHING" },
+      { key: "given", label: "GIVEN TO YOU" },
+      { key: "memorise", label: "MUST MEMORISE" },
+    ];
+    const statusBtns = statuses.map(s => ({
+      label: s.label, onPick: () => this.setState({ status: s.key }),
+      bg: this.state.status === s.key ? "#2b2620" : "#faf6ef", fg: this.state.status === s.key ? "#faf6ef" : "#2b2620",
+    }));
+
+    const strandDefs = [
+      { key: "all", label: "ALL", swatch: "#2b2620" },
+      { key: "alg", label: "NUMBER & ALGEBRA", swatch: STRAND.alg },
+      { key: "geo", label: "GEOMETRY & TRIG", swatch: STRAND.geo },
+      { key: "gc", label: "GRAPHS & CALCULUS", swatch: STRAND.gc },
+      { key: "stat", label: "STATS & PROBABILITY", swatch: STRAND.stat },
+      { key: "mech", label: "MECHANICS", swatch: STRAND.mech },
+    ];
+    const strandBtns = strandDefs.map(s => ({
+      label: s.label, swatch: s.swatch, onPick: () => this.setState({ strand: s.key }),
+      bg: this.state.strand === s.key ? "#2b2620" : "#faf6ef", fg: this.state.strand === s.key ? "#faf6ef" : "#2b2620",
+    }));
+
+    const badgeFor = (st) => {
+      if (st === "sheet") return { label: "GIVEN — ON THE SHEET", bg: "#2f7d3a", fg: "#faf6ef" };
+      if (st === "list") return { label: "GIVEN — FORMULAE LIST", bg: "#2f7d3a", fg: "#faf6ef" };
+      if (st === "booklet") return { label: "GIVEN — IN THE BOOKLET", bg: "#2f7d3a", fg: "#faf6ef" };
+      if (st === "question") return { label: "GIVEN — IN THE QUESTION", bg: "#2a6fb0", fg: "#faf6ef" };
+      if (st === "memorise") return { label: "MUST MEMORISE", bg: "#e8590c", fg: "#faf6ef" };
+      return null; // na
+    };
+
+    const track = this.state.track;
+    let given = 0, memo = 0;
+    const cards = this._formulas().map(f => {
+      const st = f.st[track];
+      if (st === "na") return null;
+      const isGiven = st === "sheet" || st === "list" || st === "booklet" || st === "question";
+      if (isGiven) given++; else memo++;
+      if (this.state.status === "given" && !isGiven) return null;
+      if (this.state.status === "memorise" && isGiven) return null;
+      if (this.state.strand !== "all" && f.strand !== this.state.strand) return null;
+      const b = badgeFor(st);
+      return {
+        name: f.name, formula: f.formula, symbols: f.symbols, when: f.when,
+        strandColor: STRAND[f.strand], topicLabel: f.topic,
+        badge: b.label, badgeBg: b.bg, badgeFg: b.fg,
+      };
+    }).filter(Boolean);
+
+    const trackName = tracks.find(t => t.key === track).label;
+    const countLine = "Showing " + cards.length + " formulas for " + trackName + " — in this course, " + given + " are given to you and " + memo + " must be memorised.";
+
+    return { trackBtns, statusBtns, strandBtns, cards, countLine };
+  }
+}
+</script>
+</body>
+</html>

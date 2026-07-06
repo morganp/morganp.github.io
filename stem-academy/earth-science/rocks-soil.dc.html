@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Rocks & Soil">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="earth-science.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">EARTH SCIENCE</a> / ROCKS &amp; SOIL</span>
+      <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← EARTH SCIENCE MAP</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// THREE FAMILIES OF ROCK — LEVEL L1</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Every rock has a story</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 800px;">Pick up any rock and its texture tells you how it was made: cooled from red-hot melt, pressed together from tiny bits, or baked and squeezed until it changed. Learn the three families, play rock detective, then dig down into the soil that rocks slowly become.</div>
+  </div>
+
+  <!-- FIG 01 — family reference -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 01 — THE THREE ROCK FAMILIES</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+      <sc-for list="{{ families }}" as="f" hint-placeholder-count="3">
+        <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 4px 4px 0 rgba(43,38,32,0.15); display: flex; flex-direction: column;">
+          <div style="height: 70px; background: {{ f.swatch }}; border-bottom: 2px solid #2b2620;"></div>
+          <div style="padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 13px; height: 13px; background: {{ f.color }}; border: 1.5px solid #2b2620; display: inline-block;"></span><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px;">{{ f.name }}</span></div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ f.made }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156;">LOOK FOR: {{ f.clue }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b6156;">e.g. {{ f.examples }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- FIG 02 — rock detective game -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.85fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — ROCK DETECTIVE: WHICH FAMILY?</div>
+      <div style="display: flex; gap: 18px; align-items: center;">
+        <div style="width: 130px; height: 130px; border: 2px solid #2b2620; background: {{ sampleSwatch }}; flex-shrink: 0;"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px;">{{ sampleName }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.5; color: #554c42;">{{ sampleHint }}</div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <sc-for list="{{ answers }}" as="a" hint-placeholder-count="3">
+          <div onClick="{{ a.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 14px; border: 2px solid #2b2620; background: {{ a.bg }}; color: {{ a.fg }}; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; gap: 10px;" style-hover="box-shadow: 3px 3px 0 rgba(43,38,32,0.25);"><span style="width: 12px; height: 12px; background: {{ a.dot }}; border: 1.5px solid #2b2620; display: inline-block;"></span>{{ a.label }}</div>
+        </sc-for>
+      </div>
+      <div style="min-height: 24px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ feedbackColor }};">{{ feedback }}</div>
+      <div onClick="{{ onNext }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px; border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">NEXT SAMPLE →</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; padding: 18px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e7ddcd;">FIELD LOG</div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">SCORE</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 34px; color: #e8590c;">{{ score }}</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">STREAK</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 34px; color: #fcc419;">{{ streak }}</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">IDENTIFIED</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 34px;">{{ solved }}</span></div>
+      <div style="margin-top: auto; font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #e7ddcd;">{{ logMsg }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — soil profile -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 0.6fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 03 — DIG A SOIL PROFILE</div>
+      <div style="display: flex; flex-direction: column; border: 2px solid #2b2620;">
+        <sc-for list="{{ horizons }}" as="h" hint-placeholder-count="5">
+          <div onClick="{{ h.onPick }}" style="height: {{ h.h }}px; background: {{ h.bg }}; border-bottom: 1.5px solid #2b2620; cursor: pointer; position: relative; display: flex; align-items: center; padding: 0 12px; outline: {{ h.outline }};" style-hover="filter: brightness(1.06);">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 15px; color: {{ h.ink }}; background: rgba(250,246,239,0.85); padding: 2px 7px; border: 1px solid #2b2620;">{{ h.tag }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ h.ink }}; margin-left: 8px;">{{ h.short }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">Click a layer (horizon). Top = surface, bottom = solid rock.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 18px; height: 18px; background: {{ selBg }}; border: 2px solid #2b2620; display: inline-block;"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 8px; border: 1.5px solid #2b2620; background: #e8590c; color: #faf6ef;">HORIZON {{ selTag }}</span></div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px;">{{ selName }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #554c42;">{{ selDesc }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">CONTAINS: {{ selContains }}</div>
+    </div>
+  </div>
+
+  <!-- uses -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 04 — WHAT WE MAKE FROM ROCKS</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;">
+      <sc-for list="{{ uses }}" as="u" hint-placeholder-count="4">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px;">{{ u.rock }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #e8590c;">→ {{ u.use }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.4; color: #554c42;">{{ u.why }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/z9bg87h" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Rocks, soils and fossils ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Rock_(geology)" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Rock (geology) ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Soil_horizon" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Soil horizon ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="weather.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Weather &amp; Seasons (L1) →</a>
+    <a href="rock-cycle.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: The Rock Cycle (L2) →</a>
+    <a href="earth-science.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Earth Science map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>EARTH SCIENCE / ROCKS &amp; SOIL</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { i: 0, picked: null, score: 0, streak: 0, solvedSet: {}, soil: "O" };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("rocks-soil");
+    this._order = this._shuffle([0,1,2,3,4,5,6,7]);
+  }
+  _shuffle(a){ a=a.slice(); for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];} return a; }
+
+  _samples() {
+    return [
+      { name: "Granite", fam: "igneous", swatch: "radial-gradient(circle at 25% 30%, #d9c9b0 3px, transparent 4px), radial-gradient(circle at 70% 55%, #8a7a63 3px, transparent 4px), radial-gradient(circle at 45% 75%, #b0472e 2px, transparent 3px), #c2b199", hint: "Speckled with interlocking crystals you can see — it cooled slowly deep underground." },
+      { name: "Basalt", fam: "igneous", swatch: "radial-gradient(circle at 40% 40%, #4a4640 2px, transparent 3px), #3b3833", hint: "Dark and fine-grained — lava that cooled fast on the surface, so its crystals are tiny." },
+      { name: "Sandstone", fam: "sedimentary", swatch: "repeating-linear-gradient(0deg, #e3c99a 0 9px, #d8ba86 9px 18px)", hint: "Made of sand grains pressed into flat layers. You can sometimes rub grains off with a finger." },
+      { name: "Limestone", fam: "sedimentary", swatch: "repeating-linear-gradient(0deg, #e8e3d3 0 11px, #d6cfba 11px 22px)", hint: "Pale, layered, often full of tiny sea-shell fossils — built up on an ancient sea floor." },
+      { name: "Chalk", fam: "sedimentary", swatch: "repeating-linear-gradient(0deg, #f4f1ea 0 12px, #e6e1d4 12px 24px)", hint: "Soft, white and powdery — the crushed shells of countless microscopic sea creatures." },
+      { name: "Marble", fam: "metamorphic", swatch: "linear-gradient(120deg, #ece7dd 0 40%, #c9bfae 50%, #ece7dd 60% 100%), #ddd6c8", hint: "Smooth with swirling bands — limestone that was baked and squeezed until it recrystallised." },
+      { name: "Slate", fam: "metamorphic", swatch: "repeating-linear-gradient(105deg, #4c5560 0 6px, #3a424c 6px 12px)", hint: "Splits into thin flat sheets — mudstone changed by pressure. Great for roof tiles." },
+      { name: "Gneiss", fam: "metamorphic", swatch: "repeating-linear-gradient(100deg, #d8cbb4 0 7px, #6e5f49 7px 12px, #b7a686 12px 19px)", hint: "Strong bands of light and dark, folded and stretched by intense heat and pressure." },
+    ];
+  }
+
+  pick(fam) {
+    if (this.state.picked) return;
+    const idx = this._order[this.state.i % 8];
+    const correct = this._samples()[idx].fam === fam;
+    const solvedSet = { ...this.state.solvedSet };
+    if (correct) solvedSet[idx] = true;
+    const solvedN = Object.keys(solvedSet).length;
+    if (correct && solvedN >= 5 && window.Progress) window.Progress.markCompleted("rocks-soil", { via: "rock-detective" });
+    this.setState({
+      picked: fam,
+      score: correct ? this.state.score + 1 : this.state.score,
+      streak: correct ? this.state.streak + 1 : 0,
+      solvedSet,
+    });
+  }
+  next() { this.setState(s => ({ i: s.i + 1, picked: null })); }
+
+  renderVals() {
+    const samples = this._samples();
+    const order = this._order || [0,1,2,3,4,5,6,7];
+    const idx = order[this.state.i % 8];
+    const s = samples[idx];
+    const fams = [
+      { key: "igneous", label: "Igneous — cooled from melt", dot: "#e8590c" },
+      { key: "sedimentary", label: "Sedimentary — pressed layers", dot: "#c99a2e" },
+      { key: "metamorphic", label: "Metamorphic — heat & pressure", dot: "#7048a8" },
+    ];
+    const picked = this.state.picked;
+    const answers = fams.map(f => {
+      let bg = "#faf6ef", fg = "#2b2620";
+      if (picked) {
+        if (f.key === s.fam) { bg = "#2f7d3a"; fg = "#faf6ef"; }
+        else if (f.key === picked) { bg = "#c0392b"; fg = "#faf6ef"; }
+      }
+      return { label: f.label, dot: f.dot, bg, fg, onPick: () => this.pick(f.key) };
+    });
+    let feedback = "", feedbackColor = "#2b2620";
+    if (picked) {
+      const right = picked === s.fam;
+      feedbackColor = right ? "#2f7d3a" : "#c0392b";
+      feedback = right ? "Correct — " + s.name + " is " + s.fam + "." : "Not quite — " + s.name + " is " + s.fam + ".";
+    }
+    const solved = Object.keys(this.state.solvedSet).length;
+    const logMsg = solved >= 5 ? "Nice work, geologist — you can read a rock's texture. Try the rest, then dig into the soil below." : "Identify at least 5 different rocks to complete this topic. Texture is your best clue.";
+
+    const families = [
+      { name: "Igneous", color: "#e8590c", swatch: "radial-gradient(circle at 25% 35%, #d9c9b0 4px, transparent 5px), radial-gradient(circle at 65% 60%, #8a7a63 4px, transparent 5px), #b8a689", made: "Formed when hot molten rock (magma or lava) cools and hardens into crystals.", clue: "interlocking crystals / speckles", examples: "granite, basalt" },
+      { name: "Sedimentary", color: "#c99a2e", swatch: "repeating-linear-gradient(0deg, #e3c99a 0 11px, #d0b07e 11px 22px)", made: "Formed when tiny bits (sediment) settle in layers and get squashed and cemented together.", clue: "flat layers, sometimes fossils", examples: "sandstone, limestone, chalk" },
+      { name: "Metamorphic", color: "#7048a8", swatch: "repeating-linear-gradient(105deg, #d8cbb4 0 7px, #6e5f49 7px 13px)", made: "Formed when an existing rock is changed by great heat and pressure — without melting.", clue: "bands, swirls, splits into sheets", examples: "marble, slate, gneiss" },
+    ];
+
+    const horizonData = {
+      O: { name: "O — Organic litter", bg: "#5a4a2e", ink: "#faf6ef", short: "leaves & twigs", desc: "The very top: fallen leaves, twigs and dead insects, slowly rotting. Dark, loose and rich in decaying matter.", contains: "leaf litter, decomposers (worms, fungi, bacteria)" },
+      A: { name: "A — Topsoil", bg: "#6b5335", ink: "#faf6ef", short: "topsoil / humus", desc: "Dark, crumbly topsoil packed with humus (rotted matter). This is where most plant roots and soil life live — the layer gardeners care about.", contains: "humus, roots, worms, minerals, air & water" },
+      B: { name: "B — Subsoil", bg: "#9b6a3c", ink: "#faf6ef", short: "subsoil", desc: "Lighter subsoil. Minerals washed down from above collect here, so it's often clay-rich and a different colour. Fewer living things.", contains: "clay, iron & minerals washed down, deep roots" },
+      C: { name: "C — Parent rock", bg: "#a98d6b", ink: "#2b2620", short: "broken rock", desc: "Broken, weathered chunks of the bedrock below. This 'parent rock' is slowly crumbling into the soil above it.", contains: "rock fragments, gravel, little organic matter" },
+      R: { name: "R — Bedrock", bg: "#7d7468", ink: "#faf6ef", short: "solid bedrock", desc: "Solid, unbroken rock — the foundation. Over thousands of years, weathering breaks its surface down to feed the layers above.", contains: "solid rock (e.g. granite, limestone)" },
+    };
+    const horizons = ["O","A","B","C","R"].map(t => ({
+      tag: t, short: horizonData[t].short, h: { O: 34, A: 60, B: 66, C: 50, R: 46 }[t],
+      bg: horizonData[t].bg, ink: horizonData[t].ink,
+      outline: this.state.soil === t ? "3px solid #e8590c" : "none",
+      onPick: () => this.setState({ soil: t }),
+    }));
+    const sel = horizonData[this.state.soil];
+
+    const uses = [
+      { rock: "Granite", use: "kitchen worktops, kerbs", why: "Very hard and hard-wearing, takes a polish." },
+      { rock: "Limestone", use: "cement & glass", why: "Heated to make cement; a key ingredient of concrete." },
+      { rock: "Slate", use: "roof tiles", why: "Splits into thin, flat, waterproof sheets." },
+      { rock: "Marble", use: "statues & floors", why: "Beautiful, smooth, and can be carved and polished." },
+      { rock: "Sandstone", use: "building blocks", why: "Easy to cut and shape into walls." },
+      { rock: "Sand & gravel", use: "concrete & roads", why: "Loose rock bits mixed into concrete and road base." },
+    ];
+
+    return {
+      families, answers, uses, horizons,
+      sampleName: s.name, sampleSwatch: s.swatch, sampleHint: s.hint,
+      feedback, feedbackColor,
+      score: this.state.score, streak: this.state.streak, solved, logMsg,
+      onNext: () => this.next(),
+      selTag: this.state.soil, selName: sel.name, selDesc: sel.desc, selContains: sel.contains, selBg: horizonData[this.state.soil].bg,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Earth Science World Map">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / EARTH SCIENCE WORLD MAP</span>
+      <a href="../index.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← ALL TOPICS</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// THE EARTH SCIENCE MAP: AGE 10 TO A-LEVEL</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">The planet, from the ground up</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 720px;">Start with the rocks under your feet and the weather over your head, then dig down through the rock cycle and Earth's layers to the grinding plates that build mountains and shake the ground. Orange topics are live; the rest are on the bench. Follow the lines — each topic builds on the ones above it.</div>
+    <div style="display: flex; gap: 18px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; align-items: center;">
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #e8590c; border: 1.5px solid #2b2620; display: inline-block;"></span>LIVE — CLICK TO OPEN</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #fff; border: 1.5px solid #2b2620; display: inline-block;"></span>ON THE BENCH</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #2f7d3a; border: 1.5px solid #2b2620; display: inline-block;"></span>COMPLETED</span>
+      <span>LINES = "LEARN THIS FIRST"</span>
+      <a href="../progress.html" style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #fff;" style-hover="background: #2b2620; color: #faf6ef;">MY PROGRESS →</a>
+    </div>
+  </div>
+
+  <!-- graph -->
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 24px; overflow-x: auto;">
+    <div style="position: relative; width: 1160px; height: 640px; border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15);">
+      <svg width="1160" height="640" style="position: absolute; inset: 0; pointer-events: none;">
+        <sc-for list="{{ edges }}" as="e" hint-placeholder-count="10">
+          <path d="{{ e.d }}" fill="none" stroke="#d8d0c4" stroke-width="1.5"></path>
+        </sc-for>
+      </svg>
+      <sc-for list="{{ bands }}" as="band" hint-placeholder-count="5">
+        <div style="position: absolute; left: 0; right: 0; top: {{ band.y }}px; border-top: 1px dashed #e6dfd2; padding: 6px 0 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #a89d8e;">{{ band.label }}</div>
+      </sc-for>
+      <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="13">
+        <a href="{{ n.href }}" style="position: absolute; left: {{ n.x }}px; top: {{ n.y }}px; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; white-space: nowrap; padding: 6px 10px; border: 1.5px solid #2b2620; background: {{ n.bg }}; color: {{ n.fg }}; text-decoration: none; cursor: {{ n.cursor }}; box-shadow: 2px 2px 0 rgba(43,38,32,0.12);" style-hover="box-shadow: 3px 3px 0 rgba(43,38,32,0.3);">{{ n.mark }}{{ n.label }}</a>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- live list -->
+  <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 8px 40px 64px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #2b2620; padding-top: 18px;">// LIVE NOW</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+      <sc-for list="{{ liveList }}" as="lv" hint-placeholder-count="8">
+        <a href="{{ lv.href }}" style="border: 2px solid #2b2620; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: #2b2620;" style-hover="box-shadow: 4px 4px 0 rgba(43,38,32,0.2);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 2px 7px; border: 1px solid #2b2620; background: #e8590c; color: #faf6ef;">{{ lv.level }}</span>
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; flex: 1;">{{ lv.title }}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #2f7d3a;">{{ lv.mark }}</span>
+          </div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ lv.desc }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e8590c; margin-top: auto;">OPEN →</div>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>EARTH SCIENCE / L1 EXPLORER → L5 EXPERT</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    if (window.Progress) this._unsub = window.Progress.onChange(() => this.forceUpdate());
+  }
+  componentWillUnmount() { if (this._unsub) this._unsub(); }
+
+  renderVals() {
+    const W = 1160, ML = 80, MR = 30;
+    const bandY = { 1: 0, 2: 130, 3: 300, 4: 470, 5: 560 };
+    const rowBase = { 1: 46, 2: 176, 3: 346, 4: 512, 5: 600 };
+
+    const topics = [
+      { id: "rocks", l: 1, label: "Rocks & soil", href: "rocks-soil.html" },
+      { id: "weather1", l: 1, label: "Weather & seasons", href: "weather.html" },
+
+      { id: "rockcyc", l: 2, label: "The rock cycle", href: "rock-cycle.html" },
+      { id: "wclimate", l: 2, label: "Weather & climate", href: "weather-climate.html" },
+      { id: "structure", l: 2, label: "Earth's structure", href: "earths-structure.html" },
+
+      { id: "plates", l: 3, label: "Plate tectonics", href: "plate-tectonics.html" },
+      { id: "rockdetail", l: 3, label: "Rock cycle detail & dating", href: "rock-cycle-detail.html" },
+      { id: "atmos", l: 3, label: "Atmosphere & climate change", href: "../chemistry/atmosphere-climate.html" },
+
+      { id: "geotime", l: 4, label: "Geological time & dating" },
+      { id: "weathersys", l: 4, label: "Weather systems & climatology" },
+
+      { id: "platedet", l: 5, label: "Plate tectonics detail" },
+      { id: "climsci", l: 5, label: "Climate science" },
+    ];
+
+    const links = [
+      ["rocks", "rockcyc"], ["weather1", "wclimate"], ["rocks", "structure"],
+      ["rockcyc", "rockdetail"], ["structure", "plates"], ["wclimate", "atmos"], ["rockcyc", "structure"],
+      ["rockdetail", "geotime"], ["wclimate", "weathersys"], ["plates", "geotime"],
+      ["plates", "platedet"], ["atmos", "climsci"], ["weathersys", "climsci"],
+    ];
+
+    const estWidth = (label) => Math.max(70, label.length * 6.6 + 22);
+    const byLevel = {};
+    topics.forEach(t => { (byLevel[t.l] = byLevel[t.l] || []).push(t); });
+    const pos = {};
+    const nodes = [];
+    const usable = W - ML - MR;
+    const GAP = 14, SUBROW_H = 34;
+
+    Object.keys(byLevel).forEach(l => {
+      const row = byLevel[l];
+      const lines = [];
+      let cur = { items: [], totalW: 0 };
+      row.forEach(t => {
+        const w = estWidth(t.label);
+        const addW = cur.items.length ? w + GAP : w;
+        if (cur.totalW + addW > usable && cur.items.length) { lines.push(cur); cur = { items: [], totalW: 0 }; }
+        cur.items.push({ t, w });
+        cur.totalW += cur.items.length > 1 ? w + GAP : w;
+      });
+      if (cur.items.length) lines.push(cur);
+      lines.forEach((line, li) => {
+        let x = ML + (usable - line.totalW) / 2;
+        const y = rowBase[l] + li * SUBROW_H;
+        line.items.forEach(({ t, w }) => {
+          const cx = x + w / 2;
+          pos[t.id] = { x: cx, y };
+          const live = !!t.href;
+          const progId = live ? t.href.replace(/.*\//, "").replace(/\.html$/, "") : null;
+          const done = live && window.Progress && window.Progress.isCompleted(progId);
+          nodes.push({
+            label: t.label, mark: done ? "✓ " : "", href: t.href || "#",
+            x: Math.round(cx), y: Math.round(y),
+            bg: done ? "#2f7d3a" : live ? "#e8590c" : "#fff",
+            fg: live ? "#faf6ef" : "#2b2620",
+            cursor: live ? "pointer" : "default",
+          });
+          x += w + GAP;
+        });
+      });
+    });
+
+    const edges = links.map(([a, b]) => {
+      const p = pos[a], q = pos[b];
+      const y1 = p.y + 28, y2 = q.y - 2;
+      return { d: "M " + p.x + " " + y1 + " C " + p.x + " " + (y1 + 36) + ", " + q.x + " " + (y2 - 36) + ", " + q.x + " " + y2 };
+    });
+
+    const bands = [
+      { y: bandY[1], label: "L1 EXPLORER — AGE 10-11" },
+      { y: bandY[2], label: "L2 FOUNDATION — KS3 / S1-S3" },
+      { y: bandY[3], label: "L3 CORE — GCSE / NATIONAL 5" },
+      { y: bandY[4], label: "L4 ADVANCED — AS / HIGHER" },
+      { y: bandY[5], label: "L5 EXPERT — A-LEVEL / ADVANCED HIGHER" },
+    ];
+
+    const liveList = [
+      { key: "rocks-soil", level: "L1", title: "Rocks & Soil", desc: "Sort rock samples into the three great families, then dig down through a soil profile.", href: "rocks-soil.html" },
+      { key: "weather", level: "L1", title: "Weather & Seasons", desc: "Tilt the Earth and orbit the Sun to make the seasons, then read a weather station.", href: "weather.html" },
+      { key: "rock-cycle", level: "L2", title: "The Rock Cycle", desc: "Follow one grain of rock around the cycle — melt it, bury it, squeeze it, cool it.", href: "rock-cycle.html" },
+      { key: "weather-climate", level: "L2", title: "Weather & Climate", desc: "Run the water cycle, tell weather from climate, and tour the world's climate zones.", href: "weather-climate.html" },
+      { key: "earths-structure", level: "L2", title: "Earth's Structure", desc: "Cut the planet open and click through crust, mantle and core — depth, heat and state.", href: "earths-structure.html" },
+      { key: "plate-tectonics", level: "L3", title: "Plate Tectonics", desc: "Drive two plates together, apart or past each other and build the landforms that result.", href: "plate-tectonics.html" },
+      { key: "rock-cycle-detail", level: "L3", title: "Rock Cycle Detail & Dating", desc: "Read rock strata like a diary and date them with superposition and radioactive clocks.", href: "rock-cycle-detail.html" },
+      { key: "atmosphere-climate", level: "L3", title: "Atmosphere & Climate Change", desc: "Shared with Chemistry — the air's composition and the greenhouse effect, hands-on.", href: "../chemistry/atmosphere-climate.html" },
+    ].map(lv => ({ ...lv, mark: window.Progress && window.Progress.isCompleted(lv.key) ? "✓ DONE" : (window.Progress && window.Progress.isVisited(lv.key) ? "· started" : "") }));
+
+    return { nodes, edges, bands, liveList };
+  }
+}
+</script>
+</body>
+</html>
