@@ -38,6 +38,8 @@ make clean                  # remove output/
 ```
 Run `make` with no args to see all targets.
 
+> **Deploy time:** `make github` takes ~12 minutes (711s) to process ~437 articles. Always run in background. Inform the user of this wait time before starting a deploy.
+
 
 ## Rules for Claude
 1. **Commits**: Do not add a `Co-Authored-By` trailer or any Claude signature to commit messages.
