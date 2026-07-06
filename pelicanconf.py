@@ -98,3 +98,7 @@ WEBAPPS = [
     ('OpenSCAD GUI', '/openscad-gui/'),
     ('STEM Academy', '/stem-academy/'),
 ]
+
+SOCIAL = [
+    ('Buy Me a Coffee', 'https://buymeacoffee.com/lizardspock'),
+]
