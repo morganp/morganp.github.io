@@ -1,11 +1,11 @@
 Title: SoC Article 11: HW/SW co-design, bridging software and silicon
-Date: 2026-05-01
+Date: 2026-07-06
 Category: Engineering
 Tags: SoC, Hardware, Computer Architecture, Electronics, Embedded Systems, Linux, Firmware, Boot, Device Drivers, RTOS
 Slug: soc-article-11-hw-sw-co-design
 Author: morganp
 Summary: How hardware and software are designed together on a SoC: the boot process from reset to running OS, device drivers, the HW/SW partitioning decision, virtual platforms, and the RTOS vs Linux choice.
-Status: draft
+Status: published
 
 *Series: Introduction to SoC Design | Article 11 of 11*
 
