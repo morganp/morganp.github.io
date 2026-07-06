@@ -325,4 +325,4 @@ The SoC design flow is a rigorous, multi-stage process designed to catch errors 
 
 ---
 
-*Previous: [Article 09 -- Hardware Description Languages]({filename}../2026-04-18_SoC_Article_09_HDL_RTL_Design/2026-04-18_SoC_Article_09_HDL_RTL_Design.md)* | *Next: [Article 11 -- HW/SW Co-Design]({filename}../2026-05-01_SoC_Article_11_HW_SW_Co_Design/2026-05-01_SoC_Article_11_HW_SW_Co_Design.md)*
+*Previous: [Article 09 -- Hardware Description Languages]({filename}../2026-04-18_SoC_Article_09_HDL_RTL_Design/2026-04-18_SoC_Article_09_HDL_RTL_Design.md)* | *Next: [Article 11 -- HW/SW Co-Design]({filename}../2026-07-06_SoC_Article_11_HW_SW_Co_Design/2026-07-06_SoC_Article_11_HW_SW_Co_Design.md)*
