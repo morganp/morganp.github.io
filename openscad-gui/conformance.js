@@ -40,6 +40,7 @@
   add('Operators & values', 'equality', 'echo(2==2, "a"=="b");', H => H.eq(0, 'true, false'));
   add('Operators & values', 'logical && || !', 'echo(true&&false, true||false, !false);', H => H.eq(0, 'false, true, true'));
   add('Operators & values', 'ternary ?:', 'echo(3<5 ? "lo" : "hi");', H => H.eq(0, '"lo"'));
+  add('Operators & values', 'ternary inside vector literal', 'x=-1; echo([x>0 ? 1 : 2, 30, 40]);', H => H.eq(0, '[2, 30, 40]'));
   add('Operators & values', 'let() expression', 'echo(let(a=4,b=3) a*b);', H => H.eq(0, '12'));
   add('Operators & values', 'vector*scalar', 'echo([1,2,3]*2);', H => H.eq(0, '[2, 4, 6]'));
   add('Operators & values', 'vector+vector', 'echo([1,2,3]+[10,20,30]);', H => H.eq(0, '[11, 22, 33]'));

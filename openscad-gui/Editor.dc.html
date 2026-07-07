@@ -64,7 +64,7 @@
     <div style="display:flex;align-items:center;gap:9px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:8px 13px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <div style="width:17px;height:17px;border-radius:5px;background:linear-gradient(135deg,#3B82F6,#2563EB);box-shadow:0 0 0 1px #2C3037, inset 0 1px 0 rgba(255,255,255,.25);"></div>
       <span style="font-weight:600;letter-spacing:.01em;color:#E6E9EE;">SCAD Studio</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.58.0</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.58.1</span>
     </div>
     <div style="display:flex;align-items:center;gap:2px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:4px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <button onClick="{{ setBasic }}" title="Basic — solids only (hides parameters, 2D shapes & extrudes)" style="{{ basicTabStyle }}">Basic</button>
@@ -945,7 +945,8 @@ class Component extends DCLogic {
   shapes = [];             // FLAT mirror of all primitive leaves (rebuilt by reindex())
   _rendered = [];          // nodes currently added to the scene (for teardown)
   vars = [];               // [{ name, value }] ordered
-  seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0 };
+  headers = [];            // verbatim include/use lines (+ @github tags) re-emitted by _programText
+  seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0, custom: 0 };
 
   // ---- z-index scale: single source of truth for stacking order (low → high) ----
   // The static base-chrome tiers (hud/chrome/panel*) are ALSO written as literals in the template
@@ -1232,6 +1233,7 @@ class Component extends DCLogic {
     const g = new THREE.Group();
     g.position.set(shape.pos[0], shape.pos[1], shape.pos[2]);
     this.setEuler(g, shape.rot);
+    if (shape.scl) g.scale.set(shape.scl[0], shape.scl[1], shape.scl[2]);   // custom module instances only
 
     // edges list (local) — spheres have no treatable edges in v1
     shape.edges = shape.type === 'cuboid'
@@ -1510,6 +1512,7 @@ class Component extends DCLogic {
       g.translate(0, 0, -T / 2); g.computeVertexNormals();
       return g;
     }
+    if (shape.type === 'custom') return this.customGeometry(shape);
     const base = new THREE.BoxGeometry(shape.dims.x, shape.dims.y, shape.dims.z);
     const treats = Object.entries(shape.treatments || {});
     if (!treats.length || !this.CSG) return base;
@@ -1538,6 +1541,7 @@ class Component extends DCLogic {
       const b = new Brush(this.solidGeometry(node));
       b.position.set(node.pos[0], node.pos[1], node.pos[2]);
       this.setEuler(b, node.rot);
+      if (node.scl) b.scale.set(node.scl[0], node.scl[1], node.scl[2]);
       b.updateMatrixWorld(true);
       return b;
     }
@@ -2648,6 +2652,7 @@ class Component extends DCLogic {
     g.add(fill); g.add(wire);
     g.position.set(node.pos[0], node.pos[1], node.pos[2]);
     this.setEuler(g, node.rot);
+    if (node.scl) g.scale.set(node.scl[0], node.scl[1], node.scl[2]);
     g.userData = { ghostFor: node.id };
     this.scene.add(g);
     this.ghost = g;
@@ -2705,7 +2710,7 @@ class Component extends DCLogic {
     } else if (n && !this.isGroup(n) && !this.isTopLevel(id)) {
       // nested member: show + drive a ghost proxy so negatives are visible and editable
       if (!this.ghost || this.ghost.userData.ghostFor !== n.id) this.buildGhost(n);
-      else { this.ghost.position.set(n.pos[0], n.pos[1], n.pos[2]); this.setEuler(this.ghost, n.rot); this.ghost.scale.set(1, 1, 1); }
+      else { this.ghost.position.set(n.pos[0], n.pos[1], n.pos[2]); this.setEuler(this.ghost, n.rot); const gs = n.scl || [1, 1, 1]; this.ghost.scale.set(gs[0], gs[1], gs[2]); }
       this._applyGizmoMode(this.ghost, true);
     } else {
       this.clearGhost();
@@ -2756,6 +2761,18 @@ class Component extends DCLogic {
       if (this.state.gizmoMode === 'scale' && obj && !this.isGroup(s)) {
         const sc = obj.scale;
         const changed = new Set(); const add = (vn) => { if (vn) changed.add(vn); };
+        if (s.type === 'custom') {
+          // no dims to bake into — the scale lives on the node and is emitted as scale([...])
+          const nz = (x) => { const v = +(+x).toFixed(4); return v || 1; };
+          s.scl = [nz(sc.x), nz(sc.y), nz(sc.z)];
+          if (s.scl[0] === 1 && s.scl[1] === 1 && s.scl[2] === 1) delete s.scl;
+          if (nested) {
+            this.rebuildAncestor(s);
+            this.buildGhost(s); this.tc.attach(this.ghost);
+          }
+          this.syncShapesState(); this.regenCode(); this.forceUpdate();
+          return;
+        }
         if (s.type === 'cuboid') {
           add(this.bakeDim(s, 'x', s.dims.x * sc.x));
           add(this.bakeDim(s, 'y', s.dims.y * sc.y));
@@ -3052,6 +3069,7 @@ class Component extends DCLogic {
   }
   defaultLabelFor(node) {
     if (this.isGroup(node)) return (node.op ? node.op[0].toUpperCase() + node.op.slice(1) : 'Group');
+    if (node.type === 'custom') return node.name || 'Custom';
     const t = node.type || 'shape';
     return t[0].toUpperCase() + t.slice(1);
   }
@@ -3602,6 +3620,7 @@ class Component extends DCLogic {
     }
     const f = { id: nid, type: n.type, label: (n.label || 'Shape') + ' copy', dims: JSON.parse(JSON.stringify(n.dims || {})), pos: (n.pos || [0, 0, 0]).slice(), treatments: JSON.parse(JSON.stringify(n.treatments || {})) };
     if (n.rot) f.rot = n.rot.slice();
+    if (n.type === 'custom') { f.name = n.name; f.argsSrc = n.argsSrc || ''; if (n.scl) f.scl = n.scl.slice(); }
     if (n.expr) f.expr = { ...n.expr };
     return f;
   }
@@ -3744,7 +3763,8 @@ class Component extends DCLogic {
       return {
         id: n.id, kind: 'prim', type: n.type, label: n.label, depth,
         treated: Object.keys(n.treatments || {}).length,
-        meta: (n.type === 'cuboid' || n.type === 'wedge') ? `${this.fmt(n.dims.x)}\u00d7${this.fmt(n.dims.y)}\u00d7${this.fmt(n.dims.z)}`
+        meta: n.type === 'custom' ? `${n.name}() \u00b7 module`
+          : (n.type === 'cuboid' || n.type === 'wedge') ? `${this.fmt(n.dims.x)}\u00d7${this.fmt(n.dims.y)}\u00d7${this.fmt(n.dims.z)}`
           : n.type === 'cylinder' ? `\u2300${this.fmt(n.dims.r * 2)} \u00d7 ${this.fmt(n.dims.h)}`
             : n.type === 'torus' ? `\u2300${this.fmt(n.dims.ring * 2)} / \u2300${this.fmt(n.dims.tube * 2)}`
               : n.type === 'tube' ? `\u2300${this.fmt(n.dims.r * 2)} / \u2300${this.fmt((n.dims.ri || 0) * 2)} \u00d7 ${this.fmt(n.dims.h)}`
@@ -3840,11 +3860,14 @@ class Component extends DCLogic {
       }
       const o = { type: n.type, label: n.label, dims: n.dims, pos: n.pos };
       if (n.rot) o.rot = n.rot;
+      if (n.type === 'custom') { o.name = n.name; o.argsSrc = n.argsSrc || ''; if (n.scl) o.scl = n.scl; }
       if (n.expr && Object.keys(n.expr).length) o.expr = n.expr;
       if (n.treatments && Object.keys(n.treatments).length) o.treatments = n.treatments;
       return o;
     };
-    return JSON.stringify({ v: 1, fn: this.state.fn, vars: this.vars.map(v => ({ name: v.name, value: v.value })), tree: this.tree.map(clean) });
+    const snap = { v: 1, fn: this.state.fn, vars: this.vars.map(v => ({ name: v.name, value: v.value })), tree: this.tree.map(clean) };
+    if (this.headers && this.headers.length) snap.headers = this.headers;
+    return JSON.stringify(snap);
   }
   readTreeSnapshot(txt) {
     const re = /(^|\n)\/\/ @scs-tree (.+?)[ \t]*$/m;
@@ -3871,6 +3894,7 @@ class Component extends DCLogic {
       treatments: n.treatments ? JSON.parse(JSON.stringify(n.treatments)) : {},
     };
     if (n.rot) o.rot = [...n.rot];
+    if (n.type === 'custom') { o.name = n.name; o.argsSrc = n.argsSrc || ''; if (n.scl) o.scl = [...n.scl]; }
     if (n.expr && Object.keys(n.expr).length) o.expr = JSON.parse(JSON.stringify(n.expr));
     return o;
   }
@@ -3880,17 +3904,19 @@ class Component extends DCLogic {
     const fn = (snap.fn != null ? snap.fn : prevFn);
     const tree = this.snapToNodes(snap.tree);
     const vars = (snap.vars || []).map(v => ({ name: v.name, value: v.value }));
+    const prevHeaders = this.headers;
+    this.headers = snap.headers || [];
     this.state.fn = fn; this.tree = tree; this.vars = vars; this.reindex();
     const expected = this._programText().replace(/\s+$/, '');
     const bare = this.stripSnapshot(txt);
     if (expected !== bare) {                 // stale / hand-edited code -> let the normal path handle it
-      this.state.fn = prevFn; this.tree = prevTree; this.vars = prevVars; this.reindex();
+      this.state.fn = prevFn; this.tree = prevTree; this.vars = prevVars; this.headers = prevHeaders; this.reindex();
       return false;
     }
     this.clearEngineRender();
     for (const n of this._rendered) { if (n.group) { this.scene.remove(n.group); this.disposeGroup(n.group); } }
     this._rendered = [];
-    this.seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0 };
+    this.seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0, custom: 0 };
     const vmap = this.varMap();
     for (const s of this.shapes) if (s.expr) this.resolveShape(s, vmap);
     this.clampAllTreatments();
@@ -3910,6 +3936,11 @@ class Component extends DCLogic {
     out.push('// Generated by SCAD Studio');
     out.push('$fn = ' + this.state.fn + ';');
     out.push('');
+    if (this.headers && this.headers.length) {
+      out.push('// --- libraries ---');
+      for (const h of this.headers) out.push(h);
+      out.push('');
+    }
     if (this.vars.length) {
       out.push('// --- parameters ---');
       for (const v of this.vars) out.push(`${v.name} = ${F(v.value)};`);
@@ -3976,6 +4007,8 @@ class Component extends DCLogic {
     if (advanced && window.ScadEngine) { this.runAdvanced(txt); return; }
     this._readsViewport = false;
 
+    this._customSet = this.knownLibModules(ast);   // library modules callable as custom shapes
+    this.headers = this.extractHeaders(txt);       // include/use (+ @github tags) re-emitted verbatim
     const parsed = this.parseScad(txt);
     const count = this.collectPrimitives(parsed.tree || []).length;
     if (!count && !parsed.vars.length) { this.flashStatus('No shapes or parameters found'); return; }
@@ -3983,7 +4016,7 @@ class Component extends DCLogic {
     // wipe and rebuild
     for (const n of this._rendered) { if (n.group) { this.scene.remove(n.group); this.disposeGroup(n.group); } }
     this._rendered = [];
-    this.tree = []; this.seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0 };
+    this.tree = []; this.seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0, custom: 0 };
     this.vars = parsed.vars.map(v => ({ name: v.name, value: v.value }));
     this.tree = (parsed.tree || []).map(p => this.buildNodeFromParsed(p));
     this.reindex();
@@ -4027,8 +4060,23 @@ class Component extends DCLogic {
       if (s.children) for (const c of s.children.stmts) if (!extrudeBodySimple(c)) return false;
       return true;
     };
+    // calls to KNOWN library modules (defined in loaded include/use files) round-trip as opaque
+    // 'custom' authoring nodes — raw arg text preserved verbatim — so they stay GUI-simple.
+    // A child block on the call (children()-style) has no authoring representation -> advanced.
+    const custom = this.knownLibModules(ast);
+    const customCallSimple = (s) => s.t === 'call' && custom.has(s.name) && !SIMPLE.has(s.name)
+      && (!s.children || !(s.children.stmts || []).length);
     const callSimple = (s) => {
-      if (!SIMPLE.has(s.name)) return false;
+      if (!SIMPLE.has(s.name)) {
+        if (customCallSimple(s)) return true;
+        // scale() is representable only as a prefix on a custom node (parseScad drops it on
+        // primitives) -> simple iff it wraps exactly one custom-call statement
+        if (s.name === 'scale' && s.children && (s.children.stmts || []).length === 1) {
+          const c = s.children.stmts[0];
+          return customCallSimple(c) || (c.t === 'call' && c.name === 'scale' && callSimple(c));
+        }
+        return false;
+      }
       if (s.args.some(a => !argSimple(a.expr))) return false;
       if (s.name === 'linear_extrude' || s.name === 'rotate_extrude') {
         if (s.children) for (const c of s.children.stmts) if (!extrudeBodySimple(c)) return false;
@@ -4038,7 +4086,12 @@ class Component extends DCLogic {
       return true;
     };
     const stmtSimple = (s) => {
-      switch (s.t) { case 'assign': return exprSimple(s.expr); case 'call': return callSimple(s); default: return false; }
+      switch (s.t) {
+        case 'assign': return exprSimple(s.expr);
+        case 'call': return callSimple(s);
+        case 'include': case 'use': return true;   // preserved verbatim as header lines
+        default: return false;
+      }
     };
     return !(ast.stmts || []).every(stmtSimple);
   }
@@ -4181,7 +4234,7 @@ class Component extends DCLogic {
 
   finishAdvanced(txt, res) {
     for (const n of this._rendered) { if (n.group) { this.scene.remove(n.group); this.disposeGroup(n.group); } }
-    this._rendered = []; this.tree = []; this.shapes = []; this.clearEdge();
+    this._rendered = []; this.tree = []; this.shapes = []; this.headers = []; this.clearEdge();
     if (this.tc) { this.tc.detach(); this.tc.visible = false; }
     this.clearEngineRender();
     // render
@@ -4823,6 +4876,11 @@ class Component extends DCLogic {
       const op = node.kind === 'op' ? node.op : 'group';
       const kids = (node.children || []).map((c, i) => this.collapseGeomRow(this.serializeGeomRaw(c, i, depth + 1), depth + 1)).filter(Boolean);
       const isColor = node.kind === 'group' && !!node.color;
+      const isModule = node.kind === 'group' && !!node.module;
+      if (isModule) {
+        // a module instance reads as one named thing; children stay inspectable underneath
+        return { id, kind: 'group', op: 'module', structural: false, label: node.module, depth, count: kids.length, children: kids, readOnly: true };
+      }
       const label = op === 'group' ? (isColor ? 'Color' : 'Group') : (op[0].toUpperCase() + op.slice(1));
       return { id, kind: 'group', op, structural: op === 'group' && !isColor, label, depth, count: kids.length, children: kids, readOnly: true };
     }
@@ -4922,6 +4980,15 @@ class Component extends DCLogic {
       if (p.dims) node.dims = p.dims;
       return node;
     }
+    if (p.type === 'custom') {
+      this.seq.custom = (this.seq.custom || 0) + 1;
+      return {
+        id: 'cs' + Date.now() + Math.random().toString(36).slice(2, 6), type: 'custom',
+        name: p.name, argsSrc: p.argsSrc || '', label: p.name + ' ' + this.seq.custom,
+        dims: {}, pos: p.pos || [0, 0, 0], rot: p.rot || undefined, scl: p.scl || undefined, treatments: {},
+        expr: (p.expr && Object.keys(p.expr).length) ? p.expr : undefined,
+      };
+    }
     this.seq[p.type] = (this.seq[p.type] || 0) + 1;
     const labelMap = { cuboid: 'Cuboid ', sphere: 'Sphere ', cylinder: 'Cylinder ', circle: 'Circle ', square: 'Square ', polygon: 'Polygon ' };
     const label = (labelMap[p.type] || 'Shape ') + this.seq[p.type];
@@ -4942,12 +5009,124 @@ class Component extends DCLogic {
     if (node.type === 'tube') return [0, 0, node.dims.h / 2];
     if (node.type === 'torus') return [0, 0, node.dims.tube];
     if (node.type === 'circle' || node.type === 'square' || node.type === 'polygon') return [0, 0, 0.3];
+    if (node.type === 'custom') {
+      // rest on the floor using the evaluated geometry's bounding box (if already built)
+      const g = this._customGeoCache && this._customGeoCache.get(this.customGeoKey(node));
+      if (g) { if (!g.boundingBox) g.computeBoundingBox(); const sz = node.scl ? node.scl[2] : 1; return [0, 0, -g.boundingBox.min.z * sz]; }
+      return [0, 0, 0];
+    }
     return [0, 0, node.dims.r];
   }
   // SCAD -> authoring-tree reconstruction lives in scad-authoring.js. Wrapper threads editor scope in.
   parseScad(txt) {
-    const r = window.ScadAuthoring.parseScad(txt, { reserved: (nm) => this.reserved(nm), restingPos: (nd) => this.restingPos(nd) });
+    const cs = this._customSet;
+    const r = window.ScadAuthoring.parseScad(txt, {
+      reserved: (nm) => this.reserved(nm),
+      restingPos: (nd) => this.restingPos(nd),
+      isCustom: (nm) => !!(cs && cs.has(nm)),
+    });
     return { vars: r.vars, tree: r.tree };
+  }
+
+  // ---- custom module-instance support (library modules as GUI shapes) ----
+  // module names defined in _scadFiles sources reachable from the include/use lines of the AST
+  // (recursive, cycle-guarded). Locally-defined modules are NOT included: the authoring emitter
+  // cannot re-emit their definitions, so programs using them stay on the advanced path.
+  knownLibModules(ast) {
+    const names = new Set();
+    if (!this._scadFiles || !this._scadFiles.size) return names;
+    const queue = [], seen = new Set();
+    for (const s of ((ast && ast.stmts) || [])) {
+      if (s && (s.t === 'include' || s.t === 'use')) queue.push((s.path || '').split('/').pop().toLowerCase());
+    }
+    while (queue.length) {
+      const key = queue.shift();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      const f = this._scadFiles.get(key);
+      if (!f || !f.source) continue;
+      let m;
+      const md = /\bmodule\s+([A-Za-z_]\w*)\s*\(/g;
+      while ((m = md.exec(f.source)) !== null) names.add(m[1]);
+      const inc = /\b(?:include|use)\s*<([^>]+)>/g;
+      while ((m = inc.exec(f.source)) !== null) queue.push(m[1].split('/').pop().toLowerCase());
+    }
+    return names;
+  }
+  // include/use lines (plus their contiguous // @github: tag comments) from the ORIGINAL source,
+  // preserved verbatim so regenCode can re-emit them — parseScad strips comments and skips includes.
+  extractHeaders(txt) {
+    const lines = (txt || '').split('\n');
+    const out = [];
+    for (let i = 0; i < lines.length; i++) {
+      if (!/^\s*(include|use)\s*</.test(lines[i])) continue;
+      let j = i;
+      while (j - 1 >= 0 && /^\s*\/\/\s*@github:/i.test(lines[j - 1])) j--;
+      for (; j <= i; j++) { const l = lines[j].trim(); if (!out.includes(l)) out.push(l); }
+    }
+    return out;
+  }
+  // one custom shape = one engine run of "headers + params + name(args);", realized and merged
+  // into a single BufferGeometry (world transforms baked, uv zeroed for three-bvh-csg).
+  customGeoKey(s) {
+    return s.name + '(' + (s.argsSrc || '') + ')|fn' + this.state.fn
+      + '|' + this.vars.map(v => v.name + '=' + v.value).join(',')
+      + '|f' + (this._scadFiles ? this._scadFiles.size : 0);
+  }
+  customGeometry(shape) {
+    this._customGeoCache = this._customGeoCache || new Map();
+    const key = this.customGeoKey(shape);
+    let g = this._customGeoCache.get(key);
+    if (!g) {
+      g = this.buildCustomGeometry(shape);
+      // keep the cache bounded; a var/args/fn change re-keys every entry
+      if (this._customGeoCache.size > 64) { for (const [k, v] of this._customGeoCache) { v.dispose(); this._customGeoCache.delete(k); } }
+      this._customGeoCache.set(key, g);
+    }
+    return g.clone();   // callers dispose per-node geometry on rebuild; the master stays cached
+  }
+  buildCustomGeometry(shape) {
+    const THREE = this.THREE;
+    const fallback = () => new THREE.BoxGeometry(5, 5, 5);
+    try {
+      const prog = [];
+      for (const h of (this.headers || [])) prog.push(h);
+      for (const v of this.vars) prog.push(v.name + ' = ' + this.fmt(v.value) + ';');
+      prog.push(shape.name + '(' + (shape.argsSrc || '') + ');');
+      const res = window.ScadEngine.run(prog.join('\n'), { $fn: this.state.fn, files: this.scadFilesMap() });
+      const tmp = new THREE.Group();
+      for (const n of (res.geom || [])) {
+        try { this.realizeNode(n, this.IDENTITY(), null, tmp); }
+        catch (e) { console.warn('custom realize', shape.name, e); }
+      }
+      tmp.updateMatrixWorld(true);
+      const pos = [], norm = [];
+      const v = new THREE.Vector3(), nm3 = new THREE.Matrix3();
+      tmp.traverse(o => {
+        if (!o.isMesh || !o.geometry) return;
+        const geo = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry;
+        const pa = geo.getAttribute('position'), na = geo.getAttribute('normal');
+        if (!pa) return;
+        nm3.getNormalMatrix(o.matrixWorld);
+        for (let i = 0; i < pa.count; i++) {
+          v.fromBufferAttribute(pa, i).applyMatrix4(o.matrixWorld); pos.push(v.x, v.y, v.z);
+          if (na) { v.fromBufferAttribute(na, i).applyMatrix3(nm3).normalize(); norm.push(v.x, v.y, v.z); }
+        }
+        if (geo !== o.geometry) geo.dispose();
+      });
+      this.disposeGroup(tmp);
+      if (!pos.length) {
+        console.warn('custom shape produced no geometry:', shape.name);
+        this.flashStatus(shape.name + '(): no geometry — check the library import');
+        return fallback();
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      if (norm.length === pos.length) g.setAttribute('normal', new THREE.Float32BufferAttribute(norm, 3));
+      else g.computeVertexNormals();
+      g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array((pos.length / 3) * 2), 2));
+      return g;
+    } catch (e) { console.warn('customGeometry failed', shape.name, e); return fallback(); }
   }
 
   onCodeChange = (e) => { this.setState({ code: e.target.value, dirty: true }); };
@@ -5691,7 +5870,7 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
     const flat = [];
     const walk = (rows) => { for (const r of rows) { flat.push(r); if (r.kind === 'group' && expanded[r.id] !== false) walk(r.children); } };
     walk(st.tree || []);
-    const opGlyph = (op) => op === 'union' ? '\u222a' : op === 'difference' ? '\u2212' : op === 'hull' ? '\u2b22' : op === 'minkowski' ? '\u2295' : op === 'group' ? '\u25a1' : op === 'linear_extrude' ? '\u21a5' : op === 'rotate_extrude' ? '\u21bb' : '\u2229';
+    const opGlyph = (op) => op === 'union' ? '\u222a' : op === 'difference' ? '\u2212' : op === 'hull' ? '\u2b22' : op === 'minkowski' ? '\u2295' : op === 'group' ? '\u25a1' : op === 'linear_extrude' ? '\u21a5' : op === 'rotate_extrude' ? '\u21bb' : op === 'module' ? '\u25c8' : '\u2229';
     const treeRows = flat.map(r => {
       const isGroup = r.kind === 'group';
       const isSel = r.id === st.selectedShapeId || selIds.includes(r.id);
@@ -5707,7 +5886,7 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
         glyph: isGroup ? opGlyph(r.op) : '',
         dotStyle: isGroup
           ? `font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1;color:${isSel ? '#9CC2F5' : '#7E96B8'};`
-          : `width:9px;height:9px;border-radius:${(r.type === 'cuboid' || r.type === 'wedge' || r.type === 'square' || r.type === 'polygon') ? '2px' : '50%'};background:${isSel ? '#3B82F6' : '#6B7280'};`,
+          : `width:9px;height:9px;border-radius:${(r.type === 'cuboid' || r.type === 'wedge' || r.type === 'square' || r.type === 'polygon' || r.type === 'custom') ? '2px' : '50%'};background:${isSel ? '#3B82F6' : '#6B7280'};`,
         rowStyle: `display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:8px;cursor:grab;margin-bottom:2px;margin-left:${r.depth * 14}px;border:1px solid ${isSel ? '#2C4D78' : 'transparent'};background:${isSel ? '#17283f' : (isGroup ? '#16191E' : 'transparent')};${st.dragOver === r.id + ':before' ? 'box-shadow:inset 0 2px 0 #3B82F6;' : st.dragOver === r.id + ':after' ? 'box-shadow:inset 0 -2px 0 #3B82F6;' : ''}`,
         onSelect: (e) => { if (this._lpFired) { this._lpFired = false; return; } if (st.readOnly) { if (!r.root) return; const mult = e && (e.metaKey || e.ctrlKey || e.shiftKey); if (mult) { this.toggleSelectReadOnly(r.id); } else { this.setState({ selectedShapeId: r.id, selectedIds: [r.id] }, () => this.updateGizmo()); } return; } this.clearEdge(); if (e && (e.metaKey || e.ctrlKey || e.shiftKey)) this.toggleSelect(r.id); else this.selectShape(r.id); },
         onCtx: (e) => { e.preventDefault(); e.stopPropagation(); this.showCtxFor(r.id, e.clientX, e.clientY); },
@@ -5830,6 +6009,7 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
         : ssh.type === 'circle' ? [this.buildField(ssh, 'd', '\u2300 diameter')]
         : ssh.type === 'square' ? [this.buildField(ssh, 'x', 'X'), this.buildField(ssh, 'y', 'Y')]
         : ssh.type === 'polygon' ? []
+        : ssh.type === 'custom' ? []
         : ssh.type === 'sphere' ? [this.buildField(ssh, 'd', '\u2300 diameter')]
           : cylExtended ? (ssh.dims.sides
             ? [this.buildField(ssh, 'd', '\u2300 base'), this.buildField(ssh, 'd2', '\u2300 top'), this.buildField(ssh, 'h', 'Z (height)'), this.buildField(ssh, 'sides', 'sides')]
