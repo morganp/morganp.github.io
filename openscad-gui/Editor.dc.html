@@ -64,7 +64,7 @@
     <div style="display:flex;align-items:center;gap:9px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:8px 13px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <div style="width:17px;height:17px;border-radius:5px;background:linear-gradient(135deg,#3B82F6,#2563EB);box-shadow:0 0 0 1px #2C3037, inset 0 1px 0 rgba(255,255,255,.25);"></div>
       <span style="font-weight:600;letter-spacing:.01em;color:#E6E9EE;">SCAD Studio</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.56.0</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.58.0</span>
     </div>
     <div style="display:flex;align-items:center;gap:2px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:4px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <button onClick="{{ setBasic }}" title="Basic — solids only (hides parameters, 2D shapes & extrudes)" style="{{ basicTabStyle }}">Basic</button>
@@ -1145,10 +1145,18 @@ class Component extends DCLogic {
     this.setState({ ready: true, csgOk: !!this.CSG });
     window.__editor = this;
 
-    // seed with a cuboid so "draw a cube, highlight an edge" works immediately.
+    // seed with a cuboid so "draw a cube, highlight an edge" works immediately — unless the URL
+    // carries a deep link (?github= / ?file=), which opens that file as the main document instead.
     // The seed's regenCode() emits via window.ScadEmitter (an async-loaded helmet module); if THREE
     // fires three-ready before that script executes, wait for it so the first emit can't crash.
-    this._whenLibsReady(() => this.addCuboid());
+    this._whenLibsReady(() => {
+      const dl = this.deepLink();
+      if (dl) this.openDeepLink(dl).catch(e => {
+        this.flashStatus('Open from URL failed: ' + (e && e.message ? e.message : String(e)));
+        this.addCuboid();
+      });
+      else this.addCuboid();
+    });
   }
   // poll until the externally-loaded authoring modules are present, then run cb (immediately if ready)
   _whenLibsReady(cb) {
@@ -4187,7 +4195,7 @@ class Component extends DCLogic {
       sub.userData = { roTopIndex: i };
       // per-node guard: a single failing part (e.g. a heavy CSG) must not abort the whole render
       try { this.realizeNode(n, this.IDENTITY(), null, sub); }
-      catch (e) { res.errors = res.errors.concat([{ msg: 'render part ' + (i + 1) + ': ' + (e.message || e) }]); }
+      catch (e) { console.warn('[render-part]', e && e.stack || e); res.errors = res.errors.concat([{ msg: 'render part ' + (i + 1) + ': ' + (e.message || e) }]); }
       grp.add(sub);
       this._roGroups[i] = sub;
     });
@@ -4350,8 +4358,7 @@ class Component extends DCLogic {
       }
       const g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-      g.computeVertexNormals();
-      return g;
+      return this.padGeoAttrs(g);
     }
     return null;
   }
@@ -4499,13 +4506,18 @@ class Component extends DCLogic {
     for (const g of plain) { const a = g.attributes.position.array; out.set(a, o); o += a.length; }
     const merged = new THREE.BufferGeometry(); merged.setAttribute('position', new THREE.Float32BufferAttribute(out, 3)); return merged;
   }
+  // three-bvh-csg requires matching attributes across CSG operands; primitives carry
+  // normal + uv, so every geometry that can meet one in Evaluator.evaluate must too, or the
+  // lib crashes indexing the missing attribute ("Cannot read properties of undefined").
+  padGeoAttrs(geo) {
+    if (!geo || !geo.attributes || !geo.attributes.position) return geo;
+    if (!geo.attributes.normal) geo.computeVertexNormals();
+    if (!geo.attributes.uv) { const c = geo.attributes.position.count; geo.setAttribute('uv', new this.THREE.Float32BufferAttribute(new Float32Array(c * 2), 2)); }
+    return geo;
+  }
   ringsToSolid(rings, mode, params) {
     const geo = mode === 'rotate' ? this.revolveSolid(rings, params) : this.linearSolid(rings, params);
-    // three-bvh-csg requires matching attributes across operands; primitives carry uv, so the
-    // extrude solids must too (the twist loft / revolve don't emit uv) or CSG with a primitive
-    // throws "Attribute uv not available on geometry".
-    if (geo && !geo.attributes.uv) { const c = geo.attributes.position.count; geo.setAttribute('uv', new this.THREE.Float32BufferAttribute(new Float32Array(c * 2), 2)); }
-    return geo;
+    return this.padGeoAttrs(geo);
   }
 
   // ---- authoring-tree 2D -> rings -> extrude solid (Slice 4) ----
@@ -4626,7 +4638,7 @@ class Component extends DCLogic {
       if (op === 'hull') {
         let pts = []; for (const b of brushes) pts = pts.concat(vertsOf(b));
         if (pts.length < 4) return this.unionBrushes(brushes);
-        const br = new this.CSG.Brush(new CG(pts)); br.updateMatrixWorld(); return br;
+        const br = new this.CSG.Brush(this.padGeoAttrs(new CG(pts))); br.updateMatrixWorld(); return br;
       }
       let acc = vertsOf(brushes[0]);
       for (let i = 1; i < brushes.length; i++) {
@@ -4634,7 +4646,7 @@ class Component extends DCLogic {
         for (const a of A) { for (const b of B) { sum.push(new THREE.Vector3(a.x+b.x, a.y+b.y, a.z+b.z)); } if (sum.length > cap) break; }
         acc = sum;
       }
-      const br = new this.CSG.Brush(new CG(acc)); br.updateMatrixWorld(); return br;
+      const br = new this.CSG.Brush(this.padGeoAttrs(new CG(acc))); br.updateMatrixWorld(); return br;
     } catch (e) { return this.unionBrushes(brushes); }
   }
   unionBrushes(brushes) { brushes = (brushes||[]).filter(Boolean); if (!brushes.length) return null; if (brushes.length === 1) return brushes[0]; if (!this._ev) this._ev = new this.CSG.Evaluator(); let acc = brushes[0]; for (let i = 1; i < brushes.length; i++) acc = this._ev.evaluate(acc, brushes[i], this.CSG.ADDITION); acc.updateMatrixWorld(); return acc; }
@@ -5152,22 +5164,97 @@ class Component extends DCLogic {
     }
     return out;
   }
-  needsGithubFetch(txt) {
-    const tags = this.scanGithubImportTags(txt);
-    return tags.some(t => !(this._scadFiles && this._scadFiles.has(t.file)) && !(this._githubFailed && this._githubFailed.has(t.spec)));
+  // Tags can live in fetched libraries too (a library's own include <...> tagged with the repo
+  // it comes from), so every scan covers the editor text PLUS every loaded .scad source.
+  _allImportSources(txt) {
+    const out = [txt || ''];
+    if (this._scadFiles) for (const [, v] of this._scadFiles) out.push(v.source || '');
+    return out;
+  }
+  _pendingGithubSpecs(txt) {
+    const specs = new Set();
+    for (const src of this._allImportSources(txt))
+      for (const t of this.scanGithubImportTags(src))
+        if (!(this._scadFiles && this._scadFiles.has(t.file)) && !(this._githubFailed && this._githubFailed.has(t.spec)))
+          specs.add(t.spec);
+    return [...specs];
+  }
+  needsGithubFetch(txt) { return this._pendingGithubSpecs(txt).length > 0; }
+
+  // ============ DEEP LINK (open a file passed on the URL) ============
+  // index.html?github=owner/repo[@ref][/path/to/file.scad]   (github.com URLs also accepted;
+  //   optional &file=<basename.scad> picks the entry file when the spec has no file path)
+  // index.html?file=<url-to-.scad>   (github.com blob / raw.githubusercontent.com URLs are
+  //   treated like ?github= so sibling includes resolve; other URLs fetch as plain text)
+  deepLink() {
+    let q; try { q = new URLSearchParams(window.location.search); } catch (_) { return null; }
+    const gh = q.get('github'), file = q.get('file');
+    // github.com blob/raw file URLs (in either param) -> owner/repo@ref/path spec
+    const asSpec = (u) => {
+      const m = (u || '').match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/(?:blob|raw)\/([^/]+)\/(.+?)[?#]?$/i)
+             || (u || '').match(/^https?:\/\/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+?)[?#]?$/i);
+      return m ? m[1] + '/' + m[2] + '@' + m[3] + '/' + m[4] : null;
+    };
+    if (gh) return { kind: 'github', spec: asSpec(gh) || gh, entry: (file || '').split('/').pop().toLowerCase() };
+    if (!file) return null;
+    const spec = asSpec(file);
+    if (spec) return { kind: 'github', spec, entry: '' };
+    return { kind: 'url', url: file };
+  }
+  async openDeepLink(d) {
+    if (d.kind === 'url') {
+      this.flashStatus('Opening ' + d.url + '…');
+      const r = await fetch(d.url);
+      if (!r.ok) throw new Error('HTTP ' + r.status + ' fetching ' + d.url);
+      const src = await r.text();
+      this.openAsMain((d.url.split('/').pop() || 'file.scad'), src);
+      return;
+    }
+    const s = this.parseGithubSpec(d.spec);
+    if (!s) throw new Error('invalid github spec: ' + d.spec);
+    // a file path in the spec names the entry; the WHOLE repo is fetched regardless so that
+    // sibling includes (and their nested @github tags) resolve like the Library dialog's fetch
+    let entry = d.entry;
+    const sub = (s.subdir || '').replace(/^\/+|\/+$/g, '');
+    if (/\.scad$/i.test(sub)) entry = sub.split('/').pop().toLowerCase();
+    this.flashStatus('Opening ' + s.owner + '/' + s.repo + '…');
+    const before = this._scadFiles ? new Set(this._scadFiles.keys()) : new Set();
+    const { ok, owner, repo } = await this.fetchGithubRepoFiles(s.owner + '/' + s.repo + (s.ref ? '@' + s.ref : ''));
+    if (!entry) {
+      const fresh = [...this._scadFiles.keys()].filter(k => !before.has(k));
+      if (fresh.length === 1) entry = fresh[0];
+    }
+    const rec = entry && this._scadFiles.get(entry);
+    if (!rec) {
+      // no unambiguous entry: leave the repo loaded as include chips and say so
+      this.forceUpdate();
+      throw new Error(entry ? entry + ' not found in ' + owner + '/' + repo
+        : ok + ' files loaded from ' + owner + '/' + repo + ' — add &file=<name.scad> to pick one');
+    }
+    this._scadFiles.delete(rec.key); // it's the main document now, not an include
+    this.openAsMain(rec.name, rec.source);
+  }
+  openAsMain(name, src) {
+    if (this._codeArea) this._codeArea.value = src;
+    this.setState({ code: src, dirty: false }, () => this.runCode());
+    this.flashStatus('Opened ' + name);
+    this.forceUpdate();
   }
   async ensureGithubImports(txt) {
-    const tags = this.scanGithubImportTags(txt);
-    const specs = [...new Set(tags.filter(t => !(this._scadFiles && this._scadFiles.has(t.file))).map(t => t.spec))];
-    for (const spec of specs) {
-      if (this._githubFailed && this._githubFailed.has(spec)) continue;
-      try {
-        const { ok, owner, repo } = await this.fetchGithubRepoFiles(spec);
-        this.flashStatus('Auto-imported ' + ok + ' file' + (ok !== 1 ? 's' : '') + ' from ' + owner + '/' + repo);
-      } catch (e) {
-        if (!this._githubFailed) this._githubFailed = new Set();
-        this._githubFailed.add(spec);
-        this.flashStatus('@github import failed (' + spec + '): ' + (e && e.message ? e.message : String(e)));
+    // multi-pass: a fetched repo can itself carry @github tags for its own includes; rescan
+    // after each round until nothing new is pending (depth-capped; failures are remembered)
+    for (let pass = 0; pass < 5; pass++) {
+      const specs = this._pendingGithubSpecs(txt);
+      if (!specs.length) break;
+      for (const spec of specs) {
+        try {
+          const { ok, owner, repo } = await this.fetchGithubRepoFiles(spec);
+          this.flashStatus('Auto-imported ' + ok + ' file' + (ok !== 1 ? 's' : '') + ' from ' + owner + '/' + repo);
+        } catch (e) {
+          if (!this._githubFailed) this._githubFailed = new Set();
+          this._githubFailed.add(spec);
+          this.flashStatus('@github import failed (' + spec + '): ' + (e && e.message ? e.message : String(e)));
+        }
       }
     }
   }
