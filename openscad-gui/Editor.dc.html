@@ -64,7 +64,7 @@
     <div style="display:flex;align-items:center;gap:9px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:8px 13px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <div style="width:17px;height:17px;border-radius:5px;background:linear-gradient(135deg,#3B82F6,#2563EB);box-shadow:0 0 0 1px #2C3037, inset 0 1px 0 rgba(255,255,255,.25);"></div>
       <span style="font-weight:600;letter-spacing:.01em;color:#E6E9EE;">SCAD Studio</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.58.1</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.59.0</span>
     </div>
     <div style="display:flex;align-items:center;gap:2px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:4px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <button onClick="{{ setBasic }}" title="Basic — solids only (hides parameters, 2D shapes & extrudes)" style="{{ basicTabStyle }}">Basic</button>
@@ -5094,6 +5094,16 @@ class Component extends DCLogic {
       for (const v of this.vars) prog.push(v.name + ' = ' + this.fmt(v.value) + ';');
       prog.push(shape.name + '(' + (shape.argsSrc || '') + ');');
       const res = window.ScadEngine.run(prog.join('\n'), { $fn: this.state.fn, files: this.scadFilesMap() });
+      // text() inside the module needs font shaping (async on first use): shape now if the font
+      // is loaded, otherwise render without it and rebuild once the font arrives.
+      const texts = []; this.collectTextNodes(res.geom, texts);
+      if (texts.length) {
+        if (this._font) { for (const n of texts) { try { n.rings = this.textToRings(n.params, this._font); } catch (e) { console.warn('custom text shape', e); } } }
+        else {
+          this._customFontPending = true;
+          this.ensureFont().then(f => { if (f && this._customFontPending) { this._customFontPending = false; this._customGeoCache = new Map(); this.rebuildScene(); } });
+        }
+      }
       const tmp = new THREE.Group();
       for (const n of (res.geom || [])) {
         try { this.realizeNode(n, this.IDENTITY(), null, tmp); }
