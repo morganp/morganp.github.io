@@ -19,7 +19,7 @@ Every diatonic major scale is built from the same fixed pattern of steps: **W-W-
 
 Applying W-W-H-W-W-W-H starting on A:
 
-[![A major scale built from the W-W-H-W-W-W-H step formula]({attach}/images/Music/DiatonicChords/a-major-scale-steps-900w.png)]({attach}/images/Music/DiatonicChords/a-major-scale-steps-HQ.png)
+[![A major scale built from the W-W-H-W-W-W-H step formula]({static}/images/Music/DiatonicChords/a-major-scale-steps-900w.png)]({static}/images/Music/DiatonicChords/a-major-scale-steps-HQ.png)
 
 That gives the A diatonic major scale: A B C# D E F# G#. Pull out the 1st, 3rd, and 5th notes -- A, C#, E -- and that triad is the A major chord.
 
@@ -37,7 +37,7 @@ That gives the A diatonic major scale: A B C# D E F# G#. Pull out the 1st, 3rd, 
 
 Do the same with the E diatonic major scale, applying W-W-H-W-W-W-H starting on E:
 
-[![E major scale built from the W-W-H-W-W-W-H step formula]({attach}/images/Music/DiatonicChords/e-major-scale-steps-900w.png)]({attach}/images/Music/DiatonicChords/e-major-scale-steps-HQ.png)
+[![E major scale built from the W-W-H-W-W-W-H step formula]({static}/images/Music/DiatonicChords/e-major-scale-steps-900w.png)]({static}/images/Music/DiatonicChords/e-major-scale-steps-HQ.png)
 
 That gives E F# G# A B C# D#. The 1st, 3rd, and 5th are E, G#, B -- the E major chord.
 
@@ -113,7 +113,7 @@ Every diatonic root note in a key can be found from a single starting point usin
 
 Worked example, root G on the 6th string at fret 3:
 
-[![The I-ii-iii-IV-V-vi root recipe on the 6th and 5th strings, worked from G at fret 3]({attach}/images/Music/DiatonicChords/diatonic-root-recipe-900w.png)]({attach}/images/Music/DiatonicChords/diatonic-root-recipe-HQ.png)
+[![The I-ii-iii-IV-V-vi root recipe on the 6th and 5th strings, worked from G at fret 3]({static}/images/Music/DiatonicChords/diatonic-root-recipe-900w.png)]({static}/images/Music/DiatonicChords/diatonic-root-recipe-HQ.png)
 
 G-A-B on the 6th string are I-ii-iii; dropping to the 5th string at the same fret 3 lands on C, the IV; C-D-E on the 5th string are IV-V-vi. Every "+2 frets" step is a whole step, matching the W in the W-W-H-W-W-W-H formula -- the only reason the recipe can skip past the H (iii to IV) without adjusting the fret count is the one-string drop, which supplies that gap for free via the tuning itself. Once a root is located by name on either string, this same shape of movement finds every other diatonic root in that key.
 
