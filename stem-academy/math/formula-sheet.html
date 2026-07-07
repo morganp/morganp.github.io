@@ -70,7 +70,12 @@
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; line-height: 1.6; background: #f6efe2; border: 1.5px solid #e6dfd2; padding: 10px 12px; color: #2b2620; white-space: pre-line;">{{ c.formula }}</div>
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; color: #6b6156;">{{ c.symbols }}</div>
         <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;"><strong>Use it when:</strong> {{ c.when }}</div>
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e; border-top: 1.5px solid #eee7da; padding-top: 8px; margin-top: auto;">EXPLAINED IN: <span style="color: {{ c.strandColor }}; font-weight: 600;">{{ c.topicLabel }}</span> <span style="color: #c9c0b2;">(coming soon)</span></div>
+        <sc-if value="{{ c.shipped }}">
+          <a href="{{ c.topicHref }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156; border-top: 1.5px solid #eee7da; padding-top: 8px; margin-top: auto; text-decoration: none;">EXPLAINED IN: <span style="color: {{ c.strandColor }}; font-weight: 600; text-decoration: underline;">{{ c.topicLabel }} →</span></a>
+        </sc-if>
+        <sc-if value="{{ c.notShipped }}">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e; border-top: 1.5px solid #eee7da; padding-top: 8px; margin-top: auto;">EXPLAINED IN: <span style="color: {{ c.strandColor }}; font-weight: 600;">{{ c.topicLabel }}</span> <span style="color: #c9c0b2;">(coming soon)</span></div>
+        </sc-if>
       </div>
     </sc-for>
   </div>
@@ -349,10 +354,22 @@ class Component extends DCLogic {
       if (this.state.status === "memorise" && isGiven) return null;
       if (this.state.strand !== "all" && f.strand !== this.state.strand) return null;
       const b = badgeFor(st);
+      const SHIPPED = {
+        "Quadratics & Graphs": "quadratics.html",
+        "Pythagoras & Trigonometry": "trigonometry.html",
+        "Shapes & Angles": "shapes-angles.html",
+        "Angles, Area & Perimeter": "geometry-measure.html",
+        "Fractions, Decimals & %": "fractions-percent.html",
+        "Probability": "probability.html",
+        "Coordinates & Straight Lines": "coordinates.html",
+        "Statistics": "statistics.html",
+      };
+      const href = SHIPPED[f.topic];
       return {
         name: f.name, formula: f.formula, symbols: f.symbols, when: f.when,
         strandColor: STRAND[f.strand], topicLabel: f.topic,
         badge: b.label, badgeBg: b.bg, badgeFg: b.fg,
+        shipped: !!href, notShipped: !href, topicHref: href || "#",
       };
     }).filter(Boolean);
 

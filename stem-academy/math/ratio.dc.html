@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Ratio & Proportion">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / RATIO &amp; PROPORTION</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #7048a8;">// SHARING FAIRLY & SCALING TOGETHER — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Ratio &amp; proportion</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 840px;">A ratio compares parts of the same whole; proportion links two quantities so they change together. Split a bar by ratio, race direct proportion against inverse, then master the cover-up triangles examiners love — speed, density and their cousins.</div>
+  </div>
+
+  <!-- FIG 01 — ratio bar splitter -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #7048a8;">// FIG. 01 — SPLIT AN AMOUNT BY RATIO</div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 180px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">TOTAL AMOUNT</span>
+          <input type="range" min="10" max="500" step="5" value="{{ total }}" onInput="{{ onTotal }}" style="accent-color: #7048a8; height: 26px;">
+          <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px;">{{ total }}</span>
+        </div>
+        <sc-for list="{{ ratioSliders }}" as="rs" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; gap: 4px; min-width: 110px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ rs.color }};">PART {{ rs.label }}</span>
+            <input type="range" min="1" max="10" step="1" value="{{ rs.val }}" onInput="{{ rs.onInput }}" style="accent-color: {{ rs.color }}; height: 26px;">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px; color: {{ rs.color }};">{{ rs.val }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600;">RATIO {{ ratioStr }} of {{ total }}</div>
+      <div style="display: flex; height: 46px; border: 2px solid #2b2620;">
+        <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="3">
+          <div style="width: {{ seg.pct }}%; background: {{ seg.color }}; display: flex; align-items: center; justify-content: center; border-right: 1.5px solid #2b2620;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #faf6ef;">{{ seg.amount }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #6b6156;">One "share" = total ÷ (sum of parts) = {{ total }} ÷ {{ sumParts }} = {{ oneShare }}. Multiply each part by that.</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — direct vs inverse -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #7048a8;">// FIG. 02 — DIRECT vs INVERSE PROPORTION</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: #2f7d3a;">Direct — y = kx</div>
+        <div style="position: relative;">
+          <svg viewBox="0 0 260 200" style="width: 100%; height: auto; border: 1.5px solid #d8d0c4; background: #fbfaf6;">
+            <line x1="20" y1="180" x2="250" y2="180" stroke="#2b2620" stroke-width="1.5"></line>
+            <line x1="20" y1="180" x2="20" y2="10" stroke="#2b2620" stroke-width="1.5"></line>
+            <line x1="20" y1="180" x2="{{ dirLineX }}" y2="{{ dirLineY }}" stroke="#2f7d3a" stroke-width="3"></line>
+            <circle cx="{{ dirPtX }}" cy="{{ dirPtY }}" r="6" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></circle>
+          </svg>
+          <div style="position: absolute; left: 4%; bottom: 2%; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">0</div>
+          <div style="position: absolute; right: 2%; bottom: 2%; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">x</div>
+          <div style="position: absolute; left: 3%; top: 2%; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">y</div>
+        </div>
+        <input type="range" min="1" max="10" step="0.5" value="{{ dirX }}" onInput="{{ onDirX }}" style="accent-color: #2f7d3a; height: 26px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">x = {{ dirX }} → y = {{ dirY }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #554c42;">Double x, y doubles too — a straight line through the origin. Recipe scaling: double the guests, double every ingredient.</div>
+      </div>
+      <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: #b0472e;">Inverse — y = k / x</div>
+        <div style="position: relative;">
+          <svg viewBox="0 0 260 200" style="width: 100%; height: auto; border: 1.5px solid #d8d0c4; background: #fbfaf6;">
+            <line x1="20" y1="180" x2="250" y2="180" stroke="#2b2620" stroke-width="1.5"></line>
+            <line x1="20" y1="180" x2="20" y2="10" stroke="#2b2620" stroke-width="1.5"></line>
+            <path d="{{ invPath }}" fill="none" stroke="#b0472e" stroke-width="3"></path>
+            <circle cx="{{ invPtX }}" cy="{{ invPtY }}" r="6" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></circle>
+          </svg>
+          <div style="position: absolute; left: 4%; bottom: 2%; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">0</div>
+          <div style="position: absolute; right: 2%; bottom: 2%; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">x</div>
+          <div style="position: absolute; left: 3%; top: 2%; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">y</div>
+        </div>
+        <input type="range" min="1" max="10" step="0.5" value="{{ invX }}" onInput="{{ onInvX }}" style="accent-color: #b0472e; height: 26px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">x = {{ invX }} → y = {{ invY }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #554c42;">Double x, y halves — a curve that never touches the axes. More workers building a wall: double the workers, half the time.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — compound measures -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #7048a8;">// FIG. 03 — COMPOUND MEASURES: THE COVER-UP TRIANGLE</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <sc-for list="{{ triangles }}" as="tr" hint-placeholder-count="2">
+        <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ tr.title }}</div>
+          <div style="display: flex; gap: 14px; align-items: center;">
+            <svg viewBox="0 0 140 120" style="width: 140px; height: 120px; flex-shrink: 0;">
+              <polygon points="70,10 130,110 10,110" fill="#f6efe2" stroke="#2b2620" stroke-width="2"></polygon>
+              <line x1="10" y1="60" x2="130" y2="60" stroke="#2b2620" stroke-width="1.5"></line>
+              <line x1="70" y1="60" x2="70" y2="110" stroke="#2b2620" stroke-width="1.5"></line>
+            </svg>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">TOP = {{ tr.top }}</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">BOTTOM-LEFT = {{ tr.bl }}</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">BOTTOM-RIGHT = {{ tr.br }}</div>
+              <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; color: #554c42;">Cover what you want: top = left × right; a bottom one = top ÷ the other bottom.</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <sc-for list="{{ tr.inputs }}" as="inp" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">{{ inp.label }}</span>
+                <input type="number" value="{{ inp.val }}" onInput="{{ inp.onInput }}" style="width: 80px; padding: 8px; border: 1.5px solid #2b2620; font-family: 'IBM Plex Mono', monospace; font-size: 13px; min-height: 40px; box-sizing: border-box;">
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">{{ tr.result }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- quiz -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #fcc419;">// QUICK CHECK — ONE DIRECT, ONE INVERSE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.5;">{{ quizQ }}</div>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <input type="number" value="{{ quizInput }}" onInput="{{ onQuizInput }}" style="width: 100px; padding: 10px; border: 2px solid #faf6ef; background: #2b2620; color: #faf6ef; font-family: 'IBM Plex Mono', monospace; font-size: 14px; min-height: 44px; box-sizing: border-box;">
+        <div onClick="{{ onQuizCheck }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px 18px; border: 2px solid #e8590c; background: #e8590c; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">CHECK</div>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ quizColor }};">{{ quizMsg }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zsyj6sg" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Ratio, proportion & rates of change ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Ratio" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Ratio ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Proportionality_(mathematics)" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Proportionality ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="seqineq.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Sequences, Simultaneous Eqns &amp; Inequalities →</a>
+    <a href="fractions-percent.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also useful: Fractions, Decimals &amp; % →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / RATIO &amp; PROPORTION</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    total: 120, parts: [2, 3, 1],
+    dirX: 3, invX: 3,
+    speed: { top: 60, bl: 2, br: "" }, density: { top: 20, bl: 4, br: "" },
+    quizI: 0, quizInput: "", quizMsg: "", quizColor: "#e7ddcd", solved: {},
+  };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("ratio"); }
+
+  setPart(i, v) { const parts = [...this.state.parts]; parts[i] = v; this.setState({ parts }); }
+
+  _quizzes() {
+    return [
+      { t: "DIRECT: 4 pancakes need 200 g of flour. How many grams of flour for 10 pancakes?", a: 500 },
+      { t: "INVERSE: 3 painters finish a fence in 8 hours. How many hours would 4 painters take (same rate each)?", a: 6 },
+      { t: "DIRECT: A car uses 6 litres of fuel every 100 km. How many litres for 250 km?", a: 15 },
+      { t: "INVERSE: 2 taps fill a tank in 9 minutes. How long would 3 identical taps take?", a: 6 },
+    ];
+  }
+  checkQuiz() {
+    const q = this._quizzes()[this.state.quizI % 4];
+    const val = parseFloat(this.state.quizInput);
+    const ok = Math.abs(val - q.a) < 0.05;
+    const solved = { ...this.state.solved };
+    if (ok) solved[this.state.quizI % 4] = true;
+    const doneCount = Object.keys(solved).length;
+    if (doneCount >= 2 && window.Progress) window.Progress.markCompleted("ratio", { via: "proportion-quiz" });
+    this.setState({
+      quizMsg: ok ? "Correct! " + q.a + " is right." : "Not quite — try again (answer is a whole/simple number).",
+      quizColor: ok ? "#8ce99a" : "#ff9b7a", solved,
+      quizI: ok ? this.state.quizI + 1 : this.state.quizI, quizInput: "",
+    });
+  }
+
+  renderVals() {
+    const colors = ["#7048a8", "#2a6fb0", "#e8590c"];
+    const labels = ["A", "B", "C"];
+    const sumParts = this.state.parts.reduce((a, b) => a + b, 0);
+    const oneShare = (this.state.total / sumParts);
+    const ratioSliders = this.state.parts.map((v, i) => ({
+      label: labels[i], val: v, color: colors[i], onInput: e => this.setPart(i, +e.target.value),
+    }));
+    const segments = this.state.parts.map((v, i) => ({
+      pct: (v / sumParts * 100).toFixed(2), color: colors[i],
+      amount: (oneShare * v).toFixed(1),
+    }));
+    const ratioStr = this.state.parts.join(" : ");
+
+    // direct graph y = 1.4x, plot range x:0-10 -> px 20-250, y:0-20 -> px180-10
+    const k1 = 1.4;
+    const toPx = (x, y) => ({ x: 20 + (x / 10) * 230, y: 180 - (y / 14) * 170 });
+    const dirEnd = toPx(10, Math.min(14, k1 * 10));
+    const dirPt = toPx(this.state.dirX, Math.min(14, k1 * this.state.dirX));
+
+    // inverse graph y = 12/x, x:0.5-10
+    const k2 = 12;
+    const invPathPts = [];
+    for (let x = 0.5; x <= 10; x += 0.25) {
+      const y = Math.min(14, k2 / x);
+      const p = toPx(x, y);
+      invPathPts.push((invPathPts.length ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1));
+    }
+    const invPt = toPx(this.state.invX, Math.min(14, k2 / this.state.invX));
+
+    // compound measure triangles
+    const spd = this.state.speed, den = this.state.density;
+    const spdSpeed = spd.bl ? (spd.top / spd.bl).toFixed(2) : "?";
+    const denResult = den.bl ? (den.top / den.bl).toFixed(2) : "?";
+    const triangles = [
+      { title: "Speed = Distance ÷ Time", top: "Distance (km)", bl: "Time (h)", br: "Speed (km/h)",
+        inputs: [
+          { label: "DISTANCE (km)", val: spd.top, onInput: e => this.setState({ speed: { ...spd, top: +e.target.value } }) },
+          { label: "TIME (h)", val: spd.bl, onInput: e => this.setState({ speed: { ...spd, bl: +e.target.value } }) },
+        ], result: "SPEED = " + spd.top + " ÷ " + spd.bl + " = " + spdSpeed + " km/h" },
+      { title: "Density = Mass ÷ Volume", top: "Mass (g)", bl: "Volume (cm³)", br: "Density (g/cm³)",
+        inputs: [
+          { label: "MASS (g)", val: den.top, onInput: e => this.setState({ density: { ...den, top: +e.target.value } }) },
+          { label: "VOLUME (cm³)", val: den.bl, onInput: e => this.setState({ density: { ...den, bl: +e.target.value } }) },
+        ], result: "DENSITY = " + den.top + " ÷ " + den.bl + " = " + denResult + " g/cm³" },
+    ];
+
+    const q = this._quizzes()[this.state.quizI % 4];
+
+    return {
+      total: this.state.total, onTotal: e => this.setState({ total: +e.target.value }),
+      ratioSliders, ratioStr, segments, sumParts, oneShare: oneShare.toFixed(2),
+      dirLineX: dirEnd.x.toFixed(1), dirLineY: dirEnd.y.toFixed(1),
+      dirPtX: dirPt.x.toFixed(1), dirPtY: dirPt.y.toFixed(1),
+      dirX: this.state.dirX, dirY: (k1 * this.state.dirX).toFixed(1),
+      onDirX: e => this.setState({ dirX: +e.target.value }),
+      invPath: invPathPts.join(" "), invPtX: invPt.x.toFixed(1), invPtY: invPt.y.toFixed(1),
+      invX: this.state.invX, invY: (k2 / this.state.invX).toFixed(1),
+      onInvX: e => this.setState({ invX: +e.target.value }),
+      triangles,
+      quizQ: q.t, quizInput: this.state.quizInput, onQuizInput: e => this.setState({ quizInput: e.target.value }),
+      onQuizCheck: () => this.checkQuiz(), quizMsg: this.state.quizMsg, quizColor: this.state.quizColor,
+    };
+  }
+}
+</script>
+</body>
+</html>

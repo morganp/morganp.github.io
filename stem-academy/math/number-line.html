@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Number & the Number Line">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / NUMBER &amp; THE NUMBER LINE</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #7048a8;">// AN INFINITE RULER — LEVEL L1 · NUMBER &amp; ALGEBRA</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Between any two numbers, more numbers</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 820px;">The number line never ends — not just left and right into bigger numbers and negatives, but zoomed IN too: between 3 and 4 hide 3.1, 3.14, 3.141... forever. Zoom and drag to explore it, then build fractions and control a place-value machine.</div>
+  </div>
+
+  <!-- FIG 01 — zoomable number line -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// FIG. 01 — ZOOM &amp; DRAG THE NUMBER LINE</div>
+        <div style="display: flex; gap: 6px;">
+          <div onClick="{{ onZoomOut }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; padding: 10px 16px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; min-width: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">−</div>
+          <div onClick="{{ onZoomIn }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; padding: 10px 16px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; min-width: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">+</div>
+        </div>
+      </div>
+      <div style="position: relative;">
+        <svg viewBox="0 0 900 140" style="width: 100%; height: auto; cursor: grab; display: block;" onMouseDown="{{ onDragStart }}" onMouseMove="{{ onDragMove }}" onMouseUp="{{ onDragEnd }}" onMouseLeave="{{ onDragEnd }}" onTouchStart="{{ onDragStart }}" onTouchMove="{{ onDragMove }}" onTouchEnd="{{ onDragEnd }}">
+          <line x1="0" y1="70" x2="900" y2="70" stroke="#2b2620" stroke-width="2"></line>
+          <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="20">
+            <line x1="{{ t.x }}" y1="{{ t.y1 }}" x2="{{ t.x }}" y2="70" stroke="#2b2620" stroke-width="{{ t.w }}"></line>
+          </sc-for>
+          <!-- zero marker -->
+          <sc-if value="{{ showZeroFlag }}">
+            <line x1="{{ zeroX }}" y1="30" x2="{{ zeroX }}" y2="110" stroke="#e8590c" stroke-width="1" stroke-dasharray="3 3"></line>
+          </sc-if>
+          <!-- your marker -->
+          <circle cx="450" cy="70" r="6" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></circle>
+        </svg>
+        <!-- tick labels as HTML overlay (SVG <text> can't host live template holes reliably) -->
+        <sc-for list="{{ majorTicks }}" as="t" hint-placeholder-count="6">
+          <div style="position: absolute; left: {{ t.pct }}%; top: 68%; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: {{ t.color }}; pointer-events: none; white-space: nowrap;">{{ t.label }}</div>
+        </sc-for>
+        <div style="position: absolute; left: 50%; top: 6%; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c; pointer-events: none; white-space: nowrap;">{{ centerLabel }}</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">ZOOM LEVEL {{ zoomLevel }} · DRAG THE LINE TO PAN</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #554c42; font-weight: 600;">{{ narration }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — fraction bar -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.55fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// FIG. 02 — BUILD A FRACTION</div>
+      <div style="display: flex; border: 2px solid #2b2620; height: 70px;">
+        <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="12">
+          <div onClick="{{ seg.onPick }}" style="flex: 1; border-right: 1.5px solid #2b2620; background: {{ seg.bg }}; cursor: pointer;" style-hover="filter: brightness(1.08);"></div>
+        </sc-for>
+      </div>
+      <input type="range" min="1" max="12" step="1" value="{{ denomRaw }}" onInput="{{ onDenom }}" style="width: 100%; accent-color: #7048a8; height: 26px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">DENOMINATOR (PIECES): {{ denom }} · click segments to shade the numerator</div>
+      <sc-if value="{{ showGhost }}">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; font-weight: 600; color: #2f7d3a;">✓ That simplifies to {{ simplified }} — same amount, fewer pieces!</div>
+      </sc-if>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center;">
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px;">{{ fracDisplay }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: #fcc419;">= {{ decDisplay }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: #a78bd0;">= {{ pctDisplay }}%</div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — place value machine -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// FIG. 03 — PLACE-VALUE MACHINE</div>
+      <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+        <sc-for list="{{ digits }}" as="d" hint-placeholder-count="6">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">{{ d.label }}</div>
+            <div style="width: 52px; height: 60px; border: 2px solid #2b2620; background: {{ d.bg }}; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; transition: transform 0.3s;">{{ d.val }}</div>
+          </div>
+          <sc-if value="{{ d.showDot }}">
+            <div style="display: flex; align-items: flex-end; padding-bottom: 8px;"><div style="font-size: 30px; font-weight: 900;">.</div></div>
+          </sc-if>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: center;">
+        <div onClick="{{ onTimes10 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 12px 18px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">× 10 →</div>
+        <div onClick="{{ onDiv10 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 12px 18px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">← ÷ 10</div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; text-align: center; color: #554c42;">{{ pvNote }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #7048a8;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zwbrd2p" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Number ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Number_line" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Number line ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="shapes-angles.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Shapes &amp; Angles (L1) →</a>
+    <a href="fractions-percent.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Fractions, Decimals &amp; % (L2) →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / NUMBER &amp; THE NUMBER LINE</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { zoom: 0, center: 0, denom: 4, shaded: 1, seenNeg: false, dragging: false, dragStartX: 0, dragStartCenter: 0, digits: { th: 1, h: 2, t: 3, u: 4, tenths: 0, hundredths: 0 } };
+
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("number-line"); }
+
+  _checkDone(zoomLevels, seenNeg) {
+    if (zoomLevels >= 2 && seenNeg && window.Progress && !this._done) { this._done = true; window.Progress.markCompleted("number-line", { via: "zoom-and-negatives" }); }
+  }
+
+  zoomIn() {
+    const z = Math.min(4, this.state.zoom + 1);
+    this._maxZoom = Math.max(this._maxZoom || 0, z);
+    this._checkDone(this._maxZoom, this.state.seenNeg);
+    this.setState({ zoom: z });
+  }
+  zoomOut() { this.setState({ zoom: Math.max(-1, this.state.zoom - 1) }); }
+
+  _step() { return Math.pow(10, -this.state.zoom); } // spacing between major ticks in value-units per 100px roughly
+
+  startDrag(e) {
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    this.setState({ dragging: true, dragStartX: x, dragStartCenter: this.state.center });
+  }
+  moveDrag(e) {
+    if (!this.state.dragging) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const dx = x - this.state.dragStartX;
+    const unitPerPx = (this._step() * 1) / 90; // 90px per major tick approx
+    const newCenter = this.state.dragStartCenter - dx * unitPerPx;
+    const seenNeg = this.state.seenNeg || newCenter < 0;
+    if (seenNeg && !this.state.seenNeg) this._checkDone(this._maxZoom || 0, true);
+    this.setState({ center: newCenter, seenNeg });
+  }
+  endDrag() { this.setState({ dragging: false }); }
+
+  renderVals() {
+    const zoom = this.state.zoom;
+    const step = this._step(); // value gap between adjacent minor ticks at current zoom
+    const center = this.state.center;
+    const decimals = Math.max(0, zoom);
+    const ticks = [];
+    const nTicks = 10;
+    for (let i = -nTicks; i <= nTicks; i++) {
+      const val = center + i * step;
+      const x = 450 + i * 45;
+      if (x < -20 || x > 920) continue;
+      const isMajor = Math.abs(Math.round(val / (step * 5)) * (step * 5) - val) < step / 1000;
+      ticks.push({
+        x: x.toFixed(1), y1: isMajor ? 55 : 62, w: isMajor ? 2 : 1,
+        ly: isMajor ? 95 : 0, fs: isMajor ? 11 : 0,
+        label: isMajor ? (decimals === 0 ? Math.round(val) : val.toFixed(decimals)) : "",
+        color: val < 0 ? "#c0392b" : "#2b2620",
+      });
+    }
+    const zeroInRange = center - nTicks * step <= 0 && center + nTicks * step >= 0;
+    const zeroX = (450 + ((0 - center) / step) * 45).toFixed(1);
+    const majorTicks = ticks.filter(t => t.label !== "").map(t => ({ pct: ((parseFloat(t.x) / 900) * 100).toFixed(2), label: t.label, color: t.color }));
+
+    const narrations = [
+      "Zoomed all the way out — whole hundreds. Zoom in to see the numbers between them.",
+      "Whole numbers. Zoom in once more and decimals appear between them.",
+      "Tenths appear — 3.1, 3.2, 3.3… there are ten of them between any two whole numbers.",
+      "Hundredths — 3.14, 3.15… the line keeps splitting forever. It never runs out of room.",
+      "Thousandths. However far you zoom, there are always more decimals hiding in between.",
+    ];
+    const narration = narrations[Math.max(0, Math.min(4, zoom + 1))];
+
+    // fraction bar
+    const denom = this.state.denom;
+    const shaded = Math.min(this.state.shaded, denom);
+    const segments = Array.from({ length: denom }, (_, i) => ({
+      bg: i < shaded ? "#7048a8" : "#efe9f5",
+      onPick: () => this.setState({ shaded: i + 1 === this.state.shaded ? i : i + 1 }),
+    }));
+    const gcd = (a, b) => b ? gcd(b, a % b) : a;
+    const g = gcd(shaded, denom) || 1;
+    const simpNum = shaded / g, simpDen = denom / g;
+    const showGhost = g > 1 && shaded > 0;
+    const dec = (shaded / denom);
+    const pct = (dec * 100);
+
+    // place value
+    const dg = this.state.digits;
+    const digitList = [
+      { key: "th", label: "THOUSANDS", val: dg.th, bg: "#efe9f5" },
+      { key: "h", label: "HUNDREDS", val: dg.h, bg: "#efe9f5" },
+      { key: "t", label: "TENS", val: dg.t, bg: "#efe9f5" },
+      { key: "u", label: "UNITS", val: dg.u, bg: "#fff3df", showDot: true },
+      { key: "tenths", label: "TENTHS", val: dg.tenths, bg: "#efe9f5" },
+      { key: "hundredths", label: "HUNDREDTHS", val: dg.hundredths, bg: "#efe9f5" },
+    ];
+    const digits = digitList.map(d => ({ label: d.label, val: d.val, bg: d.bg, showDot: !!d.showDot }));
+
+    return {
+      onZoomIn: () => this.zoomIn(), onZoomOut: () => this.zoomOut(),
+      onDragStart: e => this.startDrag(e), onDragMove: e => this.moveDrag(e), onDragEnd: () => this.endDrag(),
+      ticks, majorTicks, zoomLevel: zoom, narration,
+      showZeroFlag: zeroInRange, zeroX,
+      centerLabel: (decimals === 0 ? Math.round(center) : center.toFixed(decimals)),
+      segments, denomRaw: denom, onDenom: e => this.setState({ denom: +e.target.value, shaded: Math.min(this.state.shaded, +e.target.value) }),
+      denom, showGhost, simplified: simpNum + "/" + simpDen,
+      fracDisplay: shaded + "/" + denom, decDisplay: dec.toFixed(3).replace(/0+$/, "").replace(/\.$/, ".0"), pctDisplay: pct.toFixed(1),
+      digits,
+      onTimes10: () => this.setState(s => {
+        const d = { ...s.digits };
+        // shift left: th<-h<-t<-u<-tenths<-hundredths<-0
+        d.th = d.h; d.h = d.t; d.t = d.u; d.u = d.tenths; d.tenths = d.hundredths; d.hundredths = 0;
+        return { digits: d };
+      }),
+      onDiv10: () => this.setState(s => {
+        const d = { ...s.digits };
+        d.hundredths = d.tenths; d.tenths = d.u; d.u = d.t; d.t = d.h; d.h = d.th; d.th = 0;
+        return { digits: d };
+      }),
+      pvNote: "Every digit slides ONE column — the decimal point never moves. ×10 shifts left (bigger), ÷10 shifts right (smaller).",
+    };
+  }
+}
+</script>
+</body>
+</html>

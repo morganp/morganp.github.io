@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Coordinates & Straight Lines">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / COORDINATES &amp; STRAIGHT LINES</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #b0472e;">// STRAIGHT TALK — LEVEL L2 · GRAPHS &amp; CALCULUS</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">y = mx + c, made visible</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 820px;">Every straight line is just two numbers: <strong>m</strong>, how steep it is, and <strong>c</strong>, where it crosses the y-axis. Drag the sliders until it clicks, then plot points on a coordinate grid to sink some ships.</div>
+  </div>
+
+  <!-- GRAPH 01 -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.6fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #b0472e;">// GRAPH 01 — y = mx + c PLAYGROUND</div>
+      <div style="position: relative;">
+        <svg viewBox="0 0 400 400" style="width: 100%; height: auto; display: block; background: #fdfcfa;">
+          <sc-for list="{{ gridLines }}" as="g" hint-placeholder-count="20">
+            <line x1="{{ g.x1 }}" y1="{{ g.y1 }}" x2="{{ g.x2 }}" y2="{{ g.y2 }}" stroke="#eee7da" stroke-width="1"></line>
+          </sc-for>
+          <line x1="0" y1="200" x2="400" y2="200" stroke="#2b2620" stroke-width="2"></line>
+          <line x1="200" y1="0" x2="200" y2="400" stroke="#2b2620" stroke-width="2"></line>
+          <line x1="{{ lx1 }}" y1="{{ ly1 }}" x2="{{ lx2 }}" y2="{{ ly2 }}" stroke="#e8590c" stroke-width="3"></line>
+          <!-- gradient triangle -->
+          <sc-if value="{{ showTriangle }}">
+            <polygon points="{{ triPts }}" fill="rgba(176,71,46,0.15)" stroke="#b0472e" stroke-width="1.5"></polygon>
+          </sc-if>
+          <circle cx="200" cy="{{ interceptY }}" r="5" fill="#2f7d3a" stroke="#2b2620" stroke-width="1.5"></circle>
+        </svg>
+        <div style="position: absolute; left: 4px; top: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">y</div>
+        <div style="position: absolute; right: 4px; bottom: 48%; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">x</div>
+        <sc-if value="{{ showTriangle }}">
+          <div style="position: absolute; left: {{ runLx }}%; top: {{ runLy }}%; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #b0472e; transform: translate(-50%,0);">run = {{ runVal }}</div>
+          <div style="position: absolute; left: {{ riseLx }}%; top: {{ riseLy }}%; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #b0472e; transform: translate(0,-50%);">rise = {{ riseVal }}</div>
+        </sc-if>
+        <div style="position: absolute; left: 52%; top: {{ interceptPct }}%; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">c = {{ cVal }}</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; width: 90px;">m (gradient)</span><input type="range" min="-3" max="3" step="0.5" value="{{ mRaw }}" onInput="{{ onM }}" style="flex: 1; accent-color: #b0472e; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; width: 40px; text-align: right;">{{ mVal }}</span></div>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; width: 90px;">c (intercept)</span><input type="range" min="-4" max="4" step="1" value="{{ cRaw }}" onInput="{{ onC }}" style="flex: 1; accent-color: #2f7d3a; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; width: 40px; text-align: right;">{{ cVal }}</span></div>
+      </div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; text-align: center;">y = {{ eqStr }}</div>
+    </div>
+
+    <!-- hidden line game -->
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e8a891;">// FIND THE HIDDEN LINE</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #e7ddcd;">A line passes through these two points. Set m and c above to match it.</div>
+      <div style="display: flex; gap: 8px; justify-content: center;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; padding: 8px 12px; border: 1.5px solid #574f45; background: #3a3327;">({{ p1x }}, {{ p1y }})</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; padding: 8px 12px; border: 1.5px solid #574f45; background: #3a3327;">({{ p2x }}, {{ p2y }})</div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ hlColor }}; text-align: center; min-height: 22px;">{{ hlMsg }}</div>
+      <div onClick="{{ onNewHidden }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px; border: 2px solid #faf6ef; text-align: center; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">NEW LINE ↻</div>
+      <div style="border-top: 1.5px solid #574f45; padding-top: 12px; display: flex; justify-content: space-between;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e8a891;">FOUND</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: #fcc419;">{{ foundCount }}</span></div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — battleships -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #b0472e; align-self: flex-start;">// FIG. 02 — COORDINATE BATTLESHIPS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: #554c42;">Fire at the called coordinate: "{{ callout }}" — along the corridor, then up the stairs.</div>
+      <div style="display: grid; grid-template-columns: repeat(9, 32px); gap: 2px;">
+        <sc-for list="{{ gridCells }}" as="cell" hint-placeholder-count="81">
+          <div onClick="{{ cell.onPick }}" style="width: 32px; height: 32px; border: 1.5px solid #2b2620; background: {{ cell.bg }}; cursor: pointer; display: grid; place-items: center; font-size: 14px;" style-hover="filter: brightness(1.1);">{{ cell.mark }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">SUNK: {{ sunkCount }} / 3</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #b0472e;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zvmxsbk" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Graphs ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Linear_equation" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Linear equation ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="probability.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Probability (L2) →</a>
+    <a href="quadratics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Quadratics &amp; Graphs (L3) →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / COORDINATES &amp; STRAIGHT LINES</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { m: 1, c: 0, found: 0, hlGuessed: false, ships: null, shots: {}, sunk: 0, calloutIdx: 0 };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("coordinates");
+    this._newHidden();
+    this._placeShips();
+  }
+
+  _newHidden() {
+    const m = [-2, -1, -0.5, 0.5, 1, 1.5, 2][Math.floor(Math.random() * 7)];
+    const c = Math.floor(Math.random() * 7) - 3;
+    const x1 = -3, x2 = 3;
+    this._hidden = { m, c, x1, y1: m * x1 + c, x2, y2: m * x2 + c };
+  }
+  _placeShips() {
+    const cells = {};
+    let placed = 0;
+    while (placed < 3) {
+      const x = Math.floor(Math.random() * 9), y = Math.floor(Math.random() * 9);
+      const key = x + "," + y;
+      if (!cells[key]) { cells[key] = true; placed++; }
+    }
+    this._ships = cells;
+  }
+
+  checkHidden() {
+    const h = this._hidden;
+    if (Math.abs(this.state.m - h.m) < 0.01 && this.state.c === h.c) {
+      const found = this.state.found + 1;
+      if (found >= 3 && window.Progress) window.Progress.markCompleted("coordinates", { via: "hidden-line+battleships" });
+      this._newHidden();
+      this.setState({ found });
+    }
+  }
+
+  fire(x, y) {
+    const key = x + "," + y;
+    if (this.state.shots[key]) return;
+    const shots = { ...this.state.shots, [key]: this._ships[key] ? "hit" : "miss" };
+    const sunk = Object.keys(this._ships).filter(k => shots[k] === "hit").length;
+    if (sunk >= 3 && window.Progress) window.Progress.markCompleted("coordinates", { via: "hidden-line+battleships" });
+    this.setState({ shots, sunk, calloutIdx: this.state.calloutIdx + 1 });
+  }
+
+  renderVals() {
+    const m = this.state.m, c = this.state.c;
+    const scale = 40; // px per unit, origin at (200,200), 10 units wide (-5..5)
+    const toX = x => 200 + x * scale;
+    const toY = y => 200 - y * scale;
+    const x1 = -5, x2 = 5;
+    const y1 = m * x1 + c, y2 = m * x2 + c;
+
+    const gridLines = [];
+    for (let i = -5; i <= 5; i++) {
+      gridLines.push({ x1: toX(i), y1: 0, x2: toX(i), y2: 400 });
+      gridLines.push({ x1: 0, y1: toY(i), x2: 400, y2: toY(i) });
+    }
+
+    // gradient triangle: from a point on the line at x=1 to x=2
+    const tx1 = 1, tx2 = 2;
+    const ty1 = m * tx1 + c, ty2 = m * tx2 + c;
+    const px1 = toX(tx1), py1 = toY(ty1), px2 = toX(tx2), py2 = toY(ty2);
+    const triPts = px1 + "," + py1 + " " + px2 + "," + py1 + " " + px2 + "," + py2;
+    const showTriangle = m !== 0;
+
+    const eqStr = "" + (m === 1 ? "x" : m === -1 ? "−x" : m === 0 ? "0" : m + "x") + (c > 0 ? " + " + c : c < 0 ? " − " + Math.abs(c) : "");
+
+    const h = this._hidden;
+    const hlColor = "#e7ddcd";
+
+    // battleships grid
+    const callouts = ["along 3, up 2", "along 1, up 5", "along 6, up 0", "along 4, up 7", "along 0, up 3"];
+    const gridCells = [];
+    for (let y = 8; y >= 0; y--) {
+      for (let x = 0; x <= 8; x++) {
+        const key = x + "," + y;
+        const shot = this.state.shots[key];
+        let bg = "#eef4fa";
+        let mark = "";
+        if (shot === "hit") { bg = "#c0392b"; mark = "✕"; }
+        else if (shot === "miss") { bg = "#d8d0c4"; mark = "·"; }
+        gridCells.push({ bg, mark, onPick: () => this.fire(x, y) });
+      }
+    }
+
+    return {
+      gridLines, lx1: toX(x1), ly1: toY(y1), lx2: toX(x2), ly2: toY(y2),
+      showTriangle, triPts,
+      runLx: ((px1 + px2) / 2 / 400 * 100).toFixed(1), runLy: (py1 / 400 * 100 + 5).toFixed(1), runVal: (tx2 - tx1),
+      riseLx: (px2 / 400 * 100 + 3).toFixed(1), riseLy: ((py1 + py2) / 2 / 400 * 100).toFixed(1), riseVal: (ty2 - ty1).toFixed(1),
+      interceptY: toY(c), interceptPct: (toY(c) / 400 * 100).toFixed(1), cVal: c,
+      mRaw: m, onM: e => { this.setState({ m: +e.target.value }); setTimeout(() => this.checkHidden(), 0); },
+      cRaw: c, onC: e => { this.setState({ c: +e.target.value }); setTimeout(() => this.checkHidden(), 0); },
+      mVal: m, eqStr,
+      p1x: h.x1, p1y: h.y1.toFixed(1), p2x: h.x2, p2y: h.y2.toFixed(1),
+      hlMsg: (Math.abs(m - h.m) < 0.01 && c === h.c) ? "MATCH! New line loaded." : "Adjust m and c to pass through both points.",
+      hlColor,
+      onNewHidden: () => { this._newHidden(); this.forceUpdate(); },
+      foundCount: this.state.found,
+      callout: callouts[this.state.calloutIdx % callouts.length],
+      gridCells, sunkCount: this.state.sunk,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -203,6 +203,10 @@
     "quadratics": { label: "Quadratics & Graphs", level: "L3" },
     "trigonometry": { label: "Pythagoras & Trigonometry", level: "L3" },
     "statistics": { label: "Statistics", level: "L3" },
+    "ratio": { label: "Ratio & Proportion", level: "L3" },
+    "seqineq": { label: "Sequences, Simultaneous Eqns & Inequalities", level: "L3" },
+    "transform3d": { label: "Transformations & 3D Shapes", level: "L3" },
+    "circletheorems": { label: "Circle Theorems (Higher)", level: "L3" },
   };
 
   const Progress = {

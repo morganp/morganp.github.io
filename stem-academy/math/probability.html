@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Probability">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / PROBABILITY</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #2f7d3a;">// MESSY LUCK, TIDY LAWS — LEVEL L2 · STATS &amp; PROBABILITY</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Chance settles down, eventually</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 820px;">Any single spin is unpredictable. But spin a thousand times and the results creep toward the theoretical probability — the law of large numbers. Build a spinner and watch it happen, then explore why some dice totals are far more likely than others.</div>
+  </div>
+
+  <!-- FIG 01 — spinner lab -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 0.8fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a; align-self: flex-start;">// FIG. 01 — BUILD A SPINNER</div>
+      <svg viewBox="0 0 240 240" style="width: 200px; height: 200px;">
+        <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="4">
+          <path d="{{ s.path }}" fill="{{ s.color }}" stroke="#2b2620" stroke-width="1.5"></path>
+        </sc-for>
+        <line x1="120" y1="120" x2="{{ pointerX }}" y2="{{ pointerY }}" stroke="#2b2620" stroke-width="3" style="transition: all 0.6s ease-out;"></line>
+        <circle cx="120" cy="120" r="7" fill="#2b2620"></circle>
+      </svg>
+      <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+        <sc-for list="{{ weightSliders }}" as="w" hint-placeholder-count="4">
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: {{ w.color }}; display: inline-block; flex-shrink: 0;"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 46px;">{{ w.name }}</span><input type="range" min="1" max="20" step="1" value="{{ w.raw }}" onInput="{{ w.onChange }}" style="flex: 1; accent-color: {{ w.color }}; height: 24px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 40px; text-align: right;">{{ w.pct }}%</span></div>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <div onClick="{{ onSpin1 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px 12px; border: 2px solid #2b2620; background: #2f7d3a; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">SPIN ×1</div>
+        <div onClick="{{ onSpin100 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px 12px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">×100</div>
+        <div onClick="{{ onSpin1000 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px 12px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">×1000</div>
+        <div onClick="{{ onReset }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px 12px; border: 2px solid #2b2620; background: #fff; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">↺</div>
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">THEORY vs EXPERIMENT — TOTAL SPINS: {{ totalSpins }}</div>
+      <sc-for list="{{ compareBars }}" as="b" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 10px;"><span>{{ b.name }}</span><span>theory {{ b.theoryPct }}% · actual {{ b.actualPct }}%</span></div>
+          <div style="height: 16px; background: #eee7da; position: relative;">
+            <div style="position: absolute; height: 100%; width: {{ b.theoryPct }}%; border-right: 2px dashed #2b2620;"></div>
+            <div style="height: 100%; width: {{ b.actualPct }}%; background: {{ b.color }};"></div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42; margin-top: 6px;">{{ lawNote }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — two dice -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 0.85fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">// FIG. 02 — TWO-DICE SAMPLE SPACE (36 EQUALLY-LIKELY OUTCOMES)</div>
+      <div style="display: grid; grid-template-columns: repeat(6, 34px); gap: 2px; margin-left: 30px;">
+        <sc-for list="{{ diceCells }}" as="c" hint-placeholder-count="36">
+          <div style="width: 34px; height: 34px; background: {{ c.bg }}; border: 1.5px solid {{ c.border }}; display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;">{{ c.sum }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <div onClick="{{ onRoll1 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px 14px; border: 2px solid #2b2620; background: #2f7d3a; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">ROLL ×1</div>
+        <div onClick="{{ onRoll100 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px 14px; border: 2px solid #2b2620; background: #efe9f5; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">×100</div>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">rows/cols = die A (1–6) × die B (1–6), value = their sum. The 7-diagonal (bottom-left to top-right) has the most ways to make it.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">SUM DISTRIBUTION — {{ totalRolls }} ROLLS</div>
+      <div style="display: flex; align-items: flex-end; gap: 3px; height: 160px;">
+        <sc-for list="{{ sumBars }}" as="s" hint-placeholder-count="11">
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 2px;">
+            <div style="width: 100%; height: {{ s.h }}%; background: {{ s.color }};"></div>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px;">{{ s.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">x-axis: sum of both dice (2–12) · y-axis: how often it came up</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42;">Only 1 way to make 2 or 12 (both dice show the extreme), but 6 ways to make 7 — that's why 7 dominates.</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2f7d3a;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zsffr82" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Probability ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Law_of_large_numbers" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Law of large numbers ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="fractions-percent.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Fractions, Decimals &amp; % (L2) →</a>
+    <a href="statistics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Statistics (L3) →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / PROBABILITY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { weights: [8, 6, 4, 2], results: [0, 0, 0, 0], pointerAngle: 0, rollCounts: {}, sumCounts: {} };
+  colors = ["#e8590c", "#2a6fb0", "#2f7d3a", "#fcc419"];
+  names = ["RED", "BLUE", "GREEN", "YELLOW"];
+
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("probability"); }
+
+  _spin(n) {
+    const weights = this.state.weights;
+    const total = weights.reduce((a, b) => a + b, 0);
+    const results = [...this.state.results];
+    let lastIdx = 0, cum = 0;
+    for (let i = 0; i < n; i++) {
+      const r = Math.random() * total;
+      let acc = 0;
+      for (let j = 0; j < weights.length; j++) { acc += weights[j]; if (r <= acc) { results[j]++; lastIdx = j; break; } }
+    }
+    // pointer angle to land in last sector (visual only for the final spin)
+    let start = 0;
+    for (let j = 0; j < lastIdx; j++) start += weights[j] / total * 360;
+    const mid = start + (weights[lastIdx] / total * 180);
+    const totalSpins = results.reduce((a, b) => a + b, 0);
+    if (totalSpins >= 1000 && window.Progress && !this._done) { this._done = true; window.Progress.markCompleted("probability", { via: "spinner-1000" }); }
+    this.setState({ results, pointerAngle: mid });
+  }
+
+  renderVals() {
+    const weights = this.state.weights;
+    const total = weights.reduce((a, b) => a + b, 0);
+    let cum = 0;
+    const sectors = weights.map((w, i) => {
+      const a0 = cum / total * 2 * Math.PI - Math.PI / 2;
+      cum += w;
+      const a1 = cum / total * 2 * Math.PI - Math.PI / 2;
+      const x0 = 120 + 100 * Math.cos(a0), y0 = 120 + 100 * Math.sin(a0);
+      const x1 = 120 + 100 * Math.cos(a1), y1 = 120 + 100 * Math.sin(a1);
+      const large = (a1 - a0) > Math.PI ? 1 : 0;
+      const path = "M 120 120 L " + x0.toFixed(1) + " " + y0.toFixed(1) + " A 100 100 0 " + large + " 1 " + x1.toFixed(1) + " " + y1.toFixed(1) + " Z";
+      return { path, color: this.colors[i] };
+    });
+    const pr = this.state.pointerAngle * Math.PI / 180;
+    const pointerX = (120 + 95 * Math.cos(pr - Math.PI / 2)).toFixed(1);
+    const pointerY = (120 + 95 * Math.sin(pr - Math.PI / 2)).toFixed(1);
+
+    const weightSliders = weights.map((w, i) => ({
+      name: this.names[i], color: this.colors[i], raw: w, pct: ((w / total) * 100).toFixed(0),
+      onChange: e => { const nw = [...this.state.weights]; nw[i] = +e.target.value; this.setState({ weights: nw }); },
+    }));
+
+    const totalSpins = this.state.results.reduce((a, b) => a + b, 0);
+    const compareBars = weights.map((w, i) => ({
+      name: this.names[i], color: this.colors[i],
+      theoryPct: ((w / total) * 100).toFixed(1),
+      actualPct: totalSpins ? ((this.state.results[i] / totalSpins) * 100).toFixed(1) : "0.0",
+    }));
+    const lawNote = totalSpins >= 500 ? "Notice how close the solid bars now sit to the dashed theory lines — that's the law of large numbers at work." : totalSpins > 0 ? "With only a few spins, actual results can wander a lot from theory. Keep spinning!" : "Spin to start collecting results.";
+
+    // FIG02 dice
+    const rc = this.state.rollCounts;
+    const maxCount = Math.max(1, ...Object.values(rc));
+    const diceCells = [];
+    for (let a = 1; a <= 6; a++) {
+      for (let b = 1; b <= 6; b++) {
+        const key = a + "," + b;
+        const c = rc[key] || 0;
+        const intensity = c / maxCount;
+        const sum = a + b;
+        const isSeven = sum === 7;
+        diceCells.push({
+          sum, bg: c > 0 ? "rgba(47,125,58," + (0.15 + intensity * 0.75).toFixed(2) + ")" : "#f6efe2",
+          border: isSeven ? "#2f7d3a" : "#2b2620",
+        });
+      }
+    }
+    const totalRolls = Object.values(rc).reduce((a, b) => a + b, 0);
+    const sc = this.state.sumCounts;
+    const maxSum = Math.max(1, ...Object.values(sc));
+    const sumBars = [];
+    for (let s = 2; s <= 12; s++) {
+      const c = sc[s] || 0;
+      sumBars.push({ label: s, h: ((c / maxSum) * 100).toFixed(1), color: s === 7 ? "#2f7d3a" : "#2a6fb0" });
+    }
+
+    return {
+      sectors, pointerX, pointerY, weightSliders,
+      onSpin1: () => this._spin(1), onSpin100: () => this._spin(100), onSpin1000: () => this._spin(1000),
+      onReset: () => this.setState({ results: [0, 0, 0, 0] }),
+      totalSpins, compareBars, lawNote,
+      diceCells, totalRolls, sumBars,
+      onRoll1: () => this._roll(1), onRoll100: () => this._roll(100),
+    };
+  }
+
+  _roll(n) {
+    const rc = { ...this.state.rollCounts }, sc = { ...this.state.sumCounts };
+    for (let i = 0; i < n; i++) {
+      const a = Math.ceil(Math.random() * 6), b = Math.ceil(Math.random() * 6);
+      const key = a + "," + b;
+      rc[key] = (rc[key] || 0) + 1;
+      const s = a + b;
+      sc[s] = (sc[s] || 0) + 1;
+    }
+    this.setState({ rollCounts: rc, sumCounts: sc });
+  }
+}
+</script>
+</body>
+</html>

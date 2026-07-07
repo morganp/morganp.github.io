@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Circle Theorems">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / CIRCLE THEOREMS</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #2a6fb0;">// DRAG THE POINTS, THE RULE ALWAYS HOLDS — LEVEL L3, HIGHER TIER ONLY</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Circle theorems</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">These angle rules only ever appear on Higher-tier GCSE and National 5 Applications papers — Foundation tier skips them entirely. Drag the orange points around the circle: however you move them, the stated relationship never breaks.</div>
+  </div>
+
+  <!-- FIG 01 — theorem prover -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2a6fb0;">// FIG. 01 — DRAGGABLE CIRCLE-THEOREM PROVER</div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: grid; grid-template-columns: 1fr 0.8fr; gap: 20px;">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="7">
+            <div onClick="{{ t.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; padding: 8px 8px; border: 1.5px solid #2b2620; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; min-height: 36px; box-sizing: border-box; display: flex; align-items: center;">{{ t.label }}</div>
+          </sc-for>
+        </div>
+        <div style="aspect-ratio: 1; width: 100%; max-width: 340px; touch-action: none;" onMouseMove="{{ onDrag }}" onMouseUp="{{ onDragEnd }}" onMouseLeave="{{ onDragEnd }}" onTouchMove="{{ onDrag }}" onTouchEnd="{{ onDragEnd }}">
+          <svg viewBox="0 0 300 300" style="width: 100%; height: 100%; border: 1.5px solid #d8d0c4; background: #fbfaf6;">
+            <circle cx="150" cy="150" r="95" fill="none" stroke="#2b2620" stroke-width="2"></circle>
+            <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="4">
+              <line x1="{{ ln.x1 }}" y1="{{ ln.y1 }}" x2="{{ ln.x2 }}" y2="{{ ln.y2 }}" stroke="{{ ln.color }}" stroke-width="{{ ln.w }}" stroke-dasharray="{{ ln.dash }}"></line>
+            </sc-for>
+            <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+              <circle cx="{{ d.x }}" cy="{{ d.y }}" r="4.5" fill="{{ d.color }}" stroke="#2b2620" stroke-width="1"></circle>
+            </sc-for>
+            <sc-for list="{{ handles }}" as="h" hint-placeholder-count="2">
+              <circle cx="{{ h.x }}" cy="{{ h.y }}" r="9" fill="#e8590c" stroke="#2b2620" stroke-width="2" style="cursor: grab;" onMouseDown="{{ h.onDown }}" onTouchStart="{{ h.onDown }}"></circle>
+            </sc-for>
+          </svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">Drag any orange dot.</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px;">{{ theoremName }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ theoremDesc }}</div>
+        <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1.5px solid #d8d0c4; padding-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">
+          <sc-for list="{{ readouts }}" as="r" hint-placeholder-count="2">
+            <div style="color: {{ r.color }};">{{ r.text }}</div>
+          </sc-for>
+        </div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; color: #2f7d3a;">{{ matchLabel }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- theorem gallery -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2a6fb0;">// ALL 7 THEOREMS AT A GLANCE</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px;">
+      <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="7">
+        <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px;">{{ g.name }}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.4; color: #554c42;">{{ g.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/z9dqxfr" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Circle theorems ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Inscribed_angle" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Inscribed angle theorem ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Tangent_lines_to_circles" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Tangent lines to circles ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification — Foundation tier does not require circle theorems (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="combinedevents.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Tree &amp; Venn Diagrams →</a>
+    <a href="transform3d.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also useful: Transformations &amp; 3D Shapes →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / CIRCLE THEOREMS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    tab: "centre",
+    pAngle1: 60, pAngle2: 15, semiP: 100, quadC: 320, tangentT: 45,
+    ext: { x: 260, y: 60 }, altP: 150,
+    dragKey: null, interacted: {},
+  };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("circletheorems"); }
+
+  pt(deg) { const r = deg * Math.PI / 180; return { x: 150 + 95 * Math.cos(r), y: 150 - 95 * Math.sin(r) }; }
+  norm(d) { return ((d % 360) + 360) % 360; }
+  vecAngle(ax, ay, bx, by) {
+    const dot = ax * bx + ay * by, ma = Math.hypot(ax, ay), mb = Math.hypot(bx, by);
+    return Math.acos(Math.max(-1, Math.min(1, dot / (ma * mb)))) * 180 / Math.PI;
+  }
+
+  pickTab(t) { this.setState({ tab: t }); }
+  markInteracted(tab) {
+    const interacted = { ...this.state.interacted, [tab]: true };
+    if (Object.keys(interacted).length >= 5 && window.Progress) window.Progress.markCompleted("circletheorems", { via: "drag-all" });
+    this.setState({ interacted });
+  }
+  startDrag(key) { this.setState({ dragKey: key }); }
+  endDrag() { this.setState({ dragKey: null }); }
+  handleDrag(e) {
+    if (!this.state.dragKey) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cx0 = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy0 = e.touches ? e.touches[0].clientY : e.clientY;
+    const px = (cx0 - rect.left) / rect.width * 300;
+    const py = (cy0 - rect.top) / rect.height * 300;
+    const dx = px - 150, dy = 150 - py;
+    let deg = this.norm(Math.atan2(dy, dx) * 180 / Math.PI);
+    const key = this.state.dragKey;
+    this.markInteracted(this.state.tab);
+    if (key === "ext") {
+      const dist = Math.hypot(px - 150, py - 150);
+      let ex = px, ey = py;
+      if (dist < 115) { const s = 115 / (dist || 1); ex = 150 + (px - 150) * s; ey = 150 + (py - 150) * s; }
+      this.setState({ ext: { x: ex, y: ey } });
+      return;
+    }
+    if (key === "pAngle1") {
+      // clamp to major arc: valid outside (210,330)
+      if (deg > 210 && deg < 330) deg = (deg - 270 < 0 ? 210 : 330);
+      this.setState({ pAngle1: deg });
+    } else if (key === "pAngle2") {
+      if (deg > 210 && deg < 330) deg = (deg - 270 < 0 ? 210 : 330);
+      this.setState({ pAngle2: deg });
+    } else if (key === "semiP") {
+      if (deg < 2) deg = 2; if (deg > 178 && deg < 182) deg = 178; if (deg > 358) deg = 358;
+      this.setState({ semiP: deg });
+    } else if (key === "quadC") {
+      if (deg > 50 && deg < 250) deg = (deg < 150 ? 50 : 250);
+      this.setState({ quadC: deg });
+    } else if (key === "tangentT") {
+      this.setState({ tangentT: deg });
+    } else if (key === "altP") {
+      if (deg < 30 || deg > 270) deg = (deg > 300 || deg < 30) ? (deg > 300 ? 270 : 31) : deg;
+      this.setState({ altP: deg });
+    }
+  }
+
+  renderVals() {
+    const tab = this.state.tab;
+    const tabDefs = [
+      { key: "centre", label: "CENTRE = 2×CIRC." }, { key: "sameseg", label: "SAME SEGMENT" },
+      { key: "semicircle", label: "SEMICIRCLE = 90°" }, { key: "cyclicquad", label: "CYCLIC QUAD" },
+      { key: "tangentperp", label: "TANGENT ⊥ RADIUS" }, { key: "twotangents", label: "TWO TANGENTS" },
+      { key: "altsegment", label: "ALTERNATE SEGMENT" },
+    ];
+    const tabs = tabDefs.map(t => ({ label: t.label, onPick: () => this.pickTab(t.key), bg: tab === t.key ? "#2a6fb0" : "#faf6ef", fg: tab === t.key ? "#faf6ef" : "#2b2620" }));
+
+    let lines = [], dots = [], handles = [], readouts = [], theoremName = "", theoremDesc = "", matchLabel = "";
+    const O = { x: 150, y: 150 };
+
+    if (tab === "centre") {
+      const A = this.pt(210), B = this.pt(330), P = this.pt(this.state.pAngle1);
+      lines = [
+        { x1: A.x, y1: A.y, x2: B.x, y2: B.y, color: "#2b2620", w: 2, dash: "0" },
+        { x1: O.x, y1: O.y, x2: A.x, y2: A.y, color: "#2a6fb0", w: 2, dash: "0" },
+        { x1: O.x, y1: O.y, x2: B.x, y2: B.y, color: "#2a6fb0", w: 2, dash: "0" },
+        { x1: P.x, y1: P.y, x2: A.x, y2: A.y, color: "#7048a8", w: 2, dash: "0" },
+        { x1: P.x, y1: P.y, x2: B.x, y2: B.y, color: "#7048a8", w: 2, dash: "0" },
+      ];
+      dots = [{ x: A.x, y: A.y, color: "#2b2620" }, { x: B.x, y: B.y, color: "#2b2620" }, { x: O.x, y: O.y, color: "#2b2620" }];
+      handles = [{ x: P.x, y: P.y, onDown: () => this.startDrag("pAngle1") }];
+      const centreAngle = this.vecAngle(A.x - O.x, A.y - O.y, B.x - O.x, B.y - O.y);
+      const circAngle = this.vecAngle(A.x - P.x, A.y - P.y, B.x - P.x, B.y - P.y);
+      theoremName = "1. Angle at the centre = 2 × angle at the circumference";
+      theoremDesc = "O is the centre. A and B are fixed on the circle; drag P anywhere on the far arc.";
+      readouts = [{ text: "Angle AOB (centre) = " + centreAngle.toFixed(1) + "°", color: "#2a6fb0" }, { text: "Angle APB (circumference) = " + circAngle.toFixed(1) + "°", color: "#7048a8" }];
+      matchLabel = Math.abs(centreAngle - 2 * circAngle) < 0.5 ? "✓ centre angle = 2 × circumference angle" : "…";
+    } else if (tab === "sameseg") {
+      const A = this.pt(210), B = this.pt(330), P1 = this.pt(15), P2 = this.pt(this.state.pAngle2);
+      lines = [
+        { x1: A.x, y1: A.y, x2: B.x, y2: B.y, color: "#2b2620", w: 2, dash: "0" },
+        { x1: P1.x, y1: P1.y, x2: A.x, y2: A.y, color: "#2a6fb0", w: 2, dash: "0" }, { x1: P1.x, y1: P1.y, x2: B.x, y2: B.y, color: "#2a6fb0", w: 2, dash: "0" },
+        { x1: P2.x, y1: P2.y, x2: A.x, y2: A.y, color: "#7048a8", w: 2, dash: "0" }, { x1: P2.x, y1: P2.y, x2: B.x, y2: B.y, color: "#7048a8", w: 2, dash: "0" },
+      ];
+      dots = [{ x: A.x, y: A.y, color: "#2b2620" }, { x: B.x, y: B.y, color: "#2b2620" }, { x: P1.x, y: P1.y, color: "#2a6fb0" }];
+      handles = [{ x: P2.x, y: P2.y, onDown: () => this.startDrag("pAngle2") }];
+      const a1 = this.vecAngle(A.x - P1.x, A.y - P1.y, B.x - P1.x, B.y - P1.y);
+      const a2 = this.vecAngle(A.x - P2.x, A.y - P2.y, B.x - P2.x, B.y - P2.y);
+      theoremName = "2. Angles in the same segment are equal";
+      theoremDesc = "P1 (blue, fixed) and P2 (drag it) both sit on the same arc, looking at the same chord AB.";
+      readouts = [{ text: "Angle AP1B = " + a1.toFixed(1) + "°", color: "#2a6fb0" }, { text: "Angle AP2B = " + a2.toFixed(1) + "°", color: "#7048a8" }];
+      matchLabel = Math.abs(a1 - a2) < 0.5 ? "✓ the two angles are equal" : "…";
+    } else if (tab === "semicircle") {
+      const A = this.pt(180), B = this.pt(0), P = this.pt(this.state.semiP);
+      lines = [
+        { x1: A.x, y1: A.y, x2: B.x, y2: B.y, color: "#2b2620", w: 2, dash: "0" },
+        { x1: P.x, y1: P.y, x2: A.x, y2: A.y, color: "#7048a8", w: 2, dash: "0" }, { x1: P.x, y1: P.y, x2: B.x, y2: B.y, color: "#7048a8", w: 2, dash: "0" },
+      ];
+      dots = [{ x: A.x, y: A.y, color: "#2b2620" }, { x: B.x, y: B.y, color: "#2b2620" }, { x: O.x, y: O.y, color: "#2b2620" }];
+      handles = [{ x: P.x, y: P.y, onDown: () => this.startDrag("semiP") }];
+      const ang = this.vecAngle(A.x - P.x, A.y - P.y, B.x - P.x, B.y - P.y);
+      theoremName = "3. The angle in a semicircle is 90°";
+      theoremDesc = "AB is a diameter (passes through the centre O). Drag P anywhere on the circle.";
+      readouts = [{ text: "Angle APB = " + ang.toFixed(1) + "°", color: "#7048a8" }];
+      matchLabel = Math.abs(ang - 90) < 0.5 ? "✓ always a right angle" : "…";
+    } else if (tab === "cyclicquad") {
+      const A = this.pt(150), B = this.pt(250), D = this.pt(50), C = this.pt(this.state.quadC);
+      lines = [
+        { x1: A.x, y1: A.y, x2: B.x, y2: B.y, color: "#2b2620", w: 2, dash: "0" },
+        { x1: B.x, y1: B.y, x2: C.x, y2: C.y, color: "#2b2620", w: 2, dash: "0" },
+        { x1: C.x, y1: C.y, x2: D.x, y2: D.y, color: "#2b2620", w: 2, dash: "0" },
+        { x1: D.x, y1: D.y, x2: A.x, y2: A.y, color: "#2b2620", w: 2, dash: "0" },
+      ];
+      dots = [{ x: A.x, y: A.y, color: "#2a6fb0" }, { x: B.x, y: B.y, color: "#7048a8" }, { x: D.x, y: D.y, color: "#7048a8" }];
+      handles = [{ x: C.x, y: C.y, onDown: () => this.startDrag("quadC") }];
+      const angB = this.vecAngle(A.x - B.x, A.y - B.y, C.x - B.x, C.y - B.y);
+      const angD = this.vecAngle(C.x - D.x, C.y - D.y, A.x - D.x, A.y - D.y);
+      theoremName = "4. Opposite angles of a cyclic quadrilateral sum to 180°";
+      theoremDesc = "ABCD has all 4 vertices on the circle. A, B, D are fixed; drag C.";
+      readouts = [{ text: "Angle B = " + angB.toFixed(1) + "°", color: "#7048a8" }, { text: "Angle D = " + angD.toFixed(1) + "°", color: "#7048a8" }, { text: "Sum = " + (angB + angD).toFixed(1) + "°", color: "#2b2620" }];
+      matchLabel = Math.abs(angB + angD - 180) < 0.5 ? "✓ opposite angles sum to 180°" : "…";
+    } else if (tab === "tangentperp") {
+      const T = this.pt(this.state.tangentT);
+      const rdx = T.x - O.x, rdy = T.y - O.y, rl = Math.hypot(rdx, rdy);
+      const ux = -rdy / rl, uy = rdx / rl;
+      const tanLen = 70;
+      const t1 = { x: T.x + ux * tanLen, y: T.y + uy * tanLen }, t2 = { x: T.x - ux * tanLen, y: T.y - uy * tanLen };
+      lines = [
+        { x1: O.x, y1: O.y, x2: T.x, y2: T.y, color: "#2a6fb0", w: 2, dash: "0" },
+        { x1: t1.x, y1: t1.y, x2: t2.x, y2: t2.y, color: "#7048a8", w: 2.5, dash: "0" },
+      ];
+      dots = [{ x: O.x, y: O.y, color: "#2b2620" }];
+      handles = [{ x: T.x, y: T.y, onDown: () => this.startDrag("tangentT") }];
+      const ang = this.vecAngle(O.x - T.x, O.y - T.y, t1.x - T.x, t1.y - T.x === 0 ? 0.0001 : t1.y - T.y);
+      const angFix = this.vecAngle(O.x - T.x, O.y - T.y, t1.x - T.x, t1.y - T.y);
+      theoremName = "5. A tangent is perpendicular to the radius at the point of contact";
+      theoremDesc = "T is the point where the tangent (purple) touches the circle. Drag T anywhere.";
+      readouts = [{ text: "Angle between radius OT and tangent = " + angFix.toFixed(1) + "°", color: "#7048a8" }];
+      matchLabel = Math.abs(angFix - 90) < 0.5 ? "✓ always 90°, by construction" : "…";
+    } else if (tab === "twotangents") {
+      const E = this.state.ext;
+      const d = Math.hypot(E.x - O.x, E.y - O.y);
+      const r = 95;
+      const base = Math.atan2(E.y - O.y, E.x - O.x);
+      const delta = Math.acos(Math.min(1, r / d));
+      const T1 = { x: O.x + r * Math.cos(base + delta), y: O.y + r * Math.sin(base + delta) };
+      const T2 = { x: O.x + r * Math.cos(base - delta), y: O.y + r * Math.sin(base - delta) };
+      lines = [
+        { x1: E.x, y1: E.y, x2: T1.x, y2: T1.y, color: "#2a6fb0", w: 2, dash: "0" },
+        { x1: E.x, y1: E.y, x2: T2.x, y2: T2.y, color: "#7048a8", w: 2, dash: "0" },
+      ];
+      dots = [{ x: O.x, y: O.y, color: "#2b2620" }, { x: T1.x, y: T1.y, color: "#2a6fb0" }, { x: T2.x, y: T2.y, color: "#7048a8" }];
+      handles = [{ x: E.x, y: E.y, onDown: () => this.startDrag("ext") }];
+      const len1 = Math.hypot(E.x - T1.x, E.y - T1.y), len2 = Math.hypot(E.x - T2.x, E.y - T2.y);
+      theoremName = "6. Two tangents from an external point are equal in length";
+      theoremDesc = "E is any point outside the circle. Drag E — both tangent lengths always match.";
+      readouts = [{ text: "Length E→T1 = " + (len1 / 19).toFixed(2) + " units", color: "#2a6fb0" }, { text: "Length E→T2 = " + (len2 / 19).toFixed(2) + " units", color: "#7048a8" }];
+      matchLabel = Math.abs(len1 - len2) < 0.5 ? "✓ the two tangent lengths are equal" : "…";
+    } else {
+      const T = this.pt(270), C = this.pt(30), P = this.pt(this.state.altP);
+      const tanLen = 70;
+      const t1 = { x: T.x + tanLen, y: T.y }, t2 = { x: T.x - tanLen, y: T.y };
+      lines = [
+        { x1: t1.x, y1: t1.y, x2: t2.x, y2: t2.y, color: "#a89d8e", w: 2, dash: "0" },
+        { x1: T.x, y1: T.y, x2: C.x, y2: C.y, color: "#2b2620", w: 2, dash: "0" },
+        { x1: P.x, y1: P.y, x2: T.x, y2: T.y, color: "#7048a8", w: 2, dash: "0" }, { x1: P.x, y1: P.y, x2: C.x, y2: C.y, color: "#7048a8", w: 2, dash: "0" },
+      ];
+      dots = [{ x: T.x, y: T.y, color: "#2b2620" }, { x: C.x, y: C.y, color: "#2b2620" }];
+      handles = [{ x: P.x, y: P.y, onDown: () => this.startDrag("altP") }];
+      const tanChordAngle = this.vecAngle(t1.x - T.x, t1.y - T.y, C.x - T.x, C.y - T.y);
+      const inscribedAngle = this.vecAngle(T.x - P.x, T.y - P.y, C.x - P.x, C.y - P.y);
+      theoremName = "7. Alternate segment theorem";
+      theoremDesc = "Tangent (grey) touches at T; chord TC splits the circle. Drag P in the far ('alternate') segment.";
+      readouts = [{ text: "Tangent–chord angle at T = " + tanChordAngle.toFixed(1) + "°", color: "#2b2620" }, { text: "Angle TPC (alternate segment) = " + inscribedAngle.toFixed(1) + "°", color: "#7048a8" }];
+      matchLabel = Math.abs(tanChordAngle - inscribedAngle) < 0.5 ? "✓ tangent-chord angle = angle in alternate segment" : "…";
+    }
+
+    const gallery = [
+      { name: "1. Centre = 2×circumference", desc: "The angle at the centre is always double the angle at the circumference, for the same arc." },
+      { name: "2. Angles in the same segment", desc: "Angles subtended by the same chord, from the same side, are always equal." },
+      { name: "3. Angle in a semicircle = 90°", desc: "Any triangle drawn on a diameter has a right angle at the third point." },
+      { name: "4. Cyclic quadrilateral", desc: "Opposite angles of a quadrilateral inscribed in a circle always sum to 180°." },
+      { name: "5. Tangent ⊥ radius", desc: "A tangent line always meets the radius at exactly 90° at the point of contact." },
+      { name: "6. Two tangents equal", desc: "The two tangent segments drawn from any external point are always equal in length." },
+      { name: "7. Alternate segment theorem", desc: "The angle between a tangent and a chord equals the inscribed angle in the segment on the other side." },
+    ];
+
+    return { tabs, lines, dots, handles, theoremName, theoremDesc, readouts, matchLabel, gallery,
+      onDrag: e => this.handleDrag(e), onDragEnd: () => this.endDrag() };
+  }
+}
+</script>
+</body>
+</html>

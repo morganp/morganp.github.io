@@ -34,7 +34,7 @@
   <div style="max-width: 1240px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
     <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// THE MATH MAP: AGE 10 TO A-LEVEL</div>
     <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Numbers, patterns, proof</h1>
-    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 720px;">Maths is five strands woven together — number & algebra, geometry & trig, graphs & calculus, stats & probability, and mechanics. Each node's coloured edge shows its strand, and the strands run roughly top-to-bottom, from the number line all the way to calculus and hypothesis testing. Every topic here is on the bench — this is the build plan. Follow the lines: each topic builds on the ones above it.</div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 720px;">Maths is five strands woven together — number & algebra, geometry & trig, graphs & calculus, stats & probability, and mechanics. Each node's coloured edge shows its strand, and the strands run roughly top-to-bottom, from the number line all the way to calculus and hypothesis testing. L1–L3 (Explorer through GCSE/National 5 core) are all live below — click any orange node. L4–L5 (AS/Higher through A-level/Advanced Higher) are still on the bench. Follow the lines: each topic builds on the ones above it.</div>
     <div style="display: flex; gap: 14px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; align-items: center;">
       <span style="font-weight: 600; color: #2b2620;">STRANDS:</span>
       <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 5px; height: 14px; background: #7048a8; display: inline-block;"></span>NUMBER &amp; ALGEBRA</span>
@@ -110,19 +110,25 @@ class Component extends DCLogic {
     const STRAND = { alg: "#7048a8", geo: "#2a6fb0", gc: "#b0472e", stat: "#2f7d3a", mech: "#c99a2e" };
     // hrefs are wired as topics ship — all on the bench for now
     const topics = [
-      { id: "numberline", l: 1, s: "alg", label: "Number & the number line" },
-      { id: "shapes", l: 1, s: "geo", label: "Shapes & angles" },
-      { id: "datagraphs", l: 1, s: "stat", label: "Data & graphs" },
+      { id: "numberline", l: 1, s: "alg", label: "Number & the number line", href: "number-line.html" },
+      { id: "shapes", l: 1, s: "geo", label: "Shapes & angles", href: "shapes-angles.html" },
+      { id: "datagraphs", l: 1, s: "stat", label: "Data & graphs", href: "data-graphs.html" },
 
-      { id: "fdp", l: 2, s: "alg", label: "Fractions, decimals & %" },
+      { id: "fdp", l: 2, s: "alg", label: "Fractions, decimals & %", href: "fractions-percent.html" },
       { id: "algebra", l: 2, s: "alg", label: "Algebra & the balance", href: "algebra-basics.html" },
-      { id: "geometry", l: 2, s: "geo", label: "Angles, area & perimeter" },
-      { id: "coords", l: 2, s: "gc", label: "Coordinates & straight lines" },
-      { id: "prob", l: 2, s: "stat", label: "Probability" },
+      { id: "geometry", l: 2, s: "geo", label: "Angles, area & perimeter", href: "geometry-measure.html" },
+      { id: "coords", l: 2, s: "gc", label: "Coordinates & straight lines", href: "coordinates.html" },
+      { id: "prob", l: 2, s: "stat", label: "Probability", href: "probability.html" },
 
-      { id: "trig", l: 3, s: "geo", label: "Pythagoras & trigonometry" },
-      { id: "quadratics", l: 3, s: "gc", label: "Quadratics & graphs" },
-      { id: "stats", l: 3, s: "stat", label: "Statistics" },
+      { id: "trig", l: 3, s: "geo", label: "Pythagoras & trigonometry", href: "trigonometry.html" },
+      { id: "quadratics", l: 3, s: "gc", label: "Quadratics & graphs", href: "quadratics.html" },
+      { id: "stats", l: 3, s: "stat", label: "Statistics", href: "statistics.html" },
+      { id: "ratio", l: 3, s: "alg", label: "Ratio & proportion", href: "ratio.html" },
+      { id: "seqineq", l: 3, s: "alg", label: "Sequences, simultaneous eqns & inequalities", href: "seqineq.html" },
+      { id: "transform3d", l: 3, s: "geo", label: "Transformations & 3D shapes", href: "transform3d.html" },
+      { id: "circletheorems", l: 3, s: "geo", label: "Circle theorems (Higher)", href: "circletheorems.html" },
+      { id: "combinedevents", l: 3, s: "stat", label: "Tree & Venn diagrams" },
+      { id: "groupeddata", l: 3, s: "stat", label: "Histograms & cumulative frequency" },
 
       { id: "sequences", l: 4, s: "alg", label: "Sequences & series" },
       { id: "explogs", l: 4, s: "alg", label: "Exponentials & logarithms" },
@@ -146,6 +152,8 @@ class Component extends DCLogic {
       ["quadratics", "funccalc"], ["trig", "vectors"], ["trig", "funccalc"],
       ["quadratics", "sequences"], ["quadratics", "explogs"], ["trig", "trigadv"],
       ["stats", "distributions"], ["quadratics", "mechanics"],
+      ["algebra", "ratio"], ["algebra", "seqineq"], ["geometry", "transform3d"],
+      ["trig", "circletheorems"], ["prob", "combinedevents"], ["stats", "groupeddata"],
       ["funccalc", "calculus"], ["funccalc", "numerical"], ["funccalc", "complex"],
       ["distributions", "hypothesis"], ["trigadv", "calculus"], ["sequences", "complex"],
     ];
@@ -218,6 +226,12 @@ class Component extends DCLogic {
       { level: "L3", s: "geo", title: "Pythagoras & Trigonometry", desc: "See a² + b² = c² stay true as you drag the triangle, then measure a building with an angle." },
       { level: "L3", s: "gc", title: "Quadratics & Graphs", desc: "Bend a parabola with three sliders, then throw a ball along it to hit a target." },
       { level: "L3", s: "stat", title: "Statistics", desc: "Drag data points and watch mean, median and mode fight it out — then meet the outlier that breaks the mean." },
+      { level: "L3", s: "alg", title: "Ratio & Proportion", desc: "Split a bar by ratio, race direct vs inverse proportion, and juggle compound measures like speed and density." },
+      { level: "L3", s: "alg", title: "Sequences, Simultaneous Eqns & Inequalities", desc: "Spot the pattern in a growing sequence, solve two equations by crossing graph lines, and shade an inequality region." },
+      { level: "L3", s: "geo", title: "Transformations & 3D Shapes", desc: "Reflect, rotate, translate and enlarge a shape by dragging it, then unfold a 3D net into faces you can count." },
+      { level: "L3", s: "geo", title: "Circle Theorems (Higher)", desc: "Drag points around a circle and watch angle rules — like the angle at the centre — hold true every time." },
+      { level: "L3", s: "stat", title: "Tree & Venn Diagrams", desc: "Build a probability tree for two events and drag numbers into overlapping Venn circles." },
+      { level: "L3", s: "stat", title: "Histograms & Cumulative Frequency", desc: "Group messy data into unequal-width bars (frequency density is the trick) and climb a cumulative frequency curve." },
       { level: "L4", s: "alg", title: "Sequences & Series", desc: "Climb arithmetic and geometric staircases, then watch an infinite sum settle onto a finite answer." },
       { level: "L4", s: "alg", title: "Exponentials & Logarithms", desc: "Race linear vs doubling growth, then meet the log — the 'what power?' machine that tames it." },
       { level: "L4", s: "geo", title: "Radians & Trig Identities", desc: "Drag a point around the unit circle and watch the sine and cosine waves draw themselves." },

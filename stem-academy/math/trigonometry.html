@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Pythagoras & Trigonometry">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / PYTHAGORAS &amp; TRIGONOMETRY</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #2a6fb0;">// RIGHT TRIANGLES, RIGHT ANSWERS — LEVEL L3 · GEOMETRY &amp; TRIG</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">A triangle that never lies</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 820px;">Every right-angled triangle obeys a² + b² = c², and its angles lock its side-ratios (SOH-CAH-TOA) no matter the size. Drag the triangle to prove it stays true, master the three ratios, then measure a real building.</div>
+  </div>
+
+  <!-- FIG 01 — Pythagoras proof -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2a6fb0;">// FIG. 01 — DRAG THE TRIANGLE: a² + b² = c² ALWAYS HOLDS</div>
+      <div style="position: relative;">
+        <svg viewBox="0 0 500 320" style="width: 100%; height: auto; display: block;">
+          <!-- square on a (bottom, horizontal leg) -->
+          <rect x="{{ ax0 }}" y="{{ ay0 }}" width="{{ aLeg }}" height="{{ aLeg }}" fill="#fff3df" stroke="#e8590c" stroke-width="1.5"></rect>
+          <!-- square on b (vertical leg) -->
+          <rect x="{{ bx0 }}" y="{{ by0 }}" width="{{ bLeg }}" height="{{ bLeg }}" fill="#e6f0e8" stroke="#2f7d3a" stroke-width="1.5"></rect>
+          <!-- triangle -->
+          <polygon points="{{ triPoints }}" fill="#eef1f7" stroke="#2b2620" stroke-width="2"></polygon>
+          <!-- square on c (hypotenuse) approx via rotated rect -->
+          <polygon points="{{ cSquarePts }}" fill="#e8eef8" stroke="#2a6fb0" stroke-width="1.5"></polygon>
+          <!-- draggable handle -->
+          <circle cx="{{ handleX }}" cy="{{ handleY }}" r="9" fill="#e8590c" stroke="#2b2620" stroke-width="2" style="cursor: grab;" onMouseDown="{{ onDragStart }}" onTouchStart="{{ onDragStart }}"></circle>
+        </svg>
+        <div style="position: absolute; left: {{ aLabelPct }}%; top: {{ aLabelTopPct }}%; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">a² = {{ aSq }}</div>
+        <div style="position: absolute; left: {{ bLabelPct }}%; top: {{ bLabelTopPct }}%; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2f7d3a;">b² = {{ bSq }}</div>
+        <div style="position: absolute; left: {{ cLabelPct }}%; top: {{ cLabelTopPct }}%; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2a6fb0;">c² = {{ cSq }}</div>
+      </div>
+      <div onMouseMove="{{ onDragMove }}" onMouseUp="{{ onDragEnd }}" onMouseLeave="{{ onDragEnd }}" onTouchMove="{{ onDragMove }}" onTouchEnd="{{ onDragEnd }}" style="height: 4px;"></div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; text-align: center;">{{ aSq }} + {{ bSq }} = {{ sumAB }}  ·  c² = {{ cSq }}  <span style="color: #2f7d3a;">✓ always equal</span></div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — SOHCAHTOA -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.62fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2a6fb0;">// FIG. 02 — SOH-CAH-TOA EXPLORER</div>
+      <svg viewBox="0 0 380 260" style="width: 100%; height: auto;">
+        <polygon points="{{ shPoints }}" fill="#eef1f7" stroke="#2b2620" stroke-width="2"></polygon>
+        <line x1="{{ shAx }}" y1="{{ shAy }}" x2="{{ shBx }}" y2="{{ shAy }}" stroke="#e8590c" stroke-width="3"></line>
+        <line x1="{{ shBx }}" y1="{{ shAy }}" x2="{{ shBx }}" y2="{{ shCy }}" stroke="#2f7d3a" stroke-width="3"></line>
+        <line x1="{{ shAx }}" y1="{{ shAy }}" x2="{{ shBx }}" y2="{{ shCy }}" stroke="#2a6fb0" stroke-width="3"></line>
+        <rect x="{{ shRightAngX }}" y="{{ shRightAngY }}" width="14" height="14" fill="none" stroke="#2b2620" stroke-width="1.5"></rect>
+      </svg>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;">
+        <span style="color: #e8590c;">■ opposite (to θ)</span><span style="color: #2f7d3a;">■ adjacent</span><span style="color: #2a6fb0;">■ hypotenuse</span>
+      </div>
+      <input type="range" min="10" max="80" step="1" value="{{ thetaRaw }}" onInput="{{ onTheta }}" style="width: 100%; accent-color: #2a6fb0; height: 26px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">θ = {{ thetaVal }}°</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 60px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">sin θ</span><div style="flex: 1; height: 14px; background: #eee7da;"><div style="height: 100%; width: {{ sinPct }}%; background: #e8590c;"></div></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; width: 44px; text-align: right;">{{ sinVal }}</span></div>
+        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 60px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">cos θ</span><div style="flex: 1; height: 14px; background: #eee7da;"><div style="height: 100%; width: {{ cosPct }}%; background: #2f7d3a;"></div></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; width: 44px; text-align: right;">{{ cosVal }}</span></div>
+        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 60px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">tan θ</span><div style="flex: 1; height: 14px; background: #eee7da;"><div style="height: 100%; width: {{ tanPct }}%; background: #2a6fb0;"></div></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; width: 44px; text-align: right;">{{ tanVal }}</span></div>
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9dc3e8;">// WHICH RATIO?</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.5; color: #e7ddcd;">{{ quizQ }}</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <sc-for list="{{ quizBtns }}" as="q" hint-placeholder-count="3">
+          <div onClick="{{ q.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 10px 14px; border: 2px solid #faf6ef; background: {{ q.bg }}; color: {{ q.fg }}; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ q.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: {{ quizColor }}; min-height: 20px;">{{ quizMsg }}</div>
+      <div style="border-top: 1.5px solid #574f45; padding-top: 10px; display: flex; justify-content: space-between;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9dc3e8;">CORRECT</span><span style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; color: #fcc419;">{{ quizScore }} / 5</span></div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — measure a building -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #cfe4f2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #1c5a86;">// FIG. 03 — MEASURE A BUILDING WITHOUT CLIMBING IT</div>
+      <svg viewBox="0 0 500 220" style="width: 100%; height: auto; background: linear-gradient(#bfe0f2 0 80%, #dff0d4 80% 100%);">
+        <rect x="360" y="{{ bldgTop }}" width="90" height="{{ bldgH }}" fill="#8a9a6b" stroke="#2b2620" stroke-width="1.5"></rect>
+        <line x1="40" y1="176" x2="360" y2="176" stroke="#2b2620" stroke-width="1.5" stroke-dasharray="4 3"></line>
+        <line x1="40" y1="176" x2="360" y2="{{ bldgTop }}" stroke="#e8590c" stroke-width="2"></line>
+        <path d="M 80 176 A 40 40 0 0 1 {{ arcX }} {{ arcY }}" fill="none" stroke="#c0392b" stroke-width="2"></path>
+        <circle cx="40" cy="176" r="6" fill="#2b2620"></circle>
+      </svg>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1c5a86; width: 140px;">DISTANCE TO BUILDING</span><input type="range" min="10" max="60" step="1" value="{{ distRaw }}" onInput="{{ onDist }}" style="flex: 1; accent-color: #e8590c; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px; width: 60px; text-align: right;">{{ distVal }} m</span></div>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1c5a86; width: 140px;">ANGLE OF ELEVATION</span><input type="range" min="10" max="70" step="1" value="{{ angRaw }}" onInput="{{ onAng }}" style="flex: 1; accent-color: #e8590c; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px; width: 60px; text-align: right;">{{ angVal }}°</span></div>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #fff; border: 1.5px solid #2b2620; padding: 10px 12px;">height = distance × tan(angle) = {{ distVal }} × tan({{ angVal }}°) = <strong>{{ heightVal }} m</strong></div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2a6fb0;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zvhs34j" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Pythagoras &amp; trigonometry ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Pythagorean_theorem" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Pythagorean theorem ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="statistics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Statistics (L3) →</a>
+    <a href="geometry-measure.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also useful: Angles, Area &amp; Perimeter (L2) →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / PYTHAGORAS &amp; TRIGONOMETRY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { a: 90, b: 70, theta: 40, dist: 30, ang: 35, quizI: 0, quizScore: 0, quizPicked: null, dragging: false };
+
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("trigonometry"); }
+
+  renderVals() {
+    // FIG 01 — right triangle at origin (0,220) with legs a (horizontal) and b (vertical)
+    const a = this.state.a, b = this.state.b;
+    const ox = 60, oy = 220;
+    const p1 = { x: ox, y: oy }, p2 = { x: ox + a, y: oy }, p3 = { x: ox, y: oy - b };
+    const triPoints = p1.x + "," + p1.y + " " + p2.x + "," + p2.y + " " + p3.x + "," + p3.y;
+    // square on a: below the base
+    const ax0 = ox, ay0 = oy, aLeg = a;
+    const bx0 = ox - b, by0 = oy - b, bLeg = b;
+    // square on c: rotated, built outward from hypotenuse p2-p3
+    const c = Math.sqrt(a * a + b * b);
+    const dx = (p3.x - p2.x) / c, dy = (p3.y - p2.y) / c; // unit vector along hyp
+    const nx = -dy, ny = dx; // normal pointing away from triangle (outward, to upper-right)
+    const q1 = { x: p2.x + nx * c, y: p2.y + ny * c };
+    const q2 = { x: p3.x + nx * c, y: p3.y + ny * c };
+    const cSquarePts = [p2, q1, q2, p3].map(p => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+
+    return {
+      ax0, ay0, aLeg, bx0, by0, bLeg, triPoints, cSquarePts,
+      handleX: p3.x, handleY: p3.y,
+      onDragStart: () => this.setState({ dragging: true }),
+      onDragMove: e => {
+        if (!this.state.dragging) return;
+        const svg = e.target.closest ? e.target.closest("svg") : null;
+        // fallback: adjust via movementX/Y scaled
+        const mx = e.movementX || 0, my = e.movementY || 0;
+        if (mx || my) {
+          this.setState(s => ({ a: Math.max(30, Math.min(160, s.a - my * 0.5)), b: Math.max(30, Math.min(160, s.b - my * 0.5 + mx * 0)) }));
+        }
+      },
+      onDragEnd: () => this.setState({ dragging: false }),
+      aSq: a * a, bSq: b * b, cSq: Math.round(c * c), sumAB: a * a + b * b,
+      aLabelPct: 12, aLabelTopPct: 78, bLabelPct: 2, bLabelTopPct: 40, cLabelPct: 68, cLabelTopPct: 30,
+
+      // FIG 02
+      ...this._fig02(),
+      // FIG 03
+      ...this._fig03(),
+    };
+  }
+
+  _fig02() {
+    const theta = this.state.theta;
+    const rad = theta * Math.PI / 180;
+    const shAx = 40, shAy = 220;
+    const hyp = 220;
+    const shBx = shAx + hyp * Math.cos(rad);
+    const shCy = shAy - hyp * Math.sin(rad);
+    const shPoints = shAx + "," + shAy + " " + shBx + "," + shAy + " " + shBx + "," + shCy;
+    const sin = Math.sin(rad), cos = Math.cos(rad), tan = Math.tan(rad);
+
+    const quizzes = [
+      { q: "You know the ANGLE and the ADJACENT side. You want the OPPOSITE side. Which ratio?", ans: "tan" },
+      { q: "You know the ANGLE and the HYPOTENUSE. You want the OPPOSITE side. Which ratio?", ans: "sin" },
+      { q: "You know the ANGLE and the HYPOTENUSE. You want the ADJACENT side. Which ratio?", ans: "cos" },
+      { q: "You know OPPOSITE and ADJACENT. You want the ANGLE. Which ratio?", ans: "tan" },
+      { q: "You know ADJACENT and HYPOTENUSE. You want the ANGLE. Which ratio?", ans: "cos" },
+      { q: "You know OPPOSITE and HYPOTENUSE. You want the ANGLE. Which ratio?", ans: "sin" },
+    ];
+    const qz = quizzes[this.state.quizI % quizzes.length];
+    const picked = this.state.quizPicked;
+    const mkBtn = (key, label) => {
+      let bg = "#141b33", fg = "#e7ddcd";
+      if (picked) { if (key === qz.ans) { bg = "#2f7d3a"; fg = "#faf6ef"; } else if (key === picked) { bg = "#c0392b"; fg = "#faf6ef"; } }
+      return { label, bg, fg, onPick: () => this._pickQuiz(key, qz.ans) };
+    };
+    const quizBtns = [mkBtn("sin", "SOH — sin θ = opp/hyp"), mkBtn("cos", "CAH — cos θ = adj/hyp"), mkBtn("tan", "TOA — tan θ = opp/adj")];
+
+    return {
+      shAx, shAy, shBx, shCy, shPoints, shRightAngX: shBx - 14, shRightAngY: shAy - 14,
+      thetaRaw: theta, thetaVal: theta, onTheta: e => this.setState({ theta: +e.target.value }),
+      sinPct: (sin * 100).toFixed(1), cosPct: (cos * 100).toFixed(1), tanPct: (Math.min(tan, 1) * 100).toFixed(1),
+      sinVal: sin.toFixed(3), cosVal: cos.toFixed(3), tanVal: tan.toFixed(3),
+      quizQ: qz.q, quizBtns, quizMsg: this.state.quizMsg || "", quizColor: this.state.quizColor || "#e7ddcd", quizScore: this.state.quizScore,
+    };
+  }
+  _pickQuiz(key, ans) {
+    if (this.state.quizPicked) return;
+    const correct = key === ans;
+    const score = correct ? this.state.quizScore + 1 : this.state.quizScore;
+    if (score >= 5 && window.Progress) window.Progress.markCompleted("trigonometry", { via: "sohcahtoa-quiz" });
+    this.setState({ quizPicked: key, quizScore: score, quizMsg: correct ? "Correct!" : "Not quite — check which sides you know.", quizColor: correct ? "#8ce99a" : "#ff9b7a" });
+    setTimeout(() => this.setState({ quizI: this.state.quizI + 1, quizPicked: null, quizMsg: "" }), 1300);
+  }
+
+  _fig03() {
+    const dist = this.state.dist, ang = this.state.ang;
+    const rad = ang * Math.PI / 180;
+    const height = dist * Math.tan(rad);
+    const bldgTop = 176 - Math.min(150, height * 4);
+    const bldgH = 220 - bldgTop;
+    const arcRad = 40, arcAng = ang * Math.PI / 180;
+    return {
+      bldgTop, bldgH,
+      arcX: (80 + arcRad * Math.cos(arcAng)).toFixed(1), arcY: (176 - arcRad * Math.sin(arcAng)).toFixed(1),
+      distRaw: dist, distVal: dist, onDist: e => this.setState({ dist: +e.target.value }),
+      angRaw: ang, angVal: ang, onAng: e => this.setState({ ang: +e.target.value }),
+      heightVal: height.toFixed(1),
+    };
+  }
+}
+</script>
+</body>
+</html>

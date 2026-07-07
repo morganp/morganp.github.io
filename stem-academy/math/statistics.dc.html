@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Statistics">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / STATISTICS</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #2f7d3a;">// AVERAGES CAN LIE — LEVEL L3 · STATS &amp; PROBABILITY</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">One average, three answers</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 820px;">Mean, median and mode all claim to describe the "typical" value — but they can disagree wildly. Drag data points and watch them fight, then explore correlation and see the same data collapse into a box plot.</div>
+  </div>
+
+  <!-- GRAPH 01 -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">// GRAPH 01 — DRAG THE DOTS (VALUES 0–20)</div>
+      <svg viewBox="0 0 600 140" style="width: 100%; height: auto; cursor: default;" onMouseMove="{{ onDragMove }}" onMouseUp="{{ onDragEnd }}" onMouseLeave="{{ onDragEnd }}" onTouchMove="{{ onDragMove }}" onTouchEnd="{{ onDragEnd }}">
+        <line x1="40" y1="100" x2="560" y2="100" stroke="#2b2620" stroke-width="2"></line>
+        <sc-for list="{{ axisTicks }}" as="t" hint-placeholder-count="6">
+          <line x1="{{ t.x }}" y1="95" x2="{{ t.x }}" y2="105" stroke="#2b2620" stroke-width="1"></line>
+        </sc-for>
+        <line x1="{{ meanX }}" y1="20" x2="{{ meanX }}" y2="100" stroke="#e8590c" stroke-width="2" stroke-dasharray="4 3"></line>
+        <line x1="{{ medianX }}" y1="20" x2="{{ medianX }}" y2="100" stroke="#2a6fb0" stroke-width="2" stroke-dasharray="2 2"></line>
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="12">
+          <circle cx="{{ d.x }}" cy="100" r="8" fill="#2f7d3a" stroke="#2b2620" stroke-width="1.5" style="cursor: grab;" onMouseDown="{{ d.onDragStart }}" onTouchStart="{{ d.onDragStart }}"></circle>
+        </sc-for>
+      </svg>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px;">
+        <span style="color: #e8590c;">┊ mean = {{ meanVal }}</span>
+        <span style="color: #2a6fb0;">┊ median = {{ medianVal }}</span>
+        <span style="color: #6b6156;">mode = {{ modeVal }} · range = {{ rangeVal }}</span>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">{{ statsNote }}</div>
+    </div>
+  </div>
+
+  <!-- GRAPH 02 — scatter -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.6fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">// GRAPH 02 — SCATTER &amp; CORRELATION (DRAG POINTS)</div>
+      <svg viewBox="0 0 400 300" style="width: 100%; height: auto; cursor: default;" onMouseMove="{{ onScatterMove }}" onMouseUp="{{ onScatterEnd }}" onMouseLeave="{{ onScatterEnd }}" onTouchMove="{{ onScatterMove }}" onTouchEnd="{{ onScatterEnd }}">
+        <line x1="30" y1="270" x2="380" y2="270" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="30" y1="20" x2="30" y2="270" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="{{ fitX1 }}" y1="{{ fitY1 }}" x2="{{ fitX2 }}" y2="{{ fitY2 }}" stroke="#e8590c" stroke-width="2"></line>
+        <sc-for list="{{ scatterPts }}" as="p" hint-placeholder-count="8">
+          <circle cx="{{ p.x }}" cy="{{ p.y }}" r="7" fill="#2a6fb0" stroke="#2b2620" stroke-width="1.5" style="cursor: grab;" onMouseDown="{{ p.onDragStart }}" onTouchStart="{{ p.onDragStart }}"></circle>
+        </sc-for>
+      </svg>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">x axis: hours studied · y axis: test score</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">CORRELATION</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px;">r ≈ {{ rVal }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: #554c42;">{{ corrDesc }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #6b6156; margin-top: auto;">Drag points to change the pattern — try making them all fall on the line (r → 1), or scatter randomly (r → 0).</div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — box plot -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">// FIG. 03 — THE SAME DATA AS A BOX PLOT</div>
+      <svg viewBox="0 0 600 100" style="width: 100%; height: auto;">
+        <line x1="{{ bpMin }}" y1="50" x2="{{ bpQ1 }}" y2="50" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="{{ bpQ3 }}" y1="50" x2="{{ bpMax }}" y2="50" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="{{ bpMin }}" y1="35" x2="{{ bpMin }}" y2="65" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="{{ bpMax }}" y1="35" x2="{{ bpMax }}" y2="65" stroke="#2b2620" stroke-width="2"></line>
+        <rect x="{{ bpQ1 }}" y="25" width="{{ bpIQR }}" height="50" fill="#e6f0e8" stroke="#2f7d3a" stroke-width="2"></rect>
+        <line x1="{{ bpMedian }}" y1="25" x2="{{ bpMedian }}" y2="75" stroke="#2a6fb0" stroke-width="2.5"></line>
+      </svg>
+      <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156; padding: 0 20px;">
+        <span>MIN {{ bpMinVal }}</span><span>Q1 {{ bpQ1Val }}</span><span style="color: #2a6fb0;">MEDIAN {{ bpMedianVal }}</span><span>Q3 {{ bpQ3Val }}</span><span>MAX {{ bpMaxVal }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2f7d3a;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/z9h4jxs" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Averages and spread ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Correlation" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Correlation ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">KEEP EXPLORING</span>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Explore the Math map →</a>
+    <a href="../biology/ecology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Related: Biology sampling &amp; ecology →</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / STATISTICS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { values: [4, 6, 7, 8, 8, 9, 10, 10, 11, 12, 13, 14], dragI: null, scatter: null, dragS: null };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("statistics");
+    this.setState({ scatter: [[3,60],[4,65],[5,70],[6,68],[7,78],[8,82],[9,88],[10,92]].map(([x,y]) => ({ x, y })) });
+  }
+
+  startDrag(i) { this.setState({ dragI: i }); }
+  moveDrag(e) {
+    if (this.state.dragI === null) return;
+    const svg = e.target.closest("svg");
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const frac = (clientX - rect.left) / rect.width;
+    const vbX = frac * 600; // viewBox is 0-600, x range 40..560 maps to value 0..20
+    const v = Math.max(0, Math.min(20, ((vbX - 40) / (560 - 40)) * 20));
+    const values = [...this.state.values];
+    values[this.state.dragI] = Math.round(v * 2) / 2;
+    this.setState({ values });
+  }
+  endDrag() {
+    const values = this.state.values;
+    const mean = values.reduce((a,b)=>a+b,0)/values.length;
+    const sorted = [...values].sort((a,b)=>a-b);
+    const median = sorted.length % 2 ? sorted[(sorted.length-1)/2] : (sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;
+    if (Math.abs(mean - median) >= 2 && window.Progress && !this._done) { this._done = true; window.Progress.markCompleted("statistics", { via: "averages-lab" }); }
+    this.setState({ dragI: null });
+  }
+
+  startScatterDrag(i) { this.setState({ dragS: i }); }
+  moveScatterDrag(e) {
+    if (this.state.dragS === null) return;
+    const svg = e.target.closest("svg");
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const vbX = ((clientX - rect.left) / rect.width) * 400;
+    const vbY = ((clientY - rect.top) / rect.height) * 300;
+    const x = Math.max(0, Math.min(12, ((vbX - 30) / (380 - 30)) * 12));
+    const y = Math.max(40, Math.min(100, 100 - ((vbY - 270) / (270 - 20)) * 60 * -1));
+    const yScore = Math.max(40, Math.min(100, ((270 - vbY) / (270 - 20)) * 60 + 40));
+    const scatter = [...this.state.scatter];
+    scatter[this.state.dragS] = { x: Math.round(x * 2) / 2, y: Math.round(yScore) };
+    this.setState({ scatter });
+  }
+  endScatterDrag() { this.setState({ dragS: null }); }
+
+  renderVals() {
+    const values = this.state.values;
+    const toX = v => 40 + (v / 20) * (560 - 40);
+    const dots = values.map((v, i) => ({ x: toX(v).toFixed(1), onDragStart: () => this.startDrag(i) }));
+    const mean = values.reduce((a,b)=>a+b,0)/values.length;
+    const sorted = [...values].sort((a,b)=>a-b);
+    const median = sorted.length % 2 ? sorted[(sorted.length-1)/2] : (sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;
+    const freq = {};
+    values.forEach(v => { const key = Math.round(v); freq[key] = (freq[key]||0)+1; });
+    let mode = sorted[0], best = 0;
+    Object.entries(freq).forEach(([k,c]) => { if (c > best) { best = c; mode = +k; } });
+    const range = Math.max(...values) - Math.min(...values);
+    const axisTicks = [0,4,8,12,16,20].map(v => ({ x: toX(v).toFixed(1) }));
+
+    const gap = Math.abs(mean - median);
+    const statsNote = gap >= 2 ? "Notice: the mean has been dragged toward the outlier, but the median barely moved. The median resists outliers; the mean doesn't." : "Try dragging one dot far to the right — watch the mean chase it while the median stays put.";
+
+    // scatter
+    const scatter = this.state.scatter || [];
+    const toSx = x => 30 + (x / 12) * (380 - 30);
+    const toSy = y => 270 - ((y - 40) / 60) * (270 - 20);
+    const scatterPts = scatter.map((p, i) => ({ x: toSx(p.x).toFixed(1), y: toSy(p.y).toFixed(1), onDragStart: () => this.startScatterDrag(i) }));
+    // least squares
+    const n = scatter.length || 1;
+    const sx = scatter.reduce((a,p)=>a+p.x,0), sy = scatter.reduce((a,p)=>a+p.y,0);
+    const mx = sx/n, my = sy/n;
+    let num=0, denX=0, denY=0;
+    scatter.forEach(p => { num += (p.x-mx)*(p.y-my); denX += (p.x-mx)**2; denY += (p.y-my)**2; });
+    const r = denX && denY ? num / Math.sqrt(denX*denY) : 0;
+    const slope = denX ? num/denX : 0;
+    const intercept = my - slope*mx;
+    const fitX1 = 0, fitY1v = slope*0+intercept, fitX2 = 12, fitY2v = slope*12+intercept;
+    const corrDesc = r > 0.7 ? "Strong positive — more hours studied, higher scores." : r > 0.3 ? "Weak-to-moderate positive." : r > -0.3 ? "Little to no correlation." : r > -0.7 ? "Weak-to-moderate negative." : "Strong negative.";
+
+    // box plot from same values
+    const q = (arr, p) => { const idx = (arr.length-1)*p; const lo = Math.floor(idx), hi = Math.ceil(idx); return arr[lo] + (arr[hi]-arr[lo])*(idx-lo); };
+    const bpMinV = sorted[0], bpMaxV = sorted[sorted.length-1], bpQ1V = q(sorted,0.25), bpQ3V = q(sorted,0.75);
+    const toBpX = v => 20 + (v/20)*(580-20);
+
+    return {
+      dots, axisTicks, meanX: toX(mean).toFixed(1), medianX: toX(median).toFixed(1),
+      meanVal: mean.toFixed(1), medianVal: median.toFixed(1), modeVal: mode, rangeVal: range.toFixed(1),
+      statsNote,
+      onDragMove: e => this.moveDrag(e), onDragEnd: () => this.endDrag(),
+      scatterPts, fitX1: toSx(fitX1).toFixed(1), fitY1: toSy(Math.max(40,Math.min(100,fitY1v))).toFixed(1), fitX2: toSx(fitX2).toFixed(1), fitY2: toSy(Math.max(40,Math.min(100,fitY2v))).toFixed(1),
+      onScatterMove: e => this.moveScatterDrag(e), onScatterEnd: () => this.endScatterDrag(),
+      rVal: r.toFixed(2), corrDesc,
+      bpMin: toBpX(bpMinV).toFixed(1), bpQ1: toBpX(bpQ1V).toFixed(1), bpMedian: toBpX(median).toFixed(1), bpQ3: toBpX(bpQ3V).toFixed(1), bpMax: toBpX(bpMaxV).toFixed(1),
+      bpIQR: (toBpX(bpQ3V)-toBpX(bpQ1V)).toFixed(1),
+      bpMinVal: bpMinV, bpQ1Val: bpQ1V.toFixed(1), bpMedianVal: median.toFixed(1), bpQ3Val: bpQ3V.toFixed(1), bpMaxVal: bpMaxV,
+    };
+  }
+}
+</script>
+</body>
+</html>

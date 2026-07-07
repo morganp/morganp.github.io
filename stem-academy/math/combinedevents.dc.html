@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Tree & Venn Diagrams">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / TREE &amp; VENN DIAGRAMS</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #2f7d3a;">// COMBINING EVENTS — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Tree &amp; Venn diagrams</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 840px;">A probability tree tracks two events happening one after another; a Venn diagram tracks two properties overlapping at once. Build a tree for picking balls from a bag, then explore a Venn diagram survey with proper set notation.</div>
+  </div>
+
+  <!-- FIG 01 — tree -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 0.9fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">// FIG. 01 — PROBABILITY TREE: PICKING 2 BALLS FROM A BAG</div>
+      <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #c0392b;">RED BALLS</span><input type="range" min="1" max="8" step="1" value="{{ nRed }}" onInput="{{ onNRed }}" style="accent-color: #c0392b; width: 100px; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ nRed }}</span></div>
+        <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #2a6fb0;">BLUE BALLS</span><input type="range" min="1" max="8" step="1" value="{{ nBlue }}" onInput="{{ onNBlue }}" style="accent-color: #2a6fb0; width: 100px; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ nBlue }}</span></div>
+        <div onClick="{{ onToggleReplace }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; padding: 10px 12px; border: 1.5px solid #2b2620; background: {{ replaceBg }}; color: {{ replaceFg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ replaceLabel }}</div>
+      </div>
+      <svg viewBox="0 0 260 200" style="width: 100%; height: auto; border: 1.5px solid #d8d0c4; background: #fbfaf6;">
+        <line x1="30" y1="100" x2="110" y2="45" stroke="#c0392b" stroke-width="2.5"></line>
+        <line x1="30" y1="100" x2="110" y2="155" stroke="#2a6fb0" stroke-width="2.5"></line>
+        <line x1="110" y1="45" x2="200" y2="20" stroke="{{ rrColor }}" stroke-width="{{ rrW }}"></line>
+        <line x1="110" y1="45" x2="200" y2="70" stroke="{{ rbColor }}" stroke-width="{{ rbW }}"></line>
+        <line x1="110" y1="155" x2="200" y2="130" stroke="{{ brColor }}" stroke-width="{{ brW }}"></line>
+        <line x1="110" y1="155" x2="200" y2="180" stroke="{{ bbColor }}" stroke-width="{{ bbW }}"></line>
+        <circle cx="30" cy="100" r="5" fill="#2b2620"></circle>
+        <circle cx="110" cy="45" r="5" fill="#c0392b"></circle>
+        <circle cx="110" cy="155" r="5" fill="#2a6fb0"></circle>
+        <circle cx="200" cy="20" r="5" fill="{{ rrDot }}"></circle>
+        <circle cx="200" cy="70" r="5" fill="{{ rbDot }}"></circle>
+        <circle cx="200" cy="130" r="5" fill="{{ brDot }}"></circle>
+        <circle cx="200" cy="180" r="5" fill="{{ bbDot }}"></circle>
+      </svg>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">1st pick: red (top) / blue (bottom). 2nd pick branches again from each. Click a leaf outcome below.</div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">P(1st RED) = {{ p1r }} · P(1st BLUE) = {{ p1b }}</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <sc-for list="{{ leaves }}" as="lf" hint-placeholder-count="4">
+          <div onClick="{{ lf.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 12px; border: 1.5px solid #2b2620; background: {{ lf.bg }}; color: {{ lf.fg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center;"><span>{{ lf.label }}</span><span>{{ lf.prob }}</span></div>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">
+        <sc-for list="{{ presets }}" as="ps" hint-placeholder-count="3">
+          <div onClick="{{ ps.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 8px 10px; border: 1.5px solid #2b2620; background: {{ ps.bg }}; color: {{ ps.fg }}; cursor: pointer; min-height: 38px; box-sizing: border-box; display: flex; align-items: center;">{{ ps.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px; color: #e8590c;">{{ combinedResult }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — venn -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.85fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">// FIG. 02 — VENN DIAGRAM: A = PLAYS FOOTBALL, B = PLAYS CHESS</div>
+      <svg viewBox="0 0 300 260" style="width: 100%; height: auto; border: 1.5px solid #d8d0c4; background: #fbfaf6;">
+        <defs>
+          <mask id="mA"><rect x="0" y="0" width="300" height="260" fill="black"></rect><circle cx="115" cy="130" r="72" fill="white"></circle></mask>
+          <mask id="mB"><rect x="0" y="0" width="300" height="260" fill="black"></rect><circle cx="185" cy="130" r="72" fill="white"></circle></mask>
+          <mask id="mUnion"><rect x="0" y="0" width="300" height="260" fill="black"></rect><circle cx="115" cy="130" r="72" fill="white"></circle><circle cx="185" cy="130" r="72" fill="white"></circle></mask>
+          <mask id="mOnlyA"><rect x="0" y="0" width="300" height="260" fill="black"></rect><circle cx="115" cy="130" r="72" fill="white"></circle><circle cx="185" cy="130" r="72" fill="black"></circle></mask>
+          <mask id="mOnlyB"><rect x="0" y="0" width="300" height="260" fill="black"></rect><circle cx="185" cy="130" r="72" fill="white"></circle><circle cx="115" cy="130" r="72" fill="black"></circle></mask>
+          <mask id="mNotA"><rect x="0" y="0" width="300" height="260" fill="white"></rect><circle cx="115" cy="130" r="72" fill="black"></circle></mask>
+          <mask id="mNotB"><rect x="0" y="0" width="300" height="260" fill="white"></rect><circle cx="185" cy="130" r="72" fill="black"></circle></mask>
+          <mask id="mNeither"><rect x="0" y="0" width="300" height="260" fill="white"></rect><circle cx="115" cy="130" r="72" fill="black"></circle><circle cx="185" cy="130" r="72" fill="black"></circle></mask>
+          <clipPath id="clipB"><circle cx="185" cy="130" r="72"></circle></clipPath>
+        </defs>
+        <rect x="20" y="30" width="260" height="200" fill="none" stroke="#2b2620" stroke-width="1.5"></rect>
+        <rect x="0" y="0" width="300" height="260" fill="#e8590c" opacity="0.45" mask="{{ activeMask }}" clip-path="{{ activeClip }}"></rect>
+        <circle cx="115" cy="130" r="72" fill="none" stroke="#c0392b" stroke-width="2.5"></circle>
+        <circle cx="185" cy="130" r="72" fill="none" stroke="#2a6fb0" stroke-width="2.5"></circle>
+      </svg>
+      <div style="display: flex; gap: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border: 2px solid #c0392b; border-radius: 50%; display: inline-block;"></span>A = football</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border: 2px solid #2a6fb0; border-radius: 50%; display: inline-block;"></span>B = chess</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #e8590c; opacity: 0.45; display: inline-block;"></span>highlighted region</span>
+      </div>
+      <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+        <sc-for list="{{ notations }}" as="nt" hint-placeholder-count="9">
+          <div onClick="{{ nt.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 10px; border: 1.5px solid #2b2620; background: {{ nt.bg }}; color: {{ nt.fg }}; cursor: pointer; min-height: 38px; box-sizing: border-box; display: flex; align-items: center;">{{ nt.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">SURVEY COUNTS (enter how many pupils are in each region)</div>
+      <sc-for list="{{ regionInputs }}" as="ri" hint-placeholder-count="4">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{ ri.color }};">{{ ri.label }}</span>
+          <input type="number" min="0" value="{{ ri.val }}" onInput="{{ ri.onInput }}" style="width: 70px; padding: 8px; border: 1.5px solid #2b2620; font-family: 'IBM Plex Mono', monospace; font-size: 13px; min-height: 38px; box-sizing: border-box;">
+        </div>
+      </sc-for>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; border-top: 1.5px solid #d8d0c4; padding-top: 10px; color: {{ totalColor }};">TOTAL = {{ regionTotal }} pupils</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #554c42;">{{ selectedRegionCount }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zbg9j6f" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Probability ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Tree_diagram_(probability_theory)" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Tree diagram (probability) ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Venn_diagram" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Venn diagram ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="groupeddata.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Histograms &amp; Cumulative Frequency →</a>
+    <a href="probability.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also useful: Probability →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / TREE &amp; VENN DIAGRAMS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    nRed: 3, nBlue: 2, withReplace: true, selectedLeaf: null, presetKey: null, presetClicks: 0,
+    regions: { onlyA: 8, onlyB: 5, both: 4, neither: 6 }, notation: "A", notationsSeen: { A: true },
+  };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("combinedevents"); }
+  _checkComplete() {
+    const nn = Object.keys(this.state.notationsSeen).length;
+    if (this.state.presetClicks >= 1 && nn >= 3 && window.Progress) window.Progress.markCompleted("combinedevents", { via: "tree-and-venn" });
+  }
+  pickNotation(n) { const notationsSeen = { ...this.state.notationsSeen, [n]: true }; this.setState({ notation: n, notationsSeen }, () => this._checkComplete()); }
+  pickPreset(k) { this.setState({ presetKey: k, presetClicks: this.state.presetClicks + 1 }, () => this._checkComplete()); }
+
+  renderVals() {
+    const nRed = this.state.nRed, nBlue = this.state.nBlue, total = nRed + nBlue;
+    const p1r = nRed / total, p1b = nBlue / total;
+    let p2rGivenR, p2bGivenR, p2rGivenB, p2bGivenB;
+    if (this.state.withReplace) {
+      p2rGivenR = p1r; p2bGivenR = p1b; p2rGivenB = p1r; p2bGivenB = p1b;
+    } else {
+      p2rGivenR = (nRed - 1) / (total - 1); p2bGivenR = nBlue / (total - 1);
+      p2rGivenB = nRed / (total - 1); p2bGivenB = (nBlue - 1) / (total - 1);
+    }
+    const pRR = p1r * p2rGivenR, pRB = p1r * p2bGivenR, pBR = p1b * p2rGivenB, pBB = p1b * p2bGivenB;
+
+    const sel = this.state.selectedLeaf;
+    const leafColor = (key, base) => sel === key ? "#e8590c" : base;
+    const leaves = [
+      { key: "RR", label: "Red, Red", prob: pRR.toFixed(3) }, { key: "RB", label: "Red, Blue", prob: pRB.toFixed(3) },
+      { key: "BR", label: "Blue, Red", prob: pBR.toFixed(3) }, { key: "BB", label: "Blue, Blue", prob: pBB.toFixed(3) },
+    ].map(l => ({ ...l, onPick: () => this.setState({ selectedLeaf: l.key }), bg: sel === l.key ? "#e8590c" : "#fff", fg: sel === l.key ? "#faf6ef" : "#2b2620" }));
+
+    const lw = k => sel === k ? 4.5 : 2.5;
+    const lc = (k, base) => sel === k ? "#e8590c" : base;
+
+    const presets = [
+      { key: "same", label: "SAME COLOUR TWICE" }, { key: "diff", label: "DIFFERENT COLOURS" }, { key: "atleast1r", label: "AT LEAST ONE RED" },
+    ].map(p => ({ label: p.label, onPick: () => this.pickPreset(p.key), bg: this.state.presetKey === p.key ? "#2f7d3a" : "#fff", fg: this.state.presetKey === p.key ? "#faf6ef" : "#2b2620" }));
+    let combinedResult = "Click a preset or a leaf above.";
+    if (this.state.presetKey === "same") combinedResult = "P(same colour) = P(RR) + P(BB) = " + (pRR + pBB).toFixed(3);
+    else if (this.state.presetKey === "diff") combinedResult = "P(different) = P(RB) + P(BR) = " + (pRB + pBR).toFixed(3);
+    else if (this.state.presetKey === "atleast1r") combinedResult = "P(≥1 red) = 1 − P(BB) = " + (1 - pBB).toFixed(3);
+    else if (sel) combinedResult = "P(" + sel + ") = " + { RR: pRR, RB: pRB, BR: pBR, BB: pBB }[sel].toFixed(3);
+
+    const notationList = [
+      { key: "A", label: "A" }, { key: "B", label: "B" }, { key: "AandB", label: "A ∩ B" }, { key: "AorB", label: "A ∪ B" },
+      { key: "onlyA", label: "only A" }, { key: "onlyB", label: "only B" }, { key: "notA", label: "A′" }, { key: "notB", label: "B′" }, { key: "neither", label: "neither" },
+    ];
+    const notations = notationList.map(n => ({ label: n.label, onPick: () => this.pickNotation(n.key), bg: this.state.notation === n.key ? "#2f7d3a" : "#fff", fg: this.state.notation === n.key ? "#faf6ef" : "#2b2620" }));
+    const maskMap = { A: "url(#mA)", B: "url(#mB)", AorB: "url(#mUnion)", onlyA: "url(#mOnlyA)", onlyB: "url(#mOnlyB)", notA: "url(#mNotA)", notB: "url(#mNotB)", neither: "url(#mNeither)", AandB: "url(#mA)" };
+    const activeMask = maskMap[this.state.notation];
+    const activeClip = this.state.notation === "AandB" ? "url(#clipB)" : "none";
+
+    const r = this.state.regions;
+    const regionInputs = [
+      { key: "onlyA", label: "ONLY A (football, not chess)", color: "#c0392b" },
+      { key: "onlyB", label: "ONLY B (chess, not football)", color: "#2a6fb0" },
+      { key: "both", label: "BOTH (A ∩ B)", color: "#7048a8" },
+      { key: "neither", label: "NEITHER", color: "#6b6156" },
+    ].map(ri => ({ label: ri.label, color: ri.color, val: r[ri.key], onInput: e => this.setState({ regions: { ...r, [ri.key]: +e.target.value || 0 } }) }));
+    const regionTotal = r.onlyA + r.onlyB + r.both + r.neither;
+
+    const regionCountFor = {
+      A: r.onlyA + r.both, B: r.onlyB + r.both, AandB: r.both, AorB: r.onlyA + r.onlyB + r.both,
+      onlyA: r.onlyA, onlyB: r.onlyB, notA: r.onlyB + r.neither, notB: r.onlyA + r.neither, neither: r.neither,
+    };
+    const selectedRegionCount = "Pupils in \"" + notationList.find(n => n.key === this.state.notation).label + "\" = " + regionCountFor[this.state.notation] + " out of " + regionTotal + ".";
+
+    return {
+      nRed, nBlue, onNRed: e => this.setState({ nRed: +e.target.value }), onNBlue: e => this.setState({ nBlue: +e.target.value }),
+      replaceLabel: this.state.withReplace ? "WITH REPLACEMENT" : "WITHOUT REPLACEMENT", replaceBg: this.state.withReplace ? "#2a6fb0" : "#e8590c", replaceFg: "#faf6ef",
+      onToggleReplace: () => this.setState({ withReplace: !this.state.withReplace }),
+      p1r: p1r.toFixed(2), p1b: p1b.toFixed(2),
+      rrColor: lc("RR", "#c0392b"), rbColor: lc("RB", "#c0392b"), brColor: lc("BR", "#2a6fb0"), bbColor: lc("BB", "#2a6fb0"),
+      rrW: lw("RR"), rbW: lw("RB"), brW: lw("BR"), bbW: lw("BB"),
+      rrDot: leafColor("RR", "#c0392b"), rbDot: leafColor("RB", "#8a6a9e"), brDot: leafColor("BR", "#8a6a9e"), bbDot: leafColor("BB", "#2a6fb0"),
+      leaves, presets, combinedResult,
+      notations, activeMask, activeClip,
+      regionInputs, regionTotal, totalColor: "#2b2620", selectedRegionCount,
+    };
+  }
+}
+</script>
+</body>
+</html>

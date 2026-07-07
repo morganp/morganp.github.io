@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Sequences, Simultaneous Equations & Inequalities">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / SEQUENCES &amp; EQUATIONS</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #7048a8;">// PATTERNS, CROSSINGS & REGIONS — LEVEL L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 46px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Sequences, simultaneous equations &amp; inequalities</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">Spot the pattern in a growing sequence and write its rule, find where two lines cross to solve two equations at once, then learn to shade the region an inequality allows.</div>
+  </div>
+
+  <!-- FIG 01 — sequences -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #7048a8;">// FIG. 01 — SPOT THE PATTERN</div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <sc-for list="{{ seqTabs }}" as="t" hint-placeholder-count="3">
+          <div onClick="{{ t.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px 14px; border: 1.5px solid #2b2620; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ t.label }}</div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isLinear }}">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">FIRST TERM a</span><input type="range" min="-5" max="10" step="1" value="{{ linA }}" onInput="{{ onLinA }}" style="accent-color: #7048a8; width: 160px; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ linA }}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">COMMON DIFFERENCE d</span><input type="range" min="-5" max="10" step="1" value="{{ linD }}" onInput="{{ onLinD }}" style="accent-color: #7048a8; width: 160px; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ linD }}</span></div>
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-end;">
+          <sc-for list="{{ linBars }}" as="b" hint-placeholder-count="6">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <div style="width: 34px; height: {{ b.h }}px; background: #7048a8; border: 1.5px solid #2b2620;"></div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px;">T{{ b.n }}={{ b.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;">nth term = {{ linD }}n + {{ linIntercept }}</div>
+      </sc-if>
+
+      <sc-if value="{{ isQuadratic }}">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">a (of an²)</span><input type="range" min="1" max="5" step="1" value="{{ quadA }}" onInput="{{ onQuadA }}" style="accent-color: #7048a8; width: 140px; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ quadA }}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">b (of bn)</span><input type="range" min="-5" max="5" step="1" value="{{ quadB }}" onInput="{{ onQuadB }}" style="accent-color: #7048a8; width: 140px; height: 26px;"><span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ quadB }}</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">
+          <div>TERMS: {{ quadTermsStr }}</div>
+          <div>1st DIFFERENCES: {{ quadDiff1Str }}</div>
+          <div>2nd DIFFERENCES: {{ quadDiff2Str }} <span style="color: #e8590c;">← always 2a = {{ quadTwoA }}</span></div>
+          <div style="font-weight: 600;">nth term = {{ quadA }}n² + {{ quadB }}n</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSpecial }}">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <sc-for list="{{ specialTabs }}" as="sp" hint-placeholder-count="4">
+            <div onClick="{{ sp.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; padding: 8px 12px; border: 1.5px solid #2b2620; background: {{ sp.bg }}; color: {{ sp.fg }}; cursor: pointer; min-height: 38px; box-sizing: border-box; display: flex; align-items: center;">{{ sp.label }}</div>
+          </sc-for>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">{{ specialName }}: {{ specialTermsStr }}</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #554c42;">{{ specialNote }}</div>
+      </sc-if>
+
+      <div style="display: flex; gap: 10px; align-items: center; border-top: 1.5px solid #d8d0c4; padding-top: 12px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">JUMP TO TERM</span>
+        <input type="range" min="1" max="15" step="1" value="{{ jumpN }}" onInput="{{ onJumpN }}" style="accent-color: #e8590c; width: 160px; height: 26px;">
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px; color: #e8590c;">T{{ jumpN }} = {{ jumpVal }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — simultaneous equations -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.75fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// FIG. 02 — WHERE TWO LINES CROSS IS THE SOLUTION</div>
+      <svg viewBox="0 0 300 240" style="width: 100%; height: auto; border: 1.5px solid #d8d0c4; background: #fbfaf6;">
+        <line x1="20" y1="220" x2="280" y2="220" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="150" y1="220" x2="150" y2="10" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="{{ l1x1 }}" y1="{{ l1y1 }}" x2="{{ l1x2 }}" y2="{{ l1y2 }}" stroke="#2f7d3a" stroke-width="3"></line>
+        <line x1="{{ l2x1 }}" y1="{{ l2y1 }}" x2="{{ l2x2 }}" y2="{{ l2y2 }}" stroke="#b0472e" stroke-width="3"></line>
+        <circle cx="{{ ix }}" cy="{{ iy }}" r="6" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></circle>
+      </svg>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #2f7d3a;">LINE 1: y = m₁x + c₁</span>
+          <div style="display: flex; gap: 8px;">
+            <input type="range" min="-3" max="3" step="0.5" value="{{ m1 }}" onInput="{{ onM1 }}" style="accent-color: #2f7d3a; width: 100px; height: 26px;">
+            <input type="range" min="-6" max="6" step="1" value="{{ c1 }}" onInput="{{ onC1 }}" style="accent-color: #2f7d3a; width: 100px; height: 26px;">
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b0472e;">LINE 2: y = m₂x + c₂</span>
+          <div style="display: flex; gap: 8px;">
+            <input type="range" min="-3" max="3" step="0.5" value="{{ m2 }}" onInput="{{ onM2 }}" style="accent-color: #b0472e; width: 100px; height: 26px;">
+            <input type="range" min="-6" max="6" step="1" value="{{ c2 }}" onInput="{{ onC2 }}" style="accent-color: #b0472e; width: 100px; height: 26px;">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">y = {{ m1 }}x + {{ c1 }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">y = {{ m2 }}x + {{ c2 }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid #d8d0c4; padding-top: 8px;">SUBTRACT: 0 = {{ mDiff }}x + {{ cDiff }}</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px; color: #e8590c;">{{ solutionStr }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #554c42; margin-top: auto;">The crossing point satisfies BOTH equations at once — that's what "simultaneous" means. Parallel lines (same m) never cross: no solution.</div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — inequalities -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 0.8fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// FIG. 03A — ONE VARIABLE</div>
+      <svg viewBox="0 0 280 60" style="width: 100%; height: auto;">
+        <line x1="20" y1="30" x2="260" y2="30" stroke="#2b2620" stroke-width="2"></line>
+        <sc-for list="{{ ticks }}" as="tk" hint-placeholder-count="11">
+          <line x1="{{ tk.x }}" y1="25" x2="{{ tk.x }}" y2="35" stroke="#2b2620" stroke-width="1"></line>
+        </sc-for>
+        <line x1="{{ ineqX }}" y1="30" x2="{{ ineqEndX }}" y2="30" stroke="#e8590c" stroke-width="4"></line>
+        <circle cx="{{ ineqX }}" cy="30" r="7" fill="{{ ineqDotFill }}" stroke="#e8590c" stroke-width="3"></circle>
+      </svg>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600;">x</span>
+        <sc-for list="{{ ineqOps }}" as="op" hint-placeholder-count="4">
+          <div onClick="{{ op.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 8px 12px; border: 1.5px solid #2b2620; background: {{ op.bg }}; color: {{ op.fg }}; cursor: pointer; min-height: 38px; box-sizing: border-box; display: flex; align-items: center;">{{ op.label }}</div>
+        </sc-for>
+        <input type="range" min="-5" max="5" step="1" value="{{ ineqVal }}" onInput="{{ onIneqVal }}" style="accent-color: #e8590c; width: 100px; height: 26px;">
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px;">{{ ineqVal }}</span>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">Filled dot = value included (≥/≤). Open dot = value excluded (&gt;/&lt;).</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #7048a8;">// FIG. 03B — TWO VARIABLES: SHADE THE REGION (click to test a point)</div>
+      <svg viewBox="0 0 260 200" style="width: 100%; height: auto; border: 1.5px solid #d8d0c4; background: #fbfaf6; cursor: crosshair;" onClick="{{ onRegionClick }}">
+        <polygon points="{{ shadePoly }}" fill="#7048a8" opacity="0.25"></polygon>
+        <line x1="20" y1="180" x2="250" y2="180" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="20" y1="180" x2="20" y2="10" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="{{ regLx1 }}" y1="{{ regLy1 }}" x2="{{ regLx2 }}" y2="{{ regLy2 }}" stroke="#2b2620" stroke-width="2.5" stroke-dasharray="{{ regDash }}"></line>
+        <sc-if value="{{ hasTestPt }}">
+          <circle cx="{{ testX }}" cy="{{ testY }}" r="6" fill="{{ testColor }}" stroke="#2b2620" stroke-width="1.5"></circle>
+        </sc-if>
+      </svg>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <sc-for list="{{ regionOps }}" as="ro" hint-placeholder-count="2">
+          <div onClick="{{ ro.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 8px 12px; border: 1.5px solid #2b2620; background: {{ ro.bg }}; color: {{ ro.fg }}; cursor: pointer; min-height: 38px; box-sizing: border-box; display: flex; align-items: center;">{{ ro.label }}</div>
+        </sc-for>
+        <input type="range" min="-2" max="2" step="0.5" value="{{ regM }}" onInput="{{ onRegM }}" style="accent-color: #7048a8; width: 90px; height: 26px;">
+        <input type="range" min="-3" max="6" step="1" value="{{ regC }}" onInput="{{ onRegC }}" style="accent-color: #7048a8; width: 90px; height: 26px;">
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;">Region: y {{ regionSymbol }} {{ regM }}x + {{ regC }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: {{ testColor }}; min-height: 18px;">{{ testMsg }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zbrq7ty" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Sequences ↗</a>
+        <a href="https://en.wikipedia.org/wiki/System_of_linear_equations" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — System of linear equations ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Inequality_(mathematics)" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Inequality (mathematics) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="transform3d.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Transformations &amp; 3D Shapes →</a>
+    <a href="coordinates.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also useful: Coordinates &amp; Straight Lines →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / SEQUENCES &amp; EQUATIONS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    seqTab: "linear", linA: 3, linD: 2, quadA: 1, quadB: 1, specialType: "triangular", jumpN: 5,
+    m1: 1, c1: -2, m2: -1, c2: 4,
+    ineqOp: ">=", ineqVal: 1,
+    regM: 1, regC: 0, regionAbove: true, testPt: null,
+    seen: { linear: true }, simMoved: false, testClicks: 0,
+  };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("seqineq"); }
+
+  _checkComplete() {
+    const seenN = Object.keys(this.state.seen).length;
+    if (seenN >= 3 && this.state.simMoved && this.state.testClicks >= 2 && window.Progress) {
+      window.Progress.markCompleted("seqineq", { via: "explore-all" });
+    }
+  }
+  pickSeqTab(t) { const seen = { ...this.state.seen, [t]: true }; this.setState({ seqTab: t, seen }, () => this._checkComplete()); }
+  moveSim(patch) { this.setState({ ...patch, simMoved: true }, () => this._checkComplete()); }
+  clickRegion(e) {
+    const svg = e.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width * 260;
+    const py = (e.clientY - rect.top) / rect.height * 200;
+    const wx = (px - 20) / 23;
+    const wy = (180 - py) / 17;
+    const lineY = this.state.regM * wx + this.state.regC;
+    const inside = this.state.regionAbove ? wy > lineY : wy < lineY;
+    this.setState({ testPt: { px, py, inside }, testClicks: this.state.testClicks + 1 }, () => this._checkComplete());
+  }
+
+  _specialSeqs() {
+    return {
+      triangular: { name: "Triangular", terms: [1, 3, 6, 10, 15, 21], note: "Each term adds one more than the last (+2, +3, +4…) — dots stack into a triangle. nth term = n(n+1)/2." },
+      square: { name: "Square", terms: [1, 4, 9, 16, 25, 36], note: "Each term is n² — dots arrange into a perfect square grid." },
+      cube: { name: "Cube", terms: [1, 8, 27, 64, 125, 216], note: "Each term is n³ — think of stacking unit cubes into a bigger cube." },
+      fib: { name: "Fibonacci-type", terms: [1, 1, 2, 3, 5, 8], note: "Each term is the sum of the two before it. Named after the rabbit-breeding puzzle that first used it." },
+    };
+  }
+
+  renderVals() {
+    const linA = this.state.linA, linD = this.state.linD;
+    const linTerms = [1,2,3,4,5,6].map(n => linA + (n - 1) * linD);
+    const maxV = Math.max(...linTerms.map(Math.abs), 1);
+    const linBars = linTerms.map((v, i) => ({ n: i + 1, v, h: Math.max(6, Math.abs(v) / maxV * 70) }));
+    const linIntercept = linA - linD;
+
+    const qa = this.state.quadA, qb = this.state.quadB;
+    const quadTerms = [1,2,3,4,5].map(n => qa * n * n + qb * n);
+    const diff1 = quadTerms.slice(1).map((v, i) => v - quadTerms[i]);
+    const diff2 = diff1.slice(1).map((v, i) => v - diff1[i]);
+
+    const special = this._specialSeqs();
+    const sp = special[this.state.specialType];
+
+    let jumpVal;
+    if (this.state.seqTab === "linear") jumpVal = linA + (this.state.jumpN - 1) * linD;
+    else if (this.state.seqTab === "quadratic") jumpVal = qa * this.state.jumpN * this.state.jumpN + qb * this.state.jumpN;
+    else {
+      if (this.state.specialType === "fib") {
+        let a = 1, b = 1; for (let i = 3; i <= this.state.jumpN; i++) { const c = a + b; a = b; b = c; }
+        jumpVal = this.state.jumpN === 1 || this.state.jumpN === 2 ? 1 : b;
+      } else if (this.state.specialType === "triangular") jumpVal = this.state.jumpN * (this.state.jumpN + 1) / 2;
+      else if (this.state.specialType === "square") jumpVal = this.state.jumpN * this.state.jumpN;
+      else jumpVal = Math.pow(this.state.jumpN, 3);
+    }
+
+    // simultaneous — world x:-6..6 -> px20..280 ; y:-6..6 -> px 220..10 roughly (center 150,115)
+    const wx2px = x => 150 + x * 21.6;
+    const wy2px = y => 115 - y * 17.5;
+    const m1 = this.state.m1, c1 = this.state.c1, m2 = this.state.m2, c2 = this.state.c2;
+    const line1 = { x1: -6, y1: m1 * -6 + c1, x2: 6, y2: m1 * 6 + c1 };
+    const line2 = { x1: -6, y1: m2 * -6 + c2, x2: 6, y2: m2 * 6 + c2 };
+    const mDiff = (m1 - m2), cDiff = (c1 - c2);
+    let solutionStr;
+    if (Math.abs(mDiff) < 1e-9) solutionStr = Math.abs(cDiff) < 1e-9 ? "Same line — infinite solutions" : "Parallel — no solution";
+    else {
+      const sx = -cDiff / mDiff;
+      const sy = m1 * sx + c1;
+      solutionStr = "x = " + sx.toFixed(2) + ", y = " + sy.toFixed(2);
+    }
+    const ix = Math.abs(mDiff) < 1e-9 ? -999 : (-cDiff / mDiff);
+    const iy = m1 * ix + c1;
+
+    // 1-var inequality: number line -5..5 -> px 30..250
+    const nx2px = v => 30 + (v + 5) * 22;
+    const ops = [">", ">=", "<", "<="];
+    const dir = this.state.ineqOp;
+    const filled = dir === ">=" || dir === "<=";
+    const goesRight = dir === ">" || dir === ">=";
+    const ineqX = nx2px(this.state.ineqVal);
+    const ineqEndX = goesRight ? 260 : nx2px(-5) - 10;
+
+    // 2-var region: world x:0-10 -> px20-250, y:0-10 -> px180-10 (same scale as ratio.dc)
+    const toPx = (x, y) => ({ x: 20 + (x / 10) * 230, y: 180 - (y / 10) * 170 });
+    const regM = this.state.regM, regC = this.state.regC;
+    const yAt0 = Math.max(-2, Math.min(12, regC));
+    const yAt10 = Math.max(-2, Math.min(12, regM * 10 + regC));
+    const p0 = toPx(0, yAt0), p10 = toPx(10, yAt10);
+    const top0 = toPx(0, 10), top10 = toPx(10, 10), bot0 = toPx(0, 0), bot10 = toPx(10, 0);
+    const shadePoly = this.state.regionAbove
+      ? [p0, p10, top10, top0].map(p => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ")
+      : [p0, p10, bot10, bot0].map(p => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+
+    const tp = this.state.testPt;
+
+    return {
+      seqTabs: ["linear", "quadratic", "special"].map(t => ({
+        label: t === "linear" ? "LINEAR (ARITHMETIC)" : t === "quadratic" ? "QUADRATIC" : "SPECIAL SEQUENCES",
+        onPick: () => this.pickSeqTab(t), bg: this.state.seqTab === t ? "#7048a8" : "#faf6ef", fg: this.state.seqTab === t ? "#faf6ef" : "#2b2620",
+      })),
+      isLinear: this.state.seqTab === "linear", isQuadratic: this.state.seqTab === "quadratic", isSpecial: this.state.seqTab === "special",
+      linA, linD, onLinA: e => this.setState({ linA: +e.target.value }), onLinD: e => this.setState({ linD: +e.target.value }),
+      linBars, linIntercept,
+      quadA: qa, quadB: qb, onQuadA: e => this.setState({ quadA: +e.target.value }), onQuadB: e => this.setState({ quadB: +e.target.value }),
+      quadTermsStr: quadTerms.join(", "), quadDiff1Str: diff1.join(", "), quadDiff2Str: diff2.join(", "), quadTwoA: 2 * qa,
+      specialTabs: Object.keys(special).map(k => ({ label: special[k].name, onPick: () => this.setState({ specialType: k }), bg: this.state.specialType === k ? "#7048a8" : "#faf6ef", fg: this.state.specialType === k ? "#faf6ef" : "#2b2620" })),
+      specialName: sp.name, specialTermsStr: sp.terms.join(", ") + ", …", specialNote: sp.note,
+      jumpN: this.state.jumpN, onJumpN: e => this.setState({ jumpN: +e.target.value }), jumpVal,
+
+      l1x1: wx2px(line1.x1).toFixed(1), l1y1: wy2px(line1.y1).toFixed(1), l1x2: wx2px(line1.x2).toFixed(1), l1y2: wy2px(line1.y2).toFixed(1),
+      l2x1: wx2px(line2.x1).toFixed(1), l2y1: wy2px(line2.y1).toFixed(1), l2x2: wx2px(line2.x2).toFixed(1), l2y2: wy2px(line2.y2).toFixed(1),
+      ix: wx2px(ix).toFixed(1), iy: wy2px(iy).toFixed(1),
+      m1, c1, m2, c2, onM1: e => this.moveSim({ m1: +e.target.value }), onC1: e => this.moveSim({ c1: +e.target.value }),
+      onM2: e => this.moveSim({ m2: +e.target.value }), onC2: e => this.moveSim({ c2: +e.target.value }),
+      mDiff: mDiff.toFixed(1), cDiff: cDiff.toFixed(1), solutionStr,
+
+      ticks: Array.from({ length: 11 }, (_, i) => ({ x: nx2px(i - 5) })),
+      ineqX: ineqX.toFixed(1), ineqEndX: ineqEndX.toFixed(1), ineqDotFill: filled ? "#e8590c" : "#fff",
+      ineqOps: ops.map(o => ({ label: o, onPick: () => this.setState({ ineqOp: o }), bg: this.state.ineqOp === o ? "#e8590c" : "#faf6ef", fg: this.state.ineqOp === o ? "#faf6ef" : "#2b2620" })),
+      ineqVal: this.state.ineqVal, onIneqVal: e => this.setState({ ineqVal: +e.target.value }),
+
+      shadePoly, regLx1: p0.x.toFixed(1), regLy1: p0.y.toFixed(1), regLx2: p10.x.toFixed(1), regLy2: p10.y.toFixed(1), regDash: "0",
+      regionOps: [{ l: "y > line (ABOVE)", v: true }, { l: "y < line (BELOW)", v: false }].map(o => ({ label: o.l, onPick: () => this.setState({ regionAbove: o.v }), bg: this.state.regionAbove === o.v ? "#7048a8" : "#faf6ef", fg: this.state.regionAbove === o.v ? "#faf6ef" : "#2b2620" })),
+      regM, regC, onRegM: e => this.setState({ regM: +e.target.value }), onRegC: e => this.setState({ regC: +e.target.value }),
+      regionSymbol: this.state.regionAbove ? ">" : "<",
+      onRegionClick: e => this.clickRegion(e),
+      hasTestPt: !!tp, testX: tp ? tp.px.toFixed(1) : 0, testY: tp ? tp.py.toFixed(1) : 0,
+      testColor: tp ? (tp.inside ? "#2f7d3a" : "#c0392b") : "#6b6156",
+      testMsg: tp ? (tp.inside ? "That point satisfies the inequality — inside the shaded region." : "That point does NOT satisfy it — outside the shaded region.") : "Click anywhere on the grid to test a point.",
+    };
+  }
+}
+</script>
+</body>
+</html>

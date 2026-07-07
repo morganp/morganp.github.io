@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Shapes & Angles">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / SHAPES &amp; ANGLES</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #2a6fb0;">// TRAIN YOUR EYE — LEVEL L1 · GEOMETRY &amp; TRIG</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 50px; line-height: 1.02; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Shapes have rules</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 820px;">Guess angles by eye, drag a triangle until its three angles always sum to 180°, and hunt for mirror lines that make a shape match itself.</div>
+  </div>
+
+  <!-- FIG 01 -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.6fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2a6fb0;">// FIG. 01 — ANGLE ESTIMATOR</div>
+      <svg viewBox="0 0 300 200" style="width: 100%; height: auto;">
+        <line x1="60" y1="160" x2="240" y2="160" stroke="#2b2620" stroke-width="2.5"></line>
+        <line x1="60" y1="160" x2="{{ trueArmX }}" y2="{{ trueArmY }}" stroke="#2b2620" stroke-width="2.5"></line>
+        <path d="{{ trueArc }}" fill="none" stroke="#6b6156" stroke-width="1.5"></path>
+        <sc-if value="{{ revealed }}">
+          <line x1="60" y1="160" x2="{{ guessArmX }}" y2="{{ guessArmY }}" stroke="#e8590c" stroke-width="2" stroke-dasharray="4 3"></line>
+        </sc-if>
+      </svg>
+      <input type="range" min="0" max="180" step="1" value="{{ guessRaw }}" onInput="{{ onGuess }}" style="width: 100%; accent-color: #e8590c; height: 26px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">YOUR GUESS: {{ guessVal }}° ({{ guessName }})</span>
+        <div onClick="{{ onReveal }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 16px; border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">REVEAL</div>
+      </div>
+      <div style="min-height: 22px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ resultColor }};">{{ resultMsg }}</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9dc3e8;">SCORE</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 34px; color: #fcc419;">{{ within15 }} / 5 WITHIN 15°</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.5; color: #cbb9e8;">Acute &lt; 90° · Right = 90° · Obtuse 90–180° · Reflex &gt; 180°. Get 5 guesses within 15° to complete this figure.</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2a6fb0;">// FIG. 02 — DRAG ANY CORNER: ANGLES ALWAYS SUM TO 180°</div>
+      <svg viewBox="0 0 400 260" style="width: 100%; height: auto;" onMouseMove="{{ onTriMove }}" onMouseUp="{{ onTriEnd }}" onMouseLeave="{{ onTriEnd }}" onTouchMove="{{ onTriMove }}" onTouchEnd="{{ onTriEnd }}">
+        <polygon points="{{ triPts }}" fill="#eef1f7" stroke="#2b2620" stroke-width="2"></polygon>
+        <sc-for list="{{ vertices }}" as="v" hint-placeholder-count="3">
+          <circle cx="{{ v.x }}" cy="{{ v.y }}" r="9" fill="{{ v.color }}" stroke="#2b2620" stroke-width="2" style="cursor: grab;" onMouseDown="{{ v.onDragStart }}" onTouchStart="{{ v.onDragStart }}"></circle>
+        </sc-for>
+      </svg>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">
+        <span style="color: #e8590c;">A = {{ angA }}°</span><span style="color: #2f7d3a;">B = {{ angB }}°</span><span style="color: #2a6fb0;">C = {{ angC }}°</span>
+        <span style="font-weight: 600;">SUM = {{ angSum }}°</span>
+        <span style="color: #6b6156;">{{ triClass }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIG 03 -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2a6fb0;">// FIG. 03 — SYMMETRY MIRROR</div>
+        <div style="display: flex; gap: 6px;">
+          <sc-for list="{{ shapeBtns }}" as="b" hint-placeholder-count="4">
+            <div onClick="{{ b.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 8px 10px; border: 1.5px solid #2b2620; background: {{ b.bg }}; color: {{ b.fg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ b.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <svg viewBox="0 0 300 300" style="width: 260px; height: 260px; margin: 0 auto;">
+        <g transform="{{ shapeTransform }}"><path d="{{ shapePath }}" fill="#eef1f7" stroke="#2b2620" stroke-width="2"></path></g>
+        <line x1="{{ mirrorX1 }}" y1="{{ mirrorY1 }}" x2="{{ mirrorX2 }}" y2="{{ mirrorY2 }}" stroke="#e8590c" stroke-width="2" stroke-dasharray="6 4"></line>
+      </svg>
+      <input type="range" min="0" max="180" step="1" value="{{ mirrorRaw }}" onInput="{{ onMirror }}" style="width: 100%; accent-color: #e8590c; height: 26px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{ mirrorColor }};">{{ mirrorMsg }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2a6fb0;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zbcqtfr" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Angles and shapes ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Symmetry" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Symmetry ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="data-graphs.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Data &amp; Graphs (L1) →</a>
+    <a href="geometry-measure.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Level up: Angles, Area &amp; Perimeter (L2) →</a>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Math map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / SHAPES &amp; ANGLES</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { trueAngle: 55, guess: 90, revealed: false, within15: 0,
+    tri: [{x:120,y:220},{x:280,y:220},{x:220,y:80}], dragV: null,
+    shape: "square", mirror: 90 };
+
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("shapes-angles"); this._newAngle(); }
+  _newAngle() { this._trueA = Math.floor(Math.random() * 170) + 5; this.setState({ revealed: false }); }
+
+  reveal() {
+    const err = Math.abs(this.state.guess - this._trueA);
+    const within15 = err <= 15 ? this.state.within15 + 1 : this.state.within15;
+    if (within15 >= 5 && window.Progress && !this._done) { this._done = true; window.Progress.markCompleted("shapes-angles", { via: "angle-estimator" }); }
+    this.setState({ revealed: true, within15, lastErr: err });
+  }
+
+  startTriDrag(i) { this.setState({ dragV: i }); }
+  moveTriDrag(e) {
+    if (this.state.dragV === null) return;
+    const svg = e.target.closest("svg");
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = ((clientX - rect.left) / rect.width) * 400;
+    const y = ((clientY - rect.top) / rect.height) * 260;
+    const tri = [...this.state.tri];
+    tri[this.state.dragV] = { x: Math.max(10, Math.min(390, x)), y: Math.max(10, Math.min(250, y)) };
+    this.setState({ tri });
+  }
+  endTriDrag() { this.setState({ dragV: null }); }
+
+  _angleAt(p, a, b) {
+    const v1 = { x: a.x - p.x, y: a.y - p.y }, v2 = { x: b.x - p.x, y: b.y - p.y };
+    const dot = v1.x * v2.x + v1.y * v2.y;
+    const m1 = Math.hypot(v1.x, v1.y), m2 = Math.hypot(v2.x, v2.y);
+    return Math.acos(Math.max(-1, Math.min(1, dot / (m1 * m2)))) * 180 / Math.PI;
+  }
+
+  renderVals() {
+    const trueA = this._trueA || this.state.trueAngle;
+    const rad = trueA * Math.PI / 180;
+    const trueArmX = 60 + 150 * Math.cos(rad), trueArmY = 160 - 150 * Math.sin(rad);
+    const arcR = 30;
+    const trueArc = "M " + (60 + arcR) + " 160 A " + arcR + " " + arcR + " 0 0 0 " + (60 + arcR * Math.cos(rad)).toFixed(1) + " " + (160 - arcR * Math.sin(rad)).toFixed(1);
+    const g = this.state.guess;
+    const grad = g * Math.PI / 180;
+    const guessArmX = 60 + 150 * Math.cos(grad), guessArmY = 160 - 150 * Math.sin(grad);
+    const guessName = g < 90 ? "acute" : g === 90 ? "right" : g < 180 ? "obtuse" : "reflex";
+    const err = this.state.lastErr;
+    const resultMsg = this.state.revealed ? "True angle: " + trueA + "°. You were off by " + err + "°." + (err <= 15 ? " Great eye!" : "") : "Drag the slider to match the black arm, then reveal.";
+    const resultColor = this.state.revealed ? (err <= 15 ? "#2f7d3a" : "#c0392b") : "#2b2620";
+
+    // triangle
+    const [A, B, C] = this.state.tri;
+    const triPts = A.x+","+A.y+" "+B.x+","+B.y+" "+C.x+","+C.y;
+    const angA = this._angleAt(A, B, C), angB = this._angleAt(B, A, C), angC = this._angleAt(C, A, B);
+    const sum = angA + angB + angC;
+    const sides = [Math.hypot(B.x-C.x,B.y-C.y), Math.hypot(A.x-C.x,A.y-C.y), Math.hypot(A.x-B.x,A.y-B.y)];
+    const eq = Math.abs(sides[0]-sides[1])<8 && Math.abs(sides[1]-sides[2])<8;
+    const iso = !eq && (Math.abs(sides[0]-sides[1])<8 || Math.abs(sides[1]-sides[2])<8 || Math.abs(sides[0]-sides[2])<8);
+    const rightFlag = Math.abs(angA-90)<3 || Math.abs(angB-90)<3 || Math.abs(angC-90)<3;
+    const triClass = (eq ? "equilateral" : iso ? "isosceles" : "scalene") + (rightFlag ? " · right-angled" : "");
+    const vertices = [
+      { x: A.x, y: A.y, color: "#e8590c", onDragStart: () => this.startTriDrag(0) },
+      { x: B.x, y: B.y, color: "#2f7d3a", onDragStart: () => this.startTriDrag(1) },
+      { x: C.x, y: C.y, color: "#2a6fb0", onDragStart: () => this.startTriDrag(2) },
+    ];
+
+    // symmetry
+    const shapes = {
+      square: "M 100 100 L 200 100 L 200 200 L 100 200 Z",
+      rect: "M 70 120 L 230 120 L 230 180 L 70 180 Z",
+      triangle: "M 150 80 L 220 200 L 80 200 Z",
+      hexagon: "M 150 70 L 210 105 L 210 175 L 150 210 L 90 175 L 90 105 Z",
+    };
+    const shapeBtns = [
+      { key: "square", label: "SQUARE" }, { key: "rect", label: "RECTANGLE" }, { key: "triangle", label: "TRIANGLE" }, { key: "hexagon", label: "HEXAGON" },
+    ].map(b => ({ label: b.label, onPick: () => this.setState({ shape: b.key, mirror: 90 }), bg: this.state.shape === b.key ? "#2a6fb0" : "#faf6ef", fg: this.state.shape === b.key ? "#faf6ef" : "#2b2620" }));
+
+    const symLines = { square: [0,45,90,135], rect: [0,90], triangle: [90], hexagon: [0,30,60,90,120,150] };
+    const mirror = this.state.mirror;
+    const lines = symLines[this.state.shape];
+    const isSym = lines.some(l => Math.abs(((mirror % 180) - l + 180) % 180) < 3);
+    const mAngle = mirror * Math.PI / 180;
+    const cx = 150, cy = 150, L = 140;
+    const mirrorX1 = (cx - L * Math.cos(mAngle)).toFixed(1), mirrorY1 = (cy - L * Math.sin(mAngle)).toFixed(1);
+    const mirrorX2 = (cx + L * Math.cos(mAngle)).toFixed(1), mirrorY2 = (cy + L * Math.sin(mAngle)).toFixed(1);
+
+    return {
+      trueArmX: trueArmX.toFixed(1), trueArmY: trueArmY.toFixed(1), trueArc,
+      revealed: this.state.revealed, guessArmX: guessArmX.toFixed(1), guessArmY: guessArmY.toFixed(1),
+      guessRaw: g, guessVal: g, guessName, onGuess: e => this.setState({ guess: +e.target.value }),
+      onReveal: () => this.reveal(), resultMsg, resultColor, within15: this.state.within15,
+      triPts, vertices, angA: angA.toFixed(0), angB: angB.toFixed(0), angC: angC.toFixed(0), angSum: sum.toFixed(0), triClass,
+      onTriMove: e => this.moveTriDrag(e), onTriEnd: () => this.endTriDrag(),
+      shapeBtns, shapePath: shapes[this.state.shape], shapeTransform: "",
+      mirrorRaw: mirror, onMirror: e => this.setState({ mirror: +e.target.value }),
+      mirrorX1, mirrorY1, mirrorX2, mirrorY2,
+      mirrorMsg: isSym ? "✓ This IS a line of symmetry — both halves match!" : "Not yet a line of symmetry — keep rotating.",
+      mirrorColor: isSym ? "#2f7d3a" : "#6b6156",
+    };
+  }
+}
+</script>
+</body>
+</html>
