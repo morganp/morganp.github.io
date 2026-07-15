@@ -139,6 +139,16 @@
     ['px', 'py', 'pz'].forEach((k, i) => { if (toks[i] === undefined) return; const r = tokOrNum(toks[i], vmap); pos[i] = r.value; if (r.expr) pexpr[k] = r.expr; });
     return { pos, pexpr };
   }
+  // scale([x,y,z]) -> [x,y,z]; scale(s) -> [s,s,s]
+  function readScaleTokens(args, vmap) {
+    if (/\[/.test(args)) {
+      const toks = splitArgs(argVector(args)); const s = [1, 1, 1];
+      toks.forEach((t, i) => { if (i < 3) { const v = tokOrNum(t, vmap).value; if (v) s[i] = +v.toFixed(4); } });
+      return s;
+    }
+    const v = tokOrNum(splitArgs(args)[0] || '1', vmap).value || 1;
+    return [+v.toFixed(4), +v.toFixed(4), +v.toFixed(4)];
+  }
   // rotate([x,y,z]) -> [x,y,z]; rotate(angle) -> [0,0,angle]
   function readRotTokens(args, vmap) {
     if (/\[/.test(args)) {
@@ -231,7 +241,8 @@
       while (i < n && /[\s;]/.test(src[i])) i++;
       if (i >= n) break;
       // consume transform prefixes; remember translate/rotate as the node's pos/rot
-      let pos = null, pexpr = null, rot = null, guard = 0;
+      // (and scale — kept only on custom module-instance nodes)
+      let pos = null, pexpr = null, rot = null, scl = null, guard = 0;
       while (guard++ < 50) {
         const mm = /^([A-Za-z_]\w*)\s*\(/.exec(src.slice(i));
         if (!mm) break;
@@ -244,6 +255,12 @@
         if (nm === 'rotate') {
           const pStart = i + mm[0].length - 1, pEnd = matchParen(src, pStart);
           rot = readRotTokens(src.slice(pStart + 1, pEnd - 1), vmap);
+          i = pEnd; while (i < n && /\s/.test(src[i])) i++; continue;
+        }
+        if (nm === 'scale') {
+          const pStart = i + mm[0].length - 1, pEnd = matchParen(src, pStart);
+          const s2 = readScaleTokens(src.slice(pStart + 1, pEnd - 1), vmap);
+          scl = scl ? scl.map((v, k) => +(v * s2[k]).toFixed(4)) : s2;
           i = pEnd; while (i < n && /\s/.test(src[i])) i++; continue;
         }
         if (TRANSFORMS.includes(nm)) { const pStart = i + mm[0].length - 1, pEnd = matchParen(src, pStart); i = pEnd; while (i < n && /\s/.test(src[i])) i++; continue; }
@@ -299,6 +316,16 @@
         nodes.push(node);
         continue;
       }
+      // known library module, no child block -> custom module-instance node (raw args kept verbatim)
+      if (ctx.isCustom && ctx.isCustom(name) && src[i] !== '{') {
+        const node = { type: 'custom', name, argsSrc: args.trim(), dims: {}, pos: pos || [0, 0, 0] };
+        if (pexpr && Object.keys(pexpr).length) node.expr = { ...pexpr };
+        if (rot && (rot[0] || rot[1] || rot[2])) node.rot = rot;
+        if (scl && (scl[0] !== 1 || scl[1] !== 1 || scl[2] !== 1)) node.scl = scl;
+        while (i < n && /[\s;]/.test(src[i])) i++;
+        nodes.push(node);
+        continue;
+      }
       // unknown call -> skip its block or statement
       if (src[i] === '{') i = matchBrace(src, i);
       else { while (i < n && src[i] !== ';' && src[i] !== '{') i++; if (src[i] === ';') i++; }
@@ -323,7 +350,7 @@
       vmap[name] = val; vars.push({ name, value: +(+val).toFixed(6) });
     }
     // 2) body -> node tree
-    const tree = parseBlock(noMods, { vmap, restingPos: ctx.restingPos });
+    const tree = parseBlock(noMods, { vmap, restingPos: ctx.restingPos, isCustom: ctx.isCustom });
     return { vars, tree, vmap };
   }
 
@@ -331,7 +358,7 @@
     tokenizeExpr, toRPN, evalExpr,
     splitArgs, argRaw, argVector, tokOrNum,
     matchParen, matchBrace, stripModules, statementEnd,
-    readPosTokens, readRotTokens, readPrimitive, parsePolyPoints, numArg,
+    readPosTokens, readRotTokens, readScaleTokens, readPrimitive, parsePolyPoints, numArg,
     parseBlock, parseScad,
   };
 })();

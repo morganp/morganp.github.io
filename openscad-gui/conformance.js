@@ -40,6 +40,7 @@
   add('Operators & values', 'equality', 'echo(2==2, "a"=="b");', H => H.eq(0, 'true, false'));
   add('Operators & values', 'logical && || !', 'echo(true&&false, true||false, !false);', H => H.eq(0, 'false, true, true'));
   add('Operators & values', 'ternary ?:', 'echo(3<5 ? "lo" : "hi");', H => H.eq(0, '"lo"'));
+  add('Operators & values', 'ternary inside vector literal', 'x=-1; echo([x>0 ? 1 : 2, 30, 40]);', H => H.eq(0, '[2, 30, 40]'));
   add('Operators & values', 'let() expression', 'echo(let(a=4,b=3) a*b);', H => H.eq(0, '12'));
   add('Operators & values', 'vector*scalar', 'echo([1,2,3]*2);', H => H.eq(0, '[2, 4, 6]'));
   add('Operators & values', 'vector+vector', 'echo([1,2,3]+[10,20,30]);', H => H.eq(0, '[11, 22, 33]'));
@@ -143,6 +144,9 @@
   add('Flow & modules', 'if / else', 'if(1>2) cube(1); else sphere(2);', H => (H.typeCount('sphere') === 1 && H.typeCount('cube') === 0) || 'wrong branch');
   add('Flow & modules', 'let block (statement)', 'let(s=4) cube(s);', H => H.typeCount('cube') === 1 || 'no cube');
   add('Flow & modules', 'user module', 'module box(){ cube(3);} box();', H => H.typeCount('cube') === 1 || 'module did not expand');
+  add('Flow & modules', 'module instances tagged with name', 'module box(){ cube(3);} box(); box();',
+    H => (H.flat.filter(n => n.kind === 'group' && n.module === 'box').length === 2)
+      || ('expected 2 module-tagged groups, got ' + H.flat.filter(n => n.kind === 'group' && n.module === 'box').length));
   add('Flow & modules', 'module default/named args', 'module b(w=2,h=3){ cube([w,h,1]);} b(h=5);', H => H.typeCount('cube') === 1 || 'no cube');
   add('Flow & modules', 'children()', 'module wrap(){ children();} wrap() sphere(2);', H => H.typeCount('sphere') === 1 || 'children() did not pass through');
   add('Flow & modules', '$children count', 'module c(){ echo($children);} c(){ cube(1); sphere(1);}', H => H.eq(0, '2'));
@@ -415,6 +419,104 @@
       }
       if (ok) passed++;
       cases.push({ name: 'primitive feature-edge fill emits + defines module', ok, detail, src: 'tube + rim fillet → edge_round_in' });
+    }
+    // `// @github:` import tag (v0.57.0, restored v0.63.0): the tag scanner reads
+    // "// @github: owner/repo" directly above an include/use into {spec, file} pairs.
+    {
+      let ok = false, detail = '';
+      if (!haveEditor || typeof editor.scanGithubImportTags !== 'function') { detail = 'scanGithubImportTags missing'; }
+      else {
+        try {
+          const tags = editor.scanGithubImportTags('// @github: morganp/OpenSCAD_hinge\ninclude <../OpenSCAD_hinge/hinge_library.scad>\n// @github: o/r@v1\nuse <lib.scad>');
+          ok = tags.length === 2 && tags[0].spec === 'morganp/OpenSCAD_hinge' && tags[0].file === 'hinge_library.scad'
+            && tags[1].spec === 'o/r@v1' && tags[1].file === 'lib.scad';
+          if (!ok) detail = 'parsed ' + JSON.stringify(tags);
+        } catch (e) { detail = 'threw: ' + (e && e.message || e); }
+      }
+      if (ok) passed++;
+      cases.push({ name: '@github import tag scan', ok, detail, src: '// @github: owner/repo ↵ include <lib.scad>' });
+    }
+    // header extraction (custom shapes, v0.59.0/restored v0.63.0): include/use lines + their
+    // contiguous @github tag comments survive verbatim for regenCode re-emission.
+    {
+      let ok = false, detail = '';
+      if (!haveEditor || typeof editor.extractHeaders !== 'function') { detail = 'extractHeaders missing'; }
+      else {
+        try {
+          const h = editor.extractHeaders('// @github: o/r\ninclude <lib.scad>\ncube(5);\nuse <other.scad>');
+          ok = h.length === 3 && h[0] === '// @github: o/r' && h[1] === 'include <lib.scad>' && h[2] === 'use <other.scad>';
+          if (!ok) detail = 'extracted ' + JSON.stringify(h);
+        } catch (e) { detail = 'threw: ' + (e && e.message || e); }
+      }
+      if (ok) passed++;
+      cases.push({ name: 'include/use headers extracted with @github tags', ok, detail, src: 'include <lib.scad> + tag comment' });
+    }
+    // custom shapes (library-module instances, v0.59.0/restored v0.63.0): with a loaded library
+    // defining capsule(), `include + capsule();` classifies SIMPLE, parses to a 'custom' authoring
+    // node, and the regenerated program keeps the include header + the verbatim call.
+    {
+      let ok = false, detail = '';
+      if (!haveEditor || typeof editor.knownLibModules !== 'function') { detail = 'knownLibModules missing'; }
+      else {
+        const savedFiles = editor._scadFiles, savedSet = editor._customSet, savedHeaders = editor.headers;
+        try {
+          editor._scadFiles = new Map([['conf_lib.scad', { name: 'conf_lib.scad', key: 'conf_lib.scad', source: 'module capsule(radius=5, length=20){ sphere(radius); }', lines: 1 }]]);
+          const src = 'include <conf_lib.scad>\ntranslate([5, 6, 7]) capsule(radius = 4, length = 12);';
+          const pp = window.ScadEngine.parse(src);
+          const adv = editor.isAdvanced(pp.ast);
+          editor._customSet = editor.knownLibModules(pp.ast);
+          editor.headers = editor.extractHeaders(src);
+          const parsed = editor.parseScad(src);
+          const n = (parsed.tree || [])[0];
+          const nodeOk = !!(n && n.type === 'custom' && n.name === 'capsule' && /radius = 4/.test(n.argsSrc) && n.pos[0] === 5);
+          // emit through the real emitter: verbatim call + translate prefix
+          const out = [];
+          editor.emitNode(editor.buildNodeFromParsed(n), 0, out);
+          const code = out.join('\n');
+          const emitOk = /capsule\(radius = 4, length = 12\);/.test(code) && /translate\(\[5, 6, 7\]\)/.test(code);
+          ok = adv === false && nodeOk && emitOk;
+          if (!ok) detail = 'advanced=' + adv + ' node=' + nodeOk + ' emit=' + emitOk + (nodeOk ? '' : ' tree=' + JSON.stringify(parsed.tree).slice(0, 120)) + (emitOk ? '' : ' code=' + code.slice(0, 160));
+        } catch (e) { detail = 'threw: ' + (e && e.message || e); }
+        finally { editor._scadFiles = savedFiles; editor._customSet = savedSet; editor.headers = savedHeaders; }
+      }
+      if (ok) passed++;
+      cases.push({ name: 'custom shape: lib module call stays GUI-simple + emits verbatim', ok, detail, src: 'include <lib.scad> ↵ translate([5,6,7]) capsule(...);' });
+    }
+    // without the library loaded the same call must stay ADVANCED (engine path)
+    {
+      let ok = false, detail = '';
+      if (!haveEditor || typeof editor.isAdvanced !== 'function') { detail = 'editor unavailable'; }
+      else {
+        const savedFiles = editor._scadFiles;
+        try {
+          editor._scadFiles = new Map();
+          const pp = window.ScadEngine.parse('include <conf_lib.scad>\ncapsule(radius = 4);');
+          ok = editor.isAdvanced(pp.ast) === true;
+          if (!ok) detail = 'unknown module classified simple';
+        } catch (e) { detail = 'threw: ' + (e && e.message || e); }
+        finally { editor._scadFiles = savedFiles; }
+      }
+      if (ok) passed++;
+      cases.push({ name: 'custom shape: unknown module stays advanced', ok, detail, src: 'capsule(); with no library loaded' });
+    }
+    // deep-link URL parsing (v0.58.0, re-implemented v0.62.0): all four accepted ?github= forms
+    // reduce to owner/repo/ref/path; exercised via parseGithubSpec + the loader's URL regex.
+    {
+      let ok = false, detail = '';
+      if (!haveEditor || typeof editor.parseGithubSpec !== 'function') { detail = 'parseGithubSpec missing'; }
+      else {
+        try {
+          const a = editor.parseGithubSpec('morganp/OpenSCAD_case');
+          const b = editor.parseGithubSpec('morganp/OpenSCAD_case@v1.2/sub/dir');
+          const c = editor.parseGithubSpec('https://github.com/morganp/OpenSCAD_case/tree/main/examples');
+          ok = !!(a && a.owner === 'morganp' && a.repo === 'OpenSCAD_case'
+            && b && b.ref === 'v1.2' && b.subdir === 'sub/dir'
+            && c && c.ref === 'main' && c.subdir === 'examples');
+          if (!ok) detail = JSON.stringify({ a, b, c });
+        } catch (e) { detail = 'threw: ' + (e && e.message || e); }
+      }
+      if (ok) passed++;
+      cases.push({ name: 'github spec grammar (deep link + library dialog)', ok, detail, src: 'owner/repo[@ref][/subdir] + github.com URLs' });
     }
     return { name: 'GUI classification', passed, total: cases.length, cases };
   }

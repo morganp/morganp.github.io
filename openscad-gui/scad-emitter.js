@@ -137,6 +137,17 @@
     function emitPrimitive(s, level, out) {
       const F = (n) => fmt(n);
       const pad = ind(level);
+      // custom module instance: translate/rotate/scale prefixes + the call with its raw args verbatim
+      if (s.type === 'custom') {
+        out.push(pad + '// ' + s.label);
+        out.push(pad + `translate([${posTok(s, 'px')}, ${posTok(s, 'py')}, ${posTok(s, 'pz')}])`);
+        { const rl = rotLine(s, pad); if (rl) out.push(rl); }
+        if (s.scl && (s.scl[0] !== 1 || s.scl[1] !== 1 || s.scl[2] !== 1)) {
+          out.push(pad + `scale([${F(s.scl[0])}, ${F(s.scl[1])}, ${F(s.scl[2])}])`);
+        }
+        out.push(pad + '  ' + s.name + '(' + (s.argsSrc || '') + ');');
+        return;
+      }
       const segTreats = Object.values(s.edgeTreatments || {}).filter(t => t.segs && t.segs.length);
       if (segTreats.length) { emitPrimitiveWithEdges(s, segTreats, level, out); return; }
       const treats = Object.entries(namedTreats(s));
