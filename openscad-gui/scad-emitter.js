@@ -24,7 +24,7 @@
   window.ScadEmitter = function (ctx) {
     const fmt = ctx.fmt, gfn = ctx.gfn, isGroup = ctx.isGroup, isExtrude = ctx.isExtrude,
       cylProfile = ctx.cylProfile, edgeMatrix = ctx.edgeMatrix,
-      groupEdgeMatrix = ctx.groupEdgeMatrix, matStr = ctx.matStr;
+      groupEdgeMatrix = ctx.groupEdgeMatrix, matStr = ctx.matStr, namedTreats = ctx.namedTreats;
 
     function ind(level) { return '  '.repeat(level); }
 
@@ -96,21 +96,50 @@
       return pad + `rotate([${F(r[0])}, ${F(r[1])}, ${F(r[2])}])`;
     }
 
+    // Slice 5 for feature primitives (tube/wedge/reflex-polygon): wrap the placed base with the same
+    // convex (difference) / concave (union) edge tools the group path uses. Convex named-edge output
+    // (cuboid/cylinder) is unaffected — those carry no seg treatments and never reach here.
+    function emitPrimitiveWithEdges(s, ets, level, out) {
+      const F = (n) => fmt(n);
+      const pad = ind(level);
+      const is2D = s.type === 'circle' || s.type === 'square' || s.type === 'polygon';
+      const pzTok = is2D && !(s.expr && s.expr.pz) ? '0' : posTok(s, 'pz');
+      const pos = `[${posTok(s, 'px')}, ${posTok(s, 'py')}, ${pzTok}]`;
+      const convex = ets.filter(t => t.convex), concave = ets.filter(t => !t.convex);
+      const emitTool = (t, lvl) => {
+        const p = ind(lvl);
+        const mod = t.convex ? (t.type === 'fillet' ? 'edge_fillet' : 'edge_chamfer') : (t.type === 'fillet' ? 'edge_round_in' : 'edge_chamfer_in');
+        out.push(p + `// ${t.convex ? 'convex' : 'concave'} ${t.type} r=${F(t.size)}`);
+        for (const seg of t.segs) {
+          const M = groupEdgeMatrix(seg, t.size, t.convex);
+          out.push(p + `multmatrix(${matStr(M)})`);
+          out.push(p + `  ${mod}(${F(seg.len + 0.04)}, ${F(t.size)});`);
+        }
+      };
+      const emitBase = (lvl) => { const p = ind(lvl); out.push(p + baseCall(s).replace(/\n/g, '\n' + p) + ';'); };
+      const diffBlock = (lvl) => {
+        if (!convex.length) { emitBase(lvl); return; }
+        const p = ind(lvl);
+        out.push(p + 'difference() {');
+        emitBase(lvl + 1);
+        for (const t of convex) emitTool(t, lvl + 1);
+        out.push(p + '}');
+      };
+      out.push(pad + '// ' + s.label);
+      out.push(pad + `translate(${pos})`);
+      { const rl = rotLine(s, pad); if (rl) out.push(rl); }
+      if (!concave.length) { diffBlock(level); return; }
+      out.push(pad + 'union() {');
+      diffBlock(level + 1);
+      for (const t of concave) emitTool(t, level + 1);
+      out.push(pad + '}');
+    }
     function emitPrimitive(s, level, out) {
       const F = (n) => fmt(n);
       const pad = ind(level);
-      // custom module instance: translate/rotate/scale prefixes + the call with its raw args verbatim
-      if (s.type === 'custom') {
-        out.push(pad + '// ' + s.label);
-        out.push(pad + `translate([${posTok(s, 'px')}, ${posTok(s, 'py')}, ${posTok(s, 'pz')}])`);
-        { const rl = rotLine(s, pad); if (rl) out.push(rl); }
-        if (s.scl && (s.scl[0] !== 1 || s.scl[1] !== 1 || s.scl[2] !== 1)) {
-          out.push(pad + `scale([${F(s.scl[0])}, ${F(s.scl[1])}, ${F(s.scl[2])}])`);
-        }
-        out.push(pad + '  ' + s.name + '(' + (s.argsSrc || '') + ');');
-        return;
-      }
-      const treats = Object.entries(s.treatments || {});
+      const segTreats = Object.values(s.edgeTreatments || {}).filter(t => t.segs && t.segs.length);
+      if (segTreats.length) { emitPrimitiveWithEdges(s, segTreats, level, out); return; }
+      const treats = Object.entries(namedTreats(s));
       const is2D = s.type === 'circle' || s.type === 'square' || s.type === 'polygon';
       // 2D shapes carry a small viewport-only z lift (restingPos 0.3) to avoid z-fighting the floor;
       // never emit it — OpenSCAD 2D geometry lives at z=0 and extrudes ignore the source z anyway.
@@ -188,12 +217,12 @@
       return `cylinder(h = ${dimTok(s, 'h')}, r1 = ${dimTok(s, 'r1')}, r2 = ${dimTok(s, 'r2')}, center = true${fn})`;
     }
     function cylinderScad(s) {
-      const pts = cylProfile(s.dims.r, s.dims.r2 != null ? s.dims.r2 : s.dims.r, s.dims.h, s.treatments || {});
+      const pts = cylProfile(s.dims.r, s.dims.r2 != null ? s.dims.r2 : s.dims.r, s.dims.h, namedTreats(s));
       const poly = pts.map(p => `[${fmt(p[0])}, ${fmt(p[1])}]`).join(', ');
       const note = (s.expr && (s.expr.d || s.expr.h)) ? '  // note: treated cylinder \u2014 dimensions baked numerically\n    ' : '';
       return `${note}rotate_extrude()\n    polygon([${poly}])`;
     }
 
-    return { emitNode, emitPrimitive, emitGroupWithEdges, rotLine, baseCall, cylinderScad, dimTok, posTok, ind };
+    return { emitNode, emitPrimitive, emitPrimitiveWithEdges, emitGroupWithEdges, rotLine, baseCall, cylinderScad, dimTok, posTok, ind };
   };
 })();
