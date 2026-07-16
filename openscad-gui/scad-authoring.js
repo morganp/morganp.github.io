@@ -338,10 +338,15 @@
     const noMods = stripModules(clean);
     // 1) parameter assignments: NAME = <arithmetic> ;  (skip module-call RHS)
     const vars = []; const vmap = {};
+    // prefix paren depth, so a named arg starting a line inside a multi-line call
+    // (e.g. "length = 100," in piano_hinge(...)) is not mistaken for a parameter
+    const depth = new Array(noMods.length + 1);
+    { let d = 0; depth[0] = 0; for (let k = 0; k < noMods.length; k++) { const c = noMods[k]; if (c === '(') d++; else if (c === ')') d = Math.max(0, d - 1); depth[k + 1] = d; } }
     const varRe = /(?:^|\n)\s*([A-Za-z_]\w*)\s*=\s*([^;{}]+);/g;
     let vm;
     while ((vm = varRe.exec(noMods)) !== null) {
       const name = vm[1], rhs = vm[2].trim();
+      if (depth[vm.index] > 0) continue;
       if (ctx.reserved(name)) continue;
       if (/[A-Za-z_]\w*\s*\(/.test(rhs)) continue;       // RHS is a call, not a parameter
       if (vars.some(v => v.name === name)) continue;
