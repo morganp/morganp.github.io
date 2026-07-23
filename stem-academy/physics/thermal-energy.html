@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Thermal Energy">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="physics.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">PHYSICS</a> / THERMAL ENERGY</span>
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← PHYSICS MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// HEATING, STORING & CHANGING STATE — LEVEL L2 → L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Thermal energy</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">Pour energy into something and it usually gets hotter — but how much hotter depends on what it's made of and how much there is. And at a melting or boiling point, the temperature stops rising even as you keep heating. Explore both with the specific-heat sandbox and the heating curve.</div>
+  </div>
+
+  <!-- FIG 01 — specific heat sandbox -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — SPECIFIC HEAT SANDBOX: E = m·c·Δθ</div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <sc-for list="{{ materials }}" as="m" hint-placeholder-count="4">
+          <div onClick="{{ m.onPick }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; padding: 9px 12px; border: 1.5px solid #2b2620; background: {{ m.bg }}; color: {{ m.fg }}; cursor: pointer; min-height: 40px; box-sizing: border-box; display: flex; align-items: center;">{{ m.name }}</div>
+        </sc-for>
+      </div>
+      <svg viewBox="0 0 420 170" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <rect x="40" y="30" width="90" height="120" rx="4" fill="none" stroke="#2b2620" stroke-width="2"></rect>
+        <rect x="44" y="{{ fillY }}" width="82" height="{{ fillH }}" fill="{{ matColor }}" opacity="0.8"></rect>
+        <rect x="300" y="20" width="26" height="130" rx="13" fill="#fff" stroke="#2b2620" stroke-width="2"></rect>
+        <rect x="304" y="{{ thermoY }}" width="18" height="{{ thermoH }}" fill="#c0392b"></rect>
+        <circle cx="313" cy="150" r="16" fill="#c0392b" stroke="#2b2620" stroke-width="2"></circle>
+        <text x="360" y="{{ thermoLabelY }}" font-family="IBM Plex Mono" font-size="13" font-weight="600" fill="#c0392b">{{ finalTemp }}°C</text>
+        <text x="85" y="166" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">{{ matName }}</text>
+      </svg>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">MASS m: {{ mass }} kg</span><input type="range" min="1" max="5" step="1" value="{{ mass }}" onInput="{{ onMass }}" style="accent-color: #e8590c; height: 24px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">ENERGY IN: {{ energyKJ }} kJ</span><input type="range" min="20" max="400" step="20" value="{{ energy }}" onInput="{{ onEnergy }}" style="accent-color: #e8590c; height: 24px;"></div>
+      </div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">TEMPERATURE RISE</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;">Δθ = E ÷ (m × c)</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; color: #c0392b;">+{{ deltaT }} °C</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">c ({{ matName }}) = {{ cVal }} J/kg°C</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">{{ shcNote }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — heating curve -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 02 — HEATING CURVE: ICE → WATER → STEAM</div>
+      <svg viewBox="0 0 420 240" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <line x1="46" y1="210" x2="404" y2="210" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="46" y1="16" x2="46" y2="210" stroke="#2b2620" stroke-width="2"></line>
+        <polyline points="46,190 120,150 200,150 300,60 360,60 396,30" fill="none" stroke="#d8d0c4" stroke-width="1.5"></polyline>
+        <polyline points="{{ heatProgress }}" fill="none" stroke="#e8590c" stroke-width="3"></polyline>
+        <line x1="120" y1="150" x2="200" y2="150" stroke="#2a6fb0" stroke-width="4"></line>
+        <line x1="300" y1="60" x2="360" y2="60" stroke="#7048a8" stroke-width="4"></line>
+        <circle cx="{{ heatDotX }}" cy="{{ heatDotY }}" r="6" fill="#c0392b" stroke="#2b2620" stroke-width="1.5"></circle>
+        <text x="205" y="238" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">ENERGY ADDED (time) →</text>
+        <text x="56" y="26" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">TEMP (°C)</text>
+        <text x="160" y="144" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#2a6fb0">melting (0°C)</text>
+        <text x="330" y="54" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#7048a8">boiling (100°C)</text>
+      </svg>
+      <input type="range" min="0" max="100" step="1" value="{{ heatT }}" onInput="{{ onHeat }}" style="accent-color: #e8590c; width: 100%; height: 26px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">Drag to add energy over time.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: {{ phaseBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 8px; border: 1.5px solid #2b2620; background: #e8590c; color: #faf6ef; align-self: flex-start;">{{ phaseTag }}</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px;">{{ phaseName }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #3a3229;">{{ phaseDesc }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid rgba(43,38,32,0.2); padding-top: 10px;">{{ latentNote }}</div>
+    </div>
+  </div>
+
+  <!-- theory -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">SPECIFIC HEAT CAPACITY (c)</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">The energy needed to raise 1 kg of a substance by 1 °C. Water's is huge (4200 J/kg°C) — it soaks up loads of energy for a small temperature rise, which is why the sea warms slowly and water makes a good coolant. Metals have small c, so they heat up fast.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">LATENT HEAT (the flat parts)</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">On the flat sections the energy goes into breaking bonds to change state — not into raising the temperature. That hidden ("latent") energy is E = m·L. It's why steam scalds so badly: it dumps all its latent heat back as it condenses on your skin.</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zgf97p3" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Particle model &amp; energy ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Specific_heat_capacity" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Specific heat capacity ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Latent_heat" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Latent heat ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="pressure.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Related: Particle Model &amp; Pressure →</a>
+    <a href="energy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Related: Energy Stores &amp; Transfers →</a>
+    <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Physics map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>PHYSICS / THERMAL ENERGY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { material: "water", mass: 2, energy: 200, heatT: 20, seenΔ: false, seenLatent: false };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("thermal-energy"); }
+
+  _materials() {
+    return {
+      water: { name: "Water", c: 4200, color: "#2a6fb0", note: "Water's specific heat is the highest of everyday materials — it barely warms for the energy you add." },
+      aluminium: { name: "Aluminium", c: 900, color: "#9aa0a6", note: "A metal — low c, so it heats up several times faster than the same mass of water." },
+      copper: { name: "Copper", c: 385, color: "#b0472e", note: "Even lower c — copper heats extremely quickly, which is why it's used for heat sinks and pans." },
+      oil: { name: "Cooking oil", c: 2000, color: "#c99a2e", note: "Between water and metal — oil heats about twice as fast as water, so a chip pan gets dangerously hot quickly." },
+    };
+  }
+
+  _check() {
+    if (this.state.seenΔ && this.state.seenLatent && window.Progress) {
+      window.Progress.markCompleted("thermal-energy", { via: "shc-and-latent" });
+    }
+  }
+
+  renderVals() {
+    const mats = this._materials();
+    const mat = mats[this.state.material];
+    const energyJ = this.state.energy * 1000; // kJ -> J
+    const deltaT = energyJ / (this.state.mass * mat.c);
+    const startTemp = 15;
+    const finalTemp = Math.min(999, startTemp + deltaT);
+
+    const materials = Object.keys(mats).map(k => ({
+      name: mats[k].name, bg: this.state.material === k ? "#e8590c" : "#faf6ef", fg: this.state.material === k ? "#faf6ef" : "#2b2620",
+      onPick: () => { this.setState({ material: k, seenΔ: true }, () => this._check()); },
+    }));
+
+    // beaker fill by mass
+    const fillH = this.state.mass * 22;
+    const fillY = 150 - fillH;
+    // thermometer 0..120 mapped
+    const tclamp = Math.max(0, Math.min(120, finalTemp));
+    const thermoH = (tclamp / 120) * 120;
+    const thermoY = 140 - thermoH;
+
+    // heating curve: heatT 0..100 drives a dot along the polyline
+    const segs = [
+      { x0: 46, y0: 190, x1: 120, y1: 150, t0: 0, t1: 22, phase: "solid" },
+      { x0: 120, y0: 150, x1: 200, y1: 150, t0: 22, t1: 45, phase: "melting" },
+      { x0: 200, y0: 150, x1: 300, y1: 60, t0: 45, t1: 68, phase: "liquid" },
+      { x0: 300, y0: 60, x1: 360, y1: 60, t0: 68, t1: 90, phase: "boiling" },
+      { x0: 360, y0: 60, x1: 396, y1: 30, t0: 90, t1: 100, phase: "gas" },
+    ];
+    const ht = this.state.heatT;
+    let seg = segs[0];
+    for (const s of segs) { if (ht >= s.t0) seg = s; }
+    const frac = (ht - seg.t0) / (seg.t1 - seg.t0);
+    const dotX = seg.x0 + (seg.x1 - seg.x0) * Math.max(0, Math.min(1, frac));
+    const dotY = seg.y0 + (seg.y1 - seg.y0) * Math.max(0, Math.min(1, frac));
+    // progress polyline up to dot
+    let prog = "46,190";
+    for (const s of segs) {
+      if (ht >= s.t1) prog += " " + s.x1 + "," + s.y1;
+      else if (ht > s.t0) { prog += " " + dotX.toFixed(1) + "," + dotY.toFixed(1); break; }
+    }
+
+    if ((seg.phase === "melting" || seg.phase === "boiling") && !this.state.seenLatent) {
+      setTimeout(() => { if (!this.state.seenLatent) this.setState({ seenLatent: true }, () => this._check()); }, 0);
+    }
+
+    const phaseData = {
+      solid: { tag: "SOLID", name: "Heating ice", desc: "Energy raises the temperature — particles vibrate faster in a fixed lattice. The line slopes up.", bg: "#eef2f6", latent: "Temperature rising: E = mcΔθ." },
+      melting: { tag: "CHANGING STATE", name: "Melting (flat line)", desc: "At 0 °C the temperature STOPS rising even though you keep heating. All the energy is breaking bonds between ice particles.", bg: "#e4edf5", latent: "Latent heat of FUSION: E = mL (temperature constant)." },
+      liquid: { tag: "LIQUID", name: "Heating water", desc: "Bonds are looser now. Temperature climbs again — and slowly, because water's specific heat is high.", bg: "#e4edf5", latent: "Temperature rising: E = mcΔθ." },
+      boiling: { tag: "CHANGING STATE", name: "Boiling (flat line)", desc: "At 100 °C the temperature stalls again. Energy goes into tearing every particle free into gas.", bg: "#efe6f2", latent: "Latent heat of VAPORISATION: E = mL (temperature constant)." },
+      gas: { tag: "GAS", name: "Heating steam", desc: "Now free particles — temperature rises steeply once more.", bg: "#efe6f2", latent: "Temperature rising: E = mcΔθ." },
+    };
+    const p = phaseData[seg.phase];
+
+    return {
+      materials, matName: mat.name, matColor: mat.color, cVal: mat.c,
+      mass: this.state.mass, onMass: e => this.setState({ mass: +e.target.value, seenΔ: true }, () => this._check()),
+      energy: this.state.energy, energyKJ: this.state.energy, onEnergy: e => this.setState({ energy: +e.target.value, seenΔ: true }, () => this._check()),
+      deltaT: deltaT.toFixed(1), finalTemp: finalTemp.toFixed(0),
+      fillY: fillY.toFixed(0), fillH: fillH.toFixed(0), thermoY: thermoY.toFixed(1), thermoH: thermoH.toFixed(1),
+      thermoLabelY: Math.max(28, thermoY + 4).toFixed(0),
+      shcNote: mat.note,
+      heatT: ht, onHeat: e => this.setState({ heatT: +e.target.value }),
+      heatProgress: prog, heatDotX: dotX.toFixed(1), heatDotY: dotY.toFixed(1),
+      phaseTag: p.tag, phaseName: p.name, phaseDesc: p.desc, phaseBg: p.bg, latentNote: p.latent,
+    };
+  }
+}
+</script>
+</body>
+</html>

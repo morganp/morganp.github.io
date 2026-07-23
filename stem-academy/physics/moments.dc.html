@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Moments & Turning Forces">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="physics.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">PHYSICS</a> / MOMENTS &amp; TURNING FORCES</span>
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← PHYSICS MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// THE TURNING EFFECT OF A FORCE — LEVEL L2 → L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Moments &amp; turning forces</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">A small child can balance a heavy adult on a seesaw — if they sit far enough out. That's a moment: a turning effect that depends on both the force AND how far from the pivot it acts. Balance the beam, then see why a long spanner loosens a stubborn bolt.</div>
+  </div>
+
+  <!-- FIG 01 — balance beam -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.62fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — BALANCE THE SEESAW (start: L2 → the maths: L3)</div>
+      <svg viewBox="0 0 460 220" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <line x1="30" y1="170" x2="430" y2="170" stroke="#c9c0b2" stroke-width="1"></line>
+        <g transform="rotate({{ tilt }}, 230, 150)">
+          <rect x="40" y="145" width="380" height="10" fill="#5a4a33" stroke="#2b2620" stroke-width="1.5"></rect>
+          <rect x="{{ leftX }}" y="{{ leftBoxY }}" width="{{ leftW }}" height="{{ leftH }}" fill="#c0392b" stroke="#2b2620" stroke-width="2"></rect>
+          <rect x="{{ rightX }}" y="{{ rightBoxY }}" width="{{ rightW }}" height="{{ rightH }}" fill="#2a6fb0" stroke="#2b2620" stroke-width="2"></rect>
+          <sc-for list="{{ pivotTicks }}" as="t" hint-placeholder-count="8">
+            <line x1="{{ t.x }}" y1="147" x2="{{ t.x }}" y2="153" stroke="#faf6ef" stroke-width="1"></line>
+          </sc-for>
+        </g>
+        <polygon points="230,150 205,205 255,205" fill="#2b2620"></polygon>
+        <text x="230" y="200" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#faf6ef">pivot</text>
+      </svg>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div style="display: flex; flex-direction: column; gap: 8px; border-right: 1.5px dashed #d8d0c4; padding-right: 12px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #c0392b;">LEFT (red)</div>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">FORCE {{ lForce }} N</span><input type="range" min="1" max="8" step="1" value="{{ lMass }}" onInput="{{ onLMass }}" style="accent-color: #c0392b; height: 24px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">DISTANCE {{ lDist }} m</span><input type="range" min="1" max="4" step="0.5" value="{{ lDist }}" onInput="{{ onLDist }}" style="accent-color: #c0392b; height: 24px;"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #2a6fb0;">RIGHT (blue)</div>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">FORCE {{ rForce }} N</span><input type="range" min="1" max="8" step="1" value="{{ rMass }}" onInput="{{ onRMass }}" style="accent-color: #2a6fb0; height: 24px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">DISTANCE {{ rDist }} m</span><input type="range" min="1" max="4" step="0.5" value="{{ rDist }}" onInput="{{ onRDist }}" style="accent-color: #2a6fb0; height: 24px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: {{ balanceBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">MOMENT = FORCE × DISTANCE</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #c0392b;">ANTICLOCKWISE (left)</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px; color: #c0392b;">{{ lForce }} × {{ lDist }} = {{ lMoment }} N·m</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2a6fb0;">CLOCKWISE (right)</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px; color: #2a6fb0;">{{ rForce }} × {{ rDist }} = {{ rMoment }} N·m</div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: {{ balanceColor }}; border-top: 1.5px solid rgba(43,38,32,0.2); padding-top: 12px;">{{ balanceMsg }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156;">BALANCES FOUND: {{ balanceCount }} / 3</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — spanner -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — WHY A LONG SPANNER WINS</div>
+      <svg viewBox="0 0 420 160" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <circle cx="70" cy="80" r="22" fill="#8a7f70" stroke="#2b2620" stroke-width="2"></circle>
+        <circle cx="70" cy="80" r="9" fill="#5a4a33" stroke="#2b2620" stroke-width="1.5"></circle>
+        <rect x="70" y="72" width="{{ spannerLen }}" height="16" fill="#b0a393" stroke="#2b2620" stroke-width="2"></rect>
+        <line x1="{{ handX }}" y1="80" x2="{{ handX }}" y2="{{ forceEndY }}" stroke="#e8590c" stroke-width="3"></line>
+        <polygon points="{{ forceArrow }}" fill="#e8590c"></polygon>
+        <text x="{{ handX }}" y="140" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#e8590c">push (same force)</text>
+      </svg>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">SPANNER LENGTH</span>
+        <input type="range" min="80" max="300" step="10" value="{{ spannerRaw }}" onInput="{{ onSpanner }}" style="accent-color: #e8590c; flex: 1; min-width: 130px; height: 26px;">
+        <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: #e8590c;">{{ spannerMoment }} N·m</span>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: #554c42;">Same push, longer handle → bigger distance from the bolt → bigger moment. That's why a long spanner (or a door handle far from its hinge) turns things so much more easily.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">THE PRINCIPLE OF MOMENTS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #554c42;">When something is balanced (in equilibrium), the total <strong>clockwise</strong> moment equals the total <strong>anticlockwise</strong> moment about the pivot. Levers and gears use this to trade force for distance: push a long lever a long way with a small force to shift a big load a short way.</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">Moment is measured in newton-metres (N·m). Distance is the PERPENDICULAR distance from the pivot to the line of the force.</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zsfgr82" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Moments, levers &amp; gears ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Torque" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Moment (torque) ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Lever" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Lever ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="thermal-energy.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Thermal Energy (L3) →</a>
+    <a href="simple-machines.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Intro: Simple Machines (L1) →</a>
+    <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Physics map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>PHYSICS / MOMENTS &amp; TURNING FORCES</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { lMass: 4, lDist: 3, rMass: 6, rDist: 2, spanner: 150, balanced: {} };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("moments"); }
+
+  _register(lm, ld, rm, rd) {
+    if (lm * ld === rm * rd) {
+      const key = ld + ":" + rd;
+      if (!this.state.balanced[key]) {
+        const balanced = { ...this.state.balanced, [key]: true };
+        if (Object.keys(balanced).length >= 3 && window.Progress) window.Progress.markCompleted("moments", { via: "balance-beam" });
+        this.setState({ balanced });
+      }
+    }
+  }
+  set(patch) {
+    const s = { ...this.state, ...patch };
+    this.setState(patch, () => this._register(s.lMass, s.lDist, s.rMass, s.rDist));
+  }
+
+  renderVals() {
+    const lForce = this.state.lMass, rForce = this.state.rMass;
+    const lMoment = lForce * this.state.lDist, rMoment = rForce * this.state.rDist;
+    const net = rMoment - lMoment; // >0 tips clockwise (right down)
+    const tilt = Math.max(-14, Math.min(14, net * 0.9));
+    const balanced = Math.abs(net) < 0.001;
+
+    // beam geometry: pivot at (230,150), 1 m = 44 px
+    const pxPerM = 44;
+    const leftCX = 230 - this.state.lDist * pxPerM;
+    const rightCX = 230 + this.state.rDist * pxPerM;
+    const leftW = 20 + lForce * 3, leftH = 20 + lForce * 6;
+    const rightW = 20 + rForce * 3, rightH = 20 + rForce * 6;
+
+    const pivotTicks = [];
+    for (let m = -4; m <= 4; m++) { if (m !== 0) pivotTicks.push({ x: (230 + m * pxPerM).toFixed(0) }); }
+
+    // spanner
+    const spannerLen = this.state.spanner;
+    const handX = 70 + spannerLen;
+    const spForce = 20; // N constant
+    const spannerMoment = (spForce * (spannerLen / 100)).toFixed(0);
+    const forceEndY = 130;
+    const forceArrow = [handX + ",130", (handX - 5) + ",120", (handX + 5) + ",120"].join(" ");
+
+    let balanceMsg, balanceColor, balanceBg;
+    if (balanced) { balanceMsg = "⚖ BALANCED! Clockwise = anticlockwise moment."; balanceColor = "#2f7d3a"; balanceBg = "#eef4ea"; }
+    else if (net > 0) { balanceMsg = "Tips RIGHT — the clockwise moment is bigger."; balanceColor = "#2a6fb0"; balanceBg = "#fff"; }
+    else { balanceMsg = "Tips LEFT — the anticlockwise moment is bigger."; balanceColor = "#c0392b"; balanceBg = "#fff"; }
+
+    return {
+      tilt: tilt.toFixed(2),
+      leftX: (leftCX - leftW / 2).toFixed(1), leftBoxY: (150 - leftH).toFixed(1), leftW: leftW.toFixed(0), leftH: leftH.toFixed(0),
+      rightX: (rightCX - rightW / 2).toFixed(1), rightBoxY: (150 - rightH).toFixed(1), rightW: rightW.toFixed(0), rightH: rightH.toFixed(0),
+      pivotTicks,
+      lForce, rForce, lDist: this.state.lDist, rDist: this.state.rDist, lMass: this.state.lMass, rMass: this.state.rMass,
+      lMoment, rMoment,
+      onLMass: e => this.set({ lMass: +e.target.value }), onLDist: e => this.set({ lDist: +e.target.value }),
+      onRMass: e => this.set({ rMass: +e.target.value }), onRDist: e => this.set({ rDist: +e.target.value }),
+      balanceMsg, balanceColor, balanceBg, balanceCount: Object.keys(this.state.balanced).length,
+      spannerLen, spannerRaw: this.state.spanner, handX: handX.toFixed(0), forceEndY, forceArrow, spannerMoment,
+      onSpanner: e => this.setState({ spanner: +e.target.value }),
+    };
+  }
+}
+</script>
+</body>
+</html>

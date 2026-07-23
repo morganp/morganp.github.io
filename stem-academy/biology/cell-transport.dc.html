@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Transport in & out of cells">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="biology.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">BIOLOGY</a> / TRANSPORT IN &amp; OUT OF CELLS</span>
+      <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← BIOLOGY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// HOW SUBSTANCES CROSS THE MEMBRANE — LEVEL L2 → L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Getting in &amp; out of cells</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">Every cell is wrapped in a membrane that lets some things through and stops others. Oxygen, glucose, water and waste all cross it — by three different routes. Start with diffusion, then meet osmosis (the water special-case) and active transport (the uphill one that costs energy).</div>
+  </div>
+
+  <!-- FIG 01 — diffusion sim (L2 intro) -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — DIFFUSION (L2 START): PARTICLES SPREAD OUT</div>
+      <svg viewBox="0 0 460 220" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <line x1="230" y1="10" x2="230" y2="210" stroke="#d8d0c4" stroke-width="1" stroke-dasharray="4 4"></line>
+        <sc-for list="{{ dyeParticles }}" as="p" hint-placeholder-count="40">
+          <circle cx="{{ p.x }}" cy="{{ p.y }}" r="5" fill="#7048a8" opacity="0.8"></circle>
+        </sc-for>
+        <text x="115" y="204" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">start: crowded here</text>
+        <text x="345" y="204" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">spreads to fill evenly</text>
+      </svg>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <div onClick="{{ onDrop }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px 18px; border: 2px solid #e8590c; background: #e8590c; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">↺ DROP DYE AGAIN</div>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #554c42;">Particles move randomly, but the net flow is always from where they're crowded (high concentration) to where they're sparse (low) — until evenly spread.</span>
+      </div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">DIFFUSION</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #554c42;">The net movement of particles from a <strong>high</strong> to a <strong>low</strong> concentration, down the "concentration gradient". It's passive — no energy needed. Oxygen diffuses into your blood; carbon dioxide diffuses out.</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">FASTER WHEN: steeper gradient · higher temperature · bigger surface area · shorter distance</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — osmosis membrane (L3) -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 02 — OSMOSIS: WATER CROSSES A PARTIALLY-PERMEABLE MEMBRANE</div>
+      <svg viewBox="0 0 460 240" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <rect x="30" y="{{ leftWaterY }}" width="170" height="{{ leftWaterH }}" fill="#bcd9ee" opacity="0.8"></rect>
+        <rect x="260" y="{{ rightWaterY }}" width="170" height="{{ rightWaterH }}" fill="#bcd9ee" opacity="0.8"></rect>
+        <line x1="215" y1="20" x2="215" y2="220" stroke="#2b2620" stroke-width="3" stroke-dasharray="2 4"></line>
+        <line x1="245" y1="20" x2="245" y2="220" stroke="#2b2620" stroke-width="3" stroke-dasharray="2 4"></line>
+        <sc-for list="{{ soluteLeft }}" as="s" hint-placeholder-count="6">
+          <circle cx="{{ s.x }}" cy="{{ s.y }}" r="7" fill="#e8590c" stroke="#2b2620" stroke-width="1"></circle>
+        </sc-for>
+        <sc-for list="{{ soluteRight }}" as="s" hint-placeholder-count="12">
+          <circle cx="{{ s.x }}" cy="{{ s.y }}" r="7" fill="#e8590c" stroke="#2b2620" stroke-width="1"></circle>
+        </sc-for>
+        <line x1="230" y1="{{ arrowY }}" x2="{{ arrowTipX }}" y2="{{ arrowY }}" stroke="#2f7d3a" stroke-width="3"></line>
+        <polygon points="{{ arrowHead }}" fill="#2f7d3a"></polygon>
+        <rect x="18" y="10" width="18" height="14" fill="none"></rect>
+        <text x="115" y="234" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">LEFT: {{ leftLabel }}</text>
+        <text x="345" y="234" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#6b6156">RIGHT: {{ rightLabel }}</text>
+        <text x="230" y="16" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" fill="#2b2620">membrane</text>
+      </svg>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">RIGHT-SIDE SUGAR</span>
+        <input type="range" min="0" max="12" step="1" value="{{ rightSolute }}" onInput="{{ onSolute }}" style="accent-color: #e8590c; flex: 1; min-width: 140px; height: 26px;">
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: #2f7d3a;">{{ osmosisMsg }}</span>
+      </div>
+      <div style="display: flex; gap: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156; flex-wrap: wrap;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #bcd9ee; display: inline-block;"></span>water</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; border-radius: 50%; background: #e8590c; border: 1px solid #2b2620; display: inline-block;"></span>sugar (solute) — too big to cross</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 14px; height: 4px; background: #2f7d3a; display: inline-block;"></span>net water flow</span>
+      </div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">OSMOSIS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #554c42;">The diffusion of <strong>water</strong> across a partially-permeable membrane, from a <strong>dilute</strong> solution (lots of water) to a <strong>concentrated</strong> one (less water). The sugar can't cross — so the water moves instead, toward the sweeter side.</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">Balance the sugar on both sides and the net flow stops — the two sides are ISOTONIC.</div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — potato practical -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 03 — REQUIRED PRACTICAL: POTATO IN SUGAR SOLUTION</div>
+      <div style="position: relative;">
+        <svg viewBox="0 0 380 240" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+          <line x1="50" y1="120" x2="360" y2="120" stroke="#2b2620" stroke-width="1.5"></line>
+          <line x1="50" y1="20" x2="50" y2="220" stroke="#2b2620" stroke-width="2"></line>
+          <polyline points="{{ potatoLine }}" fill="none" stroke="#2f7d3a" stroke-width="2.5"></polyline>
+          <circle cx="{{ potatoMarkX }}" cy="{{ potatoMarkY }}" r="6" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></circle>
+          <circle cx="{{ isoX }}" cy="120" r="5" fill="none" stroke="#2b2620" stroke-width="2"></circle>
+          <text x="205" y="236" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">SUGAR CONCENTRATION (mol/dm³) →</text>
+          <text x="60" y="30" font-family="IBM Plex Mono" font-size="9" fill="#2f7d3a">% mass gain</text>
+          <text x="60" y="214" font-family="IBM Plex Mono" font-size="9" fill="#c0392b">% mass loss</text>
+          <text x="{{ isoX }}" y="112" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" fill="#2b2620">isotonic</text>
+        </svg>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">BEAKER CONC.</span>
+        <input type="range" min="0" max="10" step="1" value="{{ beaker }}" onInput="{{ onBeaker }}" style="accent-color: #2f7d3a; flex: 1; min-width: 130px; height: 26px;">
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: {{ potatoColor }};">{{ potatoMsg }}</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #8ce99a;">WHY THE POTATO CHANGES MASS</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.55; color: #e7ddcd;">In <strong>dilute</strong> sugar (weaker than the cell), water moves INTO the potato — it gains mass and gets firm. In <strong>concentrated</strong> sugar, water moves OUT — it loses mass and goes floppy. Where the line crosses zero, the solution matches the cell's own concentration: no net movement.</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8ce99a; border-top: 1.5px solid #574f45; padding-top: 10px;">{{ isoStatus }}</div>
+    </div>
+  </div>
+
+  <!-- FIG 04 — three routes compared -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 04 — THREE WAYS ACROSS THE MEMBRANE (click to compare)</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+      <sc-for list="{{ routes }}" as="r" hint-placeholder-count="3">
+        <div onClick="{{ r.onPick }}" style="border: 2px solid #2b2620; background: {{ r.bg }}; padding: 16px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; min-height: 44px; box-sizing: border-box;" style-hover="box-shadow: 4px 4px 0 rgba(43,38,32,0.2);">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 16px; color: {{ r.fg }};">{{ r.name }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ r.subFg }};">{{ r.gradient }}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ r.subFg }};">ENERGY: {{ r.energy }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px;">{{ routeName }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6; color: #554c42;">{{ routeDesc }}</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e8590c; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">IN THE BODY: {{ routeExample }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/z9223k7" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Cell transport ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Osmosis" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Osmosis ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Active_transport" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Active transport ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="organisation.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Organisation &amp; Enzymes (L3) →</a>
+    <a href="cells.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Back to: Cell Biology →</a>
+    <a href="biology.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Biology map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>BIOLOGY / TRANSPORT IN &amp; OUT OF CELLS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { dyePhase: 0, rightSolute: 8, beaker: 2, route: "diffusion", seenIso: false, seenRoutes: { diffusion: true } };
+
+  componentDidMount() {
+    if (window.Progress) window.Progress.markVisited("cell-transport");
+    this._t = setInterval(() => this.setState(s => ({ dyePhase: Math.min(1, s.dyePhase + 0.02) })), 40);
+    this._seedDye();
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+  _seedDye() {
+    this._dye = Array.from({ length: 38 }, () => ({
+      sx: 60 + Math.random() * 110, sy: 30 + Math.random() * 160,
+      ex: 40 + Math.random() * 390, ey: 20 + Math.random() * 180,
+    }));
+  }
+  dropAgain() { this._seedDye(); this.setState({ dyePhase: 0 }); }
+
+  _checkComplete() {
+    if (this.state.seenIso && Object.keys(this.state.seenRoutes).length >= 3 && window.Progress) {
+      window.Progress.markCompleted("cell-transport", { via: "osmosis-and-routes" });
+    }
+  }
+  pickRoute(r) {
+    const seenRoutes = { ...this.state.seenRoutes, [r]: true };
+    this.setState({ route: r, seenRoutes }, () => this._checkComplete());
+  }
+
+  renderVals() {
+    const ph = this.state.dyePhase;
+    const ease = 1 - Math.pow(1 - ph, 3);
+    const dye = this._dye || [];
+    const dyeParticles = dye.map(d => ({
+      x: (d.sx + (d.ex - d.sx) * ease).toFixed(1),
+      y: (d.sy + (d.ey - d.sy) * ease).toFixed(1),
+    }));
+
+    // osmosis: left = pure water (0 solute), right = rightSolute. Water flows toward higher solute (right).
+    const rs = this.state.rightSolute;
+    const ls = 0;
+    const diff = rs - ls; // >0 water moves right
+    const shift = diff * 3.2; // px of level change
+    const baseTop = 60, baseH = 150;
+    const leftWaterY = (baseTop + shift).toFixed(1);
+    const leftWaterH = (baseH - shift).toFixed(1);
+    const rightWaterY = (baseTop - shift).toFixed(1);
+    const rightWaterH = (baseH + shift).toFixed(1);
+    const soluteRight = Array.from({ length: rs }, (_, i) => ({
+      x: (270 + (i % 4) * 38).toFixed(0), y: (60 + Math.floor(i / 4) * 34).toFixed(0),
+    }));
+    const soluteLeft = [];
+    const arrowRight = diff > 0;
+    const arrowY = 130;
+    const arrowTipX = arrowRight ? 250 : 210;
+    const ah = arrowRight
+      ? [(arrowTipX) + "," + arrowY, (arrowTipX - 12) + "," + (arrowY - 6), (arrowTipX - 12) + "," + (arrowY + 6)].join(" ")
+      : [(arrowTipX) + "," + arrowY, (arrowTipX + 12) + "," + (arrowY - 6), (arrowTipX + 12) + "," + (arrowY + 6)].join(" ");
+    let osmosisMsg;
+    if (rs === 0) osmosisMsg = "Both sides pure water — no net flow.";
+    else osmosisMsg = "Water flows RIGHT → toward the sugary side";
+
+    // potato practical: line y = mass % change vs beaker conc. Cell internal ~ conc 4 (isotonic).
+    const isoConc = 4;
+    const toPx = (c, pct) => ({ x: 50 + (c / 10) * 310, y: 120 - pct * 5.2 });
+    const linePts = [];
+    for (let c = 0; c <= 10; c += 0.5) {
+      const pct = (isoConc - c) * 4.5; // + gain when beaker dilute, - loss when concentrated
+      const p = toPx(c, pct);
+      linePts.push(p.x.toFixed(1) + "," + p.y.toFixed(1));
+    }
+    const bk = this.state.beaker;
+    const bkPct = (isoConc - bk) * 4.5;
+    const mark = toPx(bk, bkPct);
+    const iso = toPx(isoConc, 0);
+    let potatoMsg, potatoColor;
+    if (Math.abs(bk - isoConc) < 0.5) { potatoMsg = "Isotonic! The beaker matches the potato cells — no net water movement, mass stays the same."; potatoColor = "#2f7d3a"; }
+    else if (bk < isoConc) { potatoMsg = "Dilute solution — water moves IN. The chip gains mass (" + bkPct.toFixed(0) + "%) and turns firm/turgid."; potatoColor = "#2a6fb0"; }
+    else { potatoMsg = "Concentrated solution — water moves OUT. The chip loses mass (" + bkPct.toFixed(0) + "%) and goes floppy/flaccid."; potatoColor = "#c0392b"; }
+
+    if (Math.abs(bk - isoConc) < 0.5 && !this.state.seenIso) {
+      // mark iso seen (defer to avoid setState in render): schedule
+      setTimeout(() => { if (!this.state.seenIso) this.setState({ seenIso: true }, () => this._checkComplete()); }, 0);
+    }
+    const isoStatus = this.state.seenIso ? "✓ You found the isotonic point (crossing zero)." : "Slide the beaker concentration until the line crosses zero to find the isotonic point.";
+
+    const routeData = {
+      diffusion: { name: "Diffusion", gradient: "HIGH → LOW", energy: "none (passive)", desc: "Any particle spreading down its concentration gradient. The membrane just lets it through — no help, no energy.", example: "oxygen into red blood cells; CO₂ out of cells into the lungs." },
+      osmosis: { name: "Osmosis", gradient: "water: DILUTE → CONCENTRATED", energy: "none (passive)", desc: "The special case for water only, across a partially-permeable membrane — from where water is plentiful to where it's scarce (lots of solute).", example: "water absorbed by plant root hair cells from the soil." },
+      active: { name: "Active transport", gradient: "LOW → HIGH (uphill!)", energy: "needs ATP (from respiration)", desc: "Pumping particles AGAINST the gradient — the only route that costs energy. Carrier proteins in the membrane do the work.", example: "root hairs absorbing mineral ions from dilute soil; the gut absorbing glucose back into the blood." },
+    };
+    const order = ["diffusion", "osmosis", "active"];
+    const routes = order.map(k => ({
+      name: routeData[k].name, gradient: routeData[k].gradient, energy: routeData[k].energy,
+      bg: this.state.route === k ? "#e8590c" : "#fff", fg: this.state.route === k ? "#faf6ef" : "#2b2620",
+      subFg: this.state.route === k ? "#ffe0d0" : "#6b6156",
+      onPick: () => this.pickRoute(k),
+    }));
+    const r = routeData[this.state.route];
+
+    return {
+      dyeParticles, onDrop: () => this.dropAgain(),
+      leftWaterY, leftWaterH, rightWaterY, rightWaterH, soluteLeft, soluteRight,
+      arrowY, arrowTipX, arrowHead: ah,
+      leftLabel: "pure water", rightLabel: rs === 0 ? "pure water" : "sugar solution",
+      rightSolute: rs, onSolute: e => this.setState({ rightSolute: +e.target.value }), osmosisMsg,
+      potatoLine: linePts.join(" "), potatoMarkX: mark.x.toFixed(1), potatoMarkY: mark.y.toFixed(1),
+      isoX: iso.x.toFixed(1),
+      beaker: bk, onBeaker: e => this.setState({ beaker: +e.target.value }), potatoMsg, potatoColor, isoStatus,
+      routes, routeName: r.name, routeDesc: r.desc, routeExample: r.example,
+    };
+  }
+}
+</script>
+</body>
+</html>

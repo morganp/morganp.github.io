@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Histograms & Cumulative Frequency">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="math.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">MATH</a> / HISTOGRAMS &amp; CUMULATIVE FREQUENCY</span>
+      <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← MATH MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #2f7d3a;">// GROUPED &amp; CONTINUOUS DATA — LEVEL L3, HIGHER-WEIGHTED</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 46px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Histograms &amp; cumulative frequency</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">When class widths are unequal, a bar's HEIGHT can lie to you — only its AREA tells the truth. Then turn the same data into a running total and read off the median and quartiles from where a line crosses the curve.</div>
+  </div>
+
+  <!-- TABLE 01 -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2f7d3a;">// TABLE 01 — DISTANCE TRAVELLED TO SCHOOL (UNEQUAL CLASS WIDTHS)</div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 4px 4px 0 rgba(43,38,32,0.15); overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">
+        <thead>
+          <tr style="background: #f6efe2; border-bottom: 2px solid #2b2620;">
+            <th style="padding: 8px 12px; text-align: left;">DISTANCE (km)</th><th style="padding: 8px 12px; text-align: right;">WIDTH</th><th style="padding: 8px 12px; text-align: right;">FREQUENCY</th><th style="padding: 8px 12px; text-align: right; color: #2f7d3a;">DENSITY (f÷w)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid #d8d0c4;"><td style="padding: 7px 12px;">0 ≤ d &lt; 5</td><td style="padding: 7px 12px; text-align: right;">5</td><td style="padding: 7px 12px; text-align: right;">15</td><td style="padding: 7px 12px; text-align: right; color: #2f7d3a;">3.0</td></tr>
+          <tr style="border-bottom: 1px solid #d8d0c4;"><td style="padding: 7px 12px;">5 ≤ d &lt; 10</td><td style="padding: 7px 12px; text-align: right;">5</td><td style="padding: 7px 12px; text-align: right;">25</td><td style="padding: 7px 12px; text-align: right; color: #2f7d3a;">5.0</td></tr>
+          <tr style="border-bottom: 1px solid #d8d0c4;"><td style="padding: 7px 12px;">10 ≤ d &lt; 15</td><td style="padding: 7px 12px; text-align: right;">5</td><td style="padding: 7px 12px; text-align: right;">15</td><td style="padding: 7px 12px; text-align: right; color: #2f7d3a;">3.0</td></tr>
+          <tr style="border-bottom: 1px solid #d8d0c4; background: #fff3df;"><td style="padding: 7px 12px;">15 ≤ d &lt; 25</td><td style="padding: 7px 12px; text-align: right;">10</td><td style="padding: 7px 12px; text-align: right;">15</td><td style="padding: 7px 12px; text-align: right; color: #2f7d3a;">1.5</td></tr>
+          <tr><td style="padding: 7px 12px;">25 ≤ d &lt; 45</td><td style="padding: 7px 12px; text-align: right;">20</td><td style="padding: 7px 12px; text-align: right;">10</td><td style="padding: 7px 12px; text-align: right; color: #2f7d3a;">0.5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156;">Highlighted row: same frequency (15) as rows 1 &amp; 3, but DOUBLE the width — watch what that does to its bar below.</div>
+  </div>
+
+  <!-- GRAPH 02 — histogram -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2f7d3a;">// GRAPH 02 — HISTOGRAM: HEIGHT = FREQUENCY (WRONG) vs HEIGHT = FREQUENCY DENSITY (CORRECT)</div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; gap: 6px;">
+        <div onClick="{{ onModeWrong }}" style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px; border: 1.5px solid #2b2620; background: {{ wrongBg }}; color: {{ wrongFg }}; cursor: pointer; text-align: center; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">HEIGHT = FREQUENCY (WRONG)</div>
+        <div onClick="{{ onModeCorrect }}" style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 10px; border: 1.5px solid #2b2620; background: {{ correctBg }}; color: {{ correctFg }}; cursor: pointer; text-align: center; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">HEIGHT = FREQUENCY DENSITY (CORRECT)</div>
+      </div>
+      <svg viewBox="0 0 340 240" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <line x1="40" y1="200" x2="312" y2="200" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="40" y1="20" x2="40" y2="200" stroke="#2b2620" stroke-width="2"></line>
+
+        <rect x="40" y="{{ h1y }}" width="28.9" height="{{ h1h }}" fill="#2f7d3a" opacity="0.55" stroke="{{ hi134 }}" stroke-width="{{ hi134w }}"></rect>
+        <rect x="68.9" y="{{ h2y }}" width="28.9" height="{{ h2h }}" fill="#2f7d3a" opacity="0.35" stroke="#2b2620" stroke-width="1.5"></rect>
+        <rect x="97.8" y="{{ h3y }}" width="28.9" height="{{ h3h }}" fill="#2f7d3a" opacity="0.55" stroke="{{ hi134 }}" stroke-width="{{ hi134w }}"></rect>
+        <rect x="126.7" y="{{ h4y }}" width="57.7" height="{{ h4h }}" fill="#2f7d3a" opacity="0.55" stroke="{{ hi134 }}" stroke-width="{{ hi134w }}"></rect>
+        <rect x="184.4" y="{{ h5y }}" width="115.6" height="{{ h5h }}" fill="#2f7d3a" opacity="0.35" stroke="#2b2620" stroke-width="1.5"></rect>
+
+        <line x1="40" y1="200" x2="40" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="68.9" y1="200" x2="68.9" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="97.8" y1="200" x2="97.8" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="126.7" y1="200" x2="126.7" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="184.4" y1="200" x2="184.4" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+        <line x1="300" y1="200" x2="300" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+        <text x="40" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">0</text>
+        <text x="68.9" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">5</text>
+        <text x="97.8" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">10</text>
+        <text x="126.7" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">15</text>
+        <text x="184.4" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">25</text>
+        <text x="300" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">45</text>
+        <text x="175" y="232" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#2b2620">DISTANCE TO SCHOOL (km)</text>
+
+        <sc-if value="{{ isCorrect }}">
+          <text x="34" y="204" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">0</text>
+          <text x="34" y="174" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">1</text>
+          <text x="34" y="144" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">2</text>
+          <text x="34" y="114" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">3</text>
+          <text x="34" y="84" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">4</text>
+          <text x="34" y="54" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">5</text>
+          <text x="34" y="24" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">6</text>
+          <text transform="rotate(-90, 12, 110)" x="12" y="110" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" font-weight="600" fill="#2f7d3a">FREQUENCY DENSITY (per km)</text>
+        </sc-if>
+        <sc-if value="{{ isWrong }}">
+          <text x="34" y="204" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">0</text>
+          <text x="34" y="171.9" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">5</text>
+          <text x="34" y="139.7" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">10</text>
+          <text x="34" y="107.6" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">15</text>
+          <text x="34" y="75.4" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">20</text>
+          <text x="34" y="43.3" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#e8590c">25</text>
+          <text transform="rotate(-90, 12, 110)" x="12" y="110" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" font-weight="600" fill="#e8590c">FREQUENCY (pupils)</text>
+        </sc-if>
+      </svg>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.5; color: {{ calloutColor }};">{{ calloutText }}</div>
+    </div>
+  </div>
+
+  <!-- GRAPH 03 — cumulative frequency -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.75fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #2f7d3a;">// GRAPH 03 — CUMULATIVE FREQUENCY CURVE (drag the orange handle)</div>
+      <div style="touch-action: none;" onMouseMove="{{ onDrag }}" onMouseUp="{{ onDragEnd }}" onMouseLeave="{{ onDragEnd }}" onTouchMove="{{ onDrag }}" onTouchEnd="{{ onDragEnd }}">
+        <svg viewBox="0 0 340 240" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+          <line x1="40" y1="200" x2="312" y2="200" stroke="#2b2620" stroke-width="2"></line>
+          <line x1="40" y1="20" x2="40" y2="200" stroke="#2b2620" stroke-width="2"></line>
+
+          <line x1="40" y1="200" x2="40" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+          <line x1="68.9" y1="200" x2="68.9" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+          <line x1="97.8" y1="200" x2="97.8" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+          <line x1="126.7" y1="200" x2="126.7" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+          <line x1="184.4" y1="200" x2="184.4" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+          <line x1="300" y1="200" x2="300" y2="205" stroke="#2b2620" stroke-width="1.5"></line>
+          <text x="40" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">0</text>
+          <text x="68.9" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">5</text>
+          <text x="97.8" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">10</text>
+          <text x="126.7" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">15</text>
+          <text x="184.4" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">25</text>
+          <text x="300" y="216" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#2b2620">45</text>
+          <text x="175" y="232" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#2b2620">DISTANCE TO SCHOOL (km)</text>
+
+          <text x="34" y="204" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">0</text>
+          <text x="34" y="159" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">20</text>
+          <text x="34" y="114" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">40</text>
+          <text x="34" y="69" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">60</text>
+          <text x="34" y="24" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">80</text>
+          <text transform="rotate(-90, 12, 110)" x="12" y="110" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" font-weight="600" fill="#2f7d3a">CUMULATIVE FREQUENCY (pupils)</text>
+
+          <polyline points="40,200 68.9,166.25 97.8,110 126.7,76.25 184.4,42.5 300,20" fill="none" stroke="#2f7d3a" stroke-width="2.5"></polyline>
+          <circle cx="40" cy="200" r="3" fill="#2f7d3a"></circle>
+          <circle cx="68.9" cy="166.25" r="3" fill="#2f7d3a"></circle>
+          <circle cx="97.8" cy="110" r="3" fill="#2f7d3a"></circle>
+          <circle cx="126.7" cy="76.25" r="3" fill="#2f7d3a"></circle>
+          <circle cx="184.4" cy="42.5" r="3" fill="#2f7d3a"></circle>
+          <circle cx="300" cy="20" r="3" fill="#2f7d3a"></circle>
+
+          <line x1="40" y1="{{ handleY }}" x2="{{ readX }}" y2="{{ handleY }}" stroke="#e8590c" stroke-width="2" stroke-dasharray="4 3"></line>
+          <line x1="{{ readX }}" y1="{{ handleY }}" x2="{{ readX }}" y2="200" stroke="#e8590c" stroke-width="2" stroke-dasharray="4 3"></line>
+          <circle cx="40" cy="{{ handleY }}" r="8" fill="#e8590c" stroke="#2b2620" stroke-width="2" style="cursor: grab;" onMouseDown="{{ onDragStart }}" onTouchStart="{{ onDragStart }}"></circle>
+          <circle cx="{{ readX }}" cy="{{ handleY }}" r="4" fill="#e8590c"></circle>
+        </svg>
+      </div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <div onClick="{{ onQ1 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 9px 12px; border: 1.5px solid #2b2620; background: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">Q1 (n/4)</div>
+        <div onClick="{{ onMedian }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 9px 12px; border: 1.5px solid #2b2620; background: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">MEDIAN (n/2)</div>
+        <div onClick="{{ onQ3 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 9px 12px; border: 1.5px solid #2b2620; background: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">Q3 (3n/4)</div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">READING (n = 80 pupils)</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 18px;">cum. freq. ≈ {{ cumTargetDisplay }}</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px; color: #e8590c;">distance ≈ {{ xReadout }} km</div>
+      </div>
+      <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">BOX PLOT — READ OFF THE SAME CURVE</div>
+        <svg viewBox="0 0 340 80" style="width: 100%; height: auto;">
+          <line x1="40" y1="40" x2="74.7" y2="40" stroke="#2b2620" stroke-width="2"></line>
+          <line x1="40" y1="28" x2="40" y2="52" stroke="#2b2620" stroke-width="2"></line>
+          <rect x="74.7" y="22" width="71.2" height="36" fill="#2f7d3a" opacity="0.3" stroke="#2b2620" stroke-width="2"></rect>
+          <line x1="97.8" y1="22" x2="97.8" y2="58" stroke="#e8590c" stroke-width="2.5"></line>
+          <line x1="145.9" y1="40" x2="300" y2="40" stroke="#2b2620" stroke-width="2"></line>
+          <line x1="300" y1="28" x2="300" y2="52" stroke="#2b2620" stroke-width="2"></line>
+          <text x="40" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">min=0</text>
+          <text x="74.7" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">Q1=6.0</text>
+          <text x="97.8" y="14" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" font-weight="600" fill="#e8590c">med=10.0</text>
+          <text x="145.9" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">Q3=18.3</text>
+          <text x="300" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">max=45</text>
+        </svg>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;">IQR = Q3 − Q1 = 18.3 − 6.0 = 12.3 km</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- quiz -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px;">
+    <div style="border: 2px solid #2b2620; background: #2b2620; color: #faf6ef; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #8ce99a;">// CHECK YOUR READING</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.5;">Using GRAPH 03 above, what are the median and the interquartile range (IQR) of distance travelled to school?</div>
+      <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e;">MEDIAN (km)</span><input type="number" step="0.1" value="{{ quizMedian }}" onInput="{{ onQuizMedian }}" style="width: 100px; padding: 10px; border: 2px solid #faf6ef; background: #2b2620; color: #faf6ef; font-family: 'IBM Plex Mono', monospace; font-size: 14px; min-height: 44px; box-sizing: border-box;"></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #a89d8e;">IQR (km)</span><input type="number" step="0.1" value="{{ quizIQR }}" onInput="{{ onQuizIQR }}" style="width: 100px; padding: 10px; border: 2px solid #faf6ef; background: #2b2620; color: #faf6ef; font-family: 'IBM Plex Mono', monospace; font-size: 14px; min-height: 44px; box-sizing: border-box;"></div>
+        <div onClick="{{ onQuizCheck }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px 18px; border: 2px solid #e8590c; background: #e8590c; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">CHECK</div>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ quizColor }}; min-height: 20px;">{{ quizMsg }}</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/z8mpfg8" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Histograms ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Histogram" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Histogram ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Empirical_distribution_function" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Cumulative frequency (empirical distribution) ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification — histograms with unequal class widths are Higher-tier only (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">KEEP EXPLORING</span>
+    <a href="math.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Explore the Math map →</a>
+    <a href="statistics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Also useful: Statistics (mean, median, box plots) →</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>MATH / HISTOGRAMS &amp; CUMULATIVE FREQUENCY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: "correct", cumTarget: 40, dragging: false, quizMedian: "", quizIQR: "", quizMsg: "", quizColor: "#a89d8e" };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("groupeddata"); }
+
+  // fixed dataset: [x, cumulative frequency] control points
+  _points() { return [[0, 0], [5, 15], [10, 40], [15, 55], [25, 70], [45, 80]]; }
+  xForCf(target) {
+    const pts = this._points();
+    const t = Math.max(0, Math.min(80, target));
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [x0, cf0] = pts[i], [x1, cf1] = pts[i + 1];
+      if (t <= cf1 || i === pts.length - 2) {
+        const frac = cf1 === cf0 ? 0 : (t - cf0) / (cf1 - cf0);
+        return x0 + frac * (x1 - x0);
+      }
+    }
+    return pts[pts.length - 1][0];
+  }
+
+  setMode(m) { this.setState({ mode: m }); }
+  startDrag() { this.setState({ dragging: true }); }
+  endDrag() { this.setState({ dragging: false }); }
+  handleDrag(e) {
+    if (!this.state.dragging) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cy0 = e.touches ? e.touches[0].clientY : e.clientY;
+    const py = (cy0 - rect.top) / rect.height * 240;
+    const cumTarget = Math.max(0, Math.min(80, (200 - py) / 2.25));
+    this.setState({ cumTarget });
+  }
+  pickPreset(v) { this.setState({ cumTarget: v }); }
+
+  checkQuiz() {
+    const med = parseFloat(this.state.quizMedian), iqr = parseFloat(this.state.quizIQR);
+    const medOk = Math.abs(med - 10.0) <= 0.6;
+    const iqrOk = Math.abs(iqr - 12.3) <= 1.2;
+    if (medOk && iqrOk) {
+      if (window.Progress) window.Progress.markCompleted("groupeddata", { via: "read-cf-curve" });
+      this.setState({ quizMsg: "Correct! Median ≈ 10.0 km, IQR ≈ 12.3 km — you read the curve accurately.", quizColor: "#8ce99a" });
+    } else {
+      let msg = "Not quite — ";
+      if (!medOk) msg += "check the median again (drag to cum. freq. = 40, half of 80). ";
+      if (!iqrOk) msg += "check the IQR (distance at Q3 minus distance at Q1).";
+      this.setState({ quizMsg: msg, quizColor: "#ff9b7a" });
+    }
+  }
+
+  renderVals() {
+    const mode = this.state.mode;
+    const isCorrect = mode === "correct";
+    const baseY = 200;
+    const hScaleCorrect = 30, hScaleWrong = 180 / 28;
+    const density = [3.0, 5.0, 3.0, 1.5, 0.5];
+    const freq = [15, 25, 15, 15, 10];
+    const bars = density.map((d, i) => {
+      const val = isCorrect ? d : freq[i];
+      const scale = isCorrect ? hScaleCorrect : hScaleWrong;
+      const h = val * scale;
+      return { y: (baseY - h).toFixed(2), h: h.toFixed(2) };
+    });
+    const hi134 = mode === "wrong" ? "#e8590c" : "#2b2620";
+    const hi134w = mode === "wrong" ? 3 : 1.5;
+
+    let calloutText, calloutColor;
+    if (mode === "wrong") {
+      calloutText = "Look closely: bars 1, 3 and 4 are drawn to the SAME height because they all have frequency = 15 — but bar 4 is TWICE as wide. Reading height alone wrongly suggests bar 4 represents the same \"crowding\" as bars 1 and 3.";
+      calloutColor = "#c0392b";
+    } else {
+      calloutText = "Now bar 4's height is HALF that of bars 1 and 3 — because its frequency density (people per km) is really half theirs. Height now correctly shows how crowded each interval is, and area (height × width) always equals the true frequency.";
+      calloutColor = "#2f7d3a";
+    }
+
+    const cumTarget = this.state.cumTarget;
+    const readXworld = this.xForCf(cumTarget);
+    const xScale = 260 / 45, ox = 40;
+    const readX = (ox + readXworld * xScale).toFixed(2);
+    const handleY = (200 - cumTarget * 2.25).toFixed(2);
+
+    return {
+      isCorrect, isWrong: !isCorrect,
+      wrongBg: mode === "wrong" ? "#e8590c" : "#faf6ef", wrongFg: mode === "wrong" ? "#faf6ef" : "#2b2620",
+      correctBg: mode === "correct" ? "#2f7d3a" : "#faf6ef", correctFg: mode === "correct" ? "#faf6ef" : "#2b2620",
+      onModeWrong: () => this.setMode("wrong"), onModeCorrect: () => this.setMode("correct"),
+      h1y: bars[0].y, h1h: bars[0].h, h2y: bars[1].y, h2h: bars[1].h, h3y: bars[2].y, h3h: bars[2].h,
+      h4y: bars[3].y, h4h: bars[3].h, h5y: bars[4].y, h5h: bars[4].h,
+      hi134, hi134w, calloutText, calloutColor,
+
+      handleY, readX,
+      onDragStart: () => this.startDrag(), onDrag: e => this.handleDrag(e), onDragEnd: () => this.endDrag(),
+      onQ1: () => this.pickPreset(20), onMedian: () => this.pickPreset(40), onQ3: () => this.pickPreset(60),
+      cumTargetDisplay: Math.round(cumTarget), xReadout: readXworld.toFixed(1),
+
+      quizMedian: this.state.quizMedian, quizIQR: this.state.quizIQR,
+      onQuizMedian: e => this.setState({ quizMedian: e.target.value }), onQuizIQR: e => this.setState({ quizIQR: e.target.value }),
+      onQuizCheck: () => this.checkQuiz(), quizMsg: this.state.quizMsg, quizColor: this.state.quizColor,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -133,6 +133,7 @@
     "periodic-trends": { label: "Periodic Trends", level: "L3" },
     "quantitative-chem": { label: "Quantitative Chemistry", level: "L3" },
     "organic-intro": { label: "Organic Chemistry Intro", level: "L3" },
+    "crude-oil": { label: "Crude Oil & Polymers", level: "L3" },
     "chemical-analysis": { label: "Chemical Analysis", level: "L3" },
     "atmosphere-climate": { label: "Atmosphere & Climate", level: "L3" },
     "salts": { label: "Acids, Bases & Salts", level: "L3" },
@@ -161,6 +162,9 @@
     "momentum": { label: "Momentum & Collisions", level: "L3" },
     "radioactivity": { label: "Radioactivity", level: "L3" },
     "pressure": { label: "Particle Model & Pressure", level: "L3" },
+    "elasticity": { label: "Forces & Elasticity", level: "L3" },
+    "moments": { label: "Moments & Turning Forces", level: "L3" },
+    "thermal-energy": { label: "Thermal Energy", level: "L3" },
     "space": { label: "Space Physics", level: "L2-L3" },
     "cells": { label: "Cells", level: "L2-L3" },
     "classification": { label: "Classification & Variation", level: "L1-L2" },
@@ -180,6 +184,7 @@
     "homeostasis": { label: "Homeostasis & Response", level: "L3" },
     "natural-selection": { label: "Evolution & Natural Selection", level: "L3" },
     "ecology": { label: "Ecology", level: "L3" },
+    "cell-transport": { label: "Transport In & Out of Cells", level: "L3" },
     "rocks-soil": { label: "Rocks & Soil", level: "L1" },
     "weather": { label: "Weather & Seasons", level: "L1" },
     "rock-cycle": { label: "The Rock Cycle", level: "L2" },
@@ -207,6 +212,8 @@
     "seqineq": { label: "Sequences, Simultaneous Eqns & Inequalities", level: "L3" },
     "transform3d": { label: "Transformations & 3D Shapes", level: "L3" },
     "circletheorems": { label: "Circle Theorems (Higher)", level: "L3" },
+    "combinedevents": { label: "Tree & Venn Diagrams", level: "L3" },
+    "groupeddata": { label: "Histograms & Cumulative Frequency", level: "L3" },
   };
 
   const Progress = {

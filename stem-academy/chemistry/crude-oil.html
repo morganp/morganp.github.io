@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Crude Oil & Polymers">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="chemistry.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">CHEMISTRY</a> / CRUDE OIL &amp; POLYMERS</span>
+      <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← CHEMISTRY MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// FROM ANCIENT PLANKTON TO PLASTICS — LEVEL L2 → L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Crude oil &amp; polymers</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">Crude oil is a mixture of hydrocarbon chains of every length — the fossil remains of tiny sea creatures. Split it into useful fractions by boiling point, crack the big ones into petrol and reactive alkenes, then chain those alkenes into the plastics all around you.</div>
+  </div>
+
+  <!-- FIG 01 — fractionating column -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 0.72fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — FRACTIONATING COLUMN (click a fraction)</div>
+      <svg viewBox="0 0 300 320" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <sc-for list="{{ fractions }}" as="f" hint-placeholder-count="6">
+          <rect x="70" y="{{ f.y }}" width="150" height="{{ f.h }}" fill="{{ f.bg }}" stroke="#2b2620" stroke-width="1.5" style="cursor: pointer;" onClick="{{ f.onPick }}"></rect>
+          <line x1="220" y1="{{ f.midY }}" x2="252" y2="{{ f.midY }}" stroke="#2b2620" stroke-width="2"></line>
+          <polygon points="{{ f.arrow }}" fill="#2b2620"></polygon>
+        </sc-for>
+        <polygon points="70,300 220,300 210,318 80,318" fill="#5a3320" stroke="#2b2620" stroke-width="1.5" style="cursor: pointer;" onClick="{{ onInlet }}"></polygon>
+        <text x="145" y="313" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" fill="#faf6ef">heated crude oil in</text>
+        <text x="255" y="20" font-family="IBM Plex Mono" font-size="8.5" fill="#c0392b">COOL top</text>
+        <text x="255" y="308" font-family="IBM Plex Mono" font-size="8.5" fill="#e8590c">HOT base</text>
+      </svg>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">Vapour rises, cooling as it climbs. Each fraction condenses at its own boiling range — short chains near the cool top, long chains at the hot base.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: {{ fracBg }}; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 8px; border: 1.5px solid #2b2620; background: #e8590c; color: #faf6ef; align-self: flex-start;">{{ fracChain }}</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 24px;">{{ fracName }}</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.55; color: #3a3229;">{{ fracUse }}</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1.5px solid rgba(43,38,32,0.2); padding-top: 10px;">
+        <div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">BOILING POINT</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px;">{{ fracBp }}</div></div>
+        <div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">VISCOSITY</div><div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 14px;">{{ fracVisc }}</div></div>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">TREND: longer chain → higher boiling point, more viscous, harder to ignite.</div>
+    </div>
+  </div>
+
+  <!-- FIG 02 — cracking -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// FIG. 02 — CRACKING: SPLIT A LONG CHAIN INTO USEFUL SHORT ONES</div>
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <svg viewBox="0 0 640 130" style="width: 100%; height: auto;">
+        <sc-for list="{{ longChain }}" as="c" hint-placeholder-count="10">
+          <circle cx="{{ c.x }}" cy="60" r="13" fill="#2b2620"></circle>
+          <line x1="{{ c.lx1 }}" y1="60" x2="{{ c.lx2 }}" y2="60" stroke="#2b2620" stroke-width="3"></line>
+        </sc-for>
+        <sc-if value="{{ cracked }}">
+          <sc-for list="{{ shortChain }}" as="c" hint-placeholder-count="6">
+            <circle cx="{{ c.x }}" cy="30" r="12" fill="#3a5566"></circle>
+            <line x1="{{ c.lx1 }}" y1="30" x2="{{ c.lx2 }}" y2="30" stroke="#3a5566" stroke-width="3"></line>
+          </sc-for>
+          <sc-for list="{{ alkeneChain }}" as="c" hint-placeholder-count="3">
+            <circle cx="{{ c.x }}" cy="100" r="12" fill="#e8590c"></circle>
+          </sc-for>
+          <line x1="{{ dblX1 }}" y1="96" x2="{{ dblX2 }}" y2="96" stroke="#e8590c" stroke-width="3"></line>
+          <line x1="{{ dblX1 }}" y1="104" x2="{{ dblX2 }}" y2="104" stroke="#e8590c" stroke-width="3"></line>
+        </sc-if>
+      </svg>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <div onClick="{{ onCrack }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 12px 18px; border: 2px solid #e8590c; background: {{ crackBg }}; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ crackLabel }}</div>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.5; color: #554c42;">{{ crackMsg }}</span>
+      </div>
+      <div style="display: flex; gap: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6b6156; flex-wrap: wrap;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #2b2620; display: inline-block;"></span>long alkane (little demand)</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #3a5566; display: inline-block;"></span>short alkane (petrol — high demand)</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #e8590c; display: inline-block;"></span>alkene (=, makes polymers)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIG 03 — polymerisation -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 8px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 03 — ADDITION POLYMERISATION: LINK ALKENES INTO PLASTIC</div>
+      <svg viewBox="0 0 640 130" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <sc-for list="{{ monomers }}" as="m" hint-placeholder-count="6">
+          <rect x="{{ m.x }}" y="40" width="70" height="50" rx="6" fill="none" stroke="{{ m.stroke }}" stroke-width="2"></rect>
+          <circle cx="{{ m.c1 }}" cy="65" r="10" fill="#e8590c"></circle>
+          <circle cx="{{ m.c2 }}" cy="65" r="10" fill="#e8590c"></circle>
+          <line x1="{{ m.b1 }}" y1="61" x2="{{ m.b2 }}" y2="61" stroke="{{ m.bond }}" stroke-width="2.5"></line>
+          <line x1="{{ m.b1 }}" y1="69" x2="{{ m.b2 }}" y2="69" stroke="{{ m.bond2 }}" stroke-width="2.5"></line>
+          <line x1="{{ m.link1 }}" y1="65" x2="{{ m.link2 }}" y2="65" stroke="{{ m.linkColor }}" stroke-width="3"></line>
+        </sc-for>
+      </svg>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">MONOMERS (n)</span>
+        <input type="range" min="1" max="6" step="1" value="{{ nMono }}" onInput="{{ onMono }}" style="accent-color: #e8590c; flex: 1; min-width: 120px; height: 26px;">
+        <div onClick="{{ onPolymerise }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 10px 16px; border: 2px solid #e8590c; background: {{ polyBg }}; color: #faf6ef; cursor: pointer; min-height: 44px; box-sizing: border-box; display: flex; align-items: center;">{{ polyLabel }}</div>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; text-align: center;">{{ polyEquation }}</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">ADDITION POLYMERISATION</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; line-height: 1.6; color: #554c42;">Many small <strong>alkene</strong> molecules (monomers) each open their C=C double bond and join hands into one long chain — the <strong>polymer</strong>. n ethene → poly(ethene). No other product forms: every atom ends up in the chain.</div>
+      <div style="display: flex; flex-direction: column; gap: 5px; border-top: 1.5px solid #d8d0c4; padding-top: 10px;">
+        <sc-for list="{{ plastics }}" as="p" hint-placeholder-count="3">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #554c42;"><strong>{{ p.name }}</strong> → {{ p.use }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zc9q7ty" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Crude oil &amp; fuels ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Fractional_distillation" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Fractional distillation ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Addition_polymer" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Addition polymer ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="chemical-analysis.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Chemical Analysis (L3) →</a>
+    <a href="organic-intro.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Back to: Organic Intro →</a>
+    <a href="chemistry.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Chemistry map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>CHEMISTRY / CRUDE OIL &amp; POLYMERS</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { fraction: 3, cracked: false, nMono: 3, polymerised: false, seen: { crack: false, poly: false, frac: {} } };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("crude-oil"); }
+
+  _fractions() {
+    return [
+      { name: "Refinery gases", chain: "C1–C4", bg: "#f7d9c4", use: "Bottled gas (LPG) for cooking and heating — the lightest, most flammable fraction.", bp: "below 25 °C", visc: "runniest (gas)" },
+      { name: "Petrol (gasoline)", chain: "C5–C10", bg: "#f2c9a0", use: "Fuel for car engines. Short chains, easily vaporised and ignited.", bp: "25–60 °C", visc: "very runny" },
+      { name: "Kerosene", chain: "C10–C16", bg: "#e6b585", use: "Jet fuel and paraffin heaters.", bp: "150–250 °C", visc: "runny" },
+      { name: "Diesel oil", chain: "C14–C20", bg: "#d19a5e", use: "Fuel for lorries, trains and diesel cars.", bp: "220–350 °C", visc: "medium" },
+      { name: "Fuel oil", chain: "C20–C50", bg: "#a87a44", use: "Fuel for ships and power stations.", bp: "350–400 °C", visc: "thick" },
+      { name: "Bitumen", chain: "C50+", bg: "#6b4a24", use: "Tar for surfacing roads and roofs — the heaviest residue, barely flows.", bp: "above 400 °C", visc: "thickest (solid-ish)" },
+    ];
+  }
+
+  crack() {
+    const seen = { ...this.state.seen, crack: true };
+    this.setState({ cracked: !this.state.cracked, seen }, () => this._check());
+  }
+  polymerise() {
+    const seen = { ...this.state.seen, poly: true };
+    this.setState({ polymerised: !this.state.polymerised, seen }, () => this._check());
+  }
+  pickFraction(i) {
+    const fseen = { ...this.state.seen.frac, [i]: true };
+    const seen = { ...this.state.seen, frac: fseen };
+    this.setState({ fraction: i, seen }, () => this._check());
+  }
+  _check() {
+    const s = this.state.seen;
+    if (s.crack && s.poly && Object.keys(s.frac).length >= 3 && window.Progress) {
+      window.Progress.markCompleted("crude-oil", { via: "fractions-crack-polymerise" });
+    }
+  }
+
+  renderVals() {
+    const fr = this._fractions();
+    const n = fr.length, top = 12, gap = 46;
+    const fractions = fr.map((f, i) => {
+      const y = top + i * gap;
+      const midY = y + (gap - 6) / 2;
+      const active = this.state.fraction === i;
+      return {
+        y: y.toFixed(0), h: (gap - 6).toFixed(0), midY: midY.toFixed(0),
+        bg: active ? "#e8590c" : f.bg,
+        arrow: [(252) + "," + midY, (244) + "," + (midY - 5), (244) + "," + (midY + 5)].join(" "),
+        onPick: () => this.pickFraction(i),
+      };
+    });
+    const f = fr[this.state.fraction];
+
+    // cracking chains
+    const longChain = Array.from({ length: 10 }, (_, i) => ({
+      x: (60 + i * 52).toFixed(0), lx1: (60 + i * 52 + 13).toFixed(0), lx2: (60 + (i + 1) * 52 - 13).toFixed(0),
+    }));
+    const shortChain = Array.from({ length: 6 }, (_, i) => ({
+      x: (60 + i * 46).toFixed(0), lx1: (60 + i * 46 + 12).toFixed(0), lx2: (60 + (i + 1) * 46 - 12).toFixed(0),
+    }));
+    const alkeneChain = Array.from({ length: 3 }, (_, i) => ({ x: (400 + i * 46).toFixed(0) }));
+
+    // polymerisation monomers
+    const nm = this.state.nMono;
+    const poly = this.state.polymerised;
+    const spacing = poly ? 92 : 100;
+    const startX = 20;
+    const monomers = Array.from({ length: nm }, (_, i) => {
+      const x = startX + i * spacing;
+      const c1 = x + 22, c2 = x + 48;
+      return {
+        x: x.toFixed(0), c1: c1.toFixed(0), c2: c2.toFixed(0),
+        b1: (c1 + 10).toFixed(0), b2: (c2 - 10).toFixed(0),
+        stroke: poly ? "transparent" : "#c9c0b2",
+        bond: poly ? "#2b2620" : "#e8590c", bond2: poly ? "transparent" : "#e8590c",
+        link1: (c2).toFixed(0), link2: (x + spacing + 22).toFixed(0),
+        linkColor: poly && i < nm - 1 ? "#2b2620" : "transparent",
+      };
+    });
+    const polyEquation = poly
+      ? nm + " C₂H₄  (ethene)  →  –(C₂H₄)–" + " ×" + nm + "  poly(ethene)"
+      : nm + " × ethene monomer (C=C double bond, orange)";
+
+    const plastics = [
+      { name: "poly(ethene)", use: "plastic bags, bottles" },
+      { name: "poly(propene)", use: "crates, ropes, furniture" },
+      { name: "PVC", use: "pipes, window frames, cables" },
+    ];
+
+    return {
+      fractions, onInlet: () => this.pickFraction(0),
+      fracName: f.name, fracChain: f.chain, fracUse: f.use, fracBp: f.bp, fracVisc: f.visc,
+      fracBg: this.state.fraction === 5 ? "#efe6d6" : "#f6efe2",
+      longChain, cracked: this.state.cracked, shortChain, alkeneChain,
+      dblX1: "412", dblX2: "434",
+      onCrack: () => this.crack(), crackLabel: this.state.cracked ? "↺ RESET" : "▶ CRACK IT",
+      crackBg: this.state.cracked ? "#2b2620" : "#e8590c",
+      crackMsg: this.state.cracked
+        ? "The long chain broke into a short alkane (petrol — high demand) PLUS a reactive alkene with a C=C double bond, used to make polymers. Cracking uses heat + a catalyst."
+        : "This long-chain alkane has little demand. Press to crack it with heat and a catalyst.",
+      monomers, nMono: nm, onMono: e => this.setState({ nMono: +e.target.value, polymerised: false }),
+      onPolymerise: () => this.polymerise(), polyLabel: poly ? "↺ UNLINK" : "▶ POLYMERISE",
+      polyBg: poly ? "#2b2620" : "#e8590c", polyEquation, plastics,
+    };
+  }
+}
+</script>
+</body>
+</html>

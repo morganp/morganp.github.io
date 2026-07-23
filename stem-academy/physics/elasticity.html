@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #faf6ef; background-image: repeating-linear-gradient(0deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(90deg, rgba(43,38,32,0.05) 0 1px, transparent 1px 24px); }
+  </style>
+  <script src="../lib/progress-store.js"></script>
+</helmet>
+
+<div style="min-height: 100vh; color: #2b2620; display: flex; flex-direction: column;" data-screen-label="Forces & Elasticity">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1.5px solid #2b2620; background: rgba(250,246,239,0.9);">
+    <a href="../index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2b2620;">
+      <div style="width: 36px; height: 36px; border: 2px solid #2b2620; display: grid; place-items: center; font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 16px; background: #e8590c; color: #faf6ef;">Ls</div>
+      <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em;">Lizard-Spock STEM Academy</div>
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b6156;"><a href="../index.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">HOME</a> / <a href="physics.html" style="color: #6b6156; text-decoration: none;" style-hover="color: #2b2620;">PHYSICS</a> / FORCES &amp; ELASTICITY</span>
+      <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #2b2620; border: 1.5px solid #2b2620; padding: 7px 14px; text-decoration: none; background: #faf6ef;">← PHYSICS MAP</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 44px 40px 8px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #e8590c;">// STRETCH, SQUASH & SPRING BACK — LEVEL L1 → L3</div>
+    <h1 style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 48px; line-height: 1.05; letter-spacing: -0.03em; margin: 0; text-wrap: balance;">Forces &amp; elasticity</h1>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 1.55; color: #554c42; max-width: 860px;">Pull a spring and it stretches; let go and it springs back. Hang more mass and it stretches proportionally more — that neat straight-line rule is Hooke's law. Load the spring, plot the graph, find the point where the rule finally breaks, and measure the energy stored.</div>
+  </div>
+
+  <!-- FIG 01 — Hooke's law apparatus + live graph -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 0.62fr 1fr; gap: 20px; align-items: stretch;">
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// FIG. 01 — LOAD THE SPRING</div>
+      <svg viewBox="0 0 200 280" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <rect x="40" y="14" width="120" height="10" fill="#5a4a33" stroke="#2b2620" stroke-width="1.5"></rect>
+        <path d="{{ springPath }}" fill="none" stroke="#2b2620" stroke-width="2.5"></path>
+        <rect x="{{ massX }}" y="{{ massY }}" width="70" height="46" fill="{{ massColor }}" stroke="#2b2620" stroke-width="2"></rect>
+        <line x1="24" y1="24" x2="24" y2="266" stroke="#2b2620" stroke-width="1.5"></line>
+        <sc-for list="{{ ruler }}" as="t" hint-placeholder-count="7">
+          <line x1="18" y1="{{ t.y }}" x2="24" y2="{{ t.y }}" stroke="#2b2620" stroke-width="1"></line>
+        </sc-for>
+      </svg>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">LOAD (FORCE): {{ forceN }} N</span>
+        <input type="range" min="0" max="12" step="1" value="{{ load }}" onInput="{{ onLoad }}" style="accent-color: #e8590c; height: 26px;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">SPRING CONSTANT k: {{ kVal }} N/m</span>
+        <input type="range" min="15" max="60" step="5" value="{{ k }}" onInput="{{ onK }}" style="accent-color: #2a6fb0; height: 26px;">
+      </div>
+    </div>
+
+    <div style="border: 2px solid #2b2620; background: #fff; box-shadow: 6px 6px 0 rgba(43,38,32,0.15); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">// GRAPH 02 — FORCE vs EXTENSION</div>
+      <svg viewBox="0 0 380 260" style="width: 100%; height: auto; background: #fbfaf6; border: 1.5px solid #d8d0c4;">
+        <line x1="46" y1="220" x2="360" y2="220" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="46" y1="20" x2="46" y2="220" stroke="#2b2620" stroke-width="2"></line>
+        <line x1="46" y1="220" x2="{{ propEndX }}" y2="{{ propEndY }}" stroke="#2f7d3a" stroke-width="2.5"></line>
+        <path d="{{ curvePath }}" fill="none" stroke="#c0392b" stroke-width="2.5"></path>
+        <polygon points="{{ peArea }}" fill="#2a6fb0" opacity="0.18"></polygon>
+        <circle cx="{{ ptX }}" cy="{{ ptY }}" r="6" fill="#e8590c" stroke="#2b2620" stroke-width="1.5"></circle>
+        <circle cx="{{ limX }}" cy="{{ limY }}" r="5" fill="none" stroke="#c0392b" stroke-width="2"></circle>
+        <text x="203" y="240" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">EXTENSION e (m) →</text>
+        <text x="56" y="32" font-family="IBM Plex Mono" font-size="9" fill="#2b2620">FORCE F (N)</text>
+        <text x="{{ limLabelX }}" y="{{ limLabelY }}" font-family="IBM Plex Mono" font-size="8.5" fill="#c0392b">limit of proportionality</text>
+      </svg>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b6156;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 14px; height: 3px; background: #2f7d3a; display: inline-block;"></span>Hooke's law: F = k·e (straight line)</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 14px; height: 3px; background: #c0392b; display: inline-block;"></span>beyond the limit (curves — permanent stretch)</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 11px; height: 11px; background: #2a6fb0; opacity: 0.3; display: inline-block;"></span>elastic PE = area = ½·k·e²</span>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: {{ statusColor }};">{{ statusMsg }}</div>
+    </div>
+  </div>
+
+  <!-- readouts -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 12px 40px 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+    <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+      <div style="border: 2px solid #2b2620; background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b6156;">{{ s.label }}</div>
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 22px; color: {{ s.color }};">{{ s.value }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- theory -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 16px 40px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">HOOKE'S LAW</div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; text-align: center; padding: 6px 0;">F = k · e</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;">Force (N) = spring constant k (N/m) × extension e (m). Double the force, double the extension — as long as you stay below the limit of proportionality. A stiffer spring (bigger k) stretches less for the same force: a steeper line.</div>
+    </div>
+    <div style="border: 2px solid #2b2620; background: #f6efe2; padding: 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #e8590c;">ELASTIC vs PLASTIC</div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; line-height: 1.55; color: #554c42;"><strong>Elastic</strong> (below the limit): the spring returns to its original length when unloaded, storing energy as <strong>elastic potential energy</strong> = ½·k·e² (the triangle's area). <strong>Plastic</strong> (beyond the limit): it's permanently deformed and won't fully spring back.</div>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 24px 40px 8px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1.5px solid #2b2620; padding-top: 18px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #e8590c;">// REFERENCES &amp; FURTHER READING</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="https://www.bbc.co.uk/bitesize/topics/zzpopbk" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">BBC Bitesize — Forces &amp; elasticity ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Hooke%27s_law" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Hooke's law ↗</a>
+        <a href="https://en.wikipedia.org/wiki/Elastic_energy" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #2a6fb0; text-decoration: none;" style-hover="text-decoration: underline;">Wikipedia — Elastic energy ↗</a>
+      </div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #6b6156;">Cross-check against your own exam board's specification (AQA, Edexcel, OCR, SQA).</div>
+    </div>
+  </div>
+
+  <!-- next -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 20px 40px 64px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1.5px solid #2b2620; margin-top: 8px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #6b6156; width: 100%;">NEXT AT THIS LEVEL</span>
+    <a href="moments.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #e8590c; color: #faf6ef; padding: 13px 22px; border: 2px solid #2b2620; box-shadow: 4px 4px 0 #2b2620; text-decoration: none;">Next: Moments &amp; Turning Forces (L3) →</a>
+    <a href="forces-motion.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #faf6ef; color: #2b2620; padding: 13px 22px; border: 2px solid #2b2620; text-decoration: none;">Related: Forces &amp; Motion →</a>
+    <a href="physics.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #6b6156; padding: 13px 6px; text-decoration: none;" style-hover="color: #2b2620;">Physics map</a>
+  </div>
+
+  <div style="border-top: 1.5px solid #2b2620; padding: 14px 32px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b6156; display: flex; justify-content: space-between; margin-top: auto;">
+    <span>Lizard-Spock STEM Academy — learn by doing</span><span>PHYSICS / FORCES &amp; ELASTICITY</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { load: 4, k: 30, seenLimit: false, readK: false };
+  componentDidMount() { if (window.Progress) window.Progress.markVisited("elasticity"); }
+
+  _check() {
+    if (this.state.seenLimit && this.state.readK && window.Progress) {
+      window.Progress.markCompleted("elasticity", { via: "hookes-law" });
+    }
+  }
+  setLoad(v) {
+    const seenLimit = this.state.seenLimit || v >= 9; // limit of proportionality at load 9
+    this.setState({ load: v, seenLimit }, () => this._check());
+  }
+  setK(v) { this.setState({ k: v, readK: true }, () => this._check()); }
+
+  renderVals() {
+    const load = this.state.load;      // 0..12 (each unit = 1 N)
+    const kVal = this.state.k;          // N/m
+    const forceN = load;                // 1 unit load = 1 N
+    const limitLoad = 9;                // limit of proportionality (N)
+
+    // extension in "graph units": e = F/k, but scale for display. Use e_px per N inversely to k.
+    // extension (m) = F / k
+    const extAt = (F) => F / kVal;
+    // beyond limit, extra non-linear stretch
+    const ext = load <= limitLoad ? extAt(load) : extAt(limitLoad) + (load - limitLoad) * (1.9 / kVal);
+    const extMax = extAt(limitLoad) + (12 - limitLoad) * (1.9 / kVal);
+
+    // spring drawing: natural length coils compress/space with extension
+    const topY = 24, coilW = 40, cx = 100;
+    const naturalLen = 90;
+    const stretchPx = Math.min(150, ext / (extAt(1)) * 9); // visual px
+    const springLen = naturalLen + stretchPx;
+    const coils = 7;
+    let d = "M " + cx + " " + topY;
+    const seg = springLen / (coils * 2);
+    for (let i = 0; i < coils * 2; i++) {
+      const y = topY + seg * (i + 1);
+      const x = cx + (i % 2 === 0 ? coilW / 2 : -coilW / 2);
+      d += " L " + x.toFixed(1) + " " + y.toFixed(1);
+    }
+    d += " L " + cx + " " + (topY + springLen).toFixed(1);
+    const massY = topY + springLen;
+    const massX = cx - 35;
+
+    const ruler = Array.from({ length: 7 }, (_, i) => ({ y: (30 + i * 36).toFixed(0) }));
+
+    // graph: x = extension (0..extMax -> px 46..360), y = force (0..12 -> px 220..20)
+    const gx = (e) => 46 + (e / extMax) * 314;
+    const gy = (F) => 220 - (F / 12) * 200;
+    const propEnd = { x: gx(extAt(limitLoad)), y: gy(limitLoad) };
+    // curve beyond limit
+    let curve = "M " + propEnd.x.toFixed(1) + " " + propEnd.y.toFixed(1);
+    for (let F = limitLoad; F <= 12; F += 0.5) {
+      const e = extAt(limitLoad) + (F - limitLoad) * (1.9 / kVal);
+      curve += " L " + gx(e).toFixed(1) + " " + gy(F).toFixed(1);
+    }
+    const pt = { x: gx(ext), y: gy(load) };
+    // elastic PE triangle (only up to current point if within limit)
+    const withinLimit = load <= limitLoad;
+    const peTopF = Math.min(load, limitLoad);
+    const peTopE = extAt(peTopF);
+    const peArea = [
+      "46,220",
+      gx(peTopE).toFixed(1) + ",220",
+      gx(peTopE).toFixed(1) + "," + gy(peTopF).toFixed(1),
+    ].join(" ");
+
+    const extM = ext;
+    const pe = 0.5 * kVal * Math.pow(Math.min(ext, extAt(limitLoad)), 2);
+
+    let statusMsg, statusColor;
+    if (load < limitLoad) { statusMsg = "Elastic region — force ∝ extension. The spring will return to its original length."; statusColor = "#2f7d3a"; }
+    else if (load === limitLoad) { statusMsg = "At the limit of proportionality — Hooke's law is about to break down."; statusColor = "#c99a2e"; }
+    else { statusMsg = "Beyond the limit — the line curves. The spring is permanently (plastically) stretched now."; statusColor = "#c0392b"; }
+
+    const stats = [
+      { label: "FORCE F", value: forceN.toFixed(0) + " N", color: "#2b2620" },
+      { label: "EXTENSION e", value: extM.toFixed(3) + " m", color: "#2b2620" },
+      { label: "SPRING CONSTANT k", value: kVal + " N/m", color: "#2a6fb0" },
+      { label: "ELASTIC PE ½ke²", value: pe.toFixed(2) + " J", color: "#2a6fb0" },
+    ];
+
+    return {
+      springPath: d, massX: massX.toFixed(0), massY: massY.toFixed(1),
+      massColor: withinLimit ? "#2a6fb0" : "#c0392b",
+      ruler, load, forceN, onLoad: e => this.setLoad(+e.target.value),
+      k: kVal, kVal, onK: e => this.setK(+e.target.value),
+      propEndX: propEnd.x.toFixed(1), propEndY: propEnd.y.toFixed(1),
+      curvePath: curve, ptX: pt.x.toFixed(1), ptY: pt.y.toFixed(1),
+      limX: propEnd.x.toFixed(1), limY: propEnd.y.toFixed(1),
+      limLabelX: Math.max(120, propEnd.x - 40).toFixed(1), limLabelY: (propEnd.y - 8).toFixed(1),
+      peArea, stats, statusMsg, statusColor,
+    };
+  }
+}
+</script>
+</body>
+</html>
