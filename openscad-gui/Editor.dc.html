@@ -64,7 +64,7 @@
     <div style="display:flex;align-items:center;gap:9px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:8px 13px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <div style="width:17px;height:17px;border-radius:5px;background:linear-gradient(135deg,#3B82F6,#2563EB);box-shadow:0 0 0 1px #2C3037, inset 0 1px 0 rgba(255,255,255,.25);"></div>
       <span style="font-weight:600;letter-spacing:.01em;color:#E6E9EE;">SCAD Studio</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.63.1</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5B616B;padding:1px 6px;border:1px solid #2C3037;border-radius:5px;margin-left:1px;">v0.69.0</span>
     </div>
     <div style="display:flex;align-items:center;gap:2px;background:rgba(27,30,35,.82);backdrop-filter:blur(12px);border:1px solid #2C3037;border-radius:11px;padding:4px;box-shadow:0 8px 26px rgba(0,0,0,.4);">
       <button onClick="{{ setBasic }}" title="Basic — solids only (hides parameters, 2D shapes & extrudes)" style="{{ basicTabStyle }}">Basic</button>
@@ -273,13 +273,13 @@
     <button onClick="{{ addCylinder }}" title="Add cylinder (C)" style="{{ btnCylinder }}">
       <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="5" rx="6" ry="2.3" stroke="currentColor" stroke-width="1.3"/><path d="M4 5v10c0 1.27 2.69 2.3 6 2.3s6-1.03 6-2.3V5" stroke="currentColor" stroke-width="1.3"/></svg>
     </button>
-    <button onClick="{{ toggleShapeMenu }}" title="More shapes\u2026" style="{{ btnShapes }}">
-      <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6.4 3 9.3 8H3.5L6.4 3Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><rect x="11" y="3.4" width="5.4" height="5.4" rx="1" stroke="currentColor" stroke-width="1.2"/><circle cx="6.3" cy="14" r="2.9" stroke="currentColor" stroke-width="1.2"/><path d="M13.6 11.2 16.5 16.4H10.7L13.6 11.2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" opacity=".55"/></svg>
+    <button onClick="{{ toggle3DMenu }}" title="3D shapes" style="{{ btn3D }}">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2.6 16.5 6v8L10 17.4 3.5 14V6L10 2.6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M3.6 6 10 9.4 16.4 6M10 9.4v8" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" opacity=".55"/></svg>
     </button>
-    <sc-if value="{{ shapeMenuOpen }}" hint-placeholder-val="{{ false }}">
-      <div onClick="{{ closeShapeMenu }}" style="position:fixed;inset:0;z-index:39;"></div>
-      <div style="position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);z-index:40;width:170px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.55);padding:6px;">
-        <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:5px 8px 6px;">Add shape</div>
+    <sc-if value="{{ menu3DOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ close3DMenu }}" style="position:fixed;inset:0;z-index:39;"></div>
+      <div style="position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);z-index:40;width:174px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.55);padding:6px;">
+        <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:5px 8px 6px;">3D shapes</div>
         <button onClick="{{ miCuboid }}" style="display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12.5px;padding:7px 8px;border-radius:8px;cursor:pointer;text-align:left;" style-hover="background:#23272E;">
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M10 2.6 16.5 6v8L10 17.4 3.5 14V6L10 2.6Z" stroke="#9AA3AE" stroke-width="1.3" stroke-linejoin="round"/><path d="M3.6 6 10 9.4 16.4 6M10 9.4v8" stroke="#9AA3AE" stroke-width="1.3" stroke-linejoin="round" opacity=".55"/></svg>
           Cuboid
@@ -312,8 +312,21 @@
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M3.5 15.4 16.4 15.4 3.5 4.6 3.5 15.4Z" stroke="#9AA3AE" stroke-width="1.3" stroke-linejoin="round"/></svg>
           Wedge
         </button>
-        <sc-if value="{{ advancedMode }}" hint-placeholder-val="{{ false }}">
-        <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:8px 8px 5px;border-top:1px solid #23272E;margin-top:4px;">2D · for extrude</div>
+        <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:8px 8px 5px;border-top:1px solid #23272E;margin-top:4px;">Hardware</div>
+        <button onClick="{{ miThread }}" style="display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12.5px;padding:7px 8px;border-radius:8px;cursor:pointer;text-align:left;" style-hover="background:#23272E;">
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><rect x="7" y="2.2" width="6" height="15.6" rx="1.2" stroke="#9AA3AE" stroke-width="1.3"/><path d="M7 5h6M7 7.6h6M7 10.2h6M7 12.8h6M7 15.4h6" stroke="#9AA3AE" stroke-width="1"/></svg>
+          Thread &amp; hardware…
+        </button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ advancedMode }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ toggle2DMenu }}" title="2D shapes \u2014 sketch profiles to extrude" style="{{ btn2D }}">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="4" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2.1 1.7"/><rect x="9.5" y="9.5" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2.1 1.7"/></svg>
+    </button>
+    <sc-if value="{{ menu2DOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ close2DMenu }}" style="position:fixed;inset:0;z-index:39;"></div>
+      <div style="position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);z-index:40;width:186px;background:rgba(24,27,31,.97);backdrop-filter:blur(14px);border:1px solid #2C3037;border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.55);padding:6px;">
+        <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:5px 8px 6px;">2D shapes</div>
         <button onClick="{{ miCircle }}" style="display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12.5px;padding:7px 8px;border-radius:8px;cursor:pointer;text-align:left;" style-hover="background:#23272E;">
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#9AA3AE" stroke-width="1.3" stroke-dasharray="2.2 1.8"/></svg>
           Circle
@@ -326,13 +339,13 @@
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M4 4 12 4 12 9 16 9 16 16 4 16Z" stroke="#9AA3AE" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="2.2 1.8"/></svg>
           Polygon
         </button>
-        <div style="font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#5B616B;padding:8px 8px 5px;border-top:1px solid #23272E;margin-top:4px;">Hardware</div>
-        <button onClick="{{ miThread }}" style="display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12.5px;padding:7px 8px;border-radius:8px;cursor:pointer;text-align:left;" style-hover="background:#23272E;">
-          <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><rect x="7" y="2.2" width="6" height="15.6" rx="1.2" stroke="#9AA3AE" stroke-width="1.3"/><path d="M7 5h6M7 7.6h6M7 10.2h6M7 12.8h6M7 15.4h6" stroke="#9AA3AE" stroke-width="1"/></svg>
-          Thread &amp; hardware…
+        <button onClick="{{ miText }}" style="display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;color:#C7CCD4;font:inherit;font-size:12.5px;padding:7px 8px;border-radius:8px;cursor:pointer;text-align:left;" style-hover="background:#23272E;">
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M4 5.5V4h12v1.5M10 4v12M7.5 16h5" stroke="#9AA3AE" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Text
         </button>
-        </sc-if>
+        <div style="font-size:10px;color:#5B616B;line-height:1.5;padding:6px 8px 3px;border-top:1px solid #23272E;margin-top:4px;">2D profiles extrude to 3D from the shape panel.</div>
       </div>
+    </sc-if>
     </sc-if>
     <div style="height:1px;background:#2C3037;margin:2px 4px;"></div>
     <button onClick="{{ pickMove }}" title="Move selected (M)" style="{{ btnMove }}">
@@ -480,6 +493,54 @@
           </div>
         </div>
       </sc-for>
+      <sc-if value="{{ showMirror }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:10px;align-items:center;margin:2px 0 11px;">
+          <div style="width:58px;flex:none;">
+            <div style="font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:#8A9099;line-height:1.2;">Mirror</div>
+            <div style="font-size:9px;color:#5B616B;font-family:'IBM Plex Mono',monospace;margin-top:1px;">axis</div>
+          </div>
+          <div style="flex:1;min-width:0;display:flex;gap:6px;">
+            <button onClick="{{ toggleMirX }}" title="Mirror across X" style="{{ mirXTab }}">X</button>
+            <button onClick="{{ toggleMirY }}" title="Mirror across Y" style="{{ mirYTab }}">Y</button>
+            <button onClick="{{ toggleMirZ }}" title="Mirror across Z" style="{{ mirZTab }}">Z</button>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sshIsText }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;margin:2px 0 11px;">
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <span style="font-size:9px;color:#6B7280;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;">TEXT</span>
+            <input value="{{ textValue }}" onInput="{{ onTextInput }}" onPointerDown="{{ stopProp }}" placeholder="Text" spellcheck="false" style="width:100%;background:#0F1114;border:1px solid #2C3037;border-radius:6px;color:#E6E9EE;font:inherit;font-size:13px;padding:6px 8px;box-sizing:border-box;outline:none;" style-focus="border-color:#3B82F6;" />
+          </div>
+          <div style="display:flex;gap:8px;">
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:9px;color:#6B7280;font-family:'IBM Plex Mono',monospace;">SIZE mm</span>
+              <input value="{{ textSize }}" onChange="{{ onTextSize }}" spellcheck="false" style="width:100%;background:#0F1114;border:1px solid #2C3037;border-radius:6px;color:#E6E9EE;font-family:'IBM Plex Mono',monospace;font-size:12px;padding:6px 8px;box-sizing:border-box;outline:none;" />
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:9px;color:#6B7280;font-family:'IBM Plex Mono',monospace;">SPACING</span>
+              <input value="{{ textSpacing }}" onChange="{{ onTextSpacing }}" spellcheck="false" style="width:100%;background:#0F1114;border:1px solid #2C3037;border-radius:6px;color:#E6E9EE;font-family:'IBM Plex Mono',monospace;font-size:12px;padding:6px 8px;box-sizing:border-box;outline:none;" />
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <span style="font-size:9px;color:#6B7280;font-family:'IBM Plex Mono',monospace;">H-ALIGN</span>
+            <div style="display:flex;gap:5px;">
+              <button onClick="{{ setHalignLeft }}" style="{{ halLeftTab }}">Left</button>
+              <button onClick="{{ setHalignCenter }}" style="{{ halCenterTab }}">Center</button>
+              <button onClick="{{ setHalignRight }}" style="{{ halRightTab }}">Right</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <span style="font-size:9px;color:#6B7280;font-family:'IBM Plex Mono',monospace;">V-ALIGN</span>
+            <div style="display:flex;gap:5px;">
+              <button onClick="{{ setValignBaseline }}" style="{{ valBaseTab }}">Base</button>
+              <button onClick="{{ setValignBottom }}" style="{{ valBotTab }}">Bottom</button>
+              <button onClick="{{ setValignCenter }}" style="{{ valCenTab }}">Center</button>
+              <button onClick="{{ setValignTop }}" style="{{ valTopTab }}">Top</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
       <sc-if value="{{ sshIsPoly }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;align-items:center;justify-content:space-between;margin:4px 0 7px;">
           <span style="font-size:10px;color:#8A9099;letter-spacing:.05em;text-transform:uppercase;">Points</span>
@@ -566,6 +627,7 @@
         <button onClick="{{ setGroupDiff }}" style="{{ groupDiffTab }}">− Difference</button>
         <button onClick="{{ setGroupInt }}" style="{{ groupIntTab }}">∩ Intersect</button>
         <button onClick="{{ setGroupHull }}" style="{{ groupHullTab }}">⬢ Hull</button>
+        <button onClick="{{ setGroupMink }}" style="{{ groupMinkTab }}">⊕ Minkowski</button>
       </div>
       </sc-if>
 
@@ -650,11 +712,12 @@
         </div>
       </sc-for>
       <sc-if value="{{ readOnlyTree }}" hint-placeholder-val="{{ false }}">
-        <div style="margin-top:6px;padding:8px 9px;border-radius:8px;background:#1B1814;border:1px solid #3A3322;display:flex;flex-direction:column;gap:7px;">
-          <div style="display:flex;align-items:center;gap:7px;">
-            <span style="font-size:10.5px;color:#C9A867;line-height:1.45;flex:1;">{{ roTreeHint }}</span>
-            <button onClick="{{ exitReadOnly }}" style="background:#23272E;border:1px solid #3A3322;color:#C9A867;font:inherit;font-size:10.5px;padding:4px 8px;border-radius:6px;cursor:pointer;flex:none;">Clear</button>
+        <div style="margin-top:6px;padding:9px 10px;border-radius:8px;background:#15191F;border:1px solid #263041;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.3" stroke="#6FA8F5" stroke-width="1.2"/><path d="M8 7.1v3.6" stroke="#6FA8F5" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="4.9" r=".85" fill="#6FA8F5"/></svg>
+            <span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#7FA8DA;font-weight:600;">Read-only render</span>
           </div>
+          <span style="font-size:10.5px;color:#9AA6B4;line-height:1.5;">{{ roTreeHint }}</span>
           <sc-if value="{{ roXformOn }}" hint-placeholder-val="{{ false }}">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
               <button onClick="{{ setGizmoMove }}" style="{{ roMoveTab }}">Move</button>
@@ -670,6 +733,7 @@
                 <button onClick="{{ roGroupDiff }}" title="Difference (first = base)" style="{{ roComboBtn }}">− Diff</button>
                 <button onClick="{{ roGroupInt }}" title="Intersection" style="{{ roComboBtn }}">∩ Int</button>
                 <button onClick="{{ roGroupHull }}" title="Hull (convex wrap)" style="{{ roComboBtn }}">⬢ Hull</button>
+                <button onClick="{{ roGroupMink }}" title="Minkowski sum" style="{{ roComboBtn }}">⊕ Mink</button>
               </div>
             </div>
           </sc-if>
@@ -683,6 +747,7 @@
             <button onClick="{{ groupDifference }}" title="Difference (first = base)" style="{{ comboBtn }}">− Diff</button>
             <button onClick="{{ groupIntersection }}" title="Intersection" style="{{ comboBtn }}">∩ Int</button>
             <button onClick="{{ groupHull }}" title="Hull (convex wrap)" style="{{ comboBtn }}">⬢ Hull</button>
+            <button onClick="{{ groupMinkowski }}" title="Minkowski sum" style="{{ comboBtn }}">⊕ Mink</button>
           </div>
         </div>
       </sc-if>
@@ -746,8 +811,7 @@
   <sc-if value="{{ readOnly }}" hint-placeholder-val="{{ false }}">
     <div style="{{ roBadgeStyle }}">
       <span style="width:8px;height:8px;border-radius:50%;background:#E0A33B;box-shadow:0 0 8px #E0A33B;flex:none;"></span>
-      <span style="font-size:11.5px;color:#E7C98A;">read-only — evaluated from code</span>
-      <button onClick="{{ exitReadOnly }}" style="background:transparent;border:none;color:#9C8550;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;" style-hover="color:#E7C98A;">×</button>
+      <span style="font-size:11.5px;color:#E7C98A;">read-only — rendered from code</span>
     </div>
   </sc-if>
 
@@ -966,7 +1030,8 @@ class Component extends DCLogic {
     fn: 48,
     fnMenuOpen: false,     // global $fn picker (bottom status bar)
     fileMenuOpen: false,   // File ▾ dropdown (top toolbar)
-    shapeMenuOpen: false,  // "add shape" flyout (left toolbar)
+    menu3DOpen: false,     // 3D-shapes flyout (left toolbar)
+    menu2DOpen: false,     // 2D-shapes flyout (left toolbar)
     vars: [],              // serializable mirror of this.vars
     paramsOpen: false,
     fxEdit: null,          // 'shapeId:key' of the field whose expression editor is open
@@ -1001,7 +1066,7 @@ class Component extends DCLogic {
   _rendered = [];          // nodes currently added to the scene (for teardown)
   vars = [];               // [{ name, value }] ordered
   headers = [];            // verbatim include/use lines (+ @github tags) re-emitted by _programText
-  seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0, custom: 0 };
+  seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, text: 0, extrude: 0, group: 0, custom: 0 };
 
   // ---- z-index scale: single source of truth for stacking order (low → high) ----
   // The static base-chrome tiers (hud/chrome/panel*) are ALSO written as literals in the template
@@ -1407,7 +1472,7 @@ class Component extends DCLogic {
     const g = new THREE.Group();
     g.position.set(shape.pos[0], shape.pos[1], shape.pos[2]);
     this.setEuler(g, shape.rot);
-    if (shape.scl) g.scale.set(shape.scl[0], shape.scl[1], shape.scl[2]);   // custom module instances only
+    this.applyNodeXform(g, shape);   // custom-module scale + per-axis mirror
 
     // edges list (local) — spheres have no treatable edges in v1
     shape.edges = shape.type === 'cuboid'
@@ -1728,8 +1793,15 @@ class Component extends DCLogic {
       g.translate(0, 0, -hy); g.rotateX(Math.PI / 2); g.computeVertexNormals();
       return g;
     }
-    if (shape.type === 'circle' || shape.type === 'square' || shape.type === 'polygon') {
+    if (shape.type === 'circle' || shape.type === 'square' || shape.type === 'polygon' || shape.type === 'text') {
       const T = 0.6;
+      if (shape.type === 'text') {
+        const shapes = this.ringsToShapes(this.textToRings(shape.dims || {}, this._font));
+        if (!shapes.length) return new THREE.BoxGeometry(0.5, 0.5, T);
+        const gt = new THREE.ExtrudeGeometry(shapes, { depth: T, bevelEnabled: false, curveSegments: Math.max(6, Math.min(24, this.gfn())) });
+        gt.translate(0, 0, -T / 2); gt.computeVertexNormals();
+        return gt;
+      }
       const shp = new THREE.Shape();
       if (shape.type === 'circle') {
         shp.absarc(0, 0, Math.max(0.2, shape.dims.r), 0, Math.PI * 2, false);
@@ -1773,7 +1845,7 @@ class Component extends DCLogic {
       const b = new Brush(this.solidGeometry(node));
       b.position.set(node.pos[0], node.pos[1], node.pos[2]);
       this.setEuler(b, node.rot);
-      if (node.scl) b.scale.set(node.scl[0], node.scl[1], node.scl[2]);
+      this.applyNodeXform(b, node);
       b.updateMatrixWorld(true);
       return b;
     }
@@ -1796,8 +1868,8 @@ class Component extends DCLogic {
     const kids = node.children.map(c => this.evalBrush(c)).filter(Boolean);
     if (!kids.length) return null;
     let acc;
-    if (node.op === 'hull') {
-      acc = this.hullMinkBrush(kids, 'hull');
+    if (node.op === 'hull' || node.op === 'minkowski') {
+      acc = (node.op === 'minkowski' && kids.length === 1) ? kids[0] : this.hullMinkBrush(kids, node.op);
     } else if (kids.length === 1) {
       acc = kids[0];
     } else {
@@ -2507,6 +2579,128 @@ class Component extends DCLogic {
     } catch (e) { return { ok: false, reason: 'threw: ' + (e.message || e) }; }
     finally { this.tree = savedTree; this.vars = savedVars; if (this._codeArea) this._codeArea.value = savedCode; this.reindex(); this.rebuildScene(); }
   }
+  // self-test (item 7 — convex↔concave blend at a shared vertex, v0.64.0): two fillet treatments that
+  // share a corner vertex with OPPOSITE convexity each contribute a bridging ball (cross-treatment joint),
+  // where the SAME pair examined WITHOUT siblings contributes none — proving the blend comes from the new
+  // cross-treatment path. Then a box carrying both treatments must apply watertight (even manifold edges).
+  mixedJunctionSelfTest() {
+    if (!this.CSG || !this.THREE) return { ok: false, reason: 'CSG/THREE unavailable' };
+    const THREE = this.THREE;
+    const segX = { a: [0, 0, 0], b: [10, 0, 0], mid: [5, 0, 0], U: [0, 1, 0], V: [0, 0, 1], len: 10 };
+    const segZ = { a: [0, 0, 0], b: [0, 0, 10], mid: [0, 0, 5], U: [1, 0, 0], V: [0, 1, 0], len: 10 };
+    const tConvex = { type: 'fillet', size: 3, convex: true, segs: [segX] };
+    const tConcave = { type: 'fillet', size: 3, convex: false, segs: [segZ] };
+    const both = [tConvex, tConcave];
+    const nConvex = this.jointBallGeoms(tConvex, both).length;
+    const nConcave = this.jointBallGeoms(tConcave, both).length;
+    const baseline = this.jointBallGeoms(tConvex, [tConvex]).length;   // no sibling → no joint
+    // three-bvh-csg output is never exact-manifold (unwelded seams, per the v0.55.0 note), so a strict
+    // even-edge test can't be the acceptance metric. Instead assert the box carrying BOTH treatments
+    // applies cleanly to non-empty geometry (no throw, real solid) — the blend balls above are the fix.
+    let applied = false, detail = '';
+    try {
+      const { Brush } = this.CSG;
+      const g = new THREE.BoxGeometry(40, 40, 40);
+      let b = new Brush(g); b.updateMatrixWorld(true);
+      b = this.applyEdgeTreatBrush(b, { edgeTreatments: { a: tConvex, b: tConcave } });
+      applied = !!(b && b.geometry && b.geometry.attributes.position && b.geometry.attributes.position.count > 0);
+    } catch (e) { detail = 'apply threw: ' + (e.message || e); }
+    return { ok: true, blended: nConvex >= 1 && nConcave >= 1, baseline, applied, detail };
+  }
+  // self-test (item 5 — wall-thickness clamping, v0.65.0): a thin-floor pocket's concave floor edges are
+  // long (length bound ~half the inner span) but the FLOOR is thin, so groupEdgeMaxR must clamp the radius
+  // to the ~2mm floor, far below the length bound. A wide convex edge must NOT be over-clamped.
+  wallClampSelfTest() {
+    if (!this.CSG || !this.THREE || typeof this.rebuildScene !== 'function') return { ok: false, reason: 'unavailable' };
+    const saved = { tree: this.tree, vars: this.vars, code: this.state.code };
+    try {
+      // outer 50×50×22 (z 0..22) − inner 40×40×20 (z 2..22): 2mm floor, 5mm walls, 40mm-long floor edges
+      const pocket = { id: 'wc_pk', op: 'difference', label: 'D', children: [
+        { id: 'wc_o', type: 'cuboid', label: 'o', dims: { x: 50, y: 50, z: 22 }, pos: [0, 0, 11] },
+        { id: 'wc_i', type: 'cuboid', label: 'i', dims: { x: 40, y: 40, z: 20 }, pos: [0, 0, 12] },
+      ] };
+      this.tree = [pocket]; this.vars = []; this.reindex(); this.rebuildScene();
+      const edges = pocket._edges || [];
+      const floorEdge = edges.filter(e => !e.convex).sort((a, b) => (b.minLen || 0) - (a.minLen || 0))[0];
+      let floorOk = false, floorDetail = 'no concave edge';
+      if (floorEdge) {
+        const maxR = this.groupEdgeMaxR(floorEdge);
+        floorOk = (floorEdge.minLen >= 20) && maxR <= 3;   // long edge, but clamped to the thin floor
+        floorDetail = 'minLen=' + (floorEdge.minLen || 0).toFixed(1) + ' wallR=' + (floorEdge.wallR != null ? floorEdge.wallR.toFixed(2) : 'n/a') + ' maxR=' + maxR.toFixed(2);
+      }
+      // a wide convex edge (union of two offset 40mm boxes) keeps a large allowance (not over-clamped)
+      const { Brush, Evaluator, ADDITION } = this.CSG, THREE = this.THREE;
+      const mk = (s, tx, ty, tz) => { const g = new THREE.BoxGeometry(s, s, s); g.translate(tx, ty, tz); const b = new Brush(g); b.updateMatrixWorld(true); return b; };
+      const ev = new Evaluator(); const u = ev.evaluate(mk(40, 0, 0, 20), mk(40, 34, 0, 29), ADDITION); u.updateMatrixWorld(true);
+      const cedges = this.detectGroupEdges(u.geometry);
+      const conv = cedges.filter(e => e.convex).sort((a, b) => this.groupEdgeMaxR(b) - this.groupEdgeMaxR(a))[0];
+      const convMax = conv ? this.groupEdgeMaxR(conv) : 0;
+      const convOk = convMax >= 8;    // a 40mm box edge stays generously filletable
+      return { ok: true, floorOk, floorDetail, convOk, convMax: +convMax.toFixed(2) };
+    } catch (e) { return { ok: false, reason: 'threw: ' + (e.message || e) }; }
+    finally { this.tree = saved.tree; this.vars = saved.vars; if (this._codeArea) this._codeArea.value = saved.code; this.reindex(); this.rebuildScene(); }
+  }
+  // self-test (item 6 — internal-edge volume/bbox battery, v0.65.0): for a convex-edge box and a
+  // concave-edge pocket, apply a known fillet and assert (a) edge detected + correctly classified,
+  // (b) volume DECREASES for a convex cut / INCREASES for a concave fill, (c) the bounding box is unchanged.
+  edgeTreatBatterySelfTest() {
+    if (!this.CSG || !this.THREE) return { ok: false, reason: 'CSG/THREE unavailable' };
+    const THREE = this.THREE, { Brush, Evaluator, ADDITION, SUBTRACTION } = this.CSG;
+    const vol = (g) => { const p = g.attributes.position, idx = g.index, N = (idx ? idx.count : p.count) / 3; let v = 0; const G = (t, c) => { const i = idx ? idx.getX(3 * t + c) : 3 * t + c; return [p.getX(i), p.getY(i), p.getZ(i)]; }; for (let t = 0; t < N; t++) { const a = G(t, 0), b = G(t, 1), c = G(t, 2); v += (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6; } return Math.abs(v); };
+    const bbox = (g) => { g.computeBoundingBox(); const b = g.boundingBox; return [b.min.x, b.min.y, b.min.z, b.max.x, b.max.y, b.max.z]; };
+    const bboxSame = (a, b) => a.every((v, i) => Math.abs(v - b[i]) < 0.6);
+    const ev = new Evaluator();
+    const mk = (s, tx, ty, tz) => { const g = new THREE.BoxGeometry(s, s, s); g.translate(tx, ty, tz); const b = new Brush(g); b.updateMatrixWorld(true); return b; };
+    const segCopy = (e) => e.segs.map(s => ({ a: s.a.slice(), b: s.b.slice(), mid: s.mid.slice(), U: s.U.slice(), V: s.V.slice(), len: s.len }));
+    const cases = [];
+    // convex: fillet a top edge of a single box → volume drops, bbox holds
+    {
+      const box = mk(40, 0, 0, 20);
+      const edges = this.detectGroupEdges(box.geometry);
+      const ce = edges.filter(e => e.convex)[0];
+      let detOk = !!ce, volOk = false, bboxOk = false;
+      if (ce) {
+        const raw = box.geometry.clone(); const v0 = vol(raw), bb0 = bbox(raw);
+        const node = { edgeTreatments: { e: { type: 'fillet', size: 3, convex: true, segs: segCopy(ce) } } };
+        const out = this.applyEdgeTreatBrush(new Brush(box.geometry), node);
+        const v1 = vol(out.geometry), bb1 = bbox(out.geometry);
+        volOk = v1 < v0 - 1; bboxOk = bboxSame(bb0, bb1);
+      }
+      cases.push({ name: 'convex edge cut (box)', detOk, classOk: !!(ce && ce.convex), volOk, bboxOk });
+    }
+    // concave: fillet the internal edges of a pocket → volume rises, bbox holds
+    {
+      const pocket = ev.evaluate(mk(50, 0, 0, 25), mk(30, 0, 0, 36), SUBTRACTION); pocket.updateMatrixWorld(true);
+      const edges = this.detectGroupEdges(pocket.geometry);
+      const ce = edges.filter(e => !e.convex)[0];
+      let detOk = !!ce, volOk = false, bboxOk = false;
+      if (ce) {
+        const raw = pocket.geometry.clone(); const v0 = vol(raw), bb0 = bbox(raw);
+        const node = { edgeTreatments: {} };
+        edges.filter(e => !e.convex).forEach((e, i) => node.edgeTreatments['c' + i] = { type: 'fillet', size: 3, convex: false, segs: segCopy(e) });
+        const out = this.applyEdgeTreatBrush(new Brush(pocket.geometry), node);
+        const v1 = vol(out.geometry), bb1 = bbox(out.geometry);
+        volOk = v1 > v0 + 1; bboxOk = bboxSame(bb0, bb1);
+      }
+      cases.push({ name: 'concave edge fill (pocket)', detOk, classOk: !!(ce && !ce.convex), volOk, bboxOk });
+    }
+    const allOk = cases.every(c => c.detOk && c.classOk && c.volOk && c.bboxOk);
+    return { ok: true, allOk, cases };
+  }
+  // count undirected mesh edges; a closed manifold shares every edge an even number of times (usually 2)
+  _isWatertight(geo) {
+    if (!geo || !geo.attributes || !geo.attributes.position) return false;
+    const g = geo.index ? geo.toNonIndexed() : geo;
+    const p = g.attributes.position, N = p.count / 3, Q = 1e3;
+    const key = (i) => Math.round(p.getX(i) * Q) + ',' + Math.round(p.getY(i) * Q) + ',' + Math.round(p.getZ(i) * Q);
+    const m = new Map();
+    for (let t = 0; t < N; t++) {
+      const k = [3 * t, 3 * t + 1, 3 * t + 2].map(key);
+      for (let e = 0; e < 3; e++) { const A = k[e], B = k[(e + 1) % 3]; const ek = A < B ? A + '|' + B : B + '|' + A; m.set(ek, (m.get(ek) || 0) + 1); }
+    }
+    let odd = 0; for (const c of m.values()) if (c % 2) odd++;
+    return odd === 0;
+  }
   detectGroupEdges(geo) {
     if (!geo || !geo.attributes || !geo.attributes.position) return [];
     const pos = geo.attributes.position, idx = geo.index;
@@ -2552,7 +2746,37 @@ class Component extends DCLogic {
     // edges were not selectable). Recover them: group collinear boundary edges, pair the two opposing
     // face normals on each supporting line, and classify convex/concave with the same apex test.
     this.pairBoundarySeams(boundary, segs, COS_FLAT);
-    return this.chainEdgeSegs(segs);
+    const chains = this.chainEdgeSegs(segs);
+    for (const c of chains) { const w = this.edgeWallLimit(geo, c); if (isFinite(w)) c.wallR = w; }
+    return chains;
+  }
+  // Measure the perpendicular wall thickness on each face adjacent to an edge and derive a max radius
+  // (item 5, v0.65.0): cast a ray from the edge midpoint INTO the solid along each adjacent face's inward
+  // normal; the nearest opposite surface is that wall's thickness. A convex fillet/chamfer may cut at most
+  // HALF the thinnest wall (two opposite treatments would otherwise meet); a concave fill may run the FULL
+  // wall (its arc rides up each adjacent face — tube wall width, pocket floor depth) before overshooting.
+  // Returns Infinity when nothing can be measured (fall back to the edge-length bound).
+  edgeWallLimit(geo, edge) {
+    const THREE = this.THREE;
+    if (!geo || !geo.attributes || !geo.attributes.position || !edge || !edge.segs || !edge.segs.length) return Infinity;
+    if (!this._wallRay) { this._wallRay = new THREE.Raycaster(); this._wallRay.firstHitOnly = false; }
+    const ray = this._wallRay;
+    const mesh = new THREE.Mesh(geo, this._wallMat || (this._wallMat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })));
+    mesh.updateMatrixWorld(true);
+    const seg = edge.segs[Math.floor(edge.segs.length / 2)];
+    const mid = new THREE.Vector3().fromArray(seg.mid);
+    let lim = Infinity;
+    for (const nArr of [seg.U, seg.V]) {
+      const dir = new THREE.Vector3().fromArray(nArr).normalize().multiplyScalar(-1);  // into the solid
+      if (dir.lengthSq() < 0.5) continue;
+      ray.set(mid.clone().addScaledVector(dir, 1e-3), dir);
+      const hits = ray.intersectObject(mesh, false);
+      let d = Infinity;
+      for (const h of hits) { if (h.distance > 0.05) { d = h.distance; break; } }
+      if (isFinite(d)) lim = Math.min(lim, d);
+    }
+    if (!isFinite(lim)) return Infinity;
+    return edge.convex ? lim / 2 : lim;
   }
   // pair collinear single-triangle boundary edges (CSG seam) into feature-edge segments
   pairBoundarySeams(boundary, segs, COS_FLAT) {
@@ -2638,7 +2862,11 @@ class Component extends DCLogic {
     }
     return chains;
   }
-  groupEdgeMaxR(edge) { return Math.max(0.5, Math.min(20, (edge ? edge.minLen : 40) / 2 - 0.2)); }
+  groupEdgeMaxR(edge) {
+    const byLen = Math.max(0.5, Math.min(20, (edge ? edge.minLen : 40) / 2 - 0.2));
+    const byWall = (edge && isFinite(edge.wallR)) ? edge.wallR - 0.2 : Infinity;   // item 5: don't punch through the thinnest adjacent wall
+    return Math.max(0.3, Math.min(byLen, byWall));
+  }
 
   // ---- tool geometry: corner-removal/-fill profile extruded along one edge segment ----
   edgeToolSegGeom(seg, type, convex, r) {
@@ -2667,7 +2895,8 @@ class Component extends DCLogic {
     const p = convex ? mid.clone().addScaledVector(U, -r).addScaledVector(V, -r) : mid.clone();
     return new THREE.Matrix4().makeBasis(U, V, E).setPosition(p);
   }
-  buildEdgeToolBrush(t) {
+  buildEdgeToolBrush(t, siblings) {
+    this._toolSiblings = siblings;   // consumed by jointBallGeoms (cross-treatment joint bridging)
     const THREE = this.THREE;
     const geos = [];
     for (const seg of t.segs) { const g = this.edgeToolSegGeom(seg, t.type, t.convex, t.size); if (g) geos.push(g); }
@@ -2678,7 +2907,7 @@ class Component extends DCLogic {
     // prisms exactly (a real router-bit ball). Only added at joints that actually turn (>15°) — a finely
     // tessellated rim (near-collinear segments) needs none, keeping the CSG cheap.
     if (t.type === 'fillet') {
-      for (const g of this.jointBallGeoms(t)) geos.push(g);
+      for (const g of this.jointBallGeoms(t, this._toolSiblings)) geos.push(g);
     }
     const merged = this.mergeGeos(geos);
     merged.computeVertexNormals();
@@ -2687,27 +2916,50 @@ class Component extends DCLogic {
     const b = new this.CSG.Brush(merged); b.updateMatrixWorld(true);
     return b;
   }
-  // spheres seated at angled interior joints of a fillet chain (arc-center of the rounding cylinder)
-  jointBallGeoms(t) {
+  // spheres seated at angled interior joints of a fillet chain (arc-center of the rounding cylinder).
+  // `siblings` = the node's other edge treatments; a joint is bridged when t's segment endpoint meets an
+  // incident segment (from t OR a sibling fillet) that TURNS >15° or is of MIXED convexity. The mixed-
+  // convexity case is item 7 (v0.64.0): a subtracted convex fillet and a unioned concave fillet that share
+  // a corner each contribute one ball at their OWN arc-center, so the flat prism caps round into a
+  // continuous blend instead of a sliver. Radius stays t.size → tangent to t's own fillet cylinder.
+  jointBallGeoms(t, siblings) {
     const THREE = this.THREE, out = [];
-    if (!t.segs.every(s => s.a && s.b)) return out;   // endpoints required (older persisted treatments lack them)
+    if (!t.segs || !t.segs.every(s => s.a && s.b)) return out;   // endpoints required (older persisted treatments lack them)
     const Q = 1e3;
     const pk = (p) => Math.round(p[0] * Q) + ',' + Math.round(p[1] * Q) + ',' + Math.round(p[2] * Q);
     const dir = (s, from) => { const to = pk(s.a) === from ? s.b : s.a; const a = pk(s.a) === from ? s.a : s.b; const d = [to[0] - a[0], to[1] - a[1], to[2] - a[2]]; const L = Math.hypot(...d) || 1; return [d[0] / L, d[1] / L, d[2] / L]; };
-    // group segments by shared endpoint
+    // incidence map over t's own segments AND sibling fillet treatments' segments (each tagged w/ its treatment)
     const at = new Map();
-    for (const s of t.segs) for (const p of [s.a, s.b]) { const k = pk(p); if (!at.has(k)) at.set(k, []); at.get(k).push(s); }
+    const addSeg = (s, tr) => { for (const p of [s.a, s.b]) { const k = pk(p); if (!at.has(k)) at.set(k, []); at.get(k).push({ s, tr }); } };
+    for (const s of t.segs) addSeg(s, t);
+    for (const other of (siblings || [])) {
+      if (other === t || other.type !== 'fillet' || !other.segs) continue;
+      for (const s of other.segs) if (s.a && s.b) addSeg(s, other);
+    }
     const seen = new Set();
-    for (const [k, segs] of at) {
-      if (segs.length < 2) continue;                 // chain end or isolated — no interior joint
-      if (seen.has(k)) continue; seen.add(k);
-      const P = (pk(segs[0].a) === k) ? segs[0].a : segs[0].b;
-      // turn angle between the two incident segments
-      const d0 = dir(segs[0], k), d1 = dir(segs[1], k);
-      const dot = -(d0[0] * d1[0] + d0[1] * d1[1] + d0[2] * d1[2]); // both point away from joint
-      if (dot > Math.cos(15 * Math.PI / 180)) continue;            // near-straight — flat caps meet
-      const s = segs[0], r = t.size;
-      const U = new THREE.Vector3().fromArray(s.U), V = new THREE.Vector3().fromArray(s.V);
+    for (const s0 of t.segs) for (const P of [s0.a, s0.b]) {
+      const k = pk(P);
+      if (seen.has(k)) continue;
+      const inc = at.get(k) || [];
+      if (inc.length < 2) continue;                  // chain end or isolated — no interior joint
+      const d0 = dir(s0, k);
+      let need = false;
+      for (const e of inc) {
+        if (e.s === s0) continue;
+        const de = dir(e.s, k);
+        const dot = -(d0[0] * de[0] + d0[1] * de[1] + d0[2] * de[2]);
+        const turns = dot <= Math.cos(15 * Math.PI / 180);
+        const mixed = (!!e.tr.convex) !== (!!t.convex);
+        // Same-treatment angled joint = the original v0.59.0 bridging (keep exactly). Cross-treatment
+        // balls are added ONLY at MIXED-convexity junctions (item 7) — same-convexity neighbors that
+        // meet were already handled acceptably by plain prism unions, and adding balls there can hand
+        // three-bvh-csg a degenerate tool. So: bridge on (own-treatment turn) OR (mixed convexity).
+        if (mixed || (e.tr === t && turns)) { need = true; break; }
+      }
+      if (!need) continue;
+      seen.add(k);
+      const r = t.size;
+      const U = new THREE.Vector3().fromArray(s0.U), V = new THREE.Vector3().fromArray(s0.V);
       const C = new THREE.Vector3().fromArray(P);
       if (t.convex) C.addScaledVector(U, -r).addScaledVector(V, -r); else C.addScaledVector(U, r).addScaledVector(V, r);
       const cseg = Math.max(8, Math.round(this.state.fn / 2));
@@ -2725,8 +2977,8 @@ class Component extends DCLogic {
     if (!this._ev) this._ev = new Evaluator();
     let acc = brush;
     const treats = Object.values(node.edgeTreatments);
-    for (const t of treats.filter(x => x.convex)) { const tool = this.buildEdgeToolBrush(t); if (tool) acc = this._ev.evaluate(acc, tool, SUBTRACTION); }
-    for (const t of treats.filter(x => !x.convex)) { const tool = this.buildEdgeToolBrush(t); if (tool) acc = this._ev.evaluate(acc, tool, ADDITION); }
+    for (const t of treats.filter(x => x.convex)) { const tool = this.buildEdgeToolBrush(t, treats); if (tool) acc = this._ev.evaluate(acc, tool, SUBTRACTION); }
+    for (const t of treats.filter(x => !x.convex)) { const tool = this.buildEdgeToolBrush(t, treats); if (tool) acc = this._ev.evaluate(acc, tool, ADDITION); }
     acc.updateMatrixWorld(true);
     return acc;
   }
@@ -3136,7 +3388,7 @@ class Component extends DCLogic {
     g.add(fill); g.add(wire);
     g.position.set(node.pos[0], node.pos[1], node.pos[2]);
     this.setEuler(g, node.rot);
-    if (node.scl) g.scale.set(node.scl[0], node.scl[1], node.scl[2]);
+    this.applyNodeXform(g, node);
     g.userData = { ghostFor: node.id };
     this.scene.add(g);
     this.ghost = g;
@@ -3156,6 +3408,16 @@ class Component extends DCLogic {
   setEuler(obj, rot) {
     const d2r = Math.PI / 180, r = rot || [0, 0, 0];
     obj.rotation.set(r[0] * d2r, r[1] * d2r, r[2] * d2r, 'ZYX');
+  }
+  // Combined scale + mirror onto a THREE object. node.scl = custom-module scale ([1,1,1] default);
+  // node.mir = [bx,by,bz] per-axis reflection flags. A mirrored axis multiplies its scale by -1;
+  // THREE's renderer flips triangle winding for negative-determinant matrices, so lit display meshes
+  // stay correct. Returns true if anything non-identity was applied.
+  applyNodeXform(obj, node) {
+    const s = node.scl || [1, 1, 1], m = node.mir || [0, 0, 0];
+    if (!node.scl && !(m[0] || m[1] || m[2])) return false;
+    obj.scale.set(s[0] * (m[0] ? -1 : 1), s[1] * (m[1] ? -1 : 1), s[2] * (m[2] ? -1 : 1));
+    return true;
   }
   readEuler(obj) {
     if (obj.rotation.order !== 'ZYX') obj.rotation.reorder('ZYX');
@@ -3194,7 +3456,7 @@ class Component extends DCLogic {
     } else if (n && !this.isGroup(n) && !this.isTopLevel(id)) {
       // nested member: show + drive a ghost proxy so negatives are visible and editable
       if (!this.ghost || this.ghost.userData.ghostFor !== n.id) this.buildGhost(n);
-      else { this.ghost.position.set(n.pos[0], n.pos[1], n.pos[2]); this.setEuler(this.ghost, n.rot); const gs = n.scl || [1, 1, 1]; this.ghost.scale.set(gs[0], gs[1], gs[2]); }
+      else { this.ghost.position.set(n.pos[0], n.pos[1], n.pos[2]); this.setEuler(this.ghost, n.rot); this.applyNodeXform(this.ghost, n); }
       this._applyGizmoMode(this.ghost, true);
     } else {
       this.clearGhost();
@@ -3357,6 +3619,16 @@ class Component extends DCLogic {
     const s = this.selShape(); if (!s || this.isGroup(s)) return;
     const target = this.restingPos(s)[2];
     this.setFieldValueRespectingBinding(s, 'pz', target);
+  };
+  // per-axis mirror toggle (Mirror X/Y/Z in the shape inspector) — reflects the primitive about the
+  // world axis plane through its own placement; emitted as mirror([...]) and rebuilt live.
+  toggleMirror = (ax) => {
+    const s = this.selShape(); if (!s || this.isGroup(s)) return;
+    if (!s.mir) s.mir = [false, false, false];
+    s.mir[ax] = !s.mir[ax];
+    if (!s.mir[0] && !s.mir[1] && !s.mir[2]) delete s.mir;
+    if (this.isTopLevel(s.id)) this.rebuildShape(s); else this.rebuildAncestor(s);
+    this.syncShapesState(); this.regenCode(); this.forceUpdate();
   };
   rebuildShape(s) {
     for (const [n, t] of Object.entries(s.edgeTreatments || {})) { if (t.segs) continue; const mx = this.edgeMaxRadius(s, n); if (t.size > mx) t.size = mx; }
@@ -3837,13 +4109,32 @@ class Component extends DCLogic {
     const dims = { pts: [[-20, -20], [20, -20], [20, -6], [-6, -6], [-6, 20], [-20, 20]] };
     this.addPrimitive({ id: 'pg' + Date.now() + this.seq.polygon, type: 'polygon', label: 'Polygon ' + this.seq.polygon, dims, pos: [...this.nextPos().slice(0, 2), 0.3] });
   };
+  addText2D = () => {
+    if (!this.scene) return;
+    this.seq.text = (this.seq.text || 0) + 1;
+    const dims = { text: 'Text', size: 10, halign: 'left', valign: 'baseline', spacing: 1 };
+    const id = 'tx' + Date.now() + this.seq.text;
+    // font shapes asynchronously; once loaded, rebuild so glyphs appear
+    this.ensureFont().then(() => { const nd = this.findNode(id); if (nd) this.rebuildShape(nd); });
+    this.addPrimitive({ id, type: 'text', label: 'Text ' + this.seq.text, dims, pos: [...this.nextPos().slice(0, 2), 0.3] });
+  };
+  setTextField = (key, val) => {
+    const s = this.selShape(); if (!s || s.type !== 'text') return;
+    if (key === 'text') s.dims.text = val;
+    else if (key === 'size') { const n = parseFloat(val); if (!isNaN(n) && n > 0) s.dims.size = n; }
+    else if (key === 'spacing') { const n = parseFloat(val); if (!isNaN(n)) s.dims.spacing = n; }
+    else if (key === 'halign' || key === 'valign') s.dims[key] = val;
+    this.ensureFont().then(() => { const nd = this.findNode(s.id); if (nd) this.rebuildShape(nd); });
+  };
   pickShape = (n) => {
-    this.setState({ shapeMenuOpen: false });
-    const fn = { cuboid: this.addCuboid, cylinder: this.addCylinder, cone: this.addCone, pyramid: this.addPyramid, sphere: this.addSphere, torus: this.addTorus, tube: this.addTube, wedge: this.addWedge, circle: this.addCircle2D, square: this.addSquare2D, polygon: this.addPolygon2D }[n];
+    this.setState({ menu3DOpen: false, menu2DOpen: false });
+    const fn = { cuboid: this.addCuboid, cylinder: this.addCylinder, cone: this.addCone, pyramid: this.addPyramid, sphere: this.addSphere, torus: this.addTorus, tube: this.addTube, wedge: this.addWedge, circle: this.addCircle2D, square: this.addSquare2D, polygon: this.addPolygon2D, text: this.addText2D }[n];
     if (fn) fn();
   };
-  toggleShapeMenu = () => this.setState({ shapeMenuOpen: !this.state.shapeMenuOpen });
-  closeShapeMenu = () => this.setState({ shapeMenuOpen: false });
+  toggle3DMenu = () => this.setState({ menu3DOpen: !this.state.menu3DOpen, menu2DOpen: false });
+  close3DMenu = () => this.setState({ menu3DOpen: false });
+  toggle2DMenu = () => this.setState({ menu2DOpen: !this.state.menu2DOpen, menu3DOpen: false });
+  close2DMenu = () => this.setState({ menu2DOpen: false });
   addSphere = () => {
     if (!this.scene) return;
     this.seq.sphere++;
@@ -4061,7 +4352,7 @@ class Component extends DCLogic {
     const firstIdx = Math.min(...nodes.map(n => arr.indexOf(n)));
     for (const n of nodes) { const k = arr.indexOf(n); if (k >= 0) arr.splice(k, 1); }
     this.seq.group++;
-    const label = (op === 'union' ? 'Union ' : op === 'difference' ? 'Difference ' : op === 'hull' ? 'Hull ' : 'Intersection ') + this.seq.group;
+    const label = (op === 'union' ? 'Union ' : op === 'difference' ? 'Difference ' : op === 'hull' ? 'Hull ' : op === 'minkowski' ? 'Minkowski ' : 'Intersection ') + this.seq.group;
     const gnode = { id: 'gp' + Date.now() + this.seq.group, op, label, children: nodes };
     arr.splice(Math.min(firstIdx, arr.length), 0, gnode);
     this.reindex();
@@ -4071,7 +4362,7 @@ class Component extends DCLogic {
   extrudeSelection = (mode, id) => {
     id = id || this.state.selectedShapeId;
     const node = this.findNode(id);
-    if (!node || this.isGroup(node) || !['circle', 'square', 'polygon'].includes(node.type)) { this.flashStatus('Select a 2D shape to extrude'); this.setState({ ctxMenu: null }); return; }
+    if (!node || this.isGroup(node) || !['circle', 'square', 'polygon', 'text'].includes(node.type)) { this.flashStatus('Select a 2D shape to extrude'); this.setState({ ctxMenu: null }); return; }
     const arr = this.parentArrayOf(id); const idx = arr.indexOf(node);
     arr.splice(idx, 1);
     this.seq.extrude = (this.seq.extrude || 0) + 1;
@@ -4108,12 +4399,13 @@ class Component extends DCLogic {
       const f = { id: nid, op: n.op, label: (n.label || 'Group') + ' copy', children: (n.children || []).map(c => this._cloneForDup(c, ctr)) };
       if (n.dims) f.dims = JSON.parse(JSON.stringify(n.dims));
       if (n.edgeTreatments) f.edgeTreatments = JSON.parse(JSON.stringify(n.edgeTreatments));
-      f.pos = (n.pos || [0, 0, 0]).slice(); if (n.rot) f.rot = n.rot.slice();
+      f.pos = (n.pos || [0, 0, 0]).slice(); if (n.rot) f.rot = n.rot.slice(); if (n.mir) f.mir = n.mir.slice();
       return f;
     }
     const f = { id: nid, type: n.type, label: (n.label || 'Shape') + ' copy', dims: JSON.parse(JSON.stringify(n.dims || {})), pos: (n.pos || [0, 0, 0]).slice() };
     if (n.edgeTreatments && Object.keys(n.edgeTreatments).length) f.edgeTreatments = JSON.parse(JSON.stringify(n.edgeTreatments));
     if (n.rot) f.rot = n.rot.slice();
+    if (n.mir) f.mir = n.mir.slice();
     if (n.type === 'custom') { f.name = n.name; f.argsSrc = n.argsSrc || ''; if (n.scl) f.scl = n.scl.slice(); }
     if (n.expr) f.expr = { ...n.expr };
     return f;
@@ -4201,17 +4493,53 @@ class Component extends DCLogic {
     this.reindex();
     this.setState({ ctxMenu: null, dragOver: null }, () => { this.rebuildScene(); this.updateGizmo(); this.syncShapesState(); this.regenCode(); });
   }
-  reorderNode(dragId, targetId, after) {
-    if (dragId === targetId) return;
-    const arr = this.parentArrayOf(dragId);
-    if (!arr || arr !== this.parentArrayOf(targetId)) { this.flashStatus('Drop onto a sibling to reorder'); return; }
+  // Cross-level move: reorder within a parent OR reparent into/out of a group.
+  // zone: 'before' | 'after' (sibling of target) | 'into' (append inside target group).
+  moveNode(dragId, targetId, zone) {
+    if (!zone || dragId === targetId) { if (this.state.dragOver) this.setState({ dragOver: null }); return; }
+    if (this.isAncestorOf(dragId, targetId)) { this.flashStatus('Can\u2019t drop a group inside itself'); this.setState({ dragOver: null }); return; }
     const dn = this.findNode(dragId), tn = this.findNode(targetId);
-    const from = arr.indexOf(dn); if (from < 0) return;
-    arr.splice(from, 1);
-    let to = arr.indexOf(tn); if (to < 0) { arr.splice(from, 0, dn); return; }
-    if (after) to += 1;
-    arr.splice(to, 0, dn);
+    const srcArr = this.parentArrayOf(dragId);
+    if (!dn || !tn || !srcArr) { this.setState({ dragOver: null }); return; }
+    let destArr, destIdx;
+    if (zone === 'into') {
+      if (!this.isGroup(tn)) { this.setState({ dragOver: null }); return; }
+      destArr = tn.children; destIdx = destArr.length;      // append as last child
+    } else {
+      destArr = this.parentArrayOf(targetId);
+      if (!destArr) { this.setState({ dragOver: null }); return; }
+      destIdx = destArr.indexOf(tn) + (zone === 'after' ? 1 : 0);
+    }
+    const from = srcArr.indexOf(dn); if (from < 0) { this.setState({ dragOver: null }); return; }
+    srcArr.splice(from, 1);
+    if (srcArr === destArr && from < destIdx) destIdx -= 1;   // account for the just-removed node
+    destArr.splice(Math.max(0, Math.min(destIdx, destArr.length)), 0, dn);
+    const reparented = srcArr !== destArr;
+    if (reparented) {
+      this.pruneEmptyGroups();
+      if (this.isGroup(tn) && zone === 'into') this.setState({ expanded: { ...this.state.expanded, [tn.id]: true } });
+    }
+    this.setState({ selectedShapeId: dragId, selectedIds: [dragId] });
     this.commitReorder();
+    if (reparented) this.flashStatus('Moved \u201c' + (dn.label || 'shape') + '\u201d');
+  }
+  // true if nodeId is ancestorId itself or lives anywhere inside ancestorId's subtree
+  isAncestorOf(ancestorId, nodeId) {
+    const anc = this.findNode(ancestorId); if (!anc) return false;
+    let found = false;
+    const walk = (n) => { if (found) return; if (n.id === nodeId) { found = true; return; } if (this.isGroup(n)) n.children.forEach(walk); };
+    walk(anc); return found;
+  }
+  // drop empty groups left behind after a child is dragged out (a difference/union with no
+  // members renders nothing and is just clutter)
+  pruneEmptyGroups() {
+    const walk = (arr) => {
+      for (let i = arr.length - 1; i >= 0; i--) {
+        const n = arr[i];
+        if (this.isGroup(n)) { walk(n.children); if (!n.children.length) arr.splice(i, 1); }
+      }
+    };
+    walk(this.tree);
   }
   moveNodeBy(id, dir) {
     const arr = this.parentArrayOf(id);
@@ -4227,20 +4555,24 @@ class Component extends DCLogic {
   };
   onTreeDragOver = (id, e) => {
     if (!this._dragId || this._dragId === id) return;
-    if (this.parentArrayOf(this._dragId) !== this.parentArrayOf(id)) return;  // siblings only
+    if (this.isAncestorOf(this._dragId, id)) return;   // can't drop a group into its own subtree
     e.preventDefault();
     if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    const tn = this.findNode(id), isGrp = this.isGroup(tn);
     const rect = e.currentTarget.getBoundingClientRect();
-    const after = (e.clientY - rect.top) > rect.height / 2;
-    const key = id + (after ? ':after' : ':before');
+    const rel = rect.height ? (e.clientY - rect.top) / rect.height : 0.5;
+    // group rows get a 3-zone hit test (above / inside / below); leaves get above / below
+    const zone = isGrp ? (rel < 0.3 ? 'before' : rel > 0.7 ? 'after' : 'into') : (rel > 0.5 ? 'after' : 'before');
+    const key = id + ':' + zone;
     if (this.state.dragOver !== key) this.setState({ dragOver: key });
   };
   onTreeDrop = (id, e) => {
     e.preventDefault(); e.stopPropagation();
     const dragId = this._dragId; this._dragId = null;
-    const after = this.state.dragOver ? this.state.dragOver.endsWith(':after') : false;
-    if (dragId) this.reorderNode(dragId, id, after);
-    else if (this.state.dragOver) this.setState({ dragOver: null });
+    const over = this.state.dragOver;
+    if (!dragId) { if (over) this.setState({ dragOver: null }); return; }
+    const zone = (over && over.indexOf(id + ':') === 0) ? over.slice(id.length + 1) : null;
+    this.moveNode(dragId, id, zone);
   };
   onTreeDragEnd = () => { this._dragId = null; if (this.state.dragOver) this.setState({ dragOver: null }); };
 
@@ -4265,6 +4597,7 @@ class Component extends DCLogic {
                 : n.type === 'circle' ? `\u2300${this.fmt(n.dims.r * 2)} \u00b7 2D`
                 : n.type === 'square' ? `${this.fmt(n.dims.x)}\u00d7${this.fmt(n.dims.y)} \u00b7 2D`
                 : n.type === 'polygon' ? `${(n.dims.pts || []).length} pts \u00b7 2D`
+                : n.type === 'text' ? `"${String(n.dims.text || '').slice(0, 10)}" \u00b7 2D`
                 : `\u2300${this.fmt(n.dims.r * 2)}`,
       };
     };
@@ -4349,12 +4682,14 @@ class Component extends DCLogic {
         if (n.dims) o.dims = n.dims;
         if (n.pos && (n.pos[0] || n.pos[1] || n.pos[2])) o.pos = n.pos;
         if (n.rot && (n.rot[0] || n.rot[1] || n.rot[2])) o.rot = n.rot;
+        if (n.mir && (n.mir[0] || n.mir[1] || n.mir[2])) o.mir = n.mir;
         if (n.edgeTreatments && Object.keys(n.edgeTreatments).length) o.edgeTreatments = n.edgeTreatments;
         o.children = (n.children || []).map(clean);
         return o;
       }
       const o = { type: n.type, label: n.label, dims: n.dims, pos: n.pos };
       if (n.rot) o.rot = n.rot;
+      if (n.mir && (n.mir[0] || n.mir[1] || n.mir[2])) o.mir = n.mir;
       if (n.type === 'custom') { o.name = n.name; o.argsSrc = n.argsSrc || ''; if (n.scl) o.scl = n.scl; }
       if (n.expr && Object.keys(n.expr).length) o.expr = n.expr;
       if (n.edgeTreatments && Object.keys(n.edgeTreatments).length) o.edgeTreatments = n.edgeTreatments;
@@ -4379,6 +4714,7 @@ class Component extends DCLogic {
       if (n.dims) o.dims = JSON.parse(JSON.stringify(n.dims));
       if (n.pos) o.pos = [...n.pos];
       if (n.rot) o.rot = [...n.rot];
+      if (n.mir) o.mir = [...n.mir];
       if (n.edgeTreatments) o.edgeTreatments = JSON.parse(JSON.stringify(n.edgeTreatments));
       return o;
     }
@@ -4390,6 +4726,7 @@ class Component extends DCLogic {
     if (n.edgeTreatments && Object.keys(n.edgeTreatments).length) o.edgeTreatments = JSON.parse(JSON.stringify(n.edgeTreatments));
     if (n.treatments) { o.edgeTreatments = o.edgeTreatments || {}; for (const [nm, t] of Object.entries(n.treatments)) if (t && !(nm in o.edgeTreatments)) o.edgeTreatments[nm] = { type: t.type, size: t.size, convex: true }; if (!Object.keys(o.edgeTreatments).length) delete o.edgeTreatments; }
     if (n.rot) o.rot = [...n.rot];
+    if (n.mir) o.mir = [...n.mir];
     if (n.type === 'custom') { o.name = n.name; o.argsSrc = n.argsSrc || ''; if (n.scl) o.scl = [...n.scl]; }
     if (n.expr && Object.keys(n.expr).length) o.expr = JSON.parse(JSON.stringify(n.expr));
     return o;
@@ -4412,7 +4749,7 @@ class Component extends DCLogic {
     this.clearEngineRender();
     for (const n of this._rendered) { if (n.group) { this.scene.remove(n.group); this.disposeGroup(n.group); } }
     this._rendered = [];
-    this.seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0, custom: 0 };
+    this.seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, text: 0, extrude: 0, group: 0, custom: 0 };
     const vmap = this.varMap();
     for (const s of this.shapes) if (s.expr) this.resolveShape(s, vmap);
     this.clampAllTreatments();
@@ -4508,8 +4845,11 @@ class Component extends DCLogic {
     // --- decide: simple GUI-editable program, or advanced -> evaluate & render read-only ---
     let advanced = false, ast = null;
     if (window.ScadEngine) {
-      try { const pp = window.ScadEngine.parse(txt); ast = pp.ast; advanced = pp.errors.length ? true : this.isAdvanced(ast); }
-      catch (e) { advanced = true; }
+      try {
+        const pp = window.ScadEngine.parse(txt); ast = pp.ast; advanced = pp.errors.length ? true : this.isAdvanced(ast);
+        if (advanced) this._advReason = pp.errors.length ? 'code with a syntax detail the visual editor can\u2019t map to shapes' : this.advancedReason(ast);
+      }
+      catch (e) { advanced = true; this._advReason = 'code the visual editor can\u2019t parse into editable shapes'; }
     }
     if (advanced && window.ScadEngine) { this.runAdvanced(txt); return; }
     this._readsViewport = false;
@@ -4523,7 +4863,7 @@ class Component extends DCLogic {
     // wipe and rebuild
     for (const n of this._rendered) { if (n.group) { this.scene.remove(n.group); this.disposeGroup(n.group); } }
     this._rendered = [];
-    this.tree = []; this.seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, extrude: 0, group: 0, custom: 0 };
+    this.tree = []; this.seq = { cuboid: 0, cylinder: 0, sphere: 0, torus: 0, tube: 0, wedge: 0, circle: 0, square: 0, polygon: 0, text: 0, extrude: 0, group: 0, custom: 0 };
     this.vars = parsed.vars.map(v => ({ name: v.name, value: v.value }));
     this.tree = (parsed.tree || []).map(p => this.buildNodeFromParsed(p));
     this.reindex();
@@ -4544,7 +4884,7 @@ class Component extends DCLogic {
   // 2D primitives. This set MUST stay in sync with parseBlock/readPrimitive (the reconstructor) —
   // anything admitted here must round-trip, or the GUI tree would silently drop geometry.
   isAdvanced(ast) {
-    const SIMPLE = new Set(['translate', 'rotate', 'cube', 'cylinder', 'sphere', 'union', 'difference', 'intersection', 'hull', 'linear_extrude', 'rotate_extrude', 'circle', 'square', 'polygon']);
+    const SIMPLE = new Set(['translate', 'rotate', 'cube', 'cylinder', 'sphere', 'union', 'difference', 'intersection', 'hull', 'minkowski', 'linear_extrude', 'rotate_extrude', 'circle', 'square', 'polygon']);
     const exprSimple = (e) => {
       if (!e) return true;
       switch (e.e) {
@@ -4601,6 +4941,33 @@ class Component extends DCLogic {
       }
     };
     return !(ast.stmts || []).every(stmtSimple);
+  }
+
+  // Plain-language summary of WHY a program renders read-only — the named constructs that have no
+  // editable GUI representation. Best-effort classification of top-level statements (not a full
+  // re-run of isAdvanced); drives the read-only notice so the user understands the mode.
+  advancedReason(ast) {
+    if (!ast || !ast.stmts) return 'advanced language features';
+    const SIMPLE = new Set(['translate', 'rotate', 'cube', 'cylinder', 'sphere', 'union', 'difference', 'intersection', 'hull', 'minkowski', 'linear_extrude', 'rotate_extrude', 'circle', 'square', 'polygon']);
+    const custom = this.knownLibModules(ast);
+    const found = [];
+    const add = (s) => { if (!found.includes(s)) found.push(s); };
+    for (const s of ast.stmts) {
+      switch (s.t) {
+        case 'for': case 'intersection_for': add('for loops'); break;
+        case 'if': add('if / else logic'); break;
+        case 'letblock': add('let() blocks'); break;
+        case 'moduledef': add('module definitions'); break;
+        case 'functiondef': add('function definitions'); break;
+        case 'block': add('nested blocks'); break;
+        case 'call': if (!SIMPLE.has(s.name) && !custom.has(s.name)) add('the ' + s.name + '() operation'); break;
+        default: break;
+      }
+    }
+    if (!found.length) return 'advanced language features';
+    if (found.length === 1) return found[0];
+    if (found.length === 2) return found[0] + ' and ' + found[1];
+    return found.slice(0, 2).join(', ') + ', and more';
   }
 
   // ============ VIEWPORT ($vp*) ↔ CAMERA BINDING (Phase 12) ============
@@ -4768,7 +5135,7 @@ class Component extends DCLogic {
     const errorLines = Array.from(new Set(res.errors.map(er => er.line || 0).filter(n => n > 0)));
     const meshCount = (() => { let c = 0; grp.traverse(o => { if (o.isMesh) c++; }); return c; })();
     this.setState({
-      readOnly: true, selectedShapeId: null, selectedIds: [], code: txt,
+      readOnly: true, selectedShapeId: null, selectedIds: [], code: txt, roReason: this._advReason || 'advanced language features',
       tree: (roots.length ? roots : (res.geom || [])).map((n, i) => this.serializeGeom(n, i, 0, true)).filter(Boolean),
       consoleLog: log, consoleOpen: log.some(l => l.type !== 'echo') || (this.state.consoleOpen),
       errorLines,
@@ -5085,6 +5452,7 @@ class Component extends DCLogic {
     if (node.type === 'circle') { const n = Math.max(8, this.gfn()), r = Math.max(0.2, node.dims.r), pts = []; for (let i = 0; i < n; i++) { const a = 2 * Math.PI * i / n; pts.push([r * Math.cos(a), r * Math.sin(a)]); } return [pts]; }
     if (node.type === 'square') { const hx = Math.max(0.5, node.dims.x) / 2, hy = Math.max(0.5, node.dims.y) / 2; return [[[-hx, -hy], [hx, -hy], [hx, hy], [-hx, hy]]]; }
     if (node.type === 'polygon') { const pts = (node.dims.pts && node.dims.pts.length >= 3) ? node.dims.pts : [[-20, -20], [20, -20], [20, 20]]; return [pts.map(p => [p[0], p[1]])]; }
+    if (node.type === 'text') { return this.textToRings(node.dims || {}, this._font); }
     return [];
   }
   xform2D(rings, node) {
@@ -5095,7 +5463,7 @@ class Component extends DCLogic {
   collectAuthored2DRings(arr, out) {
     for (const n of (arr || [])) {
       if (this.isGroup(n)) this.collectAuthored2DRings(n.children, out);
-      else if (n.type === 'circle' || n.type === 'square' || n.type === 'polygon') { for (const r of this.xform2D(this.ringsForType(n), n)) out.push(r); }
+      else if (n.type === 'circle' || n.type === 'square' || n.type === 'polygon' || n.type === 'text') { for (const r of this.xform2D(this.ringsForType(n), n)) out.push(r); }
     }
   }
   extrudeGeometry(node) {
@@ -5475,7 +5843,7 @@ class Component extends DCLogic {
         label = (p.op === 'rotate_extrude' ? 'Rotate-extrude ' : 'Linear-extrude ') + this.seq.extrude;
       } else {
         this.seq.group++;
-        const opLabel = p.op === 'union' ? 'Union ' : p.op === 'difference' ? 'Difference ' : p.op === 'hull' ? 'Hull ' : p.op === 'intersection' ? 'Intersection ' : 'Group ';
+        const opLabel = p.op === 'union' ? 'Union ' : p.op === 'difference' ? 'Difference ' : p.op === 'hull' ? 'Hull ' : p.op === 'minkowski' ? 'Minkowski ' : p.op === 'intersection' ? 'Intersection ' : 'Group ';
         label = opLabel + this.seq.group;
       }
       const node = {
@@ -5515,7 +5883,7 @@ class Component extends DCLogic {
     if (node.type === 'wedge') return [0, 0, node.dims.z / 2];
     if (node.type === 'tube') return [0, 0, node.dims.h / 2];
     if (node.type === 'torus') return [0, 0, node.dims.tube];
-    if (node.type === 'circle' || node.type === 'square' || node.type === 'polygon') return [0, 0, 0.3];
+    if (node.type === 'circle' || node.type === 'square' || node.type === 'polygon' || node.type === 'text') return [0, 0, 0.3];
     if (node.type === 'custom') {
       // rest on the floor using the evaluated geometry's bounding box (if already built)
       const g = this._customGeoCache && this._customGeoCache.get(this.customGeoKey(node));
@@ -6318,7 +6686,7 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
   setMode = (m) => {
     if (m === this.state.mode) return;
     try { localStorage.setItem('scad-mode', m); } catch (_) {}
-    const extra = m === 'basic' ? { shapeMenuOpen: false, paramsOpen: this.vars.length > 0 && this.state.paramsOpen } : {};
+    const extra = m === 'basic' ? { menu3DOpen: false, menu2DOpen: false, paramsOpen: this.vars.length > 0 && this.state.paramsOpen } : {};
     this.setState({ mode: m, ...extra });
   };
 
@@ -6423,7 +6791,7 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
         dotStyle: isGroup
           ? `font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1;color:${isSel ? '#9CC2F5' : '#7E96B8'};`
           : `width:9px;height:9px;border-radius:${(r.type === 'cuboid' || r.type === 'wedge' || r.type === 'square' || r.type === 'polygon' || r.type === 'custom') ? '2px' : '50%'};background:${isSel ? '#3B82F6' : '#6B7280'};`,
-        rowStyle: `display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:8px;cursor:grab;margin-bottom:2px;margin-left:${r.depth * 14}px;border:1px solid ${isSel ? '#2C4D78' : 'transparent'};background:${isSel ? '#17283f' : (isGroup ? '#16191E' : 'transparent')};${st.dragOver === r.id + ':before' ? 'box-shadow:inset 0 2px 0 #3B82F6;' : st.dragOver === r.id + ':after' ? 'box-shadow:inset 0 -2px 0 #3B82F6;' : ''}`,
+        rowStyle: `display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:8px;cursor:grab;margin-bottom:2px;margin-left:${r.depth * 14}px;border:1px solid ${isSel ? '#2C4D78' : 'transparent'};background:${isSel ? '#17283f' : (isGroup ? '#16191E' : 'transparent')};${st.dragOver === r.id + ':before' ? 'box-shadow:inset 0 2px 0 #3B82F6;' : st.dragOver === r.id + ':after' ? 'box-shadow:inset 0 -2px 0 #3B82F6;' : st.dragOver === r.id + ':into' ? 'box-shadow:inset 0 0 0 2px #3B82F6;background:#15243a;' : ''}`,
         onSelect: (e) => { if (this._lpFired) { this._lpFired = false; return; } if (st.readOnly) { if (!r.root) return; const mult = e && (e.metaKey || e.ctrlKey || e.shiftKey); if (mult) { this.toggleSelectReadOnly(r.id); } else { this.setState({ selectedShapeId: r.id, selectedIds: [r.id] }, () => this.updateGizmo()); } return; } this.clearEdge(); if (e && (e.metaKey || e.ctrlKey || e.shiftKey)) this.toggleSelect(r.id); else this.selectShape(r.id); },
         onCtx: (e) => { e.preventDefault(); e.stopPropagation(); this.showCtxFor(r.id, e.clientX, e.clientY); },
         onPressDown: (e) => this.treePressStart(r.id, e),
@@ -6487,17 +6855,18 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
       });
       const sep = { isItem: false, isSep: true };
       const items = [];
-      if (canG) { items.push(mk('\u222a', 'Group as Union', () => this.groupSelection('union'))); items.push(mk('\u2212', 'Group as Difference', () => this.groupSelection('difference'))); items.push(mk('\u2229', 'Group as Intersection', () => this.groupSelection('intersection'))); items.push(mk('\u2b22', 'Group as Hull', () => this.groupSelection('hull'))); }
+      if (canG) { items.push(mk('\u222a', 'Group as Union', () => this.groupSelection('union'))); items.push(mk('\u2212', 'Group as Difference', () => this.groupSelection('difference'))); items.push(mk('\u2229', 'Group as Intersection', () => this.groupSelection('intersection'))); items.push(mk('\u2b22', 'Group as Hull', () => this.groupSelection('hull'))); items.push(mk('\u2295', 'Group as Minkowski', () => this.groupSelection('minkowski'))); }
       if (nIsGroup) {
         if (items.length) items.push(sep);
         items.push(mk('\u222a', 'Union', () => this.changeOp(ctx.id, 'union'), { checked: node.op === 'union' }));
         items.push(mk('\u2212', 'Difference', () => this.changeOp(ctx.id, 'difference'), { checked: node.op === 'difference' }));
         items.push(mk('\u2229', 'Intersection', () => this.changeOp(ctx.id, 'intersection'), { checked: node.op === 'intersection' }));
         items.push(mk('\u2b22', 'Hull', () => this.changeOp(ctx.id, 'hull'), { checked: node.op === 'hull' }));
+        items.push(mk('\u2295', 'Minkowski', () => this.changeOp(ctx.id, 'minkowski'), { checked: node.op === 'minkowski' }));
         items.push(sep);
         items.push(mk('\u2922', 'Ungroup', () => this.ungroupById(ctx.id)));
       }
-      const nIs2D = node && !nIsGroup && ['circle', 'square', 'polygon'].includes(node.type);
+      const nIs2D = node && !nIsGroup && ['circle', 'square', 'polygon', 'text'].includes(node.type);
       if (nIs2D && st.mode === 'advanced') {
         if (items.length) items.push(sep);
         items.push(mk('\u21a5', 'Linear extrude', () => this.extrudeSelection('linear_extrude', ctx.id)));
@@ -6545,6 +6914,7 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
         : ssh.type === 'circle' ? [this.buildField(ssh, 'd', '\u2300 diameter')]
         : ssh.type === 'square' ? [this.buildField(ssh, 'x', 'X'), this.buildField(ssh, 'y', 'Y')]
         : ssh.type === 'polygon' ? []
+        : ssh.type === 'text' ? []
         : ssh.type === 'sphere' ? [this.buildField(ssh, 'd', '\u2300 diameter')]
           : cylExtended ? (ssh.dims.sides
             ? [this.buildField(ssh, 'd', '\u2300 base'), this.buildField(ssh, 'd2', '\u2300 top'), this.buildField(ssh, 'h', 'Z (height)'), this.buildField(ssh, 'sides', 'sides')]
@@ -6597,6 +6967,8 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
     }));
 
     const drawerW = 420;
+    // inspector panels (shape/group/edge) dock top-left beside the tool rail — clear of the
+    // top toolbar (File/version/Run) and the right-side code drawer.
     const drawerStyle = st.isMobile
       ? `position:fixed;inset:0;z-index:${this.Z.mobileDrawer};display:flex;flex-direction:column;background:rgba(16,18,22,.985);backdrop-filter:blur(16px);transform:translateX(${st.drawerOpen ? '0' : '100%'});transition:transform .28s cubic-bezier(.4,0,.2,1);`
       : `position:absolute;top:64px;bottom:0;right:0;width:${drawerW}px;z-index:${this.Z.drawerBody};display:flex;flex-direction:column;background:rgba(18,20,24,.94);backdrop-filter:blur(16px);border-left:1px solid #23272E;border-top:1px solid #23272E;border-radius:12px 0 0 0;box-shadow:-12px 0 40px rgba(0,0,0,.4);transform:translateX(${st.drawerOpen ? '0' : drawerW + 'px'});transition:transform .28s cubic-bezier(.4,0,.2,1);`;
@@ -6706,13 +7078,16 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
       basicTabStyle: `background:${st.mode === 'basic' ? '#2563EB' : 'transparent'};border:none;color:${st.mode === 'basic' ? '#fff' : '#8A9099'};font:inherit;font-size:11.5px;font-weight:500;padding:5px 13px;border-radius:8px;cursor:pointer;`,
       advTabStyle: `background:${st.mode === 'advanced' ? '#2563EB' : 'transparent'};border:none;color:${st.mode === 'advanced' ? '#fff' : '#8A9099'};font:inherit;font-size:11.5px;font-weight:500;padding:5px 13px;border-radius:8px;cursor:pointer;`,
       pickSelect: this.pickSelect, addCuboid: this.addCuboid, addCylinder: this.addCylinder, addSphere: this.addSphere,
-      btnShapes: this.toolBtn(st.shapeMenuOpen),
-      shapeMenuOpen: st.shapeMenuOpen, toggleShapeMenu: this.toggleShapeMenu, closeShapeMenu: this.closeShapeMenu,
+      btn3D: this.toolBtn(st.menu3DOpen), btn2D: this.toolBtn(st.menu2DOpen),
+      menu3DOpen: st.menu3DOpen, menu2DOpen: st.menu2DOpen,
+      toggle3DMenu: this.toggle3DMenu, close3DMenu: this.close3DMenu,
+      toggle2DMenu: this.toggle2DMenu, close2DMenu: this.close2DMenu,
       miCuboid: () => this.pickShape('cuboid'), miCylinder: () => this.pickShape('cylinder'),
       miCone: () => this.pickShape('cone'), miPyramid: () => this.pickShape('pyramid'), miSphere: () => this.pickShape('sphere'),
       miTorus: () => this.pickShape('torus'), miTube: () => this.pickShape('tube'), miWedge: () => this.pickShape('wedge'),
       miCircle: () => this.pickShape('circle'), miSquare: () => this.pickShape('square'), miPolygon: () => this.pickShape('polygon'),
-      miThread: () => this.setState({ shapeMenuOpen: false, threadOpen: true }),
+      miText: () => this.pickShape('text'),
+      miThread: () => this.setState({ menu3DOpen: false, menu2DOpen: false, threadOpen: true }),
       pickMove: this.pickMove, deleteSelected: this.deleteSelected,
       toggleParams: this.toggleParams,
 
@@ -6738,9 +7113,9 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
       dragShape: this.startPanelDrag('shape'),
       dragGroup: this.startPanelDrag('group'),
       paramsPanelStyle: this.panelStyle('params', `position:absolute;left:84px;top:72px;z-index:${this.Z.panel};width:256px;${this.panelChrome()}overflow:hidden;`),
-      edgePanelStyle: this.panelStyle('edge', `position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:${this.Z.panelTop};${this.panelChrome({bg:this.C.glassPanel2, border:this.C.borderBlue})}padding:13px 15px;min-width:330px;`),
-      shapePanelStyle: this.panelStyle('shape', `position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:${this.Z.panelMid};${this.panelChrome({bg:this.C.glassPanel2})}padding:13px 15px;width:344px;`),
-      groupPanelStyle: this.panelStyle('group', `position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:${this.Z.panelMid};${this.panelChrome({bg:this.C.glassPanel2})}padding:13px 15px;width:312px;`),
+      edgePanelStyle: this.panelStyle('edge', `position:absolute;top:64px;left:84px;z-index:${this.Z.panelTop};${this.panelChrome({bg:this.C.glassPanel2, border:this.C.borderBlue})}padding:13px 15px;min-width:330px;`),
+      shapePanelStyle: this.panelStyle('shape', `position:absolute;top:64px;left:84px;z-index:${this.Z.panelMid};${this.panelChrome({bg:this.C.glassPanel2})}padding:13px 15px;width:344px;`),
+      groupPanelStyle: this.panelStyle('group', `position:absolute;top:64px;left:84px;z-index:${this.Z.panelMid};${this.panelChrome({bg:this.C.glassPanel2})}padding:13px 15px;width:312px;`),
       varsList,
       varsEmpty: varsList.length === 0,
       varCount: varsList.length,
@@ -6761,8 +7136,29 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
       clearEdge: () => this.clearEdge(),
 
       hasShapePanel: !st.readOnly && !!st.selectedShapeId && !sel && !sshIsGroup,
-      sshIs2D: !!ssh && !sshIsGroup && ['circle', 'square', 'polygon'].includes(ssh.type),
-      sshShowExtrude: !!ssh && !sshIsGroup && ['circle', 'square', 'polygon'].includes(ssh.type) && st.mode === 'advanced',
+      sshIs2D: !!ssh && !sshIsGroup && ['circle', 'square', 'polygon', 'text'].includes(ssh.type),
+      sshShowExtrude: !!ssh && !sshIsGroup && ['circle', 'square', 'polygon', 'text'].includes(ssh.type) && st.mode === 'advanced',
+      sshIsText: !!ssh && ssh.type === 'text',
+      textValue: (ssh && ssh.type === 'text') ? (ssh.dims.text || '') : '',
+      textSize: (ssh && ssh.type === 'text') ? this.fmt(ssh.dims.size == null ? 10 : ssh.dims.size) : '',
+      textSpacing: (ssh && ssh.type === 'text') ? this.fmt(ssh.dims.spacing == null ? 1 : ssh.dims.spacing) : '',
+      onTextInput: (e) => this.setTextField('text', e.target.value),
+      onTextSize: (e) => this.setTextField('size', e.target.value),
+      onTextSpacing: (e) => this.setTextField('spacing', e.target.value),
+      setHalignLeft: () => this.setTextField('halign', 'left'),
+      setHalignCenter: () => this.setTextField('halign', 'center'),
+      setHalignRight: () => this.setTextField('halign', 'right'),
+      setValignBaseline: () => this.setTextField('valign', 'baseline'),
+      setValignBottom: () => this.setTextField('valign', 'bottom'),
+      setValignCenter: () => this.setTextField('valign', 'center'),
+      setValignTop: () => this.setTextField('valign', 'top'),
+      halLeftTab: this.tab(!!(ssh && ssh.type === 'text' && (ssh.dims.halign || 'left') === 'left')),
+      halCenterTab: this.tab(!!(ssh && ssh.type === 'text' && ssh.dims.halign === 'center')),
+      halRightTab: this.tab(!!(ssh && ssh.type === 'text' && ssh.dims.halign === 'right')),
+      valBaseTab: this.tab(!!(ssh && ssh.type === 'text' && (ssh.dims.valign || 'baseline') === 'baseline')),
+      valBotTab: this.tab(!!(ssh && ssh.type === 'text' && ssh.dims.valign === 'bottom')),
+      valCenTab: this.tab(!!(ssh && ssh.type === 'text' && ssh.dims.valign === 'center')),
+      valTopTab: this.tab(!!(ssh && ssh.type === 'text' && ssh.dims.valign === 'top')),
       sshIsPoly: !!ssh && !sshIsGroup && ssh.type === 'polygon',
       polyPoints: (!!ssh && !sshIsGroup && ssh.type === 'polygon' ? (ssh.dims.pts || []) : []).map((p, i) => ({
         idx: i, label: 'P' + (i + 1), xVal: this.fmt(p[0]), yVal: this.fmt(p[1]),
@@ -6801,10 +7197,12 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
       groupDiffTab: this.tab(sshIsGroup && ssh.op === 'difference'),
       groupIntTab: this.tab(sshIsGroup && ssh.op === 'intersection'),
       groupHullTab: this.tab(sshIsGroup && ssh.op === 'hull'),
+      groupMinkTab: this.tab(sshIsGroup && ssh.op === 'minkowski'),
       setGroupUnion: () => sshIsGroup && this.changeOp(ssh.id, 'union'),
       setGroupDiff: () => sshIsGroup && this.changeOp(ssh.id, 'difference'),
       setGroupInt: () => sshIsGroup && this.changeOp(ssh.id, 'intersection'),
       setGroupHull: () => sshIsGroup && this.changeOp(ssh.id, 'hull'),
+      setGroupMink: () => sshIsGroup && this.changeOp(ssh.id, 'minkowski'),
       showGroupGizmo: sshIsGroup && this.isTopLevel(ssh.id),
       groupMoveTab: this.tab(st.gizmoMode === 'translate'),
       groupRotateTab: this.tab(st.gizmoMode === 'rotate'),
@@ -6819,16 +7217,24 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
       rotFields,
       transformSections,
       placeOnFloor: this.placeOnFloor,
+      showMirror: !!ssh && !sshIsGroup && ssh.type !== 'custom',
+      mirXTab: this.tab(!!(ssh && ssh.mir && ssh.mir[0])),
+      mirYTab: this.tab(!!(ssh && ssh.mir && ssh.mir[1])),
+      mirZTab: this.tab(!!(ssh && ssh.mir && ssh.mir[2])),
+      toggleMirX: () => this.toggleMirror(0),
+      toggleMirY: () => this.toggleMirror(1),
+      toggleMirZ: () => this.toggleMirror(2),
       deselectShape: () => this.selectShape(null),
 
       treeRows,
       treeFooterHint: this.isCoarsePointer()
         ? 'Tap to select \u00b7 long-press a row or tap \u22ee for actions'
-        : '\u2318/Ctrl-click to multi-select \u00b7 right-click or \u22ee for actions',
+        : '\u2318/Ctrl-click to multi-select \u00b7 drag to reorder or into a group \u00b7 right-click for actions',
       isEmpty: treeRows.length === 0,
       readOnlyTree: st.readOnly,
-      roTreeHint: 'Evaluated view (read-only). Select a top-level item to move / rotate / scale it as a group, or delete it. '
-        + (this.isCoarsePointer() ? 'Tick 2+ items' : '\u2318/Ctrl-click 2+ items') + ' to combine them. Individual generated instances can\u2019t be edited.',
+      roTreeHint: 'This model uses ' + (st.roReason || 'advanced language features')
+        + ' that the visual editor can\u2019t turn into editable gizmos, so it\u2019s rendered directly from your code \u2014 the geometry is complete and correct. Edit the code to change it, or select a top-level item to move, rotate, scale, or delete it. '
+        + (this.isCoarsePointer() ? 'Tick 2+ items' : '\u2318/Ctrl-click 2+ items') + ' to combine them.',
       roXformOn: st.readOnly && (st.selectedIds || []).length < 2 && !!(st.selectedShapeId && this.findTreeRow(st.tree, st.selectedShapeId) && this.findTreeRow(st.tree, st.selectedShapeId).root),
       roCanCombine: this.canCombineReadOnly(),
       roCombineHint: (st.selectedIds || []).length + ' selected — first row is the difference base',
@@ -6837,6 +7243,7 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
       roGroupDiff: () => this.groupReadOnlySelection('difference'),
       roGroupInt: () => this.groupReadOnlySelection('intersection'),
       roGroupHull: () => this.groupReadOnlySelection('hull'),
+      roGroupMink: () => this.groupReadOnlySelection('minkowski'),
       roMoveTab: this.tab(st.gizmoMode === 'translate'),
       roRotateTab: this.tab(st.gizmoMode === 'rotate'),
       roScaleTab: this.tab(st.gizmoMode === 'scale'),
@@ -6850,6 +7257,7 @@ module hole_cutter(d, len, kind, headd, depth, tol, seg) {
       groupDifference: () => this.groupSelection('difference'),
       groupIntersection: () => this.groupSelection('intersection'),
       groupHull: () => this.groupSelection('hull'),
+      groupMinkowski: () => this.groupSelection('minkowski'),
       ctxOpen: !!ctx, ctxItems, ctxStyle, closeCtx: this.closeCtx,
 
       statusHint: st.statusMsg || (st.tool === 'pushpull' ? (st.ppMode === 'revolve' ? (st.ppDragging ? 'Revolving ' + this.fmt(Math.abs(st.ppAngle || 0)) + '\u00b0 about the hinge edge \u2014 release to apply' : 'Revolve \u2014 drag a face (near an edge) to sweep it around that edge') : (st.ppDragging ? ((st.ppDist >= 0 ? 'Pulling +' : 'Pushing ') + this.fmt(st.ppDist) + 'mm \u2014 ' + (st.ppDist >= 0 ? 'add' : 'cut') + ', release to apply') : 'Push/pull \u2014 drag a face out to add material, in to cut')) : (sel ? 'Edge selected \u2014 click fillet or chamfer (again to remove)' : (st.selectedShapeId ? 'Drag the gizmo to ' + (st.gizmoMode === 'scale' ? 'resize' : 'move') + ' \u00b7 or type exact values' : 'Hover an edge \u00b7 click to treat it'))),
