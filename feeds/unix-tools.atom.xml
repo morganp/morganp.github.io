@@ -1,5 +1,456 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-06-19T00:00:00+01:00</updated><entry><title>Using ctags with Verilog and SystemVerilog</title><link href="http://lizard-spock.co.uk/ctags-verilog-systemverilog.html" rel="alternate"></link><published>2026-06-19T00:00:00+01:00</published><updated>2026-06-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-19:/ctags-verilog-systemverilog.html</id><summary type="html">&lt;p&gt;How to generate and use ctags for Verilog/SystemVerilog projects, covering design.vc file lists, editor setup for Vim, Neovim, Emacs, and VS Code, and keeping tags up to date automatically.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/ctags-verilog-hero-HQ.png"&gt;&lt;img alt="Ctags for Verilog navigation" src="http://lizard-spock.co.uk/ctags-verilog-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-07-31T00:00:00+01:00</updated><entry><title>Zsh startup analysis and modern setup</title><link href="http://lizard-spock.co.uk/zsh-startup-analysis-and-modern-setup.html" rel="alternate"></link><published>2026-07-31T00:00:00+01:00</published><updated>2026-07-31T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-07-31:/zsh-startup-analysis-and-modern-setup.html</id><summary type="html">&lt;p&gt;Profiling Zsh startup, then rebuilding the setup around Oh My Zsh, the Git plugin, autosuggestions, syntax highlighting, and Spaceship Prompt. Covers where the milliseconds go, how completion caching changes under a framework, and every tracked file needed to reproduce it.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/zsh-hero-HQ.png"&gt;&lt;img alt="Zsh startup analysis and modern setup" src="http://lizard-spock.co.uk/zsh-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This post documents the current Zsh setup and the measurements that shaped it.
+It covers startup performance, completion behavior, plugins, and prompt design.
+The intended audience is anyone maintaining or reproducing this dotfiles setup.&lt;/p&gt;
+&lt;p&gt;The complete configuration is available in the
+&lt;a href="https://github.com/morganp/dotfiles"&gt;dotfiles repository&lt;/a&gt;. The current setup
+uses Oh My Zsh, the Git plugin, command autosuggestions, syntax highlighting,
+and Spaceship Prompt.&lt;/p&gt;
+&lt;h2&gt;Original startup performance&lt;/h2&gt;
+&lt;p&gt;The baseline identifies which startup costs existed before the framework and
+plugins. The investigation started with a small Zsh configuration.
+A configured interactive login shell started in 103.60 ms at the median.
+The macOS global configuration required 27.88 ms, leaving 75.72 ms for user
+configuration.&lt;/p&gt;
+&lt;p&gt;The final benchmark used 5 warm-up launches and 60 measured launches. A Python
+harness used &lt;code&gt;time.perf_counter()&lt;/code&gt; around &lt;code&gt;/bin/zsh&lt;/code&gt; subprocesses. The harness
+redirected standard output and standard error to &lt;code&gt;/dev/null&lt;/code&gt;.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Scenario&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Median&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Mean&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;95th percentile&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Minimum&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Maximum&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Configured interactive login&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;103.60 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;101.75 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;113.95 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;83.62 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;116.52 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;macOS global files only&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;27.88 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;26.29 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;29.97 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;19.10 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;31.34 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Configured login with &lt;code&gt;zprof&lt;/code&gt;&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;111.38 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;107.03 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;116.10 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;82.70 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;120.02 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The original &lt;code&gt;zprof&lt;/code&gt; result identified completion initialization as the main
+shell-function cost. A warm completion cache required 20.78 ms. Rebuilding the
+cache required 246.60 ms.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Warm total&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Rebuild total&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Rebuild self time&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;compinit&lt;/code&gt;&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;20.78 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;246.60 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;95.20 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;compdef&lt;/code&gt;&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;Not present&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;84.18 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;84.18 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;compdump&lt;/code&gt;&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;Not present&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;52.39 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;52.39 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;compaudit&lt;/code&gt;&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;10.97 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;14.83 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;14.83 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Top-level external commands do not appear in &lt;code&gt;zprof&lt;/code&gt;. Separate measurements
+attributed about 27.35 ms to &lt;code&gt;brew shellenv&lt;/code&gt;. Two &lt;code&gt;uname&lt;/code&gt; processes added about
+12.34 ms.&lt;/p&gt;
+&lt;h2&gt;Changes added to the setup&lt;/h2&gt;
+&lt;p&gt;This chapter summarizes each feature added after the baseline measurement. The
+setup combines a framework with focused interactive features. The tracked
+profile guards optional dependencies, so missing Homebrew packages do not
+prevent shell startup.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Feature&lt;/th&gt;
+&lt;th&gt;Purpose&lt;/th&gt;
+&lt;th&gt;Installation source&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Oh My Zsh&lt;/td&gt;
+&lt;td&gt;Framework, completion integration, and plugin loading&lt;/td&gt;
+&lt;td&gt;Manual Git clone&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Git plugin&lt;/td&gt;
+&lt;td&gt;Git aliases and helper functions&lt;/td&gt;
+&lt;td&gt;Bundled with Oh My Zsh&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Spaceship Prompt&lt;/td&gt;
+&lt;td&gt;Structured asynchronous prompt&lt;/td&gt;
+&lt;td&gt;Homebrew&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Zsh Autosuggestions&lt;/td&gt;
+&lt;td&gt;History-based command suggestions&lt;/td&gt;
+&lt;td&gt;Homebrew&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Zsh Syntax Highlighting&lt;/td&gt;
+&lt;td&gt;Command-line token and validity highlighting&lt;/td&gt;
+&lt;td&gt;Homebrew&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Victor Mono Nerd Font&lt;/td&gt;
+&lt;td&gt;Prompt and status glyphs&lt;/td&gt;
+&lt;td&gt;Homebrew cask&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Tracked &lt;code&gt;dot-zprofile&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Portable shared configuration&lt;/td&gt;
+&lt;td&gt;Dotfiles repository&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The portable setup lives in the
+&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprofile"&gt;tracked Zsh profile&lt;/a&gt;.
+Machine-local configuration remains in &lt;code&gt;~/.zprofile&lt;/code&gt;. That local file
+sources the tracked profile before applying machine-specific settings.&lt;/p&gt;
+&lt;p&gt;The shared profile loads Oh My Zsh first. It then loads
+&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zshrc"&gt;the existing interactive configuration&lt;/a&gt;.
+This order preserves existing aliases because later alias definitions override
+Oh My Zsh aliases with the same name.&lt;/p&gt;
+&lt;h2&gt;How completion changed&lt;/h2&gt;
+&lt;p&gt;This chapter compares the original completion path with the framework-managed
+path. Zsh provides the completion engine through &lt;code&gt;compinit&lt;/code&gt;. Oh My Zsh does
+not replace that engine. It configures, validates, and caches the same system.&lt;/p&gt;
+&lt;h3&gt;Previous completion path&lt;/h3&gt;
+&lt;p&gt;The previous configuration called &lt;code&gt;compinit&lt;/code&gt; directly. An optimization ran a
+full scan once each day, then used &lt;code&gt;compinit -C&lt;/code&gt; for later shells.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;autoload&lt;span class="w"&gt; &lt;/span&gt;-Uz&lt;span class="w"&gt; &lt;/span&gt;compinit
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;date&lt;span class="w"&gt; &lt;/span&gt;+&lt;span class="s1"&gt;&amp;#39;%j&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;stat&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;%Sm&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;%j&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/.zcompdump&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;/dev/null&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;compinit
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;compinit&lt;span class="w"&gt; &lt;/span&gt;-C
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This approach used &lt;code&gt;~/.zcompdump&lt;/code&gt; and reduced repeated security audits. It
+saved about 12 ms inside &lt;code&gt;compinit&lt;/code&gt;, but &lt;code&gt;date&lt;/code&gt; and &lt;code&gt;stat&lt;/code&gt; reduced the measured
+shell saving to about 4 ms.&lt;/p&gt;
+&lt;h3&gt;Current Oh My Zsh completion path&lt;/h3&gt;
+&lt;p&gt;Oh My Zsh prepares &lt;code&gt;fpath&lt;/code&gt; before running &lt;code&gt;compinit&lt;/code&gt;. It adds framework,
+custom, and enabled plugin completion directories. This ordering lets plugin
+completion definitions participate in the initial cache.&lt;/p&gt;
+&lt;p&gt;Oh My Zsh uses a host-specific and Zsh-version-specific dump file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;~/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The framework records its Git revision and the complete &lt;code&gt;fpath&lt;/code&gt; inside that
+dump. It removes the dump when either value changes. It also compiles the dump
+to Zsh Word Code with &lt;code&gt;zrecompile&lt;/code&gt;, which reduces parsing work on later starts.&lt;/p&gt;
+&lt;p&gt;Completion security behavior also changes. Oh My Zsh uses &lt;code&gt;compinit -i&lt;/code&gt; and
+reports insecure completion directories through its &lt;code&gt;compfix&lt;/code&gt; support. The
+current profile leaves this security behavior enabled.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Behavior&lt;/th&gt;
+&lt;th&gt;Previous configuration&lt;/th&gt;
+&lt;th&gt;Current Oh My Zsh configuration&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Completion engine&lt;/td&gt;
+&lt;td&gt;Native &lt;code&gt;compinit&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Native &lt;code&gt;compinit&lt;/code&gt; managed by Oh My Zsh&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Dump name&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;~/.zcompdump&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Host and Zsh-version-specific dump&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Refresh policy&lt;/td&gt;
+&lt;td&gt;Full scan once daily&lt;/td&gt;
+&lt;td&gt;Refresh when framework revision or &lt;code&gt;fpath&lt;/code&gt; changes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Plugin completions&lt;/td&gt;
+&lt;td&gt;Existing &lt;code&gt;fpath&lt;/code&gt; only&lt;/td&gt;
+&lt;td&gt;Plugin directories added before &lt;code&gt;compinit&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Security check&lt;/td&gt;
+&lt;td&gt;Full daily, skipped with &lt;code&gt;-C&lt;/code&gt; afterward&lt;/td&gt;
+&lt;td&gt;Checked through &lt;code&gt;compinit&lt;/code&gt; and &lt;code&gt;compfix&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Compiled dump&lt;/td&gt;
+&lt;td&gt;Not configured&lt;/td&gt;
+&lt;td&gt;Recompiled to Zsh Word Code&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The daily optimization remains as a fallback in &lt;code&gt;dot-zshrc&lt;/code&gt;. It runs only when
+Oh My Zsh is unavailable. This guard prevents 2 &lt;code&gt;compinit&lt;/code&gt; calls in one shell.&lt;/p&gt;
+&lt;p&gt;Pressing Tab twice lists the matches with their descriptions:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Zsh completion menu listing git subcommands with descriptions" src="http://lizard-spock.co.uk/zsh-completion-menu.png"&gt;&lt;/p&gt;
+&lt;p&gt;Oh My Zsh also configures completion menus, caching, process completion, and
+Bash completion compatibility. The local matcher style still provides
+case-insensitive completion after the framework loads.&lt;/p&gt;
+&lt;h2&gt;What the Git plugin provides&lt;/h2&gt;
+&lt;p&gt;This chapter separates Git command shortcuts from the Git information shown in
+the prompt. The
+&lt;a href="https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git"&gt;Oh My Zsh Git plugin&lt;/a&gt;
+provides a large alias library and several Git-aware functions. It does not
+install Git or change repository data during shell startup.&lt;/p&gt;
+&lt;p&gt;The aliases cover common branch, commit, fetch, log, merge, pull, push, rebase,
+stash, and worktree operations. The following examples remain available when
+they do not conflict with local aliases.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Alias or function&lt;/th&gt;
+&lt;th&gt;Behavior&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;gaa&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Run &lt;code&gt;git add --all&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;gcb&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Create and check out a branch&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;glog&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Show a one-line decorated graph&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;grt&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Change to the repository root&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;gbda&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Delete merged branches&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;git_current_branch&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Return the current branch name&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;git_main_branch&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Detect the repository's primary branch name&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;gwip&lt;/code&gt; and &lt;code&gt;gunwip&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Create and remove temporary work-in-progress commits&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Local aliases load after the plugin and retain their established behavior. For
+example, Oh My Zsh defines &lt;code&gt;gp&lt;/code&gt; as &lt;code&gt;git push&lt;/code&gt;. This setup keeps the existing
+&lt;code&gt;gp='git pull'&lt;/code&gt; alias. It also preserves the custom &lt;code&gt;gl&lt;/code&gt; graph format and other
+long-standing shortcuts.&lt;/p&gt;
+&lt;p&gt;The plugin and Spaceship Git section serve different purposes. The plugin
+provides commands and functions. Spaceship displays repository state in the
+prompt.&lt;/p&gt;
+&lt;h2&gt;Autosuggestions and syntax highlighting&lt;/h2&gt;
+&lt;p&gt;This chapter covers the 2 plugins that provide feedback while a command is
+being entered.
+&lt;a href="https://github.com/zsh-users/zsh-autosuggestions"&gt;Zsh Autosuggestions&lt;/a&gt; displays
+faint command suggestions while text is entered. It uses command history by
+default, which makes repeated commands available without a history search. The
+suggested remainder appears in a dimmed colour and is accepted with the right
+arrow key:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Zsh autosuggestion showing dimmed ghost text after a partial command" src="http://lizard-spock.co.uk/zsh-autosuggestion.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/zsh-users/zsh-syntax-highlighting"&gt;Zsh Syntax Highlighting&lt;/a&gt;
+colors command-line tokens before execution. Its main highlighter distinguishes
+valid commands, invalid commands, paths, options, strings, and shell syntax.
+This feedback can reveal a typing error before the command runs.&lt;/p&gt;
+&lt;p&gt;The recording below shows all 3 features in one session. An autosuggestion is
+accepted, Tab lists the completion matches, an unknown command turns red, and
+the corrected command turns green:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Animated demonstration of autosuggestions, tab completion, and syntax highlighting" src="http://lizard-spock.co.uk/zsh-completion.gif"&gt;&lt;/p&gt;
+&lt;p&gt;Syntax highlighting loads last because it wraps Zsh Line Editor widgets. A
+later plugin could replace those wrappers and prevent highlighting from
+tracking edits correctly.&lt;/p&gt;
+&lt;p&gt;Both plugins come from the
+&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/brew/Brewfile"&gt;tracked Brewfile&lt;/a&gt;.
+The profile checks each installed path before sourcing it. A machine without
+Homebrew therefore starts Zsh without these optional features.&lt;/p&gt;
+&lt;h2&gt;How Spaceship changes the prompt&lt;/h2&gt;
+&lt;p&gt;This chapter compares the original one-line theme with the configured
+Spaceship layout.
+&lt;a href="https://spaceship-prompt.sh/"&gt;Spaceship Prompt&lt;/a&gt; replaces the Oh My Zsh
+&lt;code&gt;robbyrussell&lt;/code&gt; theme. The configuration disables &lt;code&gt;ZSH_THEME&lt;/code&gt; and sources the
+Homebrew Spaceship package after Oh My Zsh loads.&lt;/p&gt;
+&lt;p&gt;The prompt uses this order:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;SPACESHIP_PROMPT_ASYNC&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
+&lt;span class="nv"&gt;SPACESHIP_PROMPT_ADD_NEWLINE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
+&lt;span class="nv"&gt;SPACESHIP_CHAR_SYMBOL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;⚡&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;SPACESHIP_PROMPT_ORDER&lt;/span&gt;&lt;span class="o"&gt;=(&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;user
+&lt;span class="w"&gt;  &lt;/span&gt;dir
+&lt;span class="w"&gt;  &lt;/span&gt;git
+&lt;span class="w"&gt;  &lt;/span&gt;line_sep
+&lt;span class="w"&gt;  &lt;/span&gt;char
+&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Each entry controls one prompt section:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;user&lt;/code&gt; shows the username for Secure Shell sessions, root, or user changes.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dir&lt;/code&gt; shows the current directory and truncates long paths.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git&lt;/code&gt; shows the branch and dirty, ahead, behind, or diverged state.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;line_sep&lt;/code&gt; places the command entry point on a separate line.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;char&lt;/code&gt; shows a lightning symbol that changes color with command status.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Spaceship also provides a &lt;code&gt;time&lt;/code&gt; section that prints a timestamp. This setup
+omits it deliberately. The section is absent from &lt;code&gt;SPACESHIP_PROMPT_ORDER&lt;/code&gt;, so
+Spaceship never loads it. Its &lt;code&gt;SPACESHIP_TIME_SHOW&lt;/code&gt; variable also defaults to
+&lt;code&gt;false&lt;/code&gt;, which means listing &lt;code&gt;time&lt;/code&gt; in the order alone would render nothing.&lt;/p&gt;
+&lt;p&gt;The Git section tracks the working tree. Stashing every change clears the dirty
+indicators, and restoring them brings the indicators back:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Spaceship prompt showing the Git section change as the working tree changes" src="http://lizard-spock.co.uk/zsh-prompt-git-state.png"&gt;&lt;/p&gt;
+&lt;p&gt;Asynchronous rendering prevents Git inspection from blocking command entry.
+Spaceship renders the prompt immediately, then updates asynchronous sections
+when their data becomes available. The Git section uses this behavior by
+default.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;robbyrussell&lt;/code&gt; theme uses one line. It shows a status arrow, the final
+directory component, the Git branch, and a dirty marker. Spaceship uses 2
+lines, a path of up to 3 levels, and detailed Git synchronization state.&lt;/p&gt;
+&lt;p&gt;The lightning symbol changes from green to red after a failed command. The
+Brewfile includes Victor Mono Nerd Font for branch and status glyphs.&lt;/p&gt;
+&lt;h2&gt;Startup cost after adding features&lt;/h2&gt;
+&lt;p&gt;The added features increase startup time, but the result remains below 200 ms
+at the median. Each row comes from a separate 60-launch benchmark batch, so the
+differences are directional rather than a controlled component breakdown.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Configuration&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Median startup&lt;/th&gt;
+&lt;th style="text-align: right;"&gt;Change from previous row&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Original configuration&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;103.60 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;Baseline&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Daily completion optimization&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;99.25 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;-4.35 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Oh My Zsh and 3 plugins with &lt;code&gt;robbyrussell&lt;/code&gt;&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;187.07 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;+87.82 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Oh My Zsh, 3 plugins, and Spaceship&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;178.53 ms&lt;/td&gt;
+&lt;td style="text-align: right;"&gt;-8.54 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;That Spaceship run measured 178.69 ms mean and 186.35 ms at the 95th
+percentile. The minimum was 167.73 ms, and the maximum was 189.13 ms.&lt;/p&gt;
+&lt;p&gt;The Spaceship row was measured while the &lt;code&gt;time&lt;/code&gt; section was still enabled. The
+section was removed afterwards, and the benchmark has not been repeated. The
+current prompt should therefore cost slightly less than this row reports.&lt;/p&gt;
+&lt;p&gt;Oh My Zsh accounts for most of the increase. Its measured functions include
+framework sourcing, completion validation, plugin loading, and cache
+compilation. Spaceship renders expensive Git information asynchronously, which
+protects interactive responsiveness after the shell becomes available.&lt;/p&gt;
+&lt;h2&gt;Reproduce the setup&lt;/h2&gt;
+&lt;p&gt;This chapter identifies every tracked file required to reproduce the shared
+setup. The repository contains the portable configuration and installation
+manifest:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/morganp/dotfiles"&gt;Dotfiles repository&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/morganp/dotfiles/blob/main/README.md"&gt;Installation README&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprofile"&gt;Shared Zsh profile&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zshrc"&gt;Interactive Zsh configuration&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/brew/Brewfile"&gt;Homebrew Brewfile&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Install the Homebrew packages from the repository root.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;sh
+   brew bundle install --file="$HOME/dotfiles/config/brew/Brewfile"&lt;/code&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Clone Oh My Zsh because it has no Homebrew formula.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;sh
+   git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh"&lt;/code&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create a local &lt;code&gt;~/.zprofile&lt;/code&gt; that sources the shared profile.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;zsh
+   source "$HOME/dotfiles/config/shell/dot-zprofile"&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Machine-local secrets and paths remain outside the repository.
+Application Programming Interface (API) keys live in &lt;code&gt;~/.config/codex/env&lt;/code&gt;,
+which is readable only by the owning user. The shared profile sources that
+file only when it exists.&lt;/p&gt;
+&lt;h2&gt;Verification and remaining improvements&lt;/h2&gt;
+&lt;p&gt;This chapter provides repeatable checks and identifies remaining optimization
+work. Measure wall-clock startup with a login shell:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;time&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/bin/zsh&lt;span class="w"&gt; &lt;/span&gt;-lic&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;exit 0&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Enable function-level profiling with the existing debug switch:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;time&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;ZSH_DEBUGRC&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/bin/zsh&lt;span class="w"&gt; &lt;/span&gt;-lic&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;exit 0&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Future work can avoid repeated &lt;code&gt;brew shellenv&lt;/code&gt; calls in inherited environments.
+It can also replace external &lt;code&gt;uname&lt;/code&gt; calls with Zsh parameters. De-duplicating
+&lt;code&gt;fpath&lt;/code&gt; remains useful if nested shells create repeated Homebrew completion
+paths.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="zsh"></category><category term="shell"></category><category term="dotfiles"></category><category term="performance"></category><category term="oh-my-zsh"></category><category term="spaceship"></category><category term="homebrew"></category></entry><entry><title>Using ctags with Verilog and SystemVerilog</title><link href="http://lizard-spock.co.uk/ctags-verilog-systemverilog.html" rel="alternate"></link><published>2026-06-19T00:00:00+01:00</published><updated>2026-06-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-19:/ctags-verilog-systemverilog.html</id><summary type="html">&lt;p&gt;How to generate and use ctags for Verilog/SystemVerilog projects, covering design.vc file lists, editor setup for Vim, Neovim, Emacs, and VS Code, and keeping tags up to date automatically.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/ctags-verilog-hero-HQ.png"&gt;&lt;img alt="Ctags for Verilog navigation" src="http://lizard-spock.co.uk/ctags-verilog-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Navigating a large Verilog or SystemVerilog codebase without tag-based Go to Definition is painful. This tutorial shows how to generate and use &lt;code&gt;ctags&lt;/code&gt; for projects that use a &lt;code&gt;design.vc&lt;/code&gt; file list — common in simulators like Verilator, VCS, and xrun.&lt;/p&gt;
 &lt;h2&gt;Prerequisites&lt;/h2&gt;
 &lt;ul&gt;
@@ -3063,4 +3514,4 @@ $&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;wge
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;update_dyld_shared_cache&lt;span class="w"&gt; &lt;/span&gt;-force
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="OS X"></category></entry><entry><title>"OS X open finder from command line"</title><link href="http://lizard-spock.co.uk/os-x-open-finder-from-command-line.html" rel="alternate"></link><published>2010-10-13T11:08:40+01:00</published><updated>2010-10-13T11:08:40+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-10-13:/os-x-open-finder-from-command-line.html</id><content type="html">&lt;p&gt;Just discovered this: from &lt;a href="http://grx.no/kb/2009/01/09/open-finder-for-current-directory-from-command-line/"&gt;source&lt;/a&gt;.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;open&lt;span class="w"&gt; &lt;/span&gt;.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="OS X"></category></entry><entry><title>"Remove sensitive data from git"</title><link href="http://lizard-spock.co.uk/remove-sensitive-data-from-git.html" rel="alternate"></link><published>2010-09-10T04:16:56+01:00</published><updated>2010-09-10T04:16:56+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-09-10:/remove-sensitive-data-from-git.html</id><content type="html">&lt;p&gt;&lt;a href="http://help.github.com/removing-sensitive-data/"&gt;Removing Sensitive data from git and eliminate history&lt;/a&gt;&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="Git"></category></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="OS X"></category></entry></feed>

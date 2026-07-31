@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Zsh startup analysis and modern setup</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Profiling Zsh startup, then rebuilding the setup around Oh My Zsh, the Git plugin, autosuggestions, syntax highlighting, and Spaceship Prompt...." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/programming.html">Programming</a></li>
+                                                <li class="active"><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./zsh-startup-analysis-and-modern-setup.html" rel="bookmark"
+             title="Permalink to Zsh startup analysis and modern setup">Zsh startup analysis and modern setup</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-07-31T00:00:00+01:00">
+                Published: Fri 31 July 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="./tag/zsh.html">zsh</a> <a href="./tag/shell.html">shell</a> <a href="./tag/dotfiles.html">dotfiles</a> <a href="./tag/performance.html">performance</a> <a href="./tag/oh-my-zsh.html">oh-my-zsh</a> <a href="./tag/spaceship.html">spaceship</a> <a href="./tag/homebrew.html">homebrew</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="./zsh-hero-HQ.png"><img alt="Zsh startup analysis and modern setup" src="./zsh-hero-900w.png"></a></p>
+<p>This post documents the current Zsh setup and the measurements that shaped it.
+It covers startup performance, completion behavior, plugins, and prompt design.
+The intended audience is anyone maintaining or reproducing this dotfiles setup.</p>
+<p>The complete configuration is available in the
+<a href="https://github.com/morganp/dotfiles">dotfiles repository</a>. The current setup
+uses Oh My Zsh, the Git plugin, command autosuggestions, syntax highlighting,
+and Spaceship Prompt.</p>
+<h2>Original startup performance</h2>
+<p>The baseline identifies which startup costs existed before the framework and
+plugins. The investigation started with a small Zsh configuration.
+A configured interactive login shell started in 103.60 ms at the median.
+The macOS global configuration required 27.88 ms, leaving 75.72 ms for user
+configuration.</p>
+<p>The final benchmark used 5 warm-up launches and 60 measured launches. A Python
+harness used <code>time.perf_counter()</code> around <code>/bin/zsh</code> subprocesses. The harness
+redirected standard output and standard error to <code>/dev/null</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">95th percentile</th>
+<th style="text-align: right;">Minimum</th>
+<th style="text-align: right;">Maximum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Configured interactive login</td>
+<td style="text-align: right;">103.60 ms</td>
+<td style="text-align: right;">101.75 ms</td>
+<td style="text-align: right;">113.95 ms</td>
+<td style="text-align: right;">83.62 ms</td>
+<td style="text-align: right;">116.52 ms</td>
+</tr>
+<tr>
+<td>macOS global files only</td>
+<td style="text-align: right;">27.88 ms</td>
+<td style="text-align: right;">26.29 ms</td>
+<td style="text-align: right;">29.97 ms</td>
+<td style="text-align: right;">19.10 ms</td>
+<td style="text-align: right;">31.34 ms</td>
+</tr>
+<tr>
+<td>Configured login with <code>zprof</code></td>
+<td style="text-align: right;">111.38 ms</td>
+<td style="text-align: right;">107.03 ms</td>
+<td style="text-align: right;">116.10 ms</td>
+<td style="text-align: right;">82.70 ms</td>
+<td style="text-align: right;">120.02 ms</td>
+</tr>
+</tbody>
+</table>
+<p>The original <code>zprof</code> result identified completion initialization as the main
+shell-function cost. A warm completion cache required 20.78 ms. Rebuilding the
+cache required 246.60 ms.</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th style="text-align: right;">Warm total</th>
+<th style="text-align: right;">Rebuild total</th>
+<th style="text-align: right;">Rebuild self time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>compinit</code></td>
+<td style="text-align: right;">20.78 ms</td>
+<td style="text-align: right;">246.60 ms</td>
+<td style="text-align: right;">95.20 ms</td>
+</tr>
+<tr>
+<td><code>compdef</code></td>
+<td style="text-align: right;">Not present</td>
+<td style="text-align: right;">84.18 ms</td>
+<td style="text-align: right;">84.18 ms</td>
+</tr>
+<tr>
+<td><code>compdump</code></td>
+<td style="text-align: right;">Not present</td>
+<td style="text-align: right;">52.39 ms</td>
+<td style="text-align: right;">52.39 ms</td>
+</tr>
+<tr>
+<td><code>compaudit</code></td>
+<td style="text-align: right;">10.97 ms</td>
+<td style="text-align: right;">14.83 ms</td>
+<td style="text-align: right;">14.83 ms</td>
+</tr>
+</tbody>
+</table>
+<p>Top-level external commands do not appear in <code>zprof</code>. Separate measurements
+attributed about 27.35 ms to <code>brew shellenv</code>. Two <code>uname</code> processes added about
+12.34 ms.</p>
+<h2>Changes added to the setup</h2>
+<p>This chapter summarizes each feature added after the baseline measurement. The
+setup combines a framework with focused interactive features. The tracked
+profile guards optional dependencies, so missing Homebrew packages do not
+prevent shell startup.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Purpose</th>
+<th>Installation source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Oh My Zsh</td>
+<td>Framework, completion integration, and plugin loading</td>
+<td>Manual Git clone</td>
+</tr>
+<tr>
+<td>Git plugin</td>
+<td>Git aliases and helper functions</td>
+<td>Bundled with Oh My Zsh</td>
+</tr>
+<tr>
+<td>Spaceship Prompt</td>
+<td>Structured asynchronous prompt</td>
+<td>Homebrew</td>
+</tr>
+<tr>
+<td>Zsh Autosuggestions</td>
+<td>History-based command suggestions</td>
+<td>Homebrew</td>
+</tr>
+<tr>
+<td>Zsh Syntax Highlighting</td>
+<td>Command-line token and validity highlighting</td>
+<td>Homebrew</td>
+</tr>
+<tr>
+<td>Victor Mono Nerd Font</td>
+<td>Prompt and status glyphs</td>
+<td>Homebrew cask</td>
+</tr>
+<tr>
+<td>Tracked <code>dot-zprofile</code></td>
+<td>Portable shared configuration</td>
+<td>Dotfiles repository</td>
+</tr>
+</tbody>
+</table>
+<p>The portable setup lives in the
+<a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprofile">tracked Zsh profile</a>.
+Machine-local configuration remains in <code>~/.zprofile</code>. That local file
+sources the tracked profile before applying machine-specific settings.</p>
+<p>The shared profile loads Oh My Zsh first. It then loads
+<a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zshrc">the existing interactive configuration</a>.
+This order preserves existing aliases because later alias definitions override
+Oh My Zsh aliases with the same name.</p>
+<h2>How completion changed</h2>
+<p>This chapter compares the original completion path with the framework-managed
+path. Zsh provides the completion engine through <code>compinit</code>. Oh My Zsh does
+not replace that engine. It configures, validates, and caches the same system.</p>
+<h3>Previous completion path</h3>
+<p>The previous configuration called <code>compinit</code> directly. An optimization ran a
+full scan once each day, then used <code>compinit -C</code> for later shells.</p>
+<div class="highlight"><pre><span></span><code>autoload<span class="w"> </span>-Uz<span class="w"> </span>compinit
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>+<span class="s1">&#39;%j&#39;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span><span class="s2">&quot;</span><span class="k">$(</span>stat<span class="w"> </span>-f<span class="w"> </span><span class="s1">&#39;%Sm&#39;</span><span class="w"> </span>-t<span class="w"> </span><span class="s1">&#39;%j&#39;</span><span class="w"> </span>~/.zcompdump<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>compinit
+<span class="k">else</span>
+<span class="w">  </span>compinit<span class="w"> </span>-C
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>This approach used <code>~/.zcompdump</code> and reduced repeated security audits. It
+saved about 12 ms inside <code>compinit</code>, but <code>date</code> and <code>stat</code> reduced the measured
+shell saving to about 4 ms.</p>
+<h3>Current Oh My Zsh completion path</h3>
+<p>Oh My Zsh prepares <code>fpath</code> before running <code>compinit</code>. It adds framework,
+custom, and enabled plugin completion directories. This ordering lets plugin
+completion definitions participate in the initial cache.</p>
+<p>Oh My Zsh uses a host-specific and Zsh-version-specific dump file:</p>
+<div class="highlight"><pre><span></span><code>~/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}
+</code></pre></div>
+
+<p>The framework records its Git revision and the complete <code>fpath</code> inside that
+dump. It removes the dump when either value changes. It also compiles the dump
+to Zsh Word Code with <code>zrecompile</code>, which reduces parsing work on later starts.</p>
+<p>Completion security behavior also changes. Oh My Zsh uses <code>compinit -i</code> and
+reports insecure completion directories through its <code>compfix</code> support. The
+current profile leaves this security behavior enabled.</p>
+<table>
+<thead>
+<tr>
+<th>Behavior</th>
+<th>Previous configuration</th>
+<th>Current Oh My Zsh configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Completion engine</td>
+<td>Native <code>compinit</code></td>
+<td>Native <code>compinit</code> managed by Oh My Zsh</td>
+</tr>
+<tr>
+<td>Dump name</td>
+<td><code>~/.zcompdump</code></td>
+<td>Host and Zsh-version-specific dump</td>
+</tr>
+<tr>
+<td>Refresh policy</td>
+<td>Full scan once daily</td>
+<td>Refresh when framework revision or <code>fpath</code> changes</td>
+</tr>
+<tr>
+<td>Plugin completions</td>
+<td>Existing <code>fpath</code> only</td>
+<td>Plugin directories added before <code>compinit</code></td>
+</tr>
+<tr>
+<td>Security check</td>
+<td>Full daily, skipped with <code>-C</code> afterward</td>
+<td>Checked through <code>compinit</code> and <code>compfix</code></td>
+</tr>
+<tr>
+<td>Compiled dump</td>
+<td>Not configured</td>
+<td>Recompiled to Zsh Word Code</td>
+</tr>
+</tbody>
+</table>
+<p>The daily optimization remains as a fallback in <code>dot-zshrc</code>. It runs only when
+Oh My Zsh is unavailable. This guard prevents 2 <code>compinit</code> calls in one shell.</p>
+<p>Pressing Tab twice lists the matches with their descriptions:</p>
+<p><img alt="Zsh completion menu listing git subcommands with descriptions" src="./zsh-completion-menu.png"></p>
+<p>Oh My Zsh also configures completion menus, caching, process completion, and
+Bash completion compatibility. The local matcher style still provides
+case-insensitive completion after the framework loads.</p>
+<h2>What the Git plugin provides</h2>
+<p>This chapter separates Git command shortcuts from the Git information shown in
+the prompt. The
+<a href="https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git">Oh My Zsh Git plugin</a>
+provides a large alias library and several Git-aware functions. It does not
+install Git or change repository data during shell startup.</p>
+<p>The aliases cover common branch, commit, fetch, log, merge, pull, push, rebase,
+stash, and worktree operations. The following examples remain available when
+they do not conflict with local aliases.</p>
+<table>
+<thead>
+<tr>
+<th>Alias or function</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gaa</code></td>
+<td>Run <code>git add --all</code></td>
+</tr>
+<tr>
+<td><code>gcb</code></td>
+<td>Create and check out a branch</td>
+</tr>
+<tr>
+<td><code>glog</code></td>
+<td>Show a one-line decorated graph</td>
+</tr>
+<tr>
+<td><code>grt</code></td>
+<td>Change to the repository root</td>
+</tr>
+<tr>
+<td><code>gbda</code></td>
+<td>Delete merged branches</td>
+</tr>
+<tr>
+<td><code>git_current_branch</code></td>
+<td>Return the current branch name</td>
+</tr>
+<tr>
+<td><code>git_main_branch</code></td>
+<td>Detect the repository's primary branch name</td>
+</tr>
+<tr>
+<td><code>gwip</code> and <code>gunwip</code></td>
+<td>Create and remove temporary work-in-progress commits</td>
+</tr>
+</tbody>
+</table>
+<p>Local aliases load after the plugin and retain their established behavior. For
+example, Oh My Zsh defines <code>gp</code> as <code>git push</code>. This setup keeps the existing
+<code>gp='git pull'</code> alias. It also preserves the custom <code>gl</code> graph format and other
+long-standing shortcuts.</p>
+<p>The plugin and Spaceship Git section serve different purposes. The plugin
+provides commands and functions. Spaceship displays repository state in the
+prompt.</p>
+<h2>Autosuggestions and syntax highlighting</h2>
+<p>This chapter covers the 2 plugins that provide feedback while a command is
+being entered.
+<a href="https://github.com/zsh-users/zsh-autosuggestions">Zsh Autosuggestions</a> displays
+faint command suggestions while text is entered. It uses command history by
+default, which makes repeated commands available without a history search. The
+suggested remainder appears in a dimmed colour and is accepted with the right
+arrow key:</p>
+<p><img alt="Zsh autosuggestion showing dimmed ghost text after a partial command" src="./zsh-autosuggestion.png"></p>
+<p><a href="https://github.com/zsh-users/zsh-syntax-highlighting">Zsh Syntax Highlighting</a>
+colors command-line tokens before execution. Its main highlighter distinguishes
+valid commands, invalid commands, paths, options, strings, and shell syntax.
+This feedback can reveal a typing error before the command runs.</p>
+<p>The recording below shows all 3 features in one session. An autosuggestion is
+accepted, Tab lists the completion matches, an unknown command turns red, and
+the corrected command turns green:</p>
+<p><img alt="Animated demonstration of autosuggestions, tab completion, and syntax highlighting" src="./zsh-completion.gif"></p>
+<p>Syntax highlighting loads last because it wraps Zsh Line Editor widgets. A
+later plugin could replace those wrappers and prevent highlighting from
+tracking edits correctly.</p>
+<p>Both plugins come from the
+<a href="https://github.com/morganp/dotfiles/blob/main/config/brew/Brewfile">tracked Brewfile</a>.
+The profile checks each installed path before sourcing it. A machine without
+Homebrew therefore starts Zsh without these optional features.</p>
+<h2>How Spaceship changes the prompt</h2>
+<p>This chapter compares the original one-line theme with the configured
+Spaceship layout.
+<a href="https://spaceship-prompt.sh/">Spaceship Prompt</a> replaces the Oh My Zsh
+<code>robbyrussell</code> theme. The configuration disables <code>ZSH_THEME</code> and sources the
+Homebrew Spaceship package after Oh My Zsh loads.</p>
+<p>The prompt uses this order:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">SPACESHIP_PROMPT_ASYNC</span><span class="o">=</span><span class="nb">true</span>
+<span class="nv">SPACESHIP_PROMPT_ADD_NEWLINE</span><span class="o">=</span><span class="nb">true</span>
+<span class="nv">SPACESHIP_CHAR_SYMBOL</span><span class="o">=</span><span class="s2">&quot;⚡&quot;</span>
+<span class="nv">SPACESHIP_PROMPT_ORDER</span><span class="o">=(</span>
+<span class="w">  </span>user
+<span class="w">  </span>dir
+<span class="w">  </span>git
+<span class="w">  </span>line_sep
+<span class="w">  </span>char
+<span class="o">)</span>
+</code></pre></div>
+
+<p>Each entry controls one prompt section:</p>
+<ul>
+<li><code>user</code> shows the username for Secure Shell sessions, root, or user changes.</li>
+<li><code>dir</code> shows the current directory and truncates long paths.</li>
+<li><code>git</code> shows the branch and dirty, ahead, behind, or diverged state.</li>
+<li><code>line_sep</code> places the command entry point on a separate line.</li>
+<li><code>char</code> shows a lightning symbol that changes color with command status.</li>
+</ul>
+<p>Spaceship also provides a <code>time</code> section that prints a timestamp. This setup
+omits it deliberately. The section is absent from <code>SPACESHIP_PROMPT_ORDER</code>, so
+Spaceship never loads it. Its <code>SPACESHIP_TIME_SHOW</code> variable also defaults to
+<code>false</code>, which means listing <code>time</code> in the order alone would render nothing.</p>
+<p>The Git section tracks the working tree. Stashing every change clears the dirty
+indicators, and restoring them brings the indicators back:</p>
+<p><img alt="Spaceship prompt showing the Git section change as the working tree changes" src="./zsh-prompt-git-state.png"></p>
+<p>Asynchronous rendering prevents Git inspection from blocking command entry.
+Spaceship renders the prompt immediately, then updates asynchronous sections
+when their data becomes available. The Git section uses this behavior by
+default.</p>
+<p>The <code>robbyrussell</code> theme uses one line. It shows a status arrow, the final
+directory component, the Git branch, and a dirty marker. Spaceship uses 2
+lines, a path of up to 3 levels, and detailed Git synchronization state.</p>
+<p>The lightning symbol changes from green to red after a failed command. The
+Brewfile includes Victor Mono Nerd Font for branch and status glyphs.</p>
+<h2>Startup cost after adding features</h2>
+<p>The added features increase startup time, but the result remains below 200 ms
+at the median. Each row comes from a separate 60-launch benchmark batch, so the
+differences are directional rather than a controlled component breakdown.</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th style="text-align: right;">Median startup</th>
+<th style="text-align: right;">Change from previous row</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Original configuration</td>
+<td style="text-align: right;">103.60 ms</td>
+<td style="text-align: right;">Baseline</td>
+</tr>
+<tr>
+<td>Daily completion optimization</td>
+<td style="text-align: right;">99.25 ms</td>
+<td style="text-align: right;">-4.35 ms</td>
+</tr>
+<tr>
+<td>Oh My Zsh and 3 plugins with <code>robbyrussell</code></td>
+<td style="text-align: right;">187.07 ms</td>
+<td style="text-align: right;">+87.82 ms</td>
+</tr>
+<tr>
+<td>Oh My Zsh, 3 plugins, and Spaceship</td>
+<td style="text-align: right;">178.53 ms</td>
+<td style="text-align: right;">-8.54 ms</td>
+</tr>
+</tbody>
+</table>
+<p>That Spaceship run measured 178.69 ms mean and 186.35 ms at the 95th
+percentile. The minimum was 167.73 ms, and the maximum was 189.13 ms.</p>
+<p>The Spaceship row was measured while the <code>time</code> section was still enabled. The
+section was removed afterwards, and the benchmark has not been repeated. The
+current prompt should therefore cost slightly less than this row reports.</p>
+<p>Oh My Zsh accounts for most of the increase. Its measured functions include
+framework sourcing, completion validation, plugin loading, and cache
+compilation. Spaceship renders expensive Git information asynchronously, which
+protects interactive responsiveness after the shell becomes available.</p>
+<h2>Reproduce the setup</h2>
+<p>This chapter identifies every tracked file required to reproduce the shared
+setup. The repository contains the portable configuration and installation
+manifest:</p>
+<ul>
+<li><a href="https://github.com/morganp/dotfiles">Dotfiles repository</a></li>
+<li><a href="https://github.com/morganp/dotfiles/blob/main/README.md">Installation README</a></li>
+<li><a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprofile">Shared Zsh profile</a></li>
+<li><a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zshrc">Interactive Zsh configuration</a></li>
+<li>
+<p><a href="https://github.com/morganp/dotfiles/blob/main/config/brew/Brewfile">Homebrew Brewfile</a></p>
+</li>
+<li>
+<p>Install the Homebrew packages from the repository root.</p>
+</li>
+</ul>
+<p><code>sh
+   brew bundle install --file="$HOME/dotfiles/config/brew/Brewfile"</code></p>
+<ol>
+<li>Clone Oh My Zsh because it has no Homebrew formula.</li>
+</ol>
+<p><code>sh
+   git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh"</code></p>
+<ol>
+<li>Create a local <code>~/.zprofile</code> that sources the shared profile.</li>
+</ol>
+<p><code>zsh
+   source "$HOME/dotfiles/config/shell/dot-zprofile"</code></p>
+<p>Machine-local secrets and paths remain outside the repository.
+Application Programming Interface (API) keys live in <code>~/.config/codex/env</code>,
+which is readable only by the owning user. The shared profile sources that
+file only when it exists.</p>
+<h2>Verification and remaining improvements</h2>
+<p>This chapter provides repeatable checks and identifies remaining optimization
+work. Measure wall-clock startup with a login shell:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">time</span><span class="w"> </span>/bin/zsh<span class="w"> </span>-lic<span class="w"> </span><span class="s1">&#39;exit 0&#39;</span>
+</code></pre></div>
+
+<p>Enable function-level profiling with the existing debug switch:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">time</span><span class="w"> </span><span class="nv">ZSH_DEBUGRC</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>/bin/zsh<span class="w"> </span>-lic<span class="w"> </span><span class="s1">&#39;exit 0&#39;</span>
+</code></pre></div>
+
+<p>Future work can avoid repeated <code>brew shellenv</code> calls in inherited environments.
+It can also replace external <code>uname</code> calls with Zsh parameters. De-duplicating
+<code>fpath</code> remains useful if nested shells create repeated Homebrew completion
+paths.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
