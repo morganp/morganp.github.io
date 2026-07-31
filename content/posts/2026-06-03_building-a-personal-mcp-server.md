@@ -13,7 +13,7 @@ Claude can do more than answer questions — it can read and write files on a se
 
 ## What It Is
 
-The vault is a git repository of markdown files organised around the PARA method (Projects, Areas, Resources, Archive). The MCP server is a Node.js process that reads and writes those files in response to tool calls. Claude never sees the raw filesystem — it sees a curated set of typed tools with well-defined behaviour.
+The vault is a git repository of markdown files organised around the [PARA method](https://fortelabs.com/blog/para/) (Projects, Areas, Resources, Archive). The MCP server is a Node.js process that reads and writes those files in response to tool calls. Claude never sees the raw filesystem — it sees a curated set of typed tools with well-defined behaviour.
 
 The key design principle: **progressive disclosure**. Don't give Claude a raw file API. Give it typed tools that encode domain knowledge — what a project file looks like, where the frontmatter ends, which fields are indexable.
 
