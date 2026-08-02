@@ -1,5 +1,363 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-07-31T00:00:00+01:00</updated><entry><title>Zsh startup analysis and modern setup</title><link href="http://lizard-spock.co.uk/zsh-startup-analysis-and-modern-setup.html" rel="alternate"></link><published>2026-07-31T00:00:00+01:00</published><updated>2026-07-31T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-07-31:/zsh-startup-analysis-and-modern-setup.html</id><summary type="html">&lt;p&gt;Profiling Zsh startup, then rebuilding the setup around Oh My Zsh, the Git plugin, autosuggestions, syntax highlighting, and Spaceship Prompt. Covers where the milliseconds go, how completion caching changes under a framework, and every tracked file needed to reproduce it.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/zsh-hero-HQ.png"&gt;&lt;img alt="Zsh startup analysis and modern setup" src="http://lizard-spock.co.uk/zsh-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-02T00:00:00+01:00</updated><entry><title>An always-on tmux setup</title><link href="http://lizard-spock.co.uk/tmux-always-on-setup.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/tmux-always-on-setup.html</id><summary type="html">&lt;p&gt;Four changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, and a two-row status line with a keybinding hint row.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tmux-hero-HQ.png"&gt;&lt;img alt="An always-on tmux setup" src="http://lizard-spock.co.uk/tmux-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;If you have not met it yet, tmux is a terminal multiplexer. It lets one
+terminal window hold many sessions, split into panes, and it keeps those
+sessions alive after you disconnect. I wrote up the day-to-day mechanics
+previously in the
+&lt;a href="http://lizard-spock.co.uk/tmux-training-manual-ghostty-xterm-and-pve-lxc-terminals.html"&gt;tmux Training Manual&lt;/a&gt;, which is
+the better starting point if you are learning the keybindings.&lt;/p&gt;
+&lt;p&gt;This post is about what came after that. Once tmux is part of your daily
+routine, a handful of small annoyances start to grate. You forget to start it
+and lose a terminal full of work. A reboot wipes out a carefully arranged set
+of windows and panes. Shift+Enter mysteriously stops working in Claude Code
+and Codex the moment you are inside tmux. And you spend the first month
+looking up the same four keybindings over and over.&lt;/p&gt;
+&lt;p&gt;Each of those has a fix, and each fix is only a few lines of config. This post
+walks through all four as they now sit in my
+&lt;a href="https://github.com/morganp/dotfiles"&gt;dotfiles repository&lt;/a&gt;. Individually they
+are small. Together they turn tmux from something you remember to start into
+something that is simply always there.&lt;/p&gt;
+&lt;p&gt;The four changes are:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Change&lt;/th&gt;
+&lt;th&gt;Problem it solves&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Shell-native autostart&lt;/td&gt;
+&lt;td&gt;Forgetting to run &lt;code&gt;tmux&lt;/code&gt;, then losing work when the terminal closes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tmux-resurrect and tmux-continuum&lt;/td&gt;
+&lt;td&gt;Losing the window and pane layout across a restart&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Extended key reporting&lt;/td&gt;
+&lt;td&gt;Shift+Enter being byte-identical to Enter inside tmux&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Two-row status line&lt;/td&gt;
+&lt;td&gt;Not remembering keybindings, and losing the host label under a TUI&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Everything below lives in the tmux config and the shell profile. On a standard
+Linux or macOS setup those are &lt;code&gt;~/.tmux.conf&lt;/code&gt; (or &lt;code&gt;~/.config/tmux/tmux.conf&lt;/code&gt;)
+and &lt;code&gt;~/.bashrc&lt;/code&gt; or &lt;code&gt;~/.zshrc&lt;/code&gt;. If you are following along without my dotfiles,
+use the paths in the left column below and ignore the rest of this section.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Standard location&lt;/th&gt;
+&lt;th&gt;Tracked file in my dotfiles&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;~/.tmux.conf&lt;/code&gt; or &lt;code&gt;~/.config/tmux/tmux.conf&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/tmux/tmux.conf"&gt;&lt;code&gt;config/tmux/tmux.conf&lt;/code&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;~/.zprofile&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprofile"&gt;&lt;code&gt;config/shell/dot-zprofile&lt;/code&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;~/.bashrc&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-bashrc"&gt;&lt;code&gt;config/shell/dot-bashrc&lt;/code&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Two different mechanisms put those in place, and neither is a symlink. tmux
+respects &lt;code&gt;XDG_CONFIG_HOME&lt;/code&gt;, and &lt;code&gt;config/shell/dot-profile&lt;/code&gt; sets it to point
+straight at the repository:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;XDG_CONFIG_HOME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/dotfiles/config
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;So tmux reads &lt;code&gt;~/dotfiles/config/tmux/tmux.conf&lt;/code&gt; directly, with no linking step
+at all. The shell files are sourced rather than linked, which keeps
+machine-local settings out of the repository. &lt;code&gt;~/.zprofile&lt;/code&gt; on each machine
+starts with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;&lt;span class="s2"&gt;/dotfiles/config/shell/dot-zprofile&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;dot-&lt;/code&gt; prefix is a GNU Stow convention, used elsewhere in the repository
+for configs that genuinely are linked. The wider layout is covered in
+&lt;a href="http://lizard-spock.co.uk/dotfiles-setup-stow-git.html"&gt;Managing Dotfiles with Stow and Git&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Autostart from the shell profile&lt;/h2&gt;
+&lt;p&gt;The usual advice is to configure autostart in the terminal emulator. That ties
+the behaviour to one application, so it does not follow you over SSH, and it
+does not survive changing terminals. Doing it in the shell profile is portable
+across every terminal on every machine that gets the dotfiles.&lt;/p&gt;
+&lt;p&gt;This goes in &lt;code&gt;~/.zprofile&lt;/code&gt;, which in my case is
+&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprofile"&gt;&lt;code&gt;config/shell/dot-zprofile&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Start or attach to the shared tmux session for interactive terminals. TMUX is&lt;/span&gt;
+&lt;span class="c1"&gt;# set inside tmux, which prevents new panes from creating nested sessions.&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;interactive&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;((&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;$+commands&lt;span class="o"&gt;[&lt;/span&gt;tmux&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;))&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exec&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;new-session&lt;span class="w"&gt; &lt;/span&gt;-A&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;main
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The Bash equivalent goes in &lt;code&gt;~/.bashrc&lt;/code&gt;, mine at
+&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-bashrc"&gt;&lt;code&gt;config/shell/dot-bashrc&lt;/code&gt;&lt;/a&gt;.
+Same logic, portable syntax:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;*i*&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;/dev/null&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exec&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;new-session&lt;span class="w"&gt; &lt;/span&gt;-A&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;main
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Four guards matter here, and every one of them prevents a real failure mode.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;-z "${TMUX:-}"&lt;/code&gt;&lt;/strong&gt; is the important one. tmux sets &lt;code&gt;TMUX&lt;/code&gt; inside every pane
+it owns. Without this test, each new pane runs the profile, which starts
+another tmux, which runs the profile again. That is an infinite nesting loop
+that locks up the terminal.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;-t 1&lt;/code&gt;&lt;/strong&gt; checks that standard output is a terminal. Non-interactive uses that
+still source the profile, such as &lt;code&gt;ssh host command&lt;/code&gt; or an editor spawning a
+login shell to read the environment, must not be hijacked into tmux.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;command -v tmux&lt;/code&gt;&lt;/strong&gt; keeps the profile portable to machines where tmux is not
+installed. A missing binary should not break shell startup.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;exec&lt;/code&gt;&lt;/strong&gt; replaces the shell process rather than nesting one inside the other.
+Without it you get a parent shell doing nothing but waiting, and detaching from
+tmux drops you into that dead shell instead of closing the window.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;new-session -A -s main&lt;/code&gt; is the whole trick: attach to the session named &lt;code&gt;main&lt;/code&gt;
+if it exists, create it if it does not. One flag, no &lt;code&gt;has-session&lt;/code&gt; test and
+conditional branch.&lt;/p&gt;
+&lt;p&gt;The Zsh version goes in &lt;code&gt;~/.zprofile&lt;/code&gt;, not &lt;code&gt;~/.zshrc&lt;/code&gt;. &lt;code&gt;zprofile&lt;/code&gt; is sourced
+once for a login shell. &lt;code&gt;zshrc&lt;/code&gt; is sourced for every interactive shell, which
+would be more places than necessary to run an &lt;code&gt;exec&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Session persistence with resurrect and continuum&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://github.com/tmux-plugins/tmux-resurrect"&gt;tmux-resurrect&lt;/a&gt; saves and
+restores the tmux environment. &lt;a href="https://github.com/tmux-plugins/tmux-continuum"&gt;tmux-continuum&lt;/a&gt;
+drives resurrect automatically on a timer and restores on server start. They
+are designed to be used together.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;Session&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;persistence&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;across&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;restarts&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nl"&gt;resurrect&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;prefix&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Ctrl&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;saves&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;prefix&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Ctrl&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;restores&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Saves&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;window&lt;/span&gt;
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;pane&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;layout&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;window&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;names&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;each&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;pane&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;s working directory.&lt;/span&gt;
+&lt;span class="s1"&gt;# continuum: autosaves every 15 min and auto-restores when the server starts.&lt;/span&gt;
+&lt;span class="s1"&gt;set -g @resurrect-capture-pane-contents &amp;#39;&lt;/span&gt;&lt;span class="k"&gt;on&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="s1"&gt;set -g @resurrect-dir &amp;quot;$HOME/.tmux/resurrect&amp;quot;&lt;/span&gt;
+&lt;span class="s1"&gt;set -g @continuum-restore &amp;#39;&lt;/span&gt;&lt;span class="k"&gt;on&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="s1"&gt;set -g @continuum-save-interval &amp;#39;&lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;What actually gets restored: the window and pane layout, window names, the
+active window and pane, and each pane's working directory.
+&lt;code&gt;@resurrect-capture-pane-contents 'on'&lt;/code&gt; adds the visible scrollback of each
+pane, so a restored session looks like the one you left rather than a grid of
+empty prompts.&lt;/p&gt;
+&lt;p&gt;Running programs are not restored by default, and that is the right default.
+Resurrect has an opt-in process whitelist, but blindly re-launching whatever
+was running is a good way to have a reboot re-run something you did not want
+re-run.&lt;/p&gt;
+&lt;p&gt;Saved state lands in &lt;code&gt;~/.tmux/resurrect&lt;/code&gt; as timestamped text files, with a
+&lt;code&gt;last&lt;/code&gt; symlink to the most recent:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;tmux_resurrect_20260802T094413&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;txt&lt;/span&gt;
+&lt;span class="n"&gt;tmux_resurrect_20260802T103006&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;txt&lt;/span&gt;
+&lt;span class="n"&gt;pane_contents&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;tar&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;gz&lt;/span&gt;
+&lt;span class="kr"&gt;last&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tmux_resurrect_20260802T103006&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;txt&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;They are plain text. If a restore goes wrong you can read the file and see
+exactly what it thought your layout was.&lt;/p&gt;
+&lt;p&gt;The manual keys still work alongside the autosave: &lt;code&gt;prefix + Ctrl-s&lt;/code&gt; saves,
+&lt;code&gt;prefix + Ctrl-r&lt;/code&gt; restores. Worth using the manual save before a deliberate
+reboot rather than waiting up to 15 minutes for the timer.&lt;/p&gt;
+&lt;h3&gt;The ordering gotcha&lt;/h3&gt;
+&lt;p&gt;This one cost real debugging time:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;# Keep these at the very bottom. continuum appends itself to status-right, so
+# it must run after the status-right set above or autosave is silently lost.
+run-shell ~/.tmux/plugins/tmux-resurrect/resurrect.tmux
+run-shell ~/.tmux/plugins/tmux-continuum/continuum.tmux
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Continuum implements its timer by appending a hook to &lt;code&gt;status-right&lt;/code&gt;. tmux
+evaluates the status line on an interval, so continuum piggybacks on that as
+its clock. If your own &lt;code&gt;set -g status-right&lt;/code&gt; runs &lt;em&gt;after&lt;/em&gt; continuum loads, it
+overwrites continuum's addition and the autosave stops.&lt;/p&gt;
+&lt;p&gt;Nothing warns you. Manual saves keep working, so the setup looks healthy right
+up until a crash and the newest saved state is hours old. Keep the &lt;code&gt;run-shell&lt;/code&gt;
+lines at the very bottom of the file, after every &lt;code&gt;status-right&lt;/code&gt; assignment.&lt;/p&gt;
+&lt;p&gt;These are loaded with direct &lt;code&gt;run-shell&lt;/code&gt; calls rather than through the tmux
+plugin manager, so the plugins need cloning by hand:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;https://github.com/tmux-plugins/tmux-resurrect&lt;span class="w"&gt; &lt;/span&gt;~/.tmux/plugins/tmux-resurrect
+git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;https://github.com/tmux-plugins/tmux-continuum&lt;span class="w"&gt; &lt;/span&gt;~/.tmux/plugins/tmux-continuum
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Letting Shift+Enter through&lt;/h2&gt;
+&lt;p&gt;In a plain terminal, Enter and Shift+Enter send the same byte: carriage return,
+&lt;code&gt;0x0d&lt;/code&gt;. The Shift modifier has nowhere to go in the traditional encoding. This
+is not a tmux problem to begin with, but tmux makes it one, because tmux must
+choose whether to pass the modern encoding through.&lt;/p&gt;
+&lt;p&gt;The modern encoding is CSI u, sometimes called the Kitty keyboard protocol or
+extended key reporting. It gives modifiers a place to live in the escape
+sequence, so &lt;code&gt;Shift+Enter&lt;/code&gt; becomes distinguishable from &lt;code&gt;Enter&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This matters because terminal AI tools bind Shift+Enter to "insert a newline
+without submitting". Claude Code and Codex both do. Inside tmux without the
+setting below, that binding is dead: every Shift+Enter submits the prompt
+mid-thought.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gh"&gt;#&lt;/span&gt; Pass extended key reporting (CSI u) through to applications. Without this,
+&lt;span class="gh"&gt;#&lt;/span&gt; Shift+Enter is byte-identical to Enter inside tmux, so TUIs like Codex and
+&lt;span class="gh"&gt;#&lt;/span&gt; Claude Code cannot bind it to &amp;quot;insert newline&amp;quot;.
+set -s extended-keys on
+set -as terminal-features &amp;#39;xterm*:extkeys&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Two lines, two different jobs:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;set -s extended-keys on&lt;/code&gt; is a server option that tells tmux to forward
+extended keys to the application when the application asks for them. The
+alternative value &lt;code&gt;always&lt;/code&gt; sends them unconditionally, which is more aggressive
+and can confuse applications that never opted in. &lt;code&gt;on&lt;/code&gt; is the safer setting.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;set -as terminal-features 'xterm*:extkeys'&lt;/code&gt; tells tmux that the &lt;em&gt;outer&lt;/em&gt;
+terminal is capable of the protocol. Without this, tmux has no reason to
+believe the sequences will survive on the way out, so it will not emit them.
+Note the &lt;code&gt;-a&lt;/code&gt; flag: it appends to the existing feature list rather than
+replacing it.&lt;/p&gt;
+&lt;p&gt;Both halves are required. The chain is terminal, then tmux, then application,
+and any link that does not speak the protocol breaks it. Your outer terminal
+also needs to support extended keys. Ghostty, Kitty, WezTerm and recent iTerm2
+do. Extended keys need tmux 3.2 or newer.&lt;/p&gt;
+&lt;h2&gt;The status line and a hint row&lt;/h2&gt;
+&lt;p&gt;The last piece is the status line. Two things were wrong with the default. The
+host label from the Starship prompt disappears the moment a full-screen TUI
+takes over the pane, so on a multi-machine SSH setup you lose track of where
+you are. And tmux keybindings are hard to remember while you are still learning
+them.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;style&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;bg=#1e1e2e,fg=#a6adc8&amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;left&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;30&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;left&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[fg=#89b4fa,bold] #S #[default]&amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;right&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;80&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;right&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[fg=#89b4fa,bold]󰂋 #{?#{E:DOTFILES_HOST},#{E:DOTFILES_HOST},#h}#[fg=#6c7086]  •  #[fg=#f9e2af]%H:%M &amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;window&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;separator&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;window&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[fg=#6c7086] #I:#W &amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;window&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="k"&gt;current&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[fg=#cba6f7,bold] #I:#W &amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;status-format[1]&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[align=centre,fg=#7f849c]Prefix: Ctrl-b  •  c: new tab  •  ,: rename tab  •  n/p: next/previous tab  •  0–9: choose tab  •  d: detach&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;set -g status 2&lt;/code&gt; is the interesting one. Most people know &lt;code&gt;status on&lt;/code&gt; and
+&lt;code&gt;status off&lt;/code&gt;, but the option also takes a row count up to 5. With two rows,
+&lt;code&gt;status-format[0]&lt;/code&gt; is the normal status line and &lt;code&gt;status-format[1]&lt;/code&gt; is a second
+row you can fill with anything. Here it holds a centred cheat sheet of the
+keybindings you need while learning tmux. It is a comment in the config that
+you actually read, and deleting it later is a one-line change.&lt;/p&gt;
+&lt;p&gt;The host label uses a conditional format:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gh"&gt;#&lt;/span&gt;{?#{E:DOTFILES_HOST},#{E:DOTFILES_HOST},#h}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;#{?condition,true,false}&lt;/code&gt; is the tmux ternary. &lt;code&gt;#{E:VAR}&lt;/code&gt; expands an
+environment variable from the session environment. So this reads: if
+&lt;code&gt;DOTFILES_HOST&lt;/code&gt; is set, show it, otherwise fall back to &lt;code&gt;#h&lt;/code&gt;, tmux's own short
+hostname. The fallback means the config still works on a machine that has tmux
+but not the rest of the dotfiles.&lt;/p&gt;
+&lt;h3&gt;Where DOTFILES_HOST comes from&lt;/h3&gt;
+&lt;p&gt;The variable is set in the shell, not in tmux, which is the point: one
+definition feeds both the Starship prompt and the tmux status line, so they can
+never disagree about which machine you are on.&lt;/p&gt;
+&lt;p&gt;In
+&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprompt"&gt;&lt;code&gt;config/shell/dot-zprompt&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;_dotfiles_set_host_label&lt;span class="o"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;local&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;fqdn&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;host&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;rest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;fqdn&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;hostname&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;/dev/null&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;hostname&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;/dev/null&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;%s&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;HOST&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;host&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;fqdn&lt;/span&gt;&lt;span class="p"&gt;%%.*&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;login*&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$fqdn&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;*.*.*&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;rest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;fqdn&lt;/span&gt;&lt;span class="p"&gt;#*.&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;rest&lt;/span&gt;&lt;span class="p"&gt;%%.*&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;typeset&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-g&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;DOTFILES_HOST&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$label&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+_dotfiles_set_host_label
+&lt;span class="nb"&gt;unset&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;_dotfiles_set_host_label
+&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;DOTFILES_HOST
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The Bash version in &lt;code&gt;dot-bashrc&lt;/code&gt; is the same logic with &lt;code&gt;export&lt;/code&gt; in place of
+&lt;code&gt;typeset -g&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Normally this is just the short hostname: take the fully qualified name and cut
+everything from the first dot. The interesting part is the &lt;code&gt;login*&lt;/code&gt; branch.
+Compute clusters tend to name their entry points &lt;code&gt;login1&lt;/code&gt;, &lt;code&gt;login2&lt;/code&gt;, &lt;code&gt;login3&lt;/code&gt;,
+which tells you nothing about which cluster you have landed on. When the short
+name starts with &lt;code&gt;login&lt;/code&gt; and the FQDN has at least two dots, the label becomes
+the next domain component instead. So &lt;code&gt;login2.helios.example.com&lt;/code&gt; displays as
+&lt;code&gt;helios&lt;/code&gt;, which is the piece of information you actually wanted.&lt;/p&gt;
+&lt;p&gt;The function runs once per shell and is then unset, so it costs nothing on
+redraw. &lt;code&gt;export&lt;/code&gt; is what matters for tmux: only exported variables reach the
+tmux session environment where &lt;code&gt;#{E:DOTFILES_HOST}&lt;/code&gt; can read them.&lt;/p&gt;
+&lt;p&gt;Starship picks up the same variable through its &lt;code&gt;env_var&lt;/code&gt; module in
+&lt;code&gt;config/starship/starship.toml&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[env_var.DOTFILES_HOST]&lt;/span&gt;
+&lt;span class="c1"&gt;# Shared with tmux; cluster login hosts are normalized by dot-zprompt.&lt;/span&gt;
+&lt;span class="n"&gt;variable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;DOTFILES_HOST&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;[󰂋 ]($style)[$env_value]($style) &amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;style&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;#89b4fa bold&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The same Nerd Font glyph and the same blue appear in the tmux &lt;code&gt;status-right&lt;/code&gt;
+above, so the label looks identical whether it is being drawn by the prompt or
+by tmux. When a TUI takes over the pane and the prompt scrolls away, the status
+line keeps showing it.&lt;/p&gt;
+&lt;h3&gt;Keeping the label fresh&lt;/h3&gt;
+&lt;p&gt;Session environment variables are captured when the session is created, so a
+long-lived session can hold a stale value. This line fixes that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Refresh the label when attaching from a new client. The explicit array index&lt;/span&gt;
+&lt;span class="c1"&gt;# makes repeated config reloads idempotent.&lt;/span&gt;
+&lt;span class="n"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;update-environment[99]&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;DOTFILES_HOST&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;update-environment&lt;/code&gt; is a list of variables tmux refreshes from the attaching
+client. Setting an explicit index rather than using &lt;code&gt;-a&lt;/code&gt; to append means
+reloading the config repeatedly overwrites slot 99 each time instead of piling
+up duplicate entries.&lt;/p&gt;
+&lt;p&gt;The rest is cosmetic and matches the Catppuccin Mocha palette used elsewhere in
+the setup:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;set -g pane-border-style &amp;#39;fg=#313244&amp;#39;
+set -g pane-active-border-style &amp;#39;fg=#89b4fa&amp;#39;
+set -g message-style &amp;#39;bg=#313244,fg=#cdd6f4&amp;#39;
+set -g mode-style &amp;#39;bg=#cba6f7,fg=#1e1e2e,bold&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Two more settings worth calling out, both near the top of the file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mouse&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;so&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;trackpad&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;scroll&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;enters&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;scrolls&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;pane&lt;/span&gt;
+#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;history&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;instead&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;being&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;translated&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;to&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;arrow&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;keys&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;that&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;TUIs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;like&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Claude&lt;/span&gt;
+#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Code&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;read&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;as&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;prompt&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;history&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;navigation&lt;/span&gt;
+&lt;span class="nv"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mouse&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;on&lt;/span&gt;
+
+#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;vim&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;keys&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;
+&lt;span class="nv"&gt;setw&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;keys&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;vi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;mouse on&lt;/code&gt; is not only about clicking to select panes. Without it, trackpad
+scroll is translated into arrow keys, and a TUI reading arrow keys as prompt
+history navigation will scroll your prompt history instead of the pane
+scrollback. That is a confusing bug until you know the cause.&lt;/p&gt;
+&lt;h2&gt;Gotchas worth repeating&lt;/h2&gt;
+&lt;p&gt;The four things most likely to bite:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Nested sessions.&lt;/strong&gt; The &lt;code&gt;TMUX&lt;/code&gt; guard in the shell profile is not optional.
+   Without it, opening a pane starts a new tmux inside the pane, forever.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Continuum's ordering.&lt;/strong&gt; &lt;code&gt;run-shell&lt;/code&gt; for continuum must come after every
+   &lt;code&gt;status-right&lt;/code&gt; assignment, or the autosave silently stops while manual saves
+   keep working.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Extended keys need both lines.&lt;/strong&gt; &lt;code&gt;extended-keys on&lt;/code&gt; alone does nothing if
+   tmux does not also believe the outer terminal supports the protocol.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;exec&lt;/code&gt;, not a bare call.&lt;/strong&gt; Without &lt;code&gt;exec&lt;/code&gt;, detaching leaves you in a dead
+   parent shell rather than closing the window.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Reload after editing with &lt;code&gt;prefix + r&lt;/code&gt;, which is bound in the config:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;bind r source-file $XDG_CONFIG_HOME/tmux/tmux.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that reloading does not undo settings, it only applies new ones. When
+debugging status line problems, kill the tmux server with &lt;code&gt;tmux kill-server&lt;/code&gt;
+and start fresh rather than trusting a reload.&lt;/p&gt;
+&lt;p&gt;Tested on tmux 3.7b. The full configuration is
+&lt;a href="https://github.com/morganp/dotfiles/blob/main/config/tmux/tmux.conf"&gt;&lt;code&gt;config/tmux/tmux.conf&lt;/code&gt;&lt;/a&gt;
+in the &lt;a href="https://github.com/morganp/dotfiles"&gt;dotfiles repository&lt;/a&gt;.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="tmux"></category><category term="shell"></category><category term="dotfiles"></category><category term="zsh"></category><category term="bash"></category><category term="terminal"></category></entry><entry><title>Zsh startup analysis and modern setup</title><link href="http://lizard-spock.co.uk/zsh-startup-analysis-and-modern-setup.html" rel="alternate"></link><published>2026-07-31T00:00:00+01:00</published><updated>2026-07-31T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-07-31:/zsh-startup-analysis-and-modern-setup.html</id><summary type="html">&lt;p&gt;Profiling Zsh startup, then rebuilding the setup around Oh My Zsh, the Git plugin, autosuggestions, syntax highlighting, and Spaceship Prompt. Covers where the milliseconds go, how completion caching changes under a framework, and every tracked file needed to reproduce it.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/zsh-hero-HQ.png"&gt;&lt;img alt="Zsh startup analysis and modern setup" src="http://lizard-spock.co.uk/zsh-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This post documents the current Zsh setup and the measurements that shaped it.
 It covers startup performance, completion behavior, plugins, and prompt design.
 The intended audience is anyone maintaining or reproducing this dotfiles setup.&lt;/p&gt;
@@ -3512,6 +3870,4 @@ $&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;wge
 
 &lt;p&gt;From &lt;a href="http://blog.sensibleopensource.com/what_is_dyld_and_how_to_clear_the_shared_cache.htm"&gt;Source&lt;/a&gt;, to fix it run:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;update_dyld_shared_cache&lt;span class="w"&gt; &lt;/span&gt;-force
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="OS X"></category></entry><entry><title>"OS X open finder from command line"</title><link href="http://lizard-spock.co.uk/os-x-open-finder-from-command-line.html" rel="alternate"></link><published>2010-10-13T11:08:40+01:00</published><updated>2010-10-13T11:08:40+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-10-13:/os-x-open-finder-from-command-line.html</id><content type="html">&lt;p&gt;Just discovered this: from &lt;a href="http://grx.no/kb/2009/01/09/open-finder-for-current-directory-from-command-line/"&gt;source&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;open&lt;span class="w"&gt; &lt;/span&gt;.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="OS X"></category></entry></feed>
