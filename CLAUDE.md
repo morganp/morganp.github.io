@@ -17,6 +17,20 @@ Pelican static site generator blog, hosted on GitHub Pages at lizard-spock.co.uk
 - When moving an article from draft to published, ask the user if the Date metadata should be updated to today's date before publishing.
 - do not use tabs in post, spaces only.
 
+## Writing a Post
+
+**Use the `blog-post` skill** (`.claude/skills/blog-post/`) for the full pipeline:
+narrative structure, prose passes, image generation, build verification, deploy.
+
+House style facts, needed when editing existing posts too:
+
+- **British spelling** (`optimised`, `signalling`, `centre`).
+- **Manager / subordinate**, not master / slave, for bus roles. Current AMBA terminology; note on first use that older documents use the old terms.
+- **Acronyms**: one post equals one chapter. Define once, on first use, not at every heading.
+- **Diagram fences**: ` ```wavedrom `, ` ```dot `, ` ```mermaid `, ` ```fretboard `. Prefer these over generated images whenever the content has exact labels or counts.
+- **Image generation** uses the `art` skill's `~/.claude/skills/art/tools/generate-image.ts`, authenticated by `GOOGLE_API_KEY` in `~/.claude/.env`. There is no browser login; do not use `genimg-gemini-web`. Always read a generated image back and check it before accepting it.
+- **Long posts with images** live in a folder: `content/posts/YYYY-MM-DD_Title/YYYY-MM-DD_Title.md`.
+
 ### Creating New Posts
 
 ```bash
@@ -81,7 +95,7 @@ Status: published
 
 Body goes here.
 
-Categories: Engineering, Home & Garden, Hardware & Homelab, Music, Photography, Programming, Unix & Tools
+Categories: Engineering, Home & Garden, Hardware & Homelab, Music, Photography, Programming, Unix & Tools, Outdoor
 
 
 ## Image References in Posts
