@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Intermediate 01: AXI4 protocol deep dive</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="The mechanisms behind AXI4 throughput and the bugs each one creates: burst encoding, transaction identifiers, out-of-order completion, outstanding..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li class="active"><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/programming.html">Programming</a></li>
+                                                <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./soc-intermediate-01-axi4-protocol-deep-dive.html" rel="bookmark"
+             title="Permalink to SoC Intermediate 01: AXI4 protocol deep dive">SoC Intermediate 01: AXI4 protocol deep dive</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-02T00:00:00+01:00">
+                Published: Sun 02 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/computer-architecture.html">Computer Architecture</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/embedded-systems.html">Embedded Systems</a> <a href="./tag/arm.html">ARM</a> <a href="./tag/amba.html">AMBA</a> <a href="./tag/axi.html">AXI</a> <a href="./tag/axi4.html">AXI4</a> <a href="./tag/bus-protocols.html">Bus Protocols</a> <a href="./tag/verification.html">Verification</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="./00-axi4-hero-HQ.png"><img alt="An AXI4 interconnect at the centre of a system on chip, with a processor, a direct memory access engine, a graphics processor and a memory controller exchanging tagged read and write transactions along coloured channel paths" src="./00-axi4-hero-900w.png"></a></p>
+<p><em>Series: Intermediate SoC Design | Article 1 of 10</em></p>
+<hr>
+<h2>Introduction</h2>
+<p>This article explains how the AXI4 protocol achieves high throughput, and why
+that same design makes AXI4 hard to debug. It is written for engineers who
+already know the five channels and now have to build, integrate, or debug a
+real interface.</p>
+<p>AXI is the Advanced eXtensible Interface, part of the AMBA family from ARM.
+AXI4 connects the high-bandwidth blocks of a system on chip: processors,
+direct memory access engines, graphics processors, display controllers,
+memory controllers, and coherent interconnects. The
+<a href="./soc-article-06-interconnects-and-bus-protocols.html">introductory article on interconnects</a>
+described AXI as five independent channels with a valid and ready handshake.
+This article goes further, into bursts, transaction identifiers, ordering,
+backpressure, quality of service, and protocol compliance.</p>
+<p>AXI is not a bus. It is a distributed flow-control contract between managers,
+interconnects, subordinates, buffers, bridges, and clock converters. Every one
+of those components can break the contract independently.</p>
+<p>Note: this article uses the current AMBA terms manager and subordinate. Older
+documents and much existing code use master and slave for the same roles. The
+signal names are identical in both.</p>
+<hr>
+<h2>The five channels revisited</h2>
+<p>AXI4 separates read traffic and write traffic into five independent channels.
+Each channel carries its own handshake and makes progress on its own schedule.</p>
+<p><a href="./01-five-channels-HQ.png"><img alt="The five AXI4 channels drawn between a manager and a subordinate: write address, write data and write response on the write path, read address and read data on the read path, each channel labelled with its direction and valid and ready signal pair" src="./01-five-channels-900w.png"></a></p>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AW</code></td>
+<td>Write address</td>
+<td>Manager to subordinate</td>
+</tr>
+<tr>
+<td><code>W</code></td>
+<td>Write data</td>
+<td>Manager to subordinate</td>
+</tr>
+<tr>
+<td><code>B</code></td>
+<td>Write response</td>
+<td>Subordinate to manager</td>
+</tr>
+<tr>
+<td><code>AR</code></td>
+<td>Read address</td>
+<td>Manager to subordinate</td>
+</tr>
+<tr>
+<td><code>R</code></td>
+<td>Read data</td>
+<td>Subordinate to manager</td>
+</tr>
+</tbody>
+</table>
+<p>A transfer occurs only on a rising clock edge where <code>VALID</code> and <code>READY</code> are
+both high. That single rule governs every channel.</p>
+<p>AXI decouples the address channels from the data channels deliberately. A
+manager can send several write addresses before the subordinate accepts all
+the write data. A subordinate can delay responses while it continues to accept
+new addresses. This decoupling is the source of AXI throughput.</p>
+<p>The cost of decoupling is bookkeeping. A correct design tracks every
+outstanding transaction, because the protocol never promises that two channels
+stay aligned.</p>
+<hr>
+<h2>The valid and ready contract</h2>
+<p>The valid and ready handshake carries two discipline rules that hand-written
+interfaces break more often than any other part of the protocol.</p>
+<p>The first rule constrains the source. A source must not wait for <code>READY</code>
+before it asserts <code>VALID</code>. If the source has a transfer available, it asserts
+<code>VALID</code> immediately. A design that waits for <code>READY</code> first can deadlock
+against a destination that waits for <code>VALID</code>.</p>
+<p>The second rule constrains the payload. Once <code>VALID</code> is high, the payload must
+stay stable until the transfer completes. The destination is free to assert
+and deassert <code>READY</code> at any time, and that freedom is how backpressure travels
+back through the system.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_390a8768414bb7eebe758b1079c75b6b.svg"></p>
+<p>If the payload changes while <code>VALID</code> is high and <code>READY</code> is low, the
+destination can capture corrupted information. The failure is intermittent,
+because it appears only when the destination applies backpressure at the
+moment the source changes its data.</p>
+<hr>
+<h2>Burst types and addressing</h2>
+<p>A burst moves several data beats from one address phase. AXI4 supports three
+burst types, selected by the <code>AxBURST</code> field.</p>
+<p><a href="./02-burst-types-HQ.png"><img alt="Three AXI4 burst types compared on a memory address grid: FIXED repeatedly accessing one address, INCR stepping forward through consecutive addresses, and WRAP stepping forward then wrapping back to the start of an aligned region" src="./02-burst-types-900w.png"></a></p>
+<table>
+<thead>
+<tr>
+<th>Burst</th>
+<th>Behaviour</th>
+<th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FIXED</code></td>
+<td>The address stays constant for every beat</td>
+<td>A first in, first out data port</td>
+</tr>
+<tr>
+<td><code>INCR</code></td>
+<td>The address increments by the beat size</td>
+<td>A normal memory copy</td>
+</tr>
+<tr>
+<td><code>WRAP</code></td>
+<td>The address increments, then wraps at an aligned boundary</td>
+<td>A cache line refill</td>
+</tr>
+</tbody>
+</table>
+<p>Two fields encode the shape of the burst. <code>AxLEN</code> holds the beat count minus
+one, so the transfer carries <code>AxLEN + 1</code> beats. <code>AxSIZE</code> holds the base 2
+logarithm of the beat width, so each beat carries <code>2^AxSIZE</code> bytes.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Example</span><span class="o">:</span><span class="w"> </span><span class="mi">4</span><span class="o">-</span><span class="n">beat</span><span class="w"> </span><span class="n">INCR</span><span class="w"> </span><span class="n">burst</span>
+
+<span class="w">  </span><span class="n">ARADDR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x8000</span><span class="n">_1000</span>
+<span class="w">  </span><span class="n">ARLEN</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w">          </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">beats</span>
+<span class="w">  </span><span class="n">ARSIZE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w">          </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">beat</span>
+<span class="w">  </span><span class="n">ARBURST</span><span class="o">=</span><span class="w"> </span><span class="n">INCR</span>
+
+<span class="w">  </span><span class="n">Beat</span><span class="w"> </span><span class="n">addresses</span><span class="o">:</span>
+<span class="w">    </span><span class="mh">0x8000</span><span class="n">_1000</span>
+<span class="w">    </span><span class="mh">0x8000</span><span class="n">_1008</span>
+<span class="w">    </span><span class="mh">0x8000</span><span class="n">_1010</span>
+<span class="w">    </span><span class="mh">0x8000</span><span class="n">_1018</span>
+</code></pre></div>
+
+<h3>Wrapped bursts and cache line refills</h3>
+<p>A wrapped burst keeps every beat inside one naturally aligned region. Caches
+use this to fetch the word the processor stalled on first, then collect the
+rest of the line.</p>
+<p>The wrap boundary is the total burst size, which is the beat count multiplied
+by the beat width. When the address reaches that boundary, it returns to the
+start of the aligned region rather than crossing into the next one.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_067d6deeca2ba432c3082284fb5b1faa.svg"></p>
+<p>The address <code>RADDR</code> is shown for illustration. AXI does not carry an address
+on the read data channel, because the manager already knows the address from
+the read address phase.</p>
+<hr>
+<h2>Anatomy of a write transaction</h2>
+<p>A write completes only when all three write-side channels finish their work.
+The subordinate accepts the address, accepts every data beat, and returns a
+response.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_53bdaeb211943d2f6dba1b08c33747ea.svg"></p>
+<p>The address phase and the data phase are independent. The manager can present
+write data before, during, or after the address handshake completes.</p>
+<p>Many broken subordinates assume that <code>AW</code> and <code>W</code> arrive together. The
+assumption survives a simple testbench, then fails against a real
+interconnect that reorders the two channels through separate buffers.</p>
+<p><code>WLAST</code> marks the final data beat. A subordinate that counts beats without
+checking <code>WLAST</code> cannot detect a manager that sends the wrong number.</p>
+<hr>
+<h2>Anatomy of a read transaction</h2>
+<p>A read uses fewer channels than a write. One address phase produces one or
+more read data beats, and the final beat carries <code>RLAST</code>.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_0caf6c6b0bfe0f12cf359012e0c979ac.svg"></p>
+<p>The read response travels in the <code>RRESP</code> field of each beat rather than on a
+separate channel. A burst can therefore report an error on one beat and
+success on another.</p>
+<hr>
+<h2>Transaction identifiers and ordering</h2>
+<p>Transaction identifiers let a manager keep several requests in flight at once.
+The <code>AWID</code> and <code>ARID</code> fields tag requests, and the <code>BID</code> and <code>RID</code> fields tag
+the matching responses.</p>
+<p><a href="./03-out-of-order-HQ.png"><img alt="Two tagged read requests entering an interconnect scoreboard and leaving in a different order: a request tagged ID 4 to slow memory issued first but returning second, and a request tagged ID 7 to fast memory issued second but returning first" src="./03-out-of-order-900w.png"></a></p>
+<p>Two ordering rules follow from the identifiers:</p>
+<ul>
+<li>Transactions that share an identifier must complete in the order the manager issued them.</li>
+<li>Transactions with different identifiers can complete in any order, if the interconnect and the subordinate support it.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="nx">Out</span><span class="o">-</span><span class="nx">of</span><span class="o">-</span><span class="nx">order</span><span class="w"> </span><span class="nx">read</span><span class="w"> </span><span class="nx">completion</span>
+
+<span class="w">  </span><span class="nx">Manager</span><span class="w"> </span><span class="nx">issues</span><span class="p">:</span>
+<span class="w">    </span><span class="nx">ARID</span><span class="p">=</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">DRAM</span><span class="p">,</span><span class="w"> </span><span class="nx">row</span><span class="w"> </span><span class="nx">miss</span><span class="p">,</span><span class="w"> </span><span class="nx">slow</span>
+<span class="w">    </span><span class="nx">ARID</span><span class="p">=</span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">SRAM</span><span class="p">,</span><span class="w"> </span><span class="nx">fast</span>
+
+<span class="w">  </span><span class="nx">Interconnect</span><span class="w"> </span><span class="nx">can</span><span class="w"> </span><span class="k">return</span><span class="p">:</span>
+<span class="w">    </span><span class="nx">RID</span><span class="p">=</span><span class="mi">7</span><span class="w"> </span><span class="nx">first</span>
+<span class="w">    </span><span class="nx">RID</span><span class="p">=</span><span class="mi">4</span><span class="w"> </span><span class="nx">later</span>
+
+<span class="w">  </span><span class="nx">For</span><span class="w"> </span><span class="nx">two</span><span class="w"> </span><span class="nx">requests</span><span class="w"> </span><span class="nx">that</span><span class="w"> </span><span class="nx">both</span><span class="w"> </span><span class="nx">use</span><span class="w"> </span><span class="nx">ARID</span><span class="p">=</span><span class="mi">4</span><span class="p">:</span>
+<span class="w">    </span><span class="nx">responses</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">issue</span><span class="w"> </span><span class="nx">order</span>
+</code></pre></div>
+
+<p>This rule is what lets a memory controller reorder requests around DRAM bank
+conflicts. DRAM is dynamic random access memory, and a row miss costs tens of
+nanoseconds that a reordered request can hide.</p>
+<p>The identifier is not an address and not a priority. It is the manager's
+statement about which of its own requests can complete out of order. A manager
+that reuses one identifier for everything forbids all reordering, and loses
+the performance that reordering provides.</p>
+<hr>
+<h2>Tracking outstanding transactions</h2>
+<p>Every AXI4 component keeps state for the transactions it has started and not
+yet finished. The decoupled channels make this bookkeeping mandatory rather
+than optional.</p>
+<p>A manager tracks its own outstanding requests. An interconnect tracks routing
+state so responses reach the right manager. A subordinate that accepts several
+requests tracks the responses it still owes.</p>
+<div class="highlight"><pre><span></span><code>Read outstanding table
+
+  Slot  ID  Source manager  Target subordinate  Beats left  Status
+  ----  --  --------------  ------------------  ----------  ---------
+  0     3   CPU0            DDR                 8           waiting
+  1     8   DMA             SRAM                1           returning
+  2     4   GPU             DDR                 16          waiting
+</code></pre></div>
+
+<p>Five questions decide whether the bookkeeping is correct:</p>
+<ol>
+<li><strong>Depth:</strong> How many outstanding reads and writes each interface supports.</li>
+<li><strong>Scope:</strong> Whether the limits apply per manager, per subordinate, or globally.</li>
+<li><strong>Interleaving:</strong> Whether any component still expects write data interleaving.</li>
+<li><strong>Errors:</strong> How error responses reach the originating manager, and whether the counters still balance afterwards.</li>
+<li><strong>Reset:</strong> Whether a reset during an outstanding transaction leaves a counter or a route table entry stale.</li>
+</ol>
+<p>The third answer is fixed by the standard, and it simplifies subordinate
+design. AXI3 permitted write data interleaving, so a subordinate could receive
+beats from two write bursts mixed together. AXI4 removed it.</p>
+<hr>
+<h2>Response codes</h2>
+<p>Every AXI4 transaction reports a result. The result travels in <code>BRESP</code> for
+writes and <code>RRESP</code> for reads.</p>
+<table>
+<thead>
+<tr>
+<th>Response</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OKAY</code></td>
+<td>The access succeeded</td>
+</tr>
+<tr>
+<td><code>EXOKAY</code></td>
+<td>An exclusive access succeeded</td>
+</tr>
+<tr>
+<td><code>SLVERR</code></td>
+<td>The target received the request and failed it</td>
+</tr>
+<tr>
+<td><code>DECERR</code></td>
+<td>Address decode failed, usually an unmapped address</td>
+</tr>
+</tbody>
+</table>
+<p>The interconnect generates <code>DECERR</code>, not the target peripheral. An unmapped
+address has no target peripheral to generate anything, so the decode logic
+answers on its behalf.</p>
+<p>A system that returns nothing for an unmapped address hangs instead of
+reporting a fault. This is one of the most common integration defects, and a
+single read from an unmapped address detects it.</p>
+<hr>
+<h2>Quality of service signalling</h2>
+<p>The <code>AxQOS</code> field lets a manager mark the relative urgency of a transaction.
+Quality of service, abbreviated QoS, is a 4-bit value carried on both AXI4
+address channels.</p>
+<p><a href="./04-qos-arbitration-HQ.png"><img alt="Three traffic classes arriving at an AXI arbiter with different quality of service values: a display scanout read at the highest value, a processor cache refill in the middle, and a background copy at the lowest, with the arbiter also weighing a starvation counter and outstanding transaction limits" src="./04-qos-arbitration-900w.png"></a></p>
+<p>A display controller fetching pixels for the next scanline needs low latency,
+because late pixels tear the image. A background copy engine can wait. The
+<code>AxQOS</code> field is how the manager states the difference.</p>
+<p>The field is advisory. It changes nothing unless the interconnect or the
+memory controller implements an arbitration policy that reads it.</p>
+<div class="highlight"><pre><span></span><code>QoS-aware arbitration
+
+  High urgency:  display scanout read   AxQOS=0xF
+  Medium:        CPU cache refill       AxQOS=0x8
+  Low:           background DMA copy    AxQOS=0x2
+
+  Arbiter decision considers:
+    QoS class
+    starvation counter
+    target availability
+    outstanding limit
+</code></pre></div>
+
+<p>A policy where the highest value always wins starves the lower classes.
+Starved traffic holds buffers, full buffers apply backpressure, and
+backpressure can deadlock the system that the priority scheme was meant to
+protect. Production arbiters combine priority with an aging counter or a
+guaranteed bandwidth share.</p>
+<hr>
+<h2>Choosing between AXI4 and AXI4-Lite</h2>
+<p>AXI4-Lite is a subset of AXI4 intended for control and status registers. It
+removes the features that a register bank never uses.</p>
+<ul>
+<li>Every transfer is a single beat.</li>
+<li>The burst fields are absent.</li>
+<li>The transaction identifier fields are absent.</li>
+<li>The resulting subordinate is smaller and far quicker to verify.</li>
+</ul>
+<p>Use AXI4-Lite for register banks. Use full AXI4 for high-throughput data
+movement. Attaching a large register block to full AXI4 gains nothing and
+costs verification effort, unless system integration forces the choice.</p>
+<hr>
+<h2>How AXI fails in practice</h2>
+<p>AXI failures usually appear as a hang rather than an error. A stalled
+handshake produces no exception, no trap, and no log entry.</p>
+<p><a href="./05-debug-flow-HQ.png"><img alt="A debug decision path for a stalled AXI interface: capture all five channels, identify which channel shows valid high with ready low, then determine whether the source or the destination owes progress" src="./05-debug-flow-900w.png"></a></p>
+<p>The common root causes are:</p>
+<ul>
+<li><code>VALID</code> deasserts before the destination asserts <code>READY</code></li>
+<li>The payload changes while the transfer is stalled</li>
+<li><code>WLAST</code> is missing, early, or late</li>
+<li>A subordinate assumes <code>AW</code> and <code>W</code> arrive in the same cycle</li>
+<li>An outstanding counter underflows or overflows</li>
+<li>A response identifier does not match any outstanding request</li>
+<li>An interconnect frees a route table entry before the final beat</li>
+<li>An unmapped access returns nothing instead of <code>DECERR</code></li>
+<li>A clock domain bridge drops a beat under backpressure</li>
+</ul>
+<p>The fastest way to diagnose any of these is to capture all five channels
+around the stall. Then ask one question: which channel shows <code>VALID</code> high with
+<code>READY</code> low, and which component owes the next move.</p>
+<p>That question converts a system hang into a single accountable interface. The
+component holding <code>READY</code> low is either waiting for something legitimate or
+has lost track of its own state.</p>
+<hr>
+<h2>A protocol monitor for the write channel</h2>
+<p>A small monitor catches most write channel violations before they reach
+silicon. It watches the handshakes and flags any sequence the protocol
+forbids.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_ceadc163cb9e12fd2f04182de6a4d334.svg"></p>
+<p>The three transitions into the error state cover the failures that cost the
+most debug time. A response without a request means the identifier tracking is
+broken somewhere upstream. Too many beats means a beat counter disagrees with
+<code>AWLEN</code>. A second response means two components both think they own the
+transaction.</p>
+<hr>
+<h2>Design checklist</h2>
+<p>Work through these decisions before the first line of interface code:</p>
+<ol>
+<li>Define the maximum outstanding reads and writes for every manager.</li>
+<li>Decide which managers use multiple transaction identifiers, and how many.</li>
+<li>Size every buffer for worst-case backpressure, not for average throughput.</li>
+<li>Add protocol assertions at every custom AXI boundary in the design.</li>
+<li>Map the full address space so that unmapped accesses return <code>DECERR</code>.</li>
+<li>Keep AXI4-Lite register blocks single-beat and strongly ordered.</li>
+<li>Capture all five channels in the waveform setup used for hang debug.</li>
+</ol>
+<hr>
+<h2>Summary</h2>
+<p>AXI4 performance comes from decoupling: independent channels, burst transfers,
+backpressure, transaction identifiers, and out-of-order completion. Each of
+those mechanisms raises throughput, and each one demands discipline in return.</p>
+<p>That discipline covers handshake stability, outstanding transaction tracking,
+response ordering, and error handling. Most AXI failures are not a
+misunderstanding of one signal. They come from assuming that two independent
+channels stay aligned when the protocol explicitly permits them to drift
+apart.</p>
+<hr>
+<p><em>Next: Intermediate Article 02, Cache Coherency Protocols</em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

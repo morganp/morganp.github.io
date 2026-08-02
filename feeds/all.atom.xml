@@ -1,5 +1,369 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-02T00:00:00+01:00</updated><entry><title>An always-on tmux setup</title><link href="http://lizard-spock.co.uk/tmux-always-on-setup.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/tmux-always-on-setup.html</id><summary type="html">&lt;p&gt;Five changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile that you can still escape from, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, a two-row status line with a keybinding hint row, and mouse selection that copies to the system clipboard on X11.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tmux-hero-HQ.png"&gt;&lt;img alt="An always-on tmux setup" src="http://lizard-spock.co.uk/tmux-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-02T00:00:00+01:00</updated><entry><title>SoC Intermediate 01: AXI4 protocol deep dive</title><link href="http://lizard-spock.co.uk/soc-intermediate-01-axi4-protocol-deep-dive.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/soc-intermediate-01-axi4-protocol-deep-dive.html</id><summary type="html">&lt;p&gt;The mechanisms behind AXI4 throughput and the bugs each one creates: burst encoding, transaction identifiers, out-of-order completion, outstanding transaction tracking, quality of service signalling, and the handshake rules that hand-written bridges break most often.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-axi4-hero-HQ.png"&gt;&lt;img alt="An AXI4 interconnect at the centre of a system on chip, with a processor, a direct memory access engine, a graphics processor and a memory controller exchanging tagged read and write transactions along coloured channel paths" src="http://lizard-spock.co.uk/00-axi4-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Series: Intermediate SoC Design | Article 1 of 10&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This article explains how the AXI4 protocol achieves high throughput, and why
+that same design makes AXI4 hard to debug. It is written for engineers who
+already know the five channels and now have to build, integrate, or debug a
+real interface.&lt;/p&gt;
+&lt;p&gt;AXI is the Advanced eXtensible Interface, part of the AMBA family from ARM.
+AXI4 connects the high-bandwidth blocks of a system on chip: processors,
+direct memory access engines, graphics processors, display controllers,
+memory controllers, and coherent interconnects. The
+&lt;a href="http://lizard-spock.co.uk/soc-article-06-interconnects-and-bus-protocols.html"&gt;introductory article on interconnects&lt;/a&gt;
+described AXI as five independent channels with a valid and ready handshake.
+This article goes further, into bursts, transaction identifiers, ordering,
+backpressure, quality of service, and protocol compliance.&lt;/p&gt;
+&lt;p&gt;AXI is not a bus. It is a distributed flow-control contract between managers,
+interconnects, subordinates, buffers, bridges, and clock converters. Every one
+of those components can break the contract independently.&lt;/p&gt;
+&lt;p&gt;Note: this article uses the current AMBA terms manager and subordinate. Older
+documents and much existing code use master and slave for the same roles. The
+signal names are identical in both.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The five channels revisited&lt;/h2&gt;
+&lt;p&gt;AXI4 separates read traffic and write traffic into five independent channels.
+Each channel carries its own handshake and makes progress on its own schedule.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/01-five-channels-HQ.png"&gt;&lt;img alt="The five AXI4 channels drawn between a manager and a subordinate: write address, write data and write response on the write path, read address and read data on the read path, each channel labelled with its direction and valid and ready signal pair" src="http://lizard-spock.co.uk/01-five-channels-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Channel&lt;/th&gt;
+&lt;th&gt;Name&lt;/th&gt;
+&lt;th&gt;Direction&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;AW&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Write address&lt;/td&gt;
+&lt;td&gt;Manager to subordinate&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;W&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Write data&lt;/td&gt;
+&lt;td&gt;Manager to subordinate&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;B&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Write response&lt;/td&gt;
+&lt;td&gt;Subordinate to manager&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;AR&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Read address&lt;/td&gt;
+&lt;td&gt;Manager to subordinate&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;R&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Read data&lt;/td&gt;
+&lt;td&gt;Subordinate to manager&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;A transfer occurs only on a rising clock edge where &lt;code&gt;VALID&lt;/code&gt; and &lt;code&gt;READY&lt;/code&gt; are
+both high. That single rule governs every channel.&lt;/p&gt;
+&lt;p&gt;AXI decouples the address channels from the data channels deliberately. A
+manager can send several write addresses before the subordinate accepts all
+the write data. A subordinate can delay responses while it continues to accept
+new addresses. This decoupling is the source of AXI throughput.&lt;/p&gt;
+&lt;p&gt;The cost of decoupling is bookkeeping. A correct design tracks every
+outstanding transaction, because the protocol never promises that two channels
+stay aligned.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The valid and ready contract&lt;/h2&gt;
+&lt;p&gt;The valid and ready handshake carries two discipline rules that hand-written
+interfaces break more often than any other part of the protocol.&lt;/p&gt;
+&lt;p&gt;The first rule constrains the source. A source must not wait for &lt;code&gt;READY&lt;/code&gt;
+before it asserts &lt;code&gt;VALID&lt;/code&gt;. If the source has a transfer available, it asserts
+&lt;code&gt;VALID&lt;/code&gt; immediately. A design that waits for &lt;code&gt;READY&lt;/code&gt; first can deadlock
+against a destination that waits for &lt;code&gt;VALID&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The second rule constrains the payload. Once &lt;code&gt;VALID&lt;/code&gt; is high, the payload must
+stay stable until the transfer completes. The destination is free to assert
+and deassert &lt;code&gt;READY&lt;/code&gt; at any time, and that freedom is how backpressure travels
+back through the system.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_390a8768414bb7eebe758b1079c75b6b.svg"&gt;&lt;/p&gt;
+&lt;p&gt;If the payload changes while &lt;code&gt;VALID&lt;/code&gt; is high and &lt;code&gt;READY&lt;/code&gt; is low, the
+destination can capture corrupted information. The failure is intermittent,
+because it appears only when the destination applies backpressure at the
+moment the source changes its data.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Burst types and addressing&lt;/h2&gt;
+&lt;p&gt;A burst moves several data beats from one address phase. AXI4 supports three
+burst types, selected by the &lt;code&gt;AxBURST&lt;/code&gt; field.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/02-burst-types-HQ.png"&gt;&lt;img alt="Three AXI4 burst types compared on a memory address grid: FIXED repeatedly accessing one address, INCR stepping forward through consecutive addresses, and WRAP stepping forward then wrapping back to the start of an aligned region" src="http://lizard-spock.co.uk/02-burst-types-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Burst&lt;/th&gt;
+&lt;th&gt;Behaviour&lt;/th&gt;
+&lt;th&gt;Typical use&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;FIXED&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The address stays constant for every beat&lt;/td&gt;
+&lt;td&gt;A first in, first out data port&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;INCR&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The address increments by the beat size&lt;/td&gt;
+&lt;td&gt;A normal memory copy&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;WRAP&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The address increments, then wraps at an aligned boundary&lt;/td&gt;
+&lt;td&gt;A cache line refill&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Two fields encode the shape of the burst. &lt;code&gt;AxLEN&lt;/code&gt; holds the beat count minus
+one, so the transfer carries &lt;code&gt;AxLEN + 1&lt;/code&gt; beats. &lt;code&gt;AxSIZE&lt;/code&gt; holds the base 2
+logarithm of the beat width, so each beat carries &lt;code&gt;2^AxSIZE&lt;/code&gt; bytes.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;Example&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;beat&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;INCR&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;burst&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;ARADDR&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;0x8000&lt;/span&gt;&lt;span class="n"&gt;_1000&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;ARLEN&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;beats&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;ARSIZE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;bytes&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;per&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;beat&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;ARBURST&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;INCR&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;Beat&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;addresses&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mh"&gt;0x8000&lt;/span&gt;&lt;span class="n"&gt;_1000&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mh"&gt;0x8000&lt;/span&gt;&lt;span class="n"&gt;_1008&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mh"&gt;0x8000&lt;/span&gt;&lt;span class="n"&gt;_1010&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mh"&gt;0x8000&lt;/span&gt;&lt;span class="n"&gt;_1018&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Wrapped bursts and cache line refills&lt;/h3&gt;
+&lt;p&gt;A wrapped burst keeps every beat inside one naturally aligned region. Caches
+use this to fetch the word the processor stalled on first, then collect the
+rest of the line.&lt;/p&gt;
+&lt;p&gt;The wrap boundary is the total burst size, which is the beat count multiplied
+by the beat width. When the address reaches that boundary, it returns to the
+start of the aligned region rather than crossing into the next one.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_067d6deeca2ba432c3082284fb5b1faa.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The address &lt;code&gt;RADDR&lt;/code&gt; is shown for illustration. AXI does not carry an address
+on the read data channel, because the manager already knows the address from
+the read address phase.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Anatomy of a write transaction&lt;/h2&gt;
+&lt;p&gt;A write completes only when all three write-side channels finish their work.
+The subordinate accepts the address, accepts every data beat, and returns a
+response.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_53bdaeb211943d2f6dba1b08c33747ea.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The address phase and the data phase are independent. The manager can present
+write data before, during, or after the address handshake completes.&lt;/p&gt;
+&lt;p&gt;Many broken subordinates assume that &lt;code&gt;AW&lt;/code&gt; and &lt;code&gt;W&lt;/code&gt; arrive together. The
+assumption survives a simple testbench, then fails against a real
+interconnect that reorders the two channels through separate buffers.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;WLAST&lt;/code&gt; marks the final data beat. A subordinate that counts beats without
+checking &lt;code&gt;WLAST&lt;/code&gt; cannot detect a manager that sends the wrong number.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Anatomy of a read transaction&lt;/h2&gt;
+&lt;p&gt;A read uses fewer channels than a write. One address phase produces one or
+more read data beats, and the final beat carries &lt;code&gt;RLAST&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_0caf6c6b0bfe0f12cf359012e0c979ac.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The read response travels in the &lt;code&gt;RRESP&lt;/code&gt; field of each beat rather than on a
+separate channel. A burst can therefore report an error on one beat and
+success on another.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Transaction identifiers and ordering&lt;/h2&gt;
+&lt;p&gt;Transaction identifiers let a manager keep several requests in flight at once.
+The &lt;code&gt;AWID&lt;/code&gt; and &lt;code&gt;ARID&lt;/code&gt; fields tag requests, and the &lt;code&gt;BID&lt;/code&gt; and &lt;code&gt;RID&lt;/code&gt; fields tag
+the matching responses.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/03-out-of-order-HQ.png"&gt;&lt;img alt="Two tagged read requests entering an interconnect scoreboard and leaving in a different order: a request tagged ID 4 to slow memory issued first but returning second, and a request tagged ID 7 to fast memory issued second but returning first" src="http://lizard-spock.co.uk/03-out-of-order-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Two ordering rules follow from the identifiers:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Transactions that share an identifier must complete in the order the manager issued them.&lt;/li&gt;
+&lt;li&gt;Transactions with different identifiers can complete in any order, if the interconnect and the subordinate support it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;Out&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;of&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nx"&gt;order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;read&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;completion&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Manager&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;issues&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;ARID&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;address&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;DRAM&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;row&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;miss&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;slow&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;ARID&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;address&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;SRAM&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;fast&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;Interconnect&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;can&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;RID&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;first&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;RID&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;later&lt;/span&gt;
+
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;For&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;two&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;requests&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;that&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;both&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;use&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;ARID&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;responses&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;issue&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;order&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This rule is what lets a memory controller reorder requests around DRAM bank
+conflicts. DRAM is dynamic random access memory, and a row miss costs tens of
+nanoseconds that a reordered request can hide.&lt;/p&gt;
+&lt;p&gt;The identifier is not an address and not a priority. It is the manager's
+statement about which of its own requests can complete out of order. A manager
+that reuses one identifier for everything forbids all reordering, and loses
+the performance that reordering provides.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Tracking outstanding transactions&lt;/h2&gt;
+&lt;p&gt;Every AXI4 component keeps state for the transactions it has started and not
+yet finished. The decoupled channels make this bookkeeping mandatory rather
+than optional.&lt;/p&gt;
+&lt;p&gt;A manager tracks its own outstanding requests. An interconnect tracks routing
+state so responses reach the right manager. A subordinate that accepts several
+requests tracks the responses it still owes.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Read outstanding table
+
+  Slot  ID  Source manager  Target subordinate  Beats left  Status
+  ----  --  --------------  ------------------  ----------  ---------
+  0     3   CPU0            DDR                 8           waiting
+  1     8   DMA             SRAM                1           returning
+  2     4   GPU             DDR                 16          waiting
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Five questions decide whether the bookkeeping is correct:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Depth:&lt;/strong&gt; How many outstanding reads and writes each interface supports.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Scope:&lt;/strong&gt; Whether the limits apply per manager, per subordinate, or globally.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Interleaving:&lt;/strong&gt; Whether any component still expects write data interleaving.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Errors:&lt;/strong&gt; How error responses reach the originating manager, and whether the counters still balance afterwards.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Reset:&lt;/strong&gt; Whether a reset during an outstanding transaction leaves a counter or a route table entry stale.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The third answer is fixed by the standard, and it simplifies subordinate
+design. AXI3 permitted write data interleaving, so a subordinate could receive
+beats from two write bursts mixed together. AXI4 removed it.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Response codes&lt;/h2&gt;
+&lt;p&gt;Every AXI4 transaction reports a result. The result travels in &lt;code&gt;BRESP&lt;/code&gt; for
+writes and &lt;code&gt;RRESP&lt;/code&gt; for reads.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Response&lt;/th&gt;
+&lt;th&gt;Meaning&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;OKAY&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The access succeeded&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;EXOKAY&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;An exclusive access succeeded&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;SLVERR&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The target received the request and failed it&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;DECERR&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Address decode failed, usually an unmapped address&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The interconnect generates &lt;code&gt;DECERR&lt;/code&gt;, not the target peripheral. An unmapped
+address has no target peripheral to generate anything, so the decode logic
+answers on its behalf.&lt;/p&gt;
+&lt;p&gt;A system that returns nothing for an unmapped address hangs instead of
+reporting a fault. This is one of the most common integration defects, and a
+single read from an unmapped address detects it.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Quality of service signalling&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;AxQOS&lt;/code&gt; field lets a manager mark the relative urgency of a transaction.
+Quality of service, abbreviated QoS, is a 4-bit value carried on both AXI4
+address channels.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/04-qos-arbitration-HQ.png"&gt;&lt;img alt="Three traffic classes arriving at an AXI arbiter with different quality of service values: a display scanout read at the highest value, a processor cache refill in the middle, and a background copy at the lowest, with the arbiter also weighing a starvation counter and outstanding transaction limits" src="http://lizard-spock.co.uk/04-qos-arbitration-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;A display controller fetching pixels for the next scanline needs low latency,
+because late pixels tear the image. A background copy engine can wait. The
+&lt;code&gt;AxQOS&lt;/code&gt; field is how the manager states the difference.&lt;/p&gt;
+&lt;p&gt;The field is advisory. It changes nothing unless the interconnect or the
+memory controller implements an arbitration policy that reads it.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;QoS-aware arbitration
+
+  High urgency:  display scanout read   AxQOS=0xF
+  Medium:        CPU cache refill       AxQOS=0x8
+  Low:           background DMA copy    AxQOS=0x2
+
+  Arbiter decision considers:
+    QoS class
+    starvation counter
+    target availability
+    outstanding limit
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A policy where the highest value always wins starves the lower classes.
+Starved traffic holds buffers, full buffers apply backpressure, and
+backpressure can deadlock the system that the priority scheme was meant to
+protect. Production arbiters combine priority with an aging counter or a
+guaranteed bandwidth share.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Choosing between AXI4 and AXI4-Lite&lt;/h2&gt;
+&lt;p&gt;AXI4-Lite is a subset of AXI4 intended for control and status registers. It
+removes the features that a register bank never uses.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Every transfer is a single beat.&lt;/li&gt;
+&lt;li&gt;The burst fields are absent.&lt;/li&gt;
+&lt;li&gt;The transaction identifier fields are absent.&lt;/li&gt;
+&lt;li&gt;The resulting subordinate is smaller and far quicker to verify.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Use AXI4-Lite for register banks. Use full AXI4 for high-throughput data
+movement. Attaching a large register block to full AXI4 gains nothing and
+costs verification effort, unless system integration forces the choice.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;How AXI fails in practice&lt;/h2&gt;
+&lt;p&gt;AXI failures usually appear as a hang rather than an error. A stalled
+handshake produces no exception, no trap, and no log entry.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/05-debug-flow-HQ.png"&gt;&lt;img alt="A debug decision path for a stalled AXI interface: capture all five channels, identify which channel shows valid high with ready low, then determine whether the source or the destination owes progress" src="http://lizard-spock.co.uk/05-debug-flow-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The common root causes are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;VALID&lt;/code&gt; deasserts before the destination asserts &lt;code&gt;READY&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;The payload changes while the transfer is stalled&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;WLAST&lt;/code&gt; is missing, early, or late&lt;/li&gt;
+&lt;li&gt;A subordinate assumes &lt;code&gt;AW&lt;/code&gt; and &lt;code&gt;W&lt;/code&gt; arrive in the same cycle&lt;/li&gt;
+&lt;li&gt;An outstanding counter underflows or overflows&lt;/li&gt;
+&lt;li&gt;A response identifier does not match any outstanding request&lt;/li&gt;
+&lt;li&gt;An interconnect frees a route table entry before the final beat&lt;/li&gt;
+&lt;li&gt;An unmapped access returns nothing instead of &lt;code&gt;DECERR&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;A clock domain bridge drops a beat under backpressure&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The fastest way to diagnose any of these is to capture all five channels
+around the stall. Then ask one question: which channel shows &lt;code&gt;VALID&lt;/code&gt; high with
+&lt;code&gt;READY&lt;/code&gt; low, and which component owes the next move.&lt;/p&gt;
+&lt;p&gt;That question converts a system hang into a single accountable interface. The
+component holding &lt;code&gt;READY&lt;/code&gt; low is either waiting for something legitimate or
+has lost track of its own state.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;A protocol monitor for the write channel&lt;/h2&gt;
+&lt;p&gt;A small monitor catches most write channel violations before they reach
+silicon. It watches the handshakes and flags any sequence the protocol
+forbids.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_ceadc163cb9e12fd2f04182de6a4d334.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The three transitions into the error state cover the failures that cost the
+most debug time. A response without a request means the identifier tracking is
+broken somewhere upstream. Too many beats means a beat counter disagrees with
+&lt;code&gt;AWLEN&lt;/code&gt;. A second response means two components both think they own the
+transaction.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Design checklist&lt;/h2&gt;
+&lt;p&gt;Work through these decisions before the first line of interface code:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Define the maximum outstanding reads and writes for every manager.&lt;/li&gt;
+&lt;li&gt;Decide which managers use multiple transaction identifiers, and how many.&lt;/li&gt;
+&lt;li&gt;Size every buffer for worst-case backpressure, not for average throughput.&lt;/li&gt;
+&lt;li&gt;Add protocol assertions at every custom AXI boundary in the design.&lt;/li&gt;
+&lt;li&gt;Map the full address space so that unmapped accesses return &lt;code&gt;DECERR&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Keep AXI4-Lite register blocks single-beat and strongly ordered.&lt;/li&gt;
+&lt;li&gt;Capture all five channels in the waveform setup used for hang debug.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;AXI4 performance comes from decoupling: independent channels, burst transfers,
+backpressure, transaction identifiers, and out-of-order completion. Each of
+those mechanisms raises throughput, and each one demands discipline in return.&lt;/p&gt;
+&lt;p&gt;That discipline covers handshake stability, outstanding transaction tracking,
+response ordering, and error handling. Most AXI failures are not a
+misunderstanding of one signal. They come from assuming that two independent
+channels stay aligned when the protocol explicitly permits them to drift
+apart.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;Next: Intermediate Article 02, Cache Coherency Protocols&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Computer Architecture"></category><category term="Electronics"></category><category term="Embedded Systems"></category><category term="ARM"></category><category term="AMBA"></category><category term="AXI"></category><category term="AXI4"></category><category term="Bus Protocols"></category><category term="Verification"></category></entry><entry><title>An always-on tmux setup</title><link href="http://lizard-spock.co.uk/tmux-always-on-setup.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/tmux-always-on-setup.html</id><summary type="html">&lt;p&gt;Five changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile that you can still escape from, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, a two-row status line with a keybinding hint row, and mouse selection that copies to the system clipboard on X11.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tmux-hero-HQ.png"&gt;&lt;img alt="An always-on tmux setup" src="http://lizard-spock.co.uk/tmux-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;If you have not met it yet, tmux is a terminal multiplexer. It lets one
 terminal window hold many sessions, split into panes, and it keeps those
 sessions alive after you disconnect. I wrote up the day-to-day mechanics
@@ -9768,31 +10132,4 @@ Remembering the definition of prime all numbers that are not prime are integer m
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;a href="http://www.edaplayground.com/x/BzX"&gt;Example on EDA Playground&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;This is however just a programming exercise as the resulting hardware is likely substantially bigger than just implementing a look up table to the maxim number of primes you can fit in &lt;code&gt;prime_number&lt;/code&gt;. The look up table will also be ready from time zero and not need to recompute every time you power up.&lt;/p&gt;</content><category term="Engineering"></category><category term="Math"></category><category term="Verilog"></category></entry><entry><title>"tcsh Remove trailing /"</title><link href="http://lizard-spock.co.uk/tcsh-remove-trailing.html" rel="alternate"></link><published>2014-10-08T21:15:43+01:00</published><updated>2014-10-08T21:15:43+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2014-10-08:/tcsh-remove-trailing.html</id><summary type="html">&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt;1&lt;/span&gt;
-&lt;span class="normal"&gt;2&lt;/span&gt;
-&lt;span class="normal"&gt;3&lt;/span&gt;
-&lt;span class="normal"&gt;4&lt;/span&gt;
-&lt;span class="normal"&gt;5&lt;/span&gt;
-&lt;span class="normal"&gt;6&lt;/span&gt;
-&lt;span class="normal"&gt;7&lt;/span&gt;
-&lt;span class="normal"&gt;8&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;#!/bin/tcsh&lt;/span&gt;
-
-&lt;span class="nb"&gt;set &lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;helloworld/&amp;quot;&lt;/span&gt;
-
-&lt;span class="c"&gt;## http://dbaspot.com/shell/350417-sed-removing-trailing.html&lt;/span&gt;
-&lt;span class="nb"&gt;set …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt;1&lt;/span&gt;
-&lt;span class="normal"&gt;2&lt;/span&gt;
-&lt;span class="normal"&gt;3&lt;/span&gt;
-&lt;span class="normal"&gt;4&lt;/span&gt;
-&lt;span class="normal"&gt;5&lt;/span&gt;
-&lt;span class="normal"&gt;6&lt;/span&gt;
-&lt;span class="normal"&gt;7&lt;/span&gt;
-&lt;span class="normal"&gt;8&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;#!/bin/tcsh&lt;/span&gt;
-
-&lt;span class="nb"&gt;set &lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;helloworld/&amp;quot;&lt;/span&gt;
-
-&lt;span class="c"&gt;## http://dbaspot.com/shell/350417-sed-removing-trailing.html&lt;/span&gt;
-&lt;span class="nb"&gt;set &lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$var&amp;quot;&lt;/span&gt; | sed -e &lt;span class="s1"&gt;&amp;#39;s,\(.\)/$,\1,&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
-
-&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$var&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category></entry></feed>
+&lt;p&gt;This is however just a programming exercise as the resulting hardware is likely substantially bigger than just implementing a look up table to the maxim number of primes you can fit in &lt;code&gt;prime_number&lt;/code&gt;. The look up table will also be ready from time zero and not need to recompute every time you power up.&lt;/p&gt;</content><category term="Engineering"></category><category term="Math"></category><category term="Verilog"></category></entry></feed>
