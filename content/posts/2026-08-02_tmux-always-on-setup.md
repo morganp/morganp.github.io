@@ -4,7 +4,7 @@ Category: Unix & Tools
 Tags: tmux, shell, dotfiles, zsh, bash, terminal
 Author: morganp
 Status: published
-Summary: Four changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, and a two-row status line with a keybinding hint row.
+Summary: Five changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile that you can still escape from, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, a two-row status line with a keybinding hint row, and mouse selection that copies to the system clipboard on X11.
 Slug: tmux-always-on-setup
 
 [![An always-on tmux setup]({attach}/images/Unix/tmux/tmux-hero-900w.png)]({attach}/images/Unix/tmux/tmux-hero-HQ.png)
@@ -20,16 +20,17 @@ This post is about what came after that. Once tmux is part of your daily
 routine, a handful of small annoyances start to grate. You forget to start it
 and lose a terminal full of work. A reboot wipes out a carefully arranged set
 of windows and panes. Shift+Enter mysteriously stops working in Claude Code
-and Codex the moment you are inside tmux. And you spend the first month
-looking up the same four keybindings over and over.
+and Codex the moment you are inside tmux. Selecting text with the mouse stops
+putting anything on the clipboard. And you spend the first month looking up the
+same four keybindings over and over.
 
 Each of those has a fix, and each fix is only a few lines of config. This post
-walks through all four as they now sit in my
+walks through all of them as they now sit in my
 [dotfiles repository](https://github.com/morganp/dotfiles). Individually they
 are small. Together they turn tmux from something you remember to start into
 something that is simply always there.
 
-The four changes are:
+The five changes are:
 
 | Change | Problem it solves |
 |---|---|
@@ -37,6 +38,7 @@ The four changes are:
 | tmux-resurrect and tmux-continuum | Losing the window and pane layout across a restart |
 | Extended key reporting | Shift+Enter being byte-identical to Enter inside tmux |
 | Two-row status line | Not remembering keybindings, and losing the host label under a TUI |
+| Mouse selection through a copy command | Selections not reaching the system clipboard, or arriving as escape-sequence garbage |
 
 Everything below lives in the tmux config and the shell profile. On a standard
 Linux or macOS setup those are `~/.tmux.conf` (or `~/.config/tmux/tmux.conf`)
@@ -83,8 +85,11 @@ This goes in `~/.zprofile`, which in my case is
 ```zsh
 # Start or attach to the shared tmux session for interactive terminals. TMUX is
 # set inside tmux, which prevents new panes from creating nested sessions.
-if [[ -o interactive && -z "${TMUX:-}" && -t 1 ]] && (( $+commands[tmux] )); then
-  exec tmux new-session -A -s main
+# Set NO_TMUX=1 to get a plain shell, e.g. ghostty -e "env NO_TMUX=1 zsh -l".
+# Deliberately not exec: on detach the login shell survives instead of the
+# terminal window closing.
+if [[ -o interactive && -z "${TMUX:-}" && -t 1 && -z "${NO_TMUX:-}" ]] && (( $+commands[tmux] )); then
+  tmux new-session -A -s main
 fi
 ```
 
@@ -93,8 +98,8 @@ The Bash equivalent goes in `~/.bashrc`, mine at
 Same logic, portable syntax:
 
 ```bash
-if [[ $- == *i* && -z "${TMUX:-}" && -t 1 ]] && command -v tmux >/dev/null 2>&1; then
-  exec tmux new-session -A -s main
+if [[ $- == *i* && -z "${TMUX:-}" && -t 1 && -z "${NO_TMUX:-}" ]] && command -v tmux >/dev/null 2>&1; then
+  tmux new-session -A -s main
 fi
 ```
 
@@ -112,9 +117,7 @@ login shell to read the environment, must not be hijacked into tmux.
 **`command -v tmux`** keeps the profile portable to machines where tmux is not
 installed. A missing binary should not break shell startup.
 
-**`exec`** replaces the shell process rather than nesting one inside the other.
-Without it you get a parent shell doing nothing but waiting, and detaching from
-tmux drops you into that dead shell instead of closing the window.
+**`-z "${NO_TMUX:-}"`** is the escape hatch. More on it below.
 
 `new-session -A -s main` is the whole trick: attach to the session named `main`
 if it exists, create it if it does not. One flag, no `has-session` test and
@@ -122,7 +125,64 @@ conditional branch.
 
 The Zsh version goes in `~/.zprofile`, not `~/.zshrc`. `zprofile` is sourced
 once for a login shell. `zshrc` is sourced for every interactive shell, which
-would be more places than necessary to run an `exec`.
+would be more places than necessary to run this.
+
+### Leaving a way out
+
+Two details in that block are deliberate, and both exist so you can still get
+to a shell that is not inside tmux.
+
+**No `exec`.** The common advice is `exec tmux new-session -A -s main`, which
+replaces the login shell with the tmux client rather than leaving a parent
+shell doing nothing. It also removes the thing you detach *to*: with `exec`
+there is no process behind tmux, so `prefix + d` has nothing to return to and
+the terminal window closes. Detach and quit become the same action. Running
+tmux without `exec` keeps the login shell alive underneath, so detaching lands
+you back at a prompt. The cost is one idle shell per terminal.
+
+**`NO_TMUX`.** Set it and the profile skips the autostart entirely:
+
+```sh
+ghostty -e "env NO_TMUX=1 zsh -l"
+```
+
+Both matter for the same reason: when tmux is the thing that is broken, every
+terminal you open runs straight back into it. Without a shell to detach to and
+a way to start without tmux at all, there is nowhere to stand while you inspect
+or kill the server.
+
+### Login shells inside tmux
+
+New tmux panes start as *login* Bash shells, showing up as `-bash` in the
+process list. Login Bash reads `~/.bash_profile` and does not read `~/.bashrc`
+at all, so if the autostart block and everything else lives in `~/.bashrc`,
+panes come up with none of it. The shim in `~/.bash_profile`:
+
+```bash
+if [[ -r "$HOME/.bashrc" ]]; then
+  source "$HOME/.bashrc"
+fi
+```
+
+On machines where tmux arrives through
+[environment modules](https://modules.readthedocs.io/) rather than being on
+`PATH` at login, the module has to be loaded before the `command -v` test can
+succeed. My Bash version does that inside the guard:
+
+```bash
+if [[ $- == *i* && -z "${TMUX:-}" && -t 1 && -z "${NO_TMUX:-}" ]]; then
+  _dotfiles_module_load util gnu/tmux >/dev/null 2>&1
+  if command -v tmux >/dev/null 2>&1; then
+    tmux new-session -A -s main
+  fi
+fi
+```
+
+`_dotfiles_module_load` is a small wrapper of mine that is a no-op when no
+module system is present, so the same file still works on machines without one.
+The output redirection matters: module tools are chatty, and anything they
+print during shell startup ends up in scp and rsync sessions, which breaks
+them.
 
 ## Session persistence with resurrect and continuum
 
@@ -242,7 +302,7 @@ do. Extended keys need tmux 3.2 or newer.
 
 ## The status line and a hint row
 
-The last piece is the status line. Two things were wrong with the default. The
+Next is the status line. Two things were wrong with the default. The
 host label from the Starship prompt disappears the moment a full-screen TUI
 takes over the pane, so on a multi-machine SSH setup you lose track of where
 you are. And tmux keybindings are hard to remember while you are still learning
@@ -258,7 +318,7 @@ set -g status-right '#[fg=#89b4fa,bold]󰂋 #{?#{E:DOTFILES_HOST},#{E:DOTFILES_H
 set -g window-status-separator ''
 set -g window-status-format '#[fg=#6c7086] #I:#W '
 set -g window-status-current-format '#[fg=#cba6f7,bold] #I:#W '
-set -g 'status-format[1]' '#[align=centre,fg=#7f849c]Prefix: Ctrl-b  •  c: new tab  •  ,: rename tab  •  n/p: next/previous tab  •  0–9: choose tab  •  d: detach'
+set -g 'status-format[1]' '#[align=centre,fg=#7f849c]Prefix: Ctrl-b • c: create • ,: rename • n/p: next/previous • d: detach'
 ```
 
 `set -g status 2` is the interesting one. Most people know `status on` and
@@ -267,6 +327,10 @@ set -g 'status-format[1]' '#[align=centre,fg=#7f849c]Prefix: Ctrl-b  •  c: new
 row you can fill with anything. Here it holds a centred cheat sheet of the
 keybindings you need while learning tmux. It is a comment in the config that
 you actually read, and deleting it later is a one-line change.
+
+Keep the hint row short. Long labels and wide separators wrap on a narrow pane,
+and a row that wraps stops being readable at a glance. Window numbers are
+already on the row above, so the row does not need to explain `0-9` either.
 
 The host label uses a conditional format:
 
@@ -366,36 +430,94 @@ set -g message-style 'bg=#313244,fg=#cdd6f4'
 set -g mode-style 'bg=#cba6f7,fg=#1e1e2e,bold'
 ```
 
-Two more settings worth calling out, both near the top of the file:
+## Mouse scroll and the clipboard
+
+The last piece sits at the top of the config: the block that decides what the
+mouse does.
 
 ```tmux
-# Enable mouse mode so trackpad scroll enters copy mode and scrolls pane
-# history, instead of being translated to arrow keys that TUIs like Claude
-# Code read as prompt history navigation
+# Let the wheel scroll tmux pane history. Use Shift+drag for native terminal
+# selection. On RHEL/X11, pipe tmux selections to xclip instead of emitting OSC52
+# clipboard escapes, which can show up as garbage text in some terminal paths.
 set -g mouse on
+set -g set-clipboard off
+set -s copy-command 'xclip -selection clipboard -in'
+bind M set -g mouse
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-no-clear -C
 
 # vim keys for copy mode
 setw -g mode-keys vi
 ```
 
-`mouse on` is not only about clicking to select panes. Without it, trackpad
-scroll is translated into arrow keys, and a TUI reading arrow keys as prompt
-history navigation will scroll your prompt history instead of the pane
+`mouse on` is not only about clicking to select panes. Without it, wheel and
+trackpad scroll is translated into arrow keys, and a TUI reading arrow keys as
+prompt history navigation will scroll your prompt history instead of the pane
 scrollback. That is a confusing bug until you know the cause.
+
+Turning it on, though, means tmux now owns the mouse, and that is where the
+copy and paste trouble starts. Three separate problems, three lines.
+
+**The selection vanishes the moment you release the button.** tmux's default
+`MouseDragEnd1Pane` binding is `copy-selection-and-cancel`, which copies and
+then immediately exits copy mode and clears the highlight. You get no visual
+confirmation that anything was selected at all. Rebinding to a `-no-clear`
+variant keeps the highlight up after the drag:
+
+```tmux
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-no-clear -C
+```
+
+**The copy does not reach the system clipboard.** By default tmux hands the
+selection to the terminal using OSC 52, an escape sequence asking the terminal
+emulator to set the clipboard on tmux's behalf. When it works it is excellent,
+because it survives SSH. When something in the chain does not interpret it, the
+bytes land in the terminal as visible garbage and the clipboard stays empty.
+That is what happens on RHEL over X11.
+
+Stop tmux emitting the escape sequence and give it a real command to pipe
+through instead:
+
+```tmux
+set -g set-clipboard off
+set -s copy-command 'xclip -selection clipboard -in'
+```
+
+`copy-command` is what the `-C` flag on `copy-pipe-no-clear` invokes, so the
+binding, the pipe target and the disabled OSC 52 all work as one unit. On X11
+that means [xclip](https://github.com/astrand/xclip). Wayland wants
+`wl-copy --type text/plain`, and macOS wants `pbcopy`, so this line is the one
+to change per machine.
+
+**Sometimes you want the terminal's own selection, not tmux's.** Rectangular
+selection across panes, or a drag that a remote tmux should not intercept. Most
+terminals give that to you with Shift held down while dragging, which bypasses
+mouse reporting entirely. For everything else there is a toggle:
+
+```tmux
+bind M set -g mouse
+```
+
+`prefix + M` flips mouse mode off and on. Off, the terminal gets the mouse back
+completely and normal drag-to-select works as if tmux were not there.
 
 ## Gotchas worth repeating
 
-The four things most likely to bite:
+The five things most likely to bite:
 
 1. **Nested sessions.** The `TMUX` guard in the shell profile is not optional.
    Without it, opening a pane starts a new tmux inside the pane, forever.
-2. **Continuum's ordering.** `run-shell` for continuum must come after every
+2. **No `exec`, and an escape hatch.** With `exec`, detaching closes the
+   terminal instead of returning to a shell, so there is no way to reach a
+   prompt outside tmux when tmux itself is what needs debugging. The bare call
+   plus the `NO_TMUX` guard are what keep that possible.
+3. **Continuum's ordering.** `run-shell` for continuum must come after every
    `status-right` assignment, or the autosave silently stops while manual saves
    keep working.
-3. **Extended keys need both lines.** `extended-keys on` alone does nothing if
+4. **Extended keys need both lines.** `extended-keys on` alone does nothing if
    tmux does not also believe the outer terminal supports the protocol.
-4. **`exec`, not a bare call.** Without `exec`, detaching leaves you in a dead
-   parent shell rather than closing the window.
+5. **Login Bash in panes.** tmux panes are login shells, so on Bash the
+   autostart block needs `~/.bash_profile` to source `~/.bashrc` or none of it
+   runs.
 
 Reload after editing with `prefix + r`, which is bound in the config:
 
