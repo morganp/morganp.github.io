@@ -8,7 +8,7 @@
                         <link rel="stylesheet" href="./theme/css/main.css" />
                                 <link rel="stylesheet" type="text/css" href="/static/custom.css" />
                                 <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
-    <meta name="description" content="Four changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile, session persistence with resurrect and..." />
+    <meta name="description" content="Five changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile that you can still escape from, session..." />
         </head>
 
         <body id="index" class="home">
@@ -67,14 +67,15 @@ the better starting point if you are learning the keybindings.</p>
 routine, a handful of small annoyances start to grate. You forget to start it
 and lose a terminal full of work. A reboot wipes out a carefully arranged set
 of windows and panes. Shift+Enter mysteriously stops working in Claude Code
-and Codex the moment you are inside tmux. And you spend the first month
-looking up the same four keybindings over and over.</p>
+and Codex the moment you are inside tmux. Selecting text with the mouse stops
+putting anything on the clipboard. And you spend the first month looking up the
+same four keybindings over and over.</p>
 <p>Each of those has a fix, and each fix is only a few lines of config. This post
-walks through all four as they now sit in my
+walks through all of them as they now sit in my
 <a href="https://github.com/morganp/dotfiles">dotfiles repository</a>. Individually they
 are small. Together they turn tmux from something you remember to start into
 something that is simply always there.</p>
-<p>The four changes are:</p>
+<p>The five changes are:</p>
 <table>
 <thead>
 <tr>
@@ -98,6 +99,10 @@ something that is simply always there.</p>
 <tr>
 <td>Two-row status line</td>
 <td>Not remembering keybindings, and losing the host label under a TUI</td>
+</tr>
+<tr>
+<td>Mouse selection through a copy command</td>
+<td>Selections not reaching the system clipboard, or arriving as escape-sequence garbage</td>
 </tr>
 </tbody>
 </table>
@@ -152,16 +157,19 @@ across every terminal on every machine that gets the dotfiles.</p>
 <a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprofile"><code>config/shell/dot-zprofile</code></a>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Start or attach to the shared tmux session for interactive terminals. TMUX is</span>
 <span class="c1"># set inside tmux, which prevents new panes from creating nested sessions.</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-o<span class="w"> </span>interactive<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TMUX</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-t<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>$+commands<span class="o">[</span>tmux<span class="o">]</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span><span class="nb">exec</span><span class="w"> </span>tmux<span class="w"> </span>new-session<span class="w"> </span>-A<span class="w"> </span>-s<span class="w"> </span>main
+<span class="c1"># Set NO_TMUX=1 to get a plain shell, e.g. ghostty -e &quot;env NO_TMUX=1 zsh -l&quot;.</span>
+<span class="c1"># Deliberately not exec: on detach the login shell survives instead of the</span>
+<span class="c1"># terminal window closing.</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-o<span class="w"> </span>interactive<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TMUX</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-t<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">NO_TMUX</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>$+commands<span class="o">[</span>tmux<span class="o">]</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>tmux<span class="w"> </span>new-session<span class="w"> </span>-A<span class="w"> </span>-s<span class="w"> </span>main
 <span class="k">fi</span>
 </code></pre></div>
 
 <p>The Bash equivalent goes in <code>~/.bashrc</code>, mine at
 <a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-bashrc"><code>config/shell/dot-bashrc</code></a>.
 Same logic, portable syntax:</p>
-<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$-</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*i*<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TMUX</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-t<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>tmux<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span><span class="nb">exec</span><span class="w"> </span>tmux<span class="w"> </span>new-session<span class="w"> </span>-A<span class="w"> </span>-s<span class="w"> </span>main
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$-</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*i*<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TMUX</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-t<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">NO_TMUX</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>tmux<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>tmux<span class="w"> </span>new-session<span class="w"> </span>-A<span class="w"> </span>-s<span class="w"> </span>main
 <span class="k">fi</span>
 </code></pre></div>
 
@@ -175,15 +183,58 @@ still source the profile, such as <code>ssh host command</code> or an editor spa
 login shell to read the environment, must not be hijacked into tmux.</p>
 <p><strong><code>command -v tmux</code></strong> keeps the profile portable to machines where tmux is not
 installed. A missing binary should not break shell startup.</p>
-<p><strong><code>exec</code></strong> replaces the shell process rather than nesting one inside the other.
-Without it you get a parent shell doing nothing but waiting, and detaching from
-tmux drops you into that dead shell instead of closing the window.</p>
+<p><strong><code>-z "${NO_TMUX:-}"</code></strong> is the escape hatch. More on it below.</p>
 <p><code>new-session -A -s main</code> is the whole trick: attach to the session named <code>main</code>
 if it exists, create it if it does not. One flag, no <code>has-session</code> test and
 conditional branch.</p>
 <p>The Zsh version goes in <code>~/.zprofile</code>, not <code>~/.zshrc</code>. <code>zprofile</code> is sourced
 once for a login shell. <code>zshrc</code> is sourced for every interactive shell, which
-would be more places than necessary to run an <code>exec</code>.</p>
+would be more places than necessary to run this.</p>
+<h3>Leaving a way out</h3>
+<p>Two details in that block are deliberate, and both exist so you can still get
+to a shell that is not inside tmux.</p>
+<p><strong>No <code>exec</code>.</strong> The common advice is <code>exec tmux new-session -A -s main</code>, which
+replaces the login shell with the tmux client rather than leaving a parent
+shell doing nothing. It also removes the thing you detach <em>to</em>: with <code>exec</code>
+there is no process behind tmux, so <code>prefix + d</code> has nothing to return to and
+the terminal window closes. Detach and quit become the same action. Running
+tmux without <code>exec</code> keeps the login shell alive underneath, so detaching lands
+you back at a prompt. The cost is one idle shell per terminal.</p>
+<p><strong><code>NO_TMUX</code>.</strong> Set it and the profile skips the autostart entirely:</p>
+<div class="highlight"><pre><span></span><code>ghostty<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;env NO_TMUX=1 zsh -l&quot;</span>
+</code></pre></div>
+
+<p>Both matter for the same reason: when tmux is the thing that is broken, every
+terminal you open runs straight back into it. Without a shell to detach to and
+a way to start without tmux at all, there is nowhere to stand while you inspect
+or kill the server.</p>
+<h3>Login shells inside tmux</h3>
+<p>New tmux panes start as <em>login</em> Bash shells, showing up as <code>-bash</code> in the
+process list. Login Bash reads <code>~/.bash_profile</code> and does not read <code>~/.bashrc</code>
+at all, so if the autostart block and everything else lives in <code>~/.bashrc</code>,
+panes come up with none of it. The shim in <code>~/.bash_profile</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-r<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">source</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>On machines where tmux arrives through
+<a href="https://modules.readthedocs.io/">environment modules</a> rather than being on
+<code>PATH</code> at login, the module has to be loaded before the <code>command -v</code> test can
+succeed. My Bash version does that inside the guard:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$-</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*i*<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TMUX</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-t<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">NO_TMUX</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>_dotfiles_module_load<span class="w"> </span>util<span class="w"> </span>gnu/tmux<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>tmux<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>tmux<span class="w"> </span>new-session<span class="w"> </span>-A<span class="w"> </span>-s<span class="w"> </span>main
+<span class="w">  </span><span class="k">fi</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+<p><code>_dotfiles_module_load</code> is a small wrapper of mine that is a no-op when no
+module system is present, so the same file still works on machines without one.
+The output redirection matters: module tools are chatty, and anything they
+print during shell startup ends up in scp and rsync sessions, which breaks
+them.</p>
 <h2>Session persistence with resurrect and continuum</h2>
 <p><a href="https://github.com/tmux-plugins/tmux-resurrect">tmux-resurrect</a> saves and
 restores the tmux environment. <a href="https://github.com/tmux-plugins/tmux-continuum">tmux-continuum</a>
@@ -276,7 +327,7 @@ and any link that does not speak the protocol breaks it. Your outer terminal
 also needs to support extended keys. Ghostty, Kitty, WezTerm and recent iTerm2
 do. Extended keys need tmux 3.2 or newer.</p>
 <h2>The status line and a hint row</h2>
-<p>The last piece is the status line. Two things were wrong with the default. The
+<p>Next is the status line. Two things were wrong with the default. The
 host label from the Starship prompt disappears the moment a full-screen TUI
 takes over the pane, so on a multi-machine SSH setup you lose track of where
 you are. And tmux keybindings are hard to remember while you are still learning
@@ -290,7 +341,7 @@ them.</p>
 <span class="k">set</span><span class="w"> </span><span class="o">-</span><span class="n">g</span><span class="w"> </span><span class="k">window</span><span class="o">-</span><span class="n">status</span><span class="o">-</span><span class="n">separator</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
 <span class="k">set</span><span class="w"> </span><span class="o">-</span><span class="n">g</span><span class="w"> </span><span class="k">window</span><span class="o">-</span><span class="n">status</span><span class="o">-</span><span class="nf">format</span><span class="w"> </span><span class="s1">&#39;#[fg=#6c7086] #I:#W &#39;</span>
 <span class="k">set</span><span class="w"> </span><span class="o">-</span><span class="n">g</span><span class="w"> </span><span class="k">window</span><span class="o">-</span><span class="n">status</span><span class="o">-</span><span class="k">current</span><span class="o">-</span><span class="nf">format</span><span class="w"> </span><span class="s1">&#39;#[fg=#cba6f7,bold] #I:#W &#39;</span>
-<span class="k">set</span><span class="w"> </span><span class="o">-</span><span class="n">g</span><span class="w"> </span><span class="s1">&#39;status-format[1]&#39;</span><span class="w"> </span><span class="s1">&#39;#[align=centre,fg=#7f849c]Prefix: Ctrl-b  •  c: new tab  •  ,: rename tab  •  n/p: next/previous tab  •  0–9: choose tab  •  d: detach&#39;</span>
+<span class="k">set</span><span class="w"> </span><span class="o">-</span><span class="n">g</span><span class="w"> </span><span class="s1">&#39;status-format[1]&#39;</span><span class="w"> </span><span class="s1">&#39;#[align=centre,fg=#7f849c]Prefix: Ctrl-b • c: create • ,: rename • n/p: next/previous • d: detach&#39;</span>
 </code></pre></div>
 
 <p><code>set -g status 2</code> is the interesting one. Most people know <code>status on</code> and
@@ -299,6 +350,9 @@ them.</p>
 row you can fill with anything. Here it holds a centred cheat sheet of the
 keybindings you need while learning tmux. It is a comment in the config that
 you actually read, and deleting it later is a one-line change.</p>
+<p>Keep the hint row short. Long labels and wide separators wrap on a narrow pane,
+and a row that wraps stops being readable at a glance. Window numbers are
+already on the row above, so the row does not need to explain <code>0-9</code> either.</p>
 <p>The host label uses a conditional format:</p>
 <div class="highlight"><pre><span></span><code><span class="gh">#</span>{?#{E:DOTFILES_HOST},#{E:DOTFILES_HOST},#h}
 </code></pre></div>
@@ -378,32 +432,79 @@ set -g message-style &#39;bg=#313244,fg=#cdd6f4&#39;
 set -g mode-style &#39;bg=#cba6f7,fg=#1e1e2e,bold&#39;
 </code></pre></div>
 
-<p>Two more settings worth calling out, both near the top of the file:</p>
-<div class="highlight"><pre><span></span><code>#<span class="w"> </span><span class="nv">Enable</span><span class="w"> </span><span class="nv">mouse</span><span class="w"> </span><span class="nv">mode</span><span class="w"> </span><span class="nv">so</span><span class="w"> </span><span class="nv">trackpad</span><span class="w"> </span><span class="nv">scroll</span><span class="w"> </span><span class="nv">enters</span><span class="w"> </span><span class="nv">copy</span><span class="w"> </span><span class="nv">mode</span><span class="w"> </span><span class="nv">and</span><span class="w"> </span><span class="nv">scrolls</span><span class="w"> </span><span class="nv">pane</span>
-#<span class="w"> </span><span class="nv">history</span>,<span class="w"> </span><span class="nv">instead</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="nv">being</span><span class="w"> </span><span class="nv">translated</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">arrow</span><span class="w"> </span><span class="nv">keys</span><span class="w"> </span><span class="nv">that</span><span class="w"> </span><span class="nv">TUIs</span><span class="w"> </span><span class="nv">like</span><span class="w"> </span><span class="nv">Claude</span>
-#<span class="w"> </span><span class="nv">Code</span><span class="w"> </span><span class="nv">read</span><span class="w"> </span><span class="nv">as</span><span class="w"> </span><span class="nv">prompt</span><span class="w"> </span><span class="nv">history</span><span class="w"> </span><span class="nv">navigation</span>
+<h2>Mouse scroll and the clipboard</h2>
+<p>The last piece sits at the top of the config: the block that decides what the
+mouse does.</p>
+<div class="highlight"><pre><span></span><code>#<span class="w"> </span><span class="nv">Let</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">wheel</span><span class="w"> </span><span class="nv">scroll</span><span class="w"> </span><span class="nv">tmux</span><span class="w"> </span><span class="nv">pane</span><span class="w"> </span><span class="nv">history</span>.<span class="w"> </span><span class="nv">Use</span><span class="w"> </span><span class="nv">Shift</span><span class="o">+</span><span class="nv">drag</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">native</span><span class="w"> </span><span class="nv">terminal</span>
+#<span class="w"> </span><span class="nv">selection</span>.<span class="w"> </span><span class="nv">On</span><span class="w"> </span><span class="nv">RHEL</span><span class="o">/</span><span class="nv">X11</span>,<span class="w"> </span><span class="nv">pipe</span><span class="w"> </span><span class="nv">tmux</span><span class="w"> </span><span class="nv">selections</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">xclip</span><span class="w"> </span><span class="nv">instead</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="nv">emitting</span><span class="w"> </span><span class="nv">OSC52</span>
+#<span class="w"> </span><span class="nv">clipboard</span><span class="w"> </span><span class="nv">escapes</span>,<span class="w"> </span><span class="nv">which</span><span class="w"> </span><span class="nv">can</span><span class="w"> </span><span class="k">show</span><span class="w"> </span><span class="nv">up</span><span class="w"> </span><span class="nv">as</span><span class="w"> </span><span class="nv">garbage</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">some</span><span class="w"> </span><span class="nv">terminal</span><span class="w"> </span><span class="nv">paths</span>.
 <span class="nv">set</span><span class="w"> </span><span class="o">-</span><span class="nv">g</span><span class="w"> </span><span class="nv">mouse</span><span class="w"> </span><span class="nv">on</span>
+<span class="nv">set</span><span class="w"> </span><span class="o">-</span><span class="nv">g</span><span class="w"> </span><span class="nv">set</span><span class="o">-</span><span class="nv">clipboard</span><span class="w"> </span><span class="nv">off</span>
+<span class="nv">set</span><span class="w"> </span><span class="o">-</span><span class="nv">s</span><span class="w"> </span><span class="nv">copy</span><span class="o">-</span><span class="nv">command</span><span class="w"> </span><span class="s1">&#39;xclip -selection clipboard -in&#39;</span>
+<span class="nv">bind</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="nv">set</span><span class="w"> </span><span class="o">-</span><span class="nv">g</span><span class="w"> </span><span class="nv">mouse</span>
+<span class="nv">bind</span><span class="w"> </span><span class="o">-</span><span class="nv">T</span><span class="w"> </span><span class="nv">copy</span><span class="o">-</span><span class="nv">mode</span><span class="o">-</span><span class="nv">vi</span><span class="w"> </span><span class="nv">MouseDragEnd1Pane</span><span class="w"> </span><span class="k">send</span><span class="w"> </span><span class="o">-</span><span class="nv">X</span><span class="w"> </span><span class="nv">copy</span><span class="o">-</span><span class="nv">pipe</span><span class="o">-</span><span class="nv">no</span><span class="o">-</span><span class="nv">clear</span><span class="w"> </span><span class="o">-</span><span class="nv">C</span>
 
 #<span class="w"> </span><span class="nv">vim</span><span class="w"> </span><span class="nv">keys</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">copy</span><span class="w"> </span><span class="nv">mode</span>
 <span class="nv">setw</span><span class="w"> </span><span class="o">-</span><span class="nv">g</span><span class="w"> </span><span class="nv">mode</span><span class="o">-</span><span class="nv">keys</span><span class="w"> </span><span class="nv">vi</span>
 </code></pre></div>
 
-<p><code>mouse on</code> is not only about clicking to select panes. Without it, trackpad
-scroll is translated into arrow keys, and a TUI reading arrow keys as prompt
-history navigation will scroll your prompt history instead of the pane
+<p><code>mouse on</code> is not only about clicking to select panes. Without it, wheel and
+trackpad scroll is translated into arrow keys, and a TUI reading arrow keys as
+prompt history navigation will scroll your prompt history instead of the pane
 scrollback. That is a confusing bug until you know the cause.</p>
+<p>Turning it on, though, means tmux now owns the mouse, and that is where the
+copy and paste trouble starts. Three separate problems, three lines.</p>
+<p><strong>The selection vanishes the moment you release the button.</strong> tmux's default
+<code>MouseDragEnd1Pane</code> binding is <code>copy-selection-and-cancel</code>, which copies and
+then immediately exits copy mode and clears the highlight. You get no visual
+confirmation that anything was selected at all. Rebinding to a <code>-no-clear</code>
+variant keeps the highlight up after the drag:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">bind</span><span class="w"> </span><span class="o">-</span><span class="nv">T</span><span class="w"> </span><span class="nv">copy</span><span class="o">-</span><span class="nv">mode</span><span class="o">-</span><span class="nv">vi</span><span class="w"> </span><span class="nv">MouseDragEnd1Pane</span><span class="w"> </span><span class="k">send</span><span class="w"> </span><span class="o">-</span><span class="nv">X</span><span class="w"> </span><span class="nv">copy</span><span class="o">-</span><span class="nv">pipe</span><span class="o">-</span><span class="nv">no</span><span class="o">-</span><span class="nv">clear</span><span class="w"> </span><span class="o">-</span><span class="nv">C</span>
+</code></pre></div>
+
+<p><strong>The copy does not reach the system clipboard.</strong> By default tmux hands the
+selection to the terminal using OSC 52, an escape sequence asking the terminal
+emulator to set the clipboard on tmux's behalf. When it works it is excellent,
+because it survives SSH. When something in the chain does not interpret it, the
+bytes land in the terminal as visible garbage and the clipboard stays empty.
+That is what happens on RHEL over X11.</p>
+<p>Stop tmux emitting the escape sequence and give it a real command to pipe
+through instead:</p>
+<div class="highlight"><pre><span></span><code>set -g set-clipboard off
+set -s copy-command &#39;xclip -selection clipboard -in&#39;
+</code></pre></div>
+
+<p><code>copy-command</code> is what the <code>-C</code> flag on <code>copy-pipe-no-clear</code> invokes, so the
+binding, the pipe target and the disabled OSC 52 all work as one unit. On X11
+that means <a href="https://github.com/astrand/xclip">xclip</a>. Wayland wants
+<code>wl-copy --type text/plain</code>, and macOS wants <code>pbcopy</code>, so this line is the one
+to change per machine.</p>
+<p><strong>Sometimes you want the terminal's own selection, not tmux's.</strong> Rectangular
+selection across panes, or a drag that a remote tmux should not intercept. Most
+terminals give that to you with Shift held down while dragging, which bypasses
+mouse reporting entirely. For everything else there is a toggle:</p>
+<div class="highlight"><pre><span></span><code>bind M set -g mouse
+</code></pre></div>
+
+<p><code>prefix + M</code> flips mouse mode off and on. Off, the terminal gets the mouse back
+completely and normal drag-to-select works as if tmux were not there.</p>
 <h2>Gotchas worth repeating</h2>
-<p>The four things most likely to bite:</p>
+<p>The five things most likely to bite:</p>
 <ol>
 <li><strong>Nested sessions.</strong> The <code>TMUX</code> guard in the shell profile is not optional.
    Without it, opening a pane starts a new tmux inside the pane, forever.</li>
+<li><strong>No <code>exec</code>, and an escape hatch.</strong> With <code>exec</code>, detaching closes the
+   terminal instead of returning to a shell, so there is no way to reach a
+   prompt outside tmux when tmux itself is what needs debugging. The bare call
+   plus the <code>NO_TMUX</code> guard are what keep that possible.</li>
 <li><strong>Continuum's ordering.</strong> <code>run-shell</code> for continuum must come after every
    <code>status-right</code> assignment, or the autosave silently stops while manual saves
    keep working.</li>
 <li><strong>Extended keys need both lines.</strong> <code>extended-keys on</code> alone does nothing if
    tmux does not also believe the outer terminal supports the protocol.</li>
-<li><strong><code>exec</code>, not a bare call.</strong> Without <code>exec</code>, detaching leaves you in a dead
-   parent shell rather than closing the window.</li>
+<li><strong>Login Bash in panes.</strong> tmux panes are login shells, so on Bash the
+   autostart block needs <code>~/.bash_profile</code> to source <code>~/.bashrc</code> or none of it
+   runs.</li>
 </ol>
 <p>Reload after editing with <code>prefix + r</code>, which is bound in the config:</p>
 <div class="highlight"><pre><span></span><code>bind r source-file $XDG_CONFIG_HOME/tmux/tmux.conf

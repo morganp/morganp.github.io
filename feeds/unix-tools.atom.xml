@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-02T00:00:00+01:00</updated><entry><title>An always-on tmux setup</title><link href="http://lizard-spock.co.uk/tmux-always-on-setup.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/tmux-always-on-setup.html</id><summary type="html">&lt;p&gt;Four changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, and a two-row status line with a keybinding hint row.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tmux-hero-HQ.png"&gt;&lt;img alt="An always-on tmux setup" src="http://lizard-spock.co.uk/tmux-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-02T00:00:00+01:00</updated><entry><title>An always-on tmux setup</title><link href="http://lizard-spock.co.uk/tmux-always-on-setup.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/tmux-always-on-setup.html</id><summary type="html">&lt;p&gt;Five changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile that you can still escape from, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, a two-row status line with a keybinding hint row, and mouse selection that copies to the system clipboard on X11.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/tmux-hero-HQ.png"&gt;&lt;img alt="An always-on tmux setup" src="http://lizard-spock.co.uk/tmux-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;If you have not met it yet, tmux is a terminal multiplexer. It lets one
 terminal window hold many sessions, split into panes, and it keeps those
 sessions alive after you disconnect. I wrote up the day-to-day mechanics
@@ -10,14 +10,15 @@ the better starting point if you are learning the keybindings.&lt;/p&gt;
 routine, a handful of small annoyances start to grate. You forget to start it
 and lose a terminal full of work. A reboot wipes out a carefully arranged set
 of windows and panes. Shift+Enter mysteriously stops working in Claude Code
-and Codex the moment you are inside tmux. And you spend the first month
-looking up the same four keybindings over and over.&lt;/p&gt;
+and Codex the moment you are inside tmux. Selecting text with the mouse stops
+putting anything on the clipboard. And you spend the first month looking up the
+same four keybindings over and over.&lt;/p&gt;
 &lt;p&gt;Each of those has a fix, and each fix is only a few lines of config. This post
-walks through all four as they now sit in my
+walks through all of them as they now sit in my
 &lt;a href="https://github.com/morganp/dotfiles"&gt;dotfiles repository&lt;/a&gt;. Individually they
 are small. Together they turn tmux from something you remember to start into
 something that is simply always there.&lt;/p&gt;
-&lt;p&gt;The four changes are:&lt;/p&gt;
+&lt;p&gt;The five changes are:&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -41,6 +42,10 @@ something that is simply always there.&lt;/p&gt;
 &lt;tr&gt;
 &lt;td&gt;Two-row status line&lt;/td&gt;
 &lt;td&gt;Not remembering keybindings, and losing the host label under a TUI&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Mouse selection through a copy command&lt;/td&gt;
+&lt;td&gt;Selections not reaching the system clipboard, or arriving as escape-sequence garbage&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -95,16 +100,19 @@ across every terminal on every machine that gets the dotfiles.&lt;/p&gt;
 &lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-zprofile"&gt;&lt;code&gt;config/shell/dot-zprofile&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Start or attach to the shared tmux session for interactive terminals. TMUX is&lt;/span&gt;
 &lt;span class="c1"&gt;# set inside tmux, which prevents new panes from creating nested sessions.&lt;/span&gt;
-&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;interactive&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;((&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;$+commands&lt;span class="o"&gt;[&lt;/span&gt;tmux&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;))&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exec&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;new-session&lt;span class="w"&gt; &lt;/span&gt;-A&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;main
+&lt;span class="c1"&gt;# Set NO_TMUX=1 to get a plain shell, e.g. ghostty -e &amp;quot;env NO_TMUX=1 zsh -l&amp;quot;.&lt;/span&gt;
+&lt;span class="c1"&gt;# Deliberately not exec: on detach the login shell survives instead of the&lt;/span&gt;
+&lt;span class="c1"&gt;# terminal window closing.&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;interactive&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;NO_TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;((&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;$+commands&lt;span class="o"&gt;[&lt;/span&gt;tmux&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;))&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;new-session&lt;span class="w"&gt; &lt;/span&gt;-A&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;main
 &lt;span class="k"&gt;fi&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;The Bash equivalent goes in &lt;code&gt;~/.bashrc&lt;/code&gt;, mine at
 &lt;a href="https://github.com/morganp/dotfiles/blob/main/config/shell/dot-bashrc"&gt;&lt;code&gt;config/shell/dot-bashrc&lt;/code&gt;&lt;/a&gt;.
 Same logic, portable syntax:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;*i*&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;/dev/null&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exec&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;new-session&lt;span class="w"&gt; &lt;/span&gt;-A&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;main
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;*i*&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;NO_TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;/dev/null&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;new-session&lt;span class="w"&gt; &lt;/span&gt;-A&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;main
 &lt;span class="k"&gt;fi&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -118,15 +126,58 @@ still source the profile, such as &lt;code&gt;ssh host command&lt;/code&gt; or a
 login shell to read the environment, must not be hijacked into tmux.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;&lt;code&gt;command -v tmux&lt;/code&gt;&lt;/strong&gt; keeps the profile portable to machines where tmux is not
 installed. A missing binary should not break shell startup.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;exec&lt;/code&gt;&lt;/strong&gt; replaces the shell process rather than nesting one inside the other.
-Without it you get a parent shell doing nothing but waiting, and detaching from
-tmux drops you into that dead shell instead of closing the window.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;-z "${NO_TMUX:-}"&lt;/code&gt;&lt;/strong&gt; is the escape hatch. More on it below.&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;new-session -A -s main&lt;/code&gt; is the whole trick: attach to the session named &lt;code&gt;main&lt;/code&gt;
 if it exists, create it if it does not. One flag, no &lt;code&gt;has-session&lt;/code&gt; test and
 conditional branch.&lt;/p&gt;
 &lt;p&gt;The Zsh version goes in &lt;code&gt;~/.zprofile&lt;/code&gt;, not &lt;code&gt;~/.zshrc&lt;/code&gt;. &lt;code&gt;zprofile&lt;/code&gt; is sourced
 once for a login shell. &lt;code&gt;zshrc&lt;/code&gt; is sourced for every interactive shell, which
-would be more places than necessary to run an &lt;code&gt;exec&lt;/code&gt;.&lt;/p&gt;
+would be more places than necessary to run this.&lt;/p&gt;
+&lt;h3&gt;Leaving a way out&lt;/h3&gt;
+&lt;p&gt;Two details in that block are deliberate, and both exist so you can still get
+to a shell that is not inside tmux.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;No &lt;code&gt;exec&lt;/code&gt;.&lt;/strong&gt; The common advice is &lt;code&gt;exec tmux new-session -A -s main&lt;/code&gt;, which
+replaces the login shell with the tmux client rather than leaving a parent
+shell doing nothing. It also removes the thing you detach &lt;em&gt;to&lt;/em&gt;: with &lt;code&gt;exec&lt;/code&gt;
+there is no process behind tmux, so &lt;code&gt;prefix + d&lt;/code&gt; has nothing to return to and
+the terminal window closes. Detach and quit become the same action. Running
+tmux without &lt;code&gt;exec&lt;/code&gt; keeps the login shell alive underneath, so detaching lands
+you back at a prompt. The cost is one idle shell per terminal.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;NO_TMUX&lt;/code&gt;.&lt;/strong&gt; Set it and the profile skips the autostart entirely:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ghostty&lt;span class="w"&gt; &lt;/span&gt;-e&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;env NO_TMUX=1 zsh -l&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Both matter for the same reason: when tmux is the thing that is broken, every
+terminal you open runs straight back into it. Without a shell to detach to and
+a way to start without tmux at all, there is nowhere to stand while you inspect
+or kill the server.&lt;/p&gt;
+&lt;h3&gt;Login shells inside tmux&lt;/h3&gt;
+&lt;p&gt;New tmux panes start as &lt;em&gt;login&lt;/em&gt; Bash shells, showing up as &lt;code&gt;-bash&lt;/code&gt; in the
+process list. Login Bash reads &lt;code&gt;~/.bash_profile&lt;/code&gt; and does not read &lt;code&gt;~/.bashrc&lt;/code&gt;
+at all, so if the autostart block and everything else lives in &lt;code&gt;~/.bashrc&lt;/code&gt;,
+panes come up with none of it. The shim in &lt;code&gt;~/.bash_profile&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-r&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;&lt;span class="s2"&gt;/.bashrc&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;source&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;&lt;span class="s2"&gt;/.bashrc&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On machines where tmux arrives through
+&lt;a href="https://modules.readthedocs.io/"&gt;environment modules&lt;/a&gt; rather than being on
+&lt;code&gt;PATH&lt;/code&gt; at login, the module has to be loaded before the &lt;code&gt;command -v&lt;/code&gt; test can
+succeed. My Bash version does that inside the guard:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;*i*&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;NO_TMUX&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;_dotfiles_module_load&lt;span class="w"&gt; &lt;/span&gt;util&lt;span class="w"&gt; &lt;/span&gt;gnu/tmux&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;/dev/null&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;/dev/null&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;tmux&lt;span class="w"&gt; &lt;/span&gt;new-session&lt;span class="w"&gt; &lt;/span&gt;-A&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;main
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;_dotfiles_module_load&lt;/code&gt; is a small wrapper of mine that is a no-op when no
+module system is present, so the same file still works on machines without one.
+The output redirection matters: module tools are chatty, and anything they
+print during shell startup ends up in scp and rsync sessions, which breaks
+them.&lt;/p&gt;
 &lt;h2&gt;Session persistence with resurrect and continuum&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://github.com/tmux-plugins/tmux-resurrect"&gt;tmux-resurrect&lt;/a&gt; saves and
 restores the tmux environment. &lt;a href="https://github.com/tmux-plugins/tmux-continuum"&gt;tmux-continuum&lt;/a&gt;
@@ -219,7 +270,7 @@ and any link that does not speak the protocol breaks it. Your outer terminal
 also needs to support extended keys. Ghostty, Kitty, WezTerm and recent iTerm2
 do. Extended keys need tmux 3.2 or newer.&lt;/p&gt;
 &lt;h2&gt;The status line and a hint row&lt;/h2&gt;
-&lt;p&gt;The last piece is the status line. Two things were wrong with the default. The
+&lt;p&gt;Next is the status line. Two things were wrong with the default. The
 host label from the Starship prompt disappears the moment a full-screen TUI
 takes over the pane, so on a multi-machine SSH setup you lose track of where
 you are. And tmux keybindings are hard to remember while you are still learning
@@ -233,7 +284,7 @@ them.&lt;/p&gt;
 &lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;window&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;separator&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
 &lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;window&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[fg=#6c7086] #I:#W &amp;#39;&lt;/span&gt;
 &lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;window&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="k"&gt;current&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[fg=#cba6f7,bold] #I:#W &amp;#39;&lt;/span&gt;
-&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;status-format[1]&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[align=centre,fg=#7f849c]Prefix: Ctrl-b  •  c: new tab  •  ,: rename tab  •  n/p: next/previous tab  •  0–9: choose tab  •  d: detach&amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;status-format[1]&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;#[align=centre,fg=#7f849c]Prefix: Ctrl-b • c: create • ,: rename • n/p: next/previous • d: detach&amp;#39;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;code&gt;set -g status 2&lt;/code&gt; is the interesting one. Most people know &lt;code&gt;status on&lt;/code&gt; and
@@ -242,6 +293,9 @@ them.&lt;/p&gt;
 row you can fill with anything. Here it holds a centred cheat sheet of the
 keybindings you need while learning tmux. It is a comment in the config that
 you actually read, and deleting it later is a one-line change.&lt;/p&gt;
+&lt;p&gt;Keep the hint row short. Long labels and wide separators wrap on a narrow pane,
+and a row that wraps stops being readable at a glance. Window numbers are
+already on the row above, so the row does not need to explain &lt;code&gt;0-9&lt;/code&gt; either.&lt;/p&gt;
 &lt;p&gt;The host label uses a conditional format:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gh"&gt;#&lt;/span&gt;{?#{E:DOTFILES_HOST},#{E:DOTFILES_HOST},#h}
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
@@ -321,32 +375,79 @@ set -g message-style &amp;#39;bg=#313244,fg=#cdd6f4&amp;#39;
 set -g mode-style &amp;#39;bg=#cba6f7,fg=#1e1e2e,bold&amp;#39;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;Two more settings worth calling out, both near the top of the file:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mouse&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;so&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;trackpad&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;scroll&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;enters&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;scrolls&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;pane&lt;/span&gt;
-#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;history&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;instead&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;being&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;translated&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;to&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;arrow&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;keys&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;that&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;TUIs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;like&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Claude&lt;/span&gt;
-#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Code&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;read&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;as&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;prompt&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;history&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;navigation&lt;/span&gt;
+&lt;h2&gt;Mouse scroll and the clipboard&lt;/h2&gt;
+&lt;p&gt;The last piece sits at the top of the config: the block that decides what the
+mouse does.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;wheel&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;scroll&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;tmux&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;pane&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;history&lt;/span&gt;.&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Use&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;Shift&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nv"&gt;drag&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;native&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;terminal&lt;/span&gt;
+#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;selection&lt;/span&gt;.&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;On&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;RHEL&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;X11&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;pipe&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;tmux&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;selections&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;to&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;xclip&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;instead&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;emitting&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;OSC52&lt;/span&gt;
+#&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;clipboard&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;escapes&lt;/span&gt;,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;which&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;can&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;show&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;up&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;as&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;garbage&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;text&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;some&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;terminal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;paths&lt;/span&gt;.
 &lt;span class="nv"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mouse&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;on&lt;/span&gt;
+&lt;span class="nv"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;set&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;clipboard&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;off&lt;/span&gt;
+&lt;span class="nv"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;s&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;xclip -selection clipboard -in&amp;#39;&lt;/span&gt;
+&lt;span class="nv"&gt;bind&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;M&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mouse&lt;/span&gt;
+&lt;span class="nv"&gt;bind&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;T&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;vi&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;MouseDragEnd1Pane&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;send&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;X&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;pipe&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;no&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;clear&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;C&lt;/span&gt;
 
 #&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;vim&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;keys&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;
 &lt;span class="nv"&gt;setw&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;g&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;keys&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;vi&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;code&gt;mouse on&lt;/code&gt; is not only about clicking to select panes. Without it, trackpad
-scroll is translated into arrow keys, and a TUI reading arrow keys as prompt
-history navigation will scroll your prompt history instead of the pane
+&lt;p&gt;&lt;code&gt;mouse on&lt;/code&gt; is not only about clicking to select panes. Without it, wheel and
+trackpad scroll is translated into arrow keys, and a TUI reading arrow keys as
+prompt history navigation will scroll your prompt history instead of the pane
 scrollback. That is a confusing bug until you know the cause.&lt;/p&gt;
+&lt;p&gt;Turning it on, though, means tmux now owns the mouse, and that is where the
+copy and paste trouble starts. Three separate problems, three lines.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The selection vanishes the moment you release the button.&lt;/strong&gt; tmux's default
+&lt;code&gt;MouseDragEnd1Pane&lt;/code&gt; binding is &lt;code&gt;copy-selection-and-cancel&lt;/code&gt;, which copies and
+then immediately exits copy mode and clears the highlight. You get no visual
+confirmation that anything was selected at all. Rebinding to a &lt;code&gt;-no-clear&lt;/code&gt;
+variant keeps the highlight up after the drag:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;bind&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;T&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;vi&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;MouseDragEnd1Pane&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;send&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;X&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;copy&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;pipe&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;no&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;clear&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;C&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;The copy does not reach the system clipboard.&lt;/strong&gt; By default tmux hands the
+selection to the terminal using OSC 52, an escape sequence asking the terminal
+emulator to set the clipboard on tmux's behalf. When it works it is excellent,
+because it survives SSH. When something in the chain does not interpret it, the
+bytes land in the terminal as visible garbage and the clipboard stays empty.
+That is what happens on RHEL over X11.&lt;/p&gt;
+&lt;p&gt;Stop tmux emitting the escape sequence and give it a real command to pipe
+through instead:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;set -g set-clipboard off
+set -s copy-command &amp;#39;xclip -selection clipboard -in&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;copy-command&lt;/code&gt; is what the &lt;code&gt;-C&lt;/code&gt; flag on &lt;code&gt;copy-pipe-no-clear&lt;/code&gt; invokes, so the
+binding, the pipe target and the disabled OSC 52 all work as one unit. On X11
+that means &lt;a href="https://github.com/astrand/xclip"&gt;xclip&lt;/a&gt;. Wayland wants
+&lt;code&gt;wl-copy --type text/plain&lt;/code&gt;, and macOS wants &lt;code&gt;pbcopy&lt;/code&gt;, so this line is the one
+to change per machine.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Sometimes you want the terminal's own selection, not tmux's.&lt;/strong&gt; Rectangular
+selection across panes, or a drag that a remote tmux should not intercept. Most
+terminals give that to you with Shift held down while dragging, which bypasses
+mouse reporting entirely. For everything else there is a toggle:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;bind M set -g mouse
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;prefix + M&lt;/code&gt; flips mouse mode off and on. Off, the terminal gets the mouse back
+completely and normal drag-to-select works as if tmux were not there.&lt;/p&gt;
 &lt;h2&gt;Gotchas worth repeating&lt;/h2&gt;
-&lt;p&gt;The four things most likely to bite:&lt;/p&gt;
+&lt;p&gt;The five things most likely to bite:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;strong&gt;Nested sessions.&lt;/strong&gt; The &lt;code&gt;TMUX&lt;/code&gt; guard in the shell profile is not optional.
    Without it, opening a pane starts a new tmux inside the pane, forever.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No &lt;code&gt;exec&lt;/code&gt;, and an escape hatch.&lt;/strong&gt; With &lt;code&gt;exec&lt;/code&gt;, detaching closes the
+   terminal instead of returning to a shell, so there is no way to reach a
+   prompt outside tmux when tmux itself is what needs debugging. The bare call
+   plus the &lt;code&gt;NO_TMUX&lt;/code&gt; guard are what keep that possible.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Continuum's ordering.&lt;/strong&gt; &lt;code&gt;run-shell&lt;/code&gt; for continuum must come after every
    &lt;code&gt;status-right&lt;/code&gt; assignment, or the autosave silently stops while manual saves
    keep working.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Extended keys need both lines.&lt;/strong&gt; &lt;code&gt;extended-keys on&lt;/code&gt; alone does nothing if
    tmux does not also believe the outer terminal supports the protocol.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;exec&lt;/code&gt;, not a bare call.&lt;/strong&gt; Without &lt;code&gt;exec&lt;/code&gt;, detaching leaves you in a dead
-   parent shell rather than closing the window.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Login Bash in panes.&lt;/strong&gt; tmux panes are login shells, so on Bash the
+   autostart block needs &lt;code&gt;~/.bash_profile&lt;/code&gt; to source &lt;code&gt;~/.bashrc&lt;/code&gt; or none of it
+   runs.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Reload after editing with &lt;code&gt;prefix + r&lt;/code&gt;, which is bound in the config:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;bind r source-file $XDG_CONFIG_HOME/tmux/tmux.conf
