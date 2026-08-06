@@ -88,6 +88,15 @@ Ash is the right wood: tough, springy, and it takes the repeated tension cycles 
 
 Plus a 610 mm bow saw blade and about 1.4 m of 550 paracord.
 
+The blade used here is the Bahco 23-24, a 24 inch raker tooth hard point bowsaw blade, sold as
+[600 mm at Axminster](https://www.axminstertools.com/bahco-23-24-raker-tooth-hard-point-bowsaw-blade-600mm-24-112224)
+and also stocked
+[on Amazon](https://www.amazon.co.uk/Bahco-23-24-Raker-Tooth-Bowsaw/dp/B0001IX71K/).
+Raker tooth is the pattern to want for green wood: the rakers clear the sawdust
+out of the kerf instead of packing it in. Note that suppliers describe the same
+24 inch blade as either 600 mm or 610 mm, which is another reason to measure the
+eyelet spacing on the blade in your hand rather than trusting the listing.
+
 The arms are a mirror pair, not two identical parts. The slot opens on the inner face of each, so they are handed. Mark them before you cut.
 
 Measure your own blade before committing to the stretcher length. Eyelet spacing varies between makers and 597 mm is typical, not universal. Better still, cut the stretcher last and fit it to the frame you actually built.
