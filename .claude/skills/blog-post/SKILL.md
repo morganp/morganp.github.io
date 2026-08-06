@@ -94,10 +94,42 @@ models do not.
 | State machines, flows, graphs | Graphviz | ` ```dot ` |
 | Sequence and flowcharts | Mermaid | ` ```mermaid ` |
 | Chord, scale, tab diagrams | Fretboard | ` ```fretboard ` |
+| Dimensioned or mechanical drawings | Hand-authored SVG | see below |
 | Mood, hero, concept illustration | Generated image | see Stage 4 |
 
 Check WaveDrom wave strings are all the same length before building, since a
 short string silently misaligns the diagram.
+
+### Hand-authored SVG
+
+`art` is the default for every image on this blog. The one exception is a
+drawing whose whole purpose is exact numbers: a dimensioned elevation, a cut
+list drawing, a scaled cross-section, a measured layout. No plugin fence covers
+these, and `art/workflows/technical-diagrams.md` routes to image generation,
+which inherits the exact-numbers problem the top of this stage warns about.
+
+For those, author the SVG by hand in the lizard-spock palette, then render the
+PNG pair so the house embed rules still apply:
+
+```bash
+rsvg-convert -w 1800 NN-name.svg -o NN-name-HQ.png
+sips -Z 900 NN-name-HQ.png --out NN-name-900w.png
+```
+
+Palette to use in the SVG, taken from the aesthetic file so the drawings sit
+with the generated images:
+
+| Role | Value |
+|---|---|
+| Background | `#F5F2EC` |
+| Lines | `#2D2D2D`, supporting detail `#4A4A4A` |
+| Focal accent | `#7B35C2` |
+| Action accent | `#E07820` |
+
+Keep the SVG source in the image folder next to the PNGs so a dimension change
+is an edit rather than a redraw. Anything not in the exact-numbers case goes
+through `art`, and choosing SVG over `art` for a borderline image is a decision
+to state to the user, not to make silently.
 
 ---
 
