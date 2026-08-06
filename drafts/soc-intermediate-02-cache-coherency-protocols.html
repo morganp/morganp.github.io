@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Intermediate 02: Cache coherency protocols</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Why two threads with separate counters can run slower than one thread, and the coherency machinery that explains it: the single-writer rule, MESI..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/soc-intermediate-02-cache-coherency-protocols.html" rel="bookmark"
+             title="Permalink to SoC Intermediate 02: Cache coherency protocols">SoC Intermediate 02: Cache coherency protocols</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-02T00:00:00+01:00">
+                Published: Sun 02 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/computer-architecture.html">Computer Architecture</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/multicore.html">Multicore</a> <a href="../tag/caches.html">Caches</a> <a href="../tag/mesi.html">MESI</a> <a href="../tag/coherency.html">Coherency</a> <a href="../tag/arm.html">ARM</a> <a href="../tag/verification.html">Verification</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="../drafts/00-coherency-hero-HQ.png"><img alt="A multicore cache coherency fabric on a system on chip, with four processor caches around a shared interconnect that carries snoop and ownership traffic to a directory and a memory controller" src="../drafts/00-coherency-hero-900w.png"></a></p>
+<p><em>Series: Intermediate SoC Design | Article 2 of 10</em></p>
+<hr>
+<h2>Two counters that will not scale</h2>
+<p>Here is a loop that counts events. It runs in about 2 seconds.</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">hits</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">stats</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+
+<span class="c1">// thread 0 runs: for (...) stats[0].hits++;</span>
+<span class="c1">// thread 1 runs: for (...) stats[1].hits++;</span>
+</code></pre></div>
+
+<p>You split it across two threads, one counter each. The threads share no
+variables. There is no lock, no atomic, no memory barrier, and no bug that any
+code review would catch. Each thread touches its own element and nothing else.</p>
+<p>It now takes 6 seconds. Adding a core made the program three times slower.</p>
+<p>Nothing in that code explains the result. The explanation lives one layer down,
+in the hardware that keeps caches agreeing with each other. This article covers
+that machinery: what it guarantees, how it works, and why it occasionally
+punishes correct-looking code. It targets engineers building or integrating
+multicore hardware, and the systems programmers who live with the result.</p>
+<hr>
+<h2>Coherence is not consistency</h2>
+<p>Two terms sound interchangeable and are not. Getting them confused makes every
+later discussion harder.</p>
+<p>Coherence concerns one address at a time. If one core writes address <code>X</code>, every
+other core eventually sees that write to <code>X</code>, and nobody keeps using a stale
+copy. Cache controllers and the interconnect implement it.</p>
+<p>Memory consistency concerns ordering between different addresses. It defines
+what software can assume about the order of loads and stores to <code>X</code> and <code>Y</code>.
+Barriers and acquire and release semantics live here. The instruction set
+architecture defines the model, and cores, store buffers, and the coherency
+fabric enforce it together.</p>
+<p>A useful split: coherence is hardware keeping a promise about one location.
+Consistency is the contract the hardware offers software about many locations.
+This article is about coherence.</p>
+<hr>
+<h2>The single-writer rule</h2>
+<p>Every coherent system rests on one invariant. Learn this and most of the
+protocol becomes predictable.</p>
+<div class="highlight"><pre><span></span><code><span class="k">For</span><span class="w"> </span><span class="nv">any</span><span class="w"> </span><span class="nv">cache</span><span class="w"> </span><span class="nv">line</span>:
+
+<span class="w">  </span><span class="nv">Many</span><span class="w"> </span><span class="nv">caches</span><span class="w"> </span><span class="nv">may</span><span class="w"> </span><span class="nv">hold</span><span class="w"> </span><span class="nv">clean</span>,<span class="w"> </span><span class="nv">readable</span><span class="w"> </span><span class="nv">copies</span>.
+<span class="w">  </span><span class="nv">Only</span><span class="w"> </span><span class="nv">one</span><span class="w"> </span><span class="nv">cache</span><span class="w"> </span><span class="nv">may</span><span class="w"> </span><span class="nv">hold</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">dirty</span>,<span class="w"> </span><span class="nv">writable</span><span class="w"> </span><span class="nv">copy</span>.
+</code></pre></div>
+
+<p><a href="../drafts/01-single-writer-HQ.png"><img alt="The single writer rule illustrated: three processor caches holding clean readable copies of the same cache line on one side, and a single cache holding the one dirty writable copy on the other" src="../drafts/01-single-writer-900w.png"></a></p>
+<p>Readers are cheap and can be plentiful. Writers are exclusive. When a core
+wants to write a line that other caches hold, it must first take ownership and
+remove every other copy.</p>
+<p>That removal step is the source of most coherency traffic, most coherency
+latency, and the performance mystery in the opening section.</p>
+<hr>
+<h2>The four states of a cache line</h2>
+<p>MESI is the classic state machine for a cache line, named for its four stable
+states. Each cache tracks a state per line, not per variable.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Modified</td>
+<td>This cache holds the only valid copy, and it differs from memory</td>
+</tr>
+<tr>
+<td>Exclusive</td>
+<td>This cache holds the only valid copy, and it matches memory</td>
+</tr>
+<tr>
+<td>Shared</td>
+<td>This cache holds a clean copy, and other caches might hold it too</td>
+</tr>
+<tr>
+<td>Invalid</td>
+<td>This cache line holds nothing usable</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_c5175f1c17b13dfa4039c458b587ac2f.svg"></p>
+<p>Exclusive is the state that repays study. A line arrives in Exclusive when a
+core reads it and no other cache holds it. The copy is clean, so no writeback
+is needed, but the core already has sole ownership. A later write moves it to
+Modified with no bus traffic at all.</p>
+<p>Without Exclusive, every first write to a freshly read line would need an
+invalidate transaction that has nobody to invalidate. That is why the state
+exists, and why protocols that omit it perform worse on private data.</p>
+<p>Real designs add transient states on top of these four. A line waiting for
+invalidate acknowledgements is neither Shared nor Modified, and the
+implementation needs somewhere to put it.</p>
+<hr>
+<h2>What happens on a read miss</h2>
+<p>A read miss is the simplest coherent transaction, and it introduces every
+component involved.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_1ab6b5ab17d6c81f6aedcb4a449c1a11.svg"></p>
+<p>The snoop filter decides who hears the request. It knows which caches might
+hold the line, so it sends the snoop only to those, rather than to everyone.</p>
+<p>If another cache holds the line in Modified, that cache owns the newest data
+and memory is stale. It either writes the line back and lets memory answer, or
+forwards the data directly to the requester. Direct forwarding, called cache to
+cache transfer, is faster and most modern fabrics do it.</p>
+<hr>
+<h2>Taking ownership before a write</h2>
+<p>A core cannot write a line it shares. It first issues a read-for-ownership,
+which fetches the data and invalidates every other copy in one transaction.</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_653f0e907370ec65201379003ec8f711.svg"></p>
+<p>Read the last two rows together. The line state changes to Modified only after
+both acknowledgements arrive. Until then the requesting core holds a promise,
+not ownership.</p>
+<p>That ordering is the single-writer rule expressed in silicon. A design that
+transitions early creates a window where two caches both believe they can
+write, and the resulting corruption appears only under precise timing.</p>
+<p>The cost is visible in the diagram. Every write to a shared line pays for a
+round trip to every sharer before it can proceed.</p>
+<hr>
+<h2>Snooping: every cache hears everything</h2>
+<p>The direct way to keep caches agreeing is to let them all listen to the same
+coherence traffic.</p>
+<p><a href="../drafts/02-snooping-HQ.png"><img alt="Snooping coherency: four processor caches all connected to one shared coherent bus, with a single request broadcast reaching every cache simultaneously" src="../drafts/02-snooping-900w.png"></a></p>
+<p>Every cache observes every read, invalidate, and ownership request, and each
+one checks whether it holds the line. The model holds few surprises during
+bring-up, and latency is low because there is no lookup step before the
+broadcast.</p>
+<p>It stops scaling for three reasons:</p>
+<ul>
+<li>Snoop traffic grows with the product of core count and request rate</li>
+<li>Every broadcast wakes caches that do not hold the line, which wastes power</li>
+<li>One structure that every cache must observe becomes hard to close timing on</li>
+</ul>
+<p>Snooping suits four cores. It does not suit thirty-two.</p>
+<hr>
+<h2>Directories: telling only the caches that care</h2>
+<p>A directory records which caches might hold each line. The fabric consults it
+and sends targeted snoops instead of broadcasting.</p>
+<p><a href="../drafts/03-directory-HQ.png"><img alt="Directory based coherency: a central directory holding a sharer list for a cache line, sending targeted snoops to only the two caches that hold copies while two other caches are left undisturbed" src="../drafts/03-directory-900w.png"></a></p>
+<div class="highlight"><pre><span></span><code><span class="n">Directory</span><span class="w"> </span><span class="n">entry</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">cache</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="n">A</span>
+
+<span class="w">  </span><span class="nl">Tag</span><span class="p">:</span><span class="w">       </span><span class="n">A</span><span class="p">[</span><span class="n">PA</span><span class="w"> </span><span class="n">tag</span><span class="p">]</span>
+<span class="w">  </span><span class="nl">Owner</span><span class="p">:</span><span class="w">     </span><span class="n">Core3</span><span class="p">,</span><span class="w"> </span><span class="n">when</span><span class="w"> </span><span class="n">Modified</span>
+<span class="w">  </span><span class="nl">Sharers</span><span class="p">:</span><span class="w">   </span><span class="n">Core0</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="n">Core1</span><span class="o">=</span><span class="mi">0</span><span class="w"> </span><span class="n">Core2</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="n">Core3</span><span class="o">=</span><span class="mi">0</span>
+<span class="w">  </span><span class="nl">State</span><span class="p">:</span><span class="w">     </span><span class="n">Shared</span>
+</code></pre></div>
+
+<p>A read from Core 1 now disturbs Core 0 and Core 2 only. Core 3 never sees the
+request, so its cache stays quiet and its power stays down.</p>
+<p>The costs are real. The directory needs storage proportional to the memory it
+covers, which is why designs track only cached lines rather than all of memory.
+Race handling also becomes harder, because the directory itself is a shared
+structure that can be stale while a transaction is in flight.</p>
+<hr>
+<h2>Snoop filters and the asymmetry of being wrong</h2>
+<p>A snoop filter is a compact directory whose job is avoiding pointless snoops.
+It does not have to be precise, but it does have to be conservative in one
+specific direction.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Conservative</span><span class="w"> </span><span class="n">snoop</span><span class="w"> </span><span class="n">filter</span><span class="w"> </span><span class="n">rule</span><span class="o">:</span>
+
+<span class="w">  </span><span class="s">&quot;Not present&quot;</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">definitely</span><span class="w"> </span><span class="kr">not</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">cache</span><span class="p">.</span>
+<span class="w">  </span><span class="s">&quot;Maybe present&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">fabric</span><span class="w"> </span><span class="n">sends</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">snoop</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">check</span><span class="p">.</span>
+</code></pre></div>
+
+<p>The two ways of being wrong are not equivalent, and the difference matters more
+than any other property of the structure.</p>
+<p>A false positive says a cache might hold a line it does not hold. The fabric
+sends a snoop, the cache answers that it has nothing, and the system loses a
+little time and power. The result stays correct.</p>
+<p>A false negative says a cache does not hold a line it actually holds. The
+fabric skips the snoop, a stale copy survives an invalidate, and two caches
+disagree about memory. The result is silent data corruption.</p>
+<p>Treat a false negative as a correctness bug of the highest severity. It is not
+a performance tuning question.</p>
+<hr>
+<h2>The hardware does not share variables</h2>
+<p>Return to the two counters. The threads shared no variables, and that was true.
+It was also irrelevant.</p>
+<p>Coherency does not track variables. It has no idea that <code>stats[0].hits</code> and
+<code>stats[1].hits</code> are different objects, because it never sees objects. It tracks
+cache lines, typically 64 bytes, and a line is the smallest thing it can own,
+share, or invalidate.</p>
+<p><a href="../drafts/04-false-sharing-HQ.png"><img alt="False sharing: two processor cores writing to two different variables that occupy the same 64 byte cache line, with the line ownership bouncing back and forth between the two caches on every write" src="../drafts/04-false-sharing-900w.png"></a></p>
+<div class="highlight"><pre><span></span><code><span class="n">One</span><span class="w"> </span><span class="mi">64</span><span class="o">-</span><span class="n">byte</span><span class="w"> </span><span class="n">cache</span><span class="w"> </span><span class="n">line</span>
+
+<span class="w">  </span><span class="n">offset</span><span class="o">:</span><span class="w">  </span><span class="o">+</span><span class="mi">0</span><span class="w">            </span><span class="o">+</span><span class="mi">8</span><span class="w">                        </span><span class="o">+</span><span class="mi">63</span>
+<span class="w">           </span><span class="p">[</span><span class="n">stats</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="w">    </span><span class="p">[</span><span class="n">stats</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="w">    </span><span class="p">[</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">rest</span><span class="w"> </span><span class="kr">of</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">]</span>
+<span class="w">            </span><span class="o">^</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="mi">0</span><span class="w">    </span><span class="o">^</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="mi">1</span>
+
+<span class="w">  </span><span class="n">Thread</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="n">writes</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">takes</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="n">Modified</span><span class="p">,</span><span class="w"> </span><span class="n">invalidates</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">  </span><span class="n">Thread</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">writes</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">takes</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="n">Modified</span><span class="p">,</span><span class="w"> </span><span class="n">invalidates</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="n">Thread</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="n">writes</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">takes</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="n">Modified</span><span class="p">,</span><span class="w"> </span><span class="n">invalidates</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="mi">1</span>
+</code></pre></div>
+
+<p>Both counters sit in one line. Every write by either thread must take exclusive
+ownership of that line, which means invalidating the other core's copy. The
+line ping-pongs between the two caches, and each write pays a full coherency
+round trip instead of hitting in L1.</p>
+<p>This is false sharing. The name is precise: the threads share nothing at the
+level of the source code, and everything at the level the hardware operates on.
+No amount of reading the C source reveals it, because the C source does not
+mention the unit that matters.</p>
+<p>It is a software performance bug with a hardware cause, and neither layer is
+wrong. The hardware is honouring the single-writer rule exactly as specified.</p>
+<hr>
+<h2>When accelerators join the domain</h2>
+<p>Direct memory access engines and accelerators read and write memory without
+executing any of the cache maintenance instructions a core would. Systems
+handle this in one of three ways.</p>
+<p><a href="../drafts/05-dma-coherency-HQ.png"><img alt="Three coherency approaches for a direct memory access engine: non-coherent with software cache maintenance, input output coherent participating in snoops for selected transactions, and fully coherent sharing the domain with the processors" src="../drafts/05-dma-coherency-900w.png"></a></p>
+<ol>
+<li><strong>Non-coherent:</strong> Software cleans caches before a transfer out and invalidates them after a transfer in. The hardware is cheap, and a single missed maintenance operation corrupts the transfer.</li>
+<li><strong>Input output coherent:</strong> The engine participates in the coherency fabric for selected transactions, so its reads snoop the caches. Software stops needing maintenance for those buffers.</li>
+<li><strong>Fully coherent:</strong> The accelerator holds coherent copies itself, through a protocol such as ACE or CHI, and behaves like another core in the domain.</li>
+</ol>
+<p>Each step up the list gains programmability and costs fabric complexity and
+verification effort. Most bugs in this area come from the first option, where a
+missing cache maintenance operation produces stale data that appears only when
+timing shifts.</p>
+<p>State the coherency domain boundaries explicitly in the specification. Every
+engineer integrating a block needs to know which side of the boundary it sits
+on.</p>
+<hr>
+<h2>Atomics need the same ownership</h2>
+<p>Locks, reference counters, and queue indices all need read-modify-write
+sequences that no other core can interleave with. Coherency supplies the
+mechanism.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">Atomic</span><span class="w"> </span><span class="nx">increment</span>
+
+<span class="w">  </span><span class="mi">1</span><span class="p">.</span><span class="w"> </span><span class="nx">The</span><span class="w"> </span><span class="nx">core</span><span class="w"> </span><span class="nx">acquires</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="nx">with</span><span class="w"> </span><span class="nx">exclusive</span><span class="w"> </span><span class="nx">intent</span><span class="p">.</span>
+<span class="w">  </span><span class="mi">2</span><span class="p">.</span><span class="w"> </span><span class="nx">The</span><span class="w"> </span><span class="nx">fabric</span><span class="w"> </span><span class="nx">prevents</span><span class="w"> </span><span class="nx">another</span><span class="w"> </span><span class="nx">core</span><span class="w"> </span><span class="nx">taking</span><span class="w"> </span><span class="nx">ownership</span><span class="w"> </span><span class="nx">unobserved</span><span class="p">.</span>
+<span class="w">  </span><span class="mi">3</span><span class="p">.</span><span class="w"> </span><span class="nx">The</span><span class="w"> </span><span class="nx">core</span><span class="w"> </span><span class="nx">writes</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">updated</span><span class="w"> </span><span class="nx">value</span><span class="p">.</span>
+<span class="w">  </span><span class="mi">4</span><span class="p">.</span><span class="w"> </span><span class="nx">If</span><span class="w"> </span><span class="nx">another</span><span class="w"> </span><span class="nx">core</span><span class="w"> </span><span class="nx">did</span><span class="w"> </span><span class="nx">intervene</span><span class="p">,</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">operation</span><span class="w"> </span><span class="nx">fails</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="nx">software</span><span class="w"> </span><span class="nx">retries</span><span class="p">.</span>
+</code></pre></div>
+
+<p>Exclusive monitors, load-reserved and store-conditional pairs, and far atomics
+executed near memory are all built on this foundation. The coherence protocol
+provides ownership, and the instruction set defines what software sees.</p>
+<p>Contended atomics are expensive for the same reason false sharing is expensive.
+Every attempt moves a line between caches.</p>
+<hr>
+<h2>Why coherency bugs hide</h2>
+<p>Coherency bugs need specific interleavings, so they survive a great deal of
+testing before appearing.</p>
+<ul>
+<li>Two cores racing for ownership of one line</li>
+<li>An eviction colliding with an inbound snoop</li>
+<li>A dirty line forwarded while its writeback is still pending</li>
+<li>A snoop filter entry replaced at the wrong moment</li>
+<li>Barrier ordering combined with outstanding writes</li>
+<li>A transfer reading memory that a cache still owns</li>
+</ul>
+<p>None of these appear in a single-core test, and few appear in a directed
+multicore test that runs the same order every time. Verification therefore
+combines four approaches:</p>
+<ul>
+<li>Protocol checkers that watch the invariants continuously</li>
+<li>Randomised traffic to reach interleavings nobody predicted</li>
+<li>Formal properties for local invariants such as single-writer</li>
+<li>Directed tests for the race classes already known</li>
+</ul>
+<hr>
+<h2>Design checklist</h2>
+<p>Decide these before the first line of coherent RTL:</p>
+<ol>
+<li>Define the coherency domain boundaries in the specification.</li>
+<li>Classify every requester as coherent, input output coherent, or non-coherent.</li>
+<li>Keep stable line state and transient transaction state separate in the RTL.</li>
+<li>Assert the single-writer invariant continuously, not only in directed tests.</li>
+<li>Treat any snoop filter false negative as a correctness failure.</li>
+<li>Measure false sharing and lock contention as part of performance sign-off.</li>
+<li>Verify cache maintenance against real transfer buffers, not synthetic ones.</li>
+</ol>
+<hr>
+<h2>Padding, and how to check</h2>
+<p>The fix for the opening example is one line. Give each counter its own cache
+line:</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">hits</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">aligned</span><span class="p">(</span><span class="mi">64</span><span class="p">)))</span><span class="w"> </span><span class="n">stats</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</code></pre></div>
+
+<p>The program returns to 2 seconds, and the memory cost is 56 wasted bytes per
+counter. That trade is almost always worth taking for data written by different
+threads.</p>
+<p>To find the problem rather than guess at it, use <code>perf c2c</code>. It reports cache
+line contention directly, and names both the offending line and the offsets
+within it:</p>
+<div class="highlight"><pre><span></span><code>perf<span class="w"> </span>c2c<span class="w"> </span>record<span class="w"> </span>./your_program
+perf<span class="w"> </span>c2c<span class="w"> </span>report
+</code></pre></div>
+
+<p>Worth running once on anything threaded that scales worse than it should. The
+counters that fight are rarely the ones anybody suspects.</p>
+<hr>
+<p><em>Previous: <a href="../soc-intermediate-01-axi4-protocol-deep-dive.html">Article I-01: AXI4 protocol deep dive</a></em>
+<em>Next: Intermediate Article 03, Pipeline Design and Hazards</em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
