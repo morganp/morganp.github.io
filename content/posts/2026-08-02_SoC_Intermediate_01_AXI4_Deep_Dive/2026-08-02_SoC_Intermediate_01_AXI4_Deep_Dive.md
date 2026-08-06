@@ -475,4 +475,4 @@ apart.
 
 ---
 
-*Next: Intermediate Article 02, Cache Coherency Protocols*
+*Next: [Intermediate Article 02: Cache coherency protocols]({filename}../2026-08-06_SoC_Intermediate_02_Cache_Coherency/2026-08-06_SoC_Intermediate_02_Cache_Coherency.md)*
