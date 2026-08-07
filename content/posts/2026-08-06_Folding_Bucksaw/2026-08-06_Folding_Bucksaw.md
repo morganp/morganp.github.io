@@ -1,4 +1,4 @@
-Title: Building a folding bucksaw: the fold decides the throat
+Title: Building a folding bucksaw
 Date: 2026-08-06
 Category: Outdoor
 Tags: bushcraft, woodwork, tools, scouting
