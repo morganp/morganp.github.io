@@ -115,6 +115,3 @@ Last Argument
 
     $ mkdir notes
     $ cd !$
-
-<!--Image Example: image location content/images/photo.jpg-->
-![photo]({attach}/images/photo.jpg)
