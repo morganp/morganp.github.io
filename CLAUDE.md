@@ -207,7 +207,11 @@ make devserver
 To check how many diagrams rendered in a draft post without opening a browser:
 
 ```bash
-grep -c "fretboard-diagram" output/drafts/<slug>.html
+grep -c "images/fretboard/" output/drafts/<slug>.html
+grep -c "images/wavedrom/" output/drafts/<slug>.html
+grep -c "images/fsm/"      output/drafts/<slug>.html
 ```
+
+Match on the `src` path, not on a class name. The plugins emit no diagram-specific CSS class -- the markup is `<img alt="fretboard diagram" src="./images/fretboard/fretboard_<hash>.svg">` and the equivalents `alt="WaveDrom timing diagram"` and `alt="FSM diagram"`. Matching a slug-like string such as `fretboard-diagram` is doubly wrong: it never matches the markup, and it returns a false non-zero on any post whose own slug contains it.
 
 A count of 0 means the plugin preprocessor did not run or all renders failed. Check for Python tracebacks in the build output -- silent failures write a warning to the log and fall through to Pygments, which displays the raw block as a syntax-highlighted code block instead of an image.
