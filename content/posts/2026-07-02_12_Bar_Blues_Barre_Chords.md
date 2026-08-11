@@ -55,27 +55,15 @@ Each corner of the triangle gets a barre shape named after the open chord it is 
 
 Same G at fret 3 as the recap diagram. The 1 is the E shape at fret 3; the 4 sits directly below it at the same fret in the A shape; the 5 is that A shape slid up two frets:
 
-<style>
-.chord-row { display: flex; flex-wrap: wrap; gap: 0.75em; justify-content: center; align-items: flex-start; }
-.chord-row p { margin: 0; }
-.chord-row img { max-width: 100%; height: auto; }
-</style>
-
-<div class="chord-row" markdown="1">
-
 ```fretdrom
-{ chord: { name: "G (the 1)", subtitle: "E shape at fret 3", frets: "355433", intervals: ["R", "5", "R", "3", "5", "R"], barre: { fret: 3, from_string: 1, to_string: 6 } } }
+{
+  chords: [
+    { name: "G (the 1)", subtitle: "E shape at fret 3", frets: "355433", intervals: ["R", "5", "R", "3", "5", "R"], barre: { fret: 3, from_string: 1, to_string: 6 } },
+    { name: "C (the 4)", subtitle: "A shape at fret 3", frets: "x35553", intervals: [null, "R", "5", "R", "3", "5"], barre: { fret: 3, from_string: 2, to_string: 6 } },
+    { name: "D (the 5)", subtitle: "A shape at fret 5", frets: "x57775", start_fret: 5, intervals: [null, "R", "5", "R", "3", "5"], barre: { fret: 5, from_string: 2, to_string: 6 } }
+  ]
+}
 ```
-
-```fretdrom
-{ chord: { name: "C (the 4)", subtitle: "A shape at fret 3", frets: "x35553", intervals: [null, "R", "5", "R", "3", "5"], barre: { fret: 3, from_string: 2, to_string: 6 } } }
-```
-
-```fretdrom
-{ chord: { name: "D (the 5)", subtitle: "A shape at fret 5", frets: "x57775", start_fret: 5, intervals: [null, "R", "5", "R", "3", "5"], barre: { fret: 5, from_string: 2, to_string: 6 } } }
-```
-
-</div>
 
 The 4 is the 1's pattern dropped one string set at the same frets, and the 5 is the 4 slid two frets up -- the triangle from the recap, now wearing full chords. Play any 12-bar grid from the previous post with these three and notice how little the hand travels: the 1-to-4 change is a string hop at the same fret, and the 4-to-5 change is a two-fret slide of the same shape. The shuffle feel carries over unchanged.
 
@@ -98,20 +86,14 @@ This is the answer to the horn-player problem from the last post: when someone c
 
 Want the bluesier dominant 7th sound from the [previous post]({filename}/posts/2026-07-02_12_Bar_Blues_Fable.md)? Each barre shape turns into a movable 7th chord by *lifting* one finger: the freed string drops back onto the index-finger barre, and that barre note is the b7. In the E shape, lift the finger on the D string; in the A shape, lift the finger on the G string:
 
-<div class="chord-row" markdown="1">
-
 ```fretdrom
-{ chord: { name: "G7 (the 1)", subtitle: "E shape at fret 3", frets: "353433", intervals: ["R", "5", "b7", "3", "5", "R"], barre: { fret: 3, from_string: 1, to_string: 6 } } }
+{
+  chords: [
+    { name: "G7 (the 1)", subtitle: "E shape at fret 3", frets: "353433", intervals: ["R", "5", "b7", "3", "5", "R"], barre: { fret: 3, from_string: 1, to_string: 6 } },
+    { name: "C7 (the 4)", subtitle: "A shape at fret 3", frets: "x35353", intervals: [null, "R", "5", "b7", "3", "5"], barre: { fret: 3, from_string: 2, to_string: 6 } },
+    { name: "D7 (the 5)", subtitle: "A shape at fret 5", frets: "x57575", start_fret: 5, intervals: [null, "R", "5", "b7", "3", "5"], barre: { fret: 5, from_string: 2, to_string: 6 } }
+  ]
+}
 ```
-
-```fretdrom
-{ chord: { name: "C7 (the 4)", subtitle: "A shape at fret 3", frets: "x35353", intervals: [null, "R", "5", "b7", "3", "5"], barre: { fret: 3, from_string: 2, to_string: 6 } } }
-```
-
-```fretdrom
-{ chord: { name: "D7 (the 5)", subtitle: "A shape at fret 5", frets: "x57575", start_fret: 5, intervals: [null, "R", "5", "b7", "3", "5"], barre: { fret: 5, from_string: 2, to_string: 6 } } }
-```
-
-</div>
 
 Same triangle, same frets, one finger fewer per chord. Swap them in wherever the grid wants more grit -- the 5 chord first, then all three -- and the triangle still plays the form anywhere on the neck.

@@ -27,27 +27,16 @@ Quick change, long 5, and the shuffle feel all carry over from the [first post](
 
 1-4-5 in G is G, C, D. GDAD is practically built for the key of G -- the 1 chord is two open courses and one finger:
 
-<style>
-.chord-row { display: flex; flex-wrap: wrap; gap: 0.75em; justify-content: center; align-items: flex-start; }
-.chord-row p { margin: 0; }
-.chord-row img { max-width: 100%; height: auto; }
-</style>
-
-<div class="chord-row" markdown="1">
-
 ```fretdrom
-{ chord: { name: "G (the 1)", tuning: "GDAD", frets: "0020", intervals: ["R", "5", "3", "5"] } }
+{
+  tuning: "GDAD",
+  chords: [
+    { name: "G (the 1)", frets: "0020", intervals: ["R", "5", "3", "5"] },
+    { name: "C (the 4)", frets: "0232", intervals: ["5", "3", "R", "3"] },
+    { name: "D (the 5)", frets: "2004", intervals: ["5", "R", "5", "3"] }
+  ]
+}
 ```
-
-```fretdrom
-{ chord: { name: "C (the 4)", tuning: "GDAD", frets: "0232", intervals: ["5", "3", "R", "3"] } }
-```
-
-```fretdrom
-{ chord: { name: "D (the 5)", tuning: "GDAD", frets: "2004", intervals: ["5", "R", "5", "3"] } }
-```
-
-</div>
 
 The C voicing keeps the open G course ringing underneath (technically C/G); on a droning instrument that is a feature, not a compromise.
 
@@ -55,41 +44,31 @@ The C voicing keeps the open G course ringing underneath (technically C/G); on a
 
 1-4-5 in A is A, D, E:
 
-<div class="chord-row" markdown="1">
-
 ```fretdrom
-{ chord: { name: "A (the 1)", tuning: "GDAD", frets: "2242", intervals: ["R", "5", "3", "5"] } }
+{
+  tuning: "GDAD",
+  chords: [
+    { name: "A (the 1)", frets: "2242", intervals: ["R", "5", "3", "5"] },
+    { name: "D (the 4)", frets: "2004", intervals: ["5", "R", "5", "3"] },
+    { name: "E (the 5)", frets: "1222", intervals: ["3", "R", "5", "R"] }
+  ]
+}
 ```
-
-```fretdrom
-{ chord: { name: "D (the 4)", tuning: "GDAD", frets: "2004", intervals: ["5", "R", "5", "3"] } }
-```
-
-```fretdrom
-{ chord: { name: "E (the 5)", tuning: "GDAD", frets: "1222", intervals: ["3", "R", "5", "R"] } }
-```
-
-</div>
 
 ## Key of E
 
 1-4-5 in E is E, A, B. The B is the A shape from the key of A slid two frets up -- the same "same shape, two frets" move the [guitar barre post]({filename}/posts/2026-07-02_12_Bar_Blues_Barre_Chords.md) uses for every 4-to-5 change:
 
-<div class="chord-row" markdown="1">
-
 ```fretdrom
-{ chord: { name: "E (the 1)", tuning: "GDAD", frets: "1222", intervals: ["3", "R", "5", "R"] } }
+{
+  tuning: "GDAD",
+  chords: [
+    { name: "E (the 1)", frets: "1222", intervals: ["3", "R", "5", "R"] },
+    { name: "A (the 4)", frets: "2242", intervals: ["R", "5", "3", "5"] },
+    { name: "B (the 5)", subtitle: "A shape, two frets up", frets: "4464", start_fret: 4, intervals: ["R", "5", "3", "5"], barre: { fret: 4, from_string: 1, to_string: 4 } }
+  ]
+}
 ```
-
-```fretdrom
-{ chord: { name: "A (the 4)", tuning: "GDAD", frets: "2242", intervals: ["R", "5", "3", "5"] } }
-```
-
-```fretdrom
-{ chord: { name: "B (the 5)", subtitle: "A shape, two frets up", tuning: "GDAD", frets: "4464", start_fret: 4, intervals: ["R", "5", "3", "5"], barre: { fret: 4, from_string: 1, to_string: 4 } } }
-```
-
-</div>
 
 Drop the 3rd (the fret-6 note) and the barre alone gives 4-4-x-4 style bare fifths -- a B5 that drives just as well. Which leads to the real bouzouki move:
 

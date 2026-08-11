@@ -77,27 +77,15 @@ Plain major chords work fine. For more of a blues feel, swap any or all of them 
 
 Open E and A, plus B7, the friendliest way to play the 5 in this key (the full B barre chord is no fun in the middle of a shuffle):
 
-<style>
-.chord-row { display: flex; flex-wrap: wrap; gap: 0.75em; justify-content: center; align-items: flex-start; }
-.chord-row p { margin: 0; }
-.chord-row img { max-width: 100%; height: auto; }
-</style>
-
-<div class="chord-row" markdown="1">
-
 ```fretdrom
-{ chord: { name: "E (the 1)", frets: "022100", intervals: ["R", "5", "R", "3", "5", "R"] } }
+{
+  chords: [
+    { name: "E (the 1)", frets: "022100", intervals: ["R", "5", "R", "3", "5", "R"] },
+    { name: "A (the 4)", frets: "x02220", intervals: [null, "R", "5", "R", "3", "5"] },
+    { name: "B7 (the 5)", frets: "x21202", intervals: [null, "R", "3", "b7", "R", "5"] }
+  ]
+}
 ```
-
-```fretdrom
-{ chord: { name: "A (the 4)", frets: "x02220", intervals: [null, "R", "5", "R", "3", "5"] } }
-```
-
-```fretdrom
-{ chord: { name: "B7 (the 5)", frets: "x21202", intervals: [null, "R", "3", "b7", "R", "5"] } }
-```
-
-</div>
 
 ## The shuffle feel
 
