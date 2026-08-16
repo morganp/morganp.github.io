@@ -429,4 +429,4 @@ counters that fight are rarely the ones anybody suspects.
 ---
 
 *Previous: [Article I-01: AXI4 protocol deep dive]({filename}../2026-08-02_SoC_Intermediate_01_AXI4_Deep_Dive/2026-08-02_SoC_Intermediate_01_AXI4_Deep_Dive.md)*
-*Next: Intermediate Article 03, Pipeline Design and Hazards*
+*Next: [Article I-03: Pipeline design and hazards]({filename}../2026-08-16_SoC_Intermediate_03_Pipeline_Hazards/2026-08-16_SoC_Intermediate_03_Pipeline_Hazards.md)*
