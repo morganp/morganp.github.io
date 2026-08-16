@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Supports that peel off: a Bambu Studio profile that stops fighting back</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="The Bambu Studio support settings I have settled on for a 0.4mm nozzle at 0.16mm layer height, and why each one matters when you are trying to get..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/bambu-easy-remove-support-settings.html" rel="bookmark"
+             title="Permalink to Supports that peel off: a Bambu Studio profile that stops fighting back">Supports that peel off: a Bambu Studio profile that stops fighting back</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-10T00:00:00+01:00">
+                Published: Mon 10 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/3d-print.html">3D Print</a> <a href="../tag/bambu-lab.html">Bambu Lab</a> <a href="../tag/slicer.html">Slicer</a> <a href="../tag/supports.html">Supports</a> <a href="../tag/orcaslicer.html">OrcaSlicer</a> </p>        
+</footer><!-- /.post-info -->        <p>The print finished four hours ago and it is still in the vice. One pair of pliers has already slipped and put a bright crescent scar across the face of the part. The support block is not coming off in one piece, it is coming off in flakes, and every flake takes a little of the model surface with it.</p>
+<p>Nothing went wrong. The slicer did exactly what it was told. The problem is that the default support profile is tuned to hold overhangs up reliably, and holding up reliably and letting go cleanly are opposite requirements.</p>
+<p>This post is the profile I have settled on in Bambu Studio for a 0.4mm nozzle at 0.16mm layer height, printing PLA on an A1 Mini, and the reasoning behind each value. The settings map straight across to OrcaSlicer, which shares the same support engine. It started from a handful of Reddit threads and then a few months of adjusting one number at a time.</p>
+<h2>What actually holds a support onto the model</h2>
+<p>It is tempting to think of support removal as a strength problem, as though the support is glued on and you need enough force to break the glue. That is not what is happening.</p>
+<p>A support touches the model in exactly two places. The top of the support column meets the underside of the overhang, and the bottom of the support column meets whatever it is standing on. Everywhere else it is standing in open air. All the effort of removal goes into those two interfaces, and both of them are governed by a gap you set in the slicer.</p>
+<p>If that gap is zero, the interface extrusion is laid onto solid plastic that is still warm. It welds. No amount of care with the pliers will separate a weld, so you end up tearing the model surface instead of the support.</p>
+<p>If the gap is too large, the interface has nothing under it, sags into the void, and the overhang above prints onto a wavy surface. The support is easy to remove because it barely worked.</p>
+<p>Everything below is about landing between those two failures, and about reducing how much support gets generated in the first place.</p>
+<h2>The support section</h2>
+<p><img alt="Bambu Studio support section showing tree auto type, Tree Slim style, threshold angle 25, and on build plate only enabled" src="../drafts/01-support-section-900w.png"></p>
+<p><strong>Type: tree (auto), Style: Tree Slim.</strong> Tree supports touch the model at discrete points rather than under the entire projected footprint. Less contact area is less to break. Tree Slim keeps the branches thin and does not thicken them into the plate-filling structures that Tree Strong produces.</p>
+<p><strong>Threshold angle: 25 degrees.</strong> Bambu Studio measures this as the slope of the surface away from horizontal, so a vertical wall is 90 degrees, and it generates support where the slope falls below the threshold. Lowering it from the 30 degree default therefore generates less support. You can see the same logic in the stock profiles: the 0.12mm fine profiles ship at 20 degrees and the 0.30mm draft profiles at 40, because a fine layer height holds a shallow overhang that a coarse one drops. At 0.16mm, 25 is the point where a surface prints acceptably without help and is not worth the scar left behind by supporting it. If your geometry has a lot of shallow overhangs that matter cosmetically, put it back up.</p>
+<p><strong>On build plate only: enabled.</strong> Supports that land on the model itself are the ones that leave the worst marks, because you are prying against a surface rather than against the plate. Turning this on means anything that would need a support standing on the model gets no support at all, so it is a constraint on how you orient the part rather than a free improvement.</p>
+<p><strong>Support critical regions only and Remove small overhangs: both enabled.</strong> These prune the generated support down to the places that genuinely fail without it. Small isolated overhangs bridge fine and do not justify a branch.</p>
+<h2>The advanced section</h2>
+<p><img alt="Bambu Studio advanced support settings showing initial layer density 90 percent, top Z distance 0.25mm, bottom Z distance 0.2mm, hollow base pattern, and 3 top interface layers" src="../drafts/02-advanced-section-900w.png"></p>
+<p><strong>Top Z distance: 0.25mm. Bottom Z distance: 0.2mm.</strong> These are the two gaps. Top Z is the air gap between the top of the support and the underside of the model, and it is the number that decides whether removal is a fingernail job or a pliers job. Bottom Z is the gap under the support where it stands on something.</p>
+<p>Note what 0.25mm is not: it is not a multiple of the 0.16mm layer height. That matters, and it is dealt with further down.</p>
+<p><strong>Support wall loops: 0.</strong> A wall loop puts a continuous perimeter around the support body, which turns a stack of loose infill lines into a rigid tube. Rigid is exactly what you do not want. The setting runs from -1 to 2, where -1 is auto and 0 permits infill-only support wherever the support body is thick enough to stand without a wall. That is the case for most tree branches, so the result is a support you can crumble under a thumb.</p>
+<p><strong>Initial layer density 90%, initial layer expansion -1mm.</strong> The first layer of support is nearly solid, so the thin tree branches have a footing that stays stuck to the plate. Expansion widens that first layer to help adhesion, and the -1 is not a one millimetre shrink, it is the auto value: the slicer sizes the expansion itself. Leave it there unless branches are lifting.</p>
+<p><strong>Base pattern: Hollow, spacing 2.5mm, pattern angle 0.</strong> Sparse support body, again in the service of weakness.</p>
+<p><strong>Top interface layers: 3.</strong> The interface is the dense cap at the top of the support that the model prints onto. Fewer than three and the overhang quality drops, because the first sparse layer above a thin interface has too little to sit on. More than three and you are just adding solid material that has to come off later.</p>
+<h2>Interface spacing and the XY gap</h2>
+<p><img alt="Bambu Studio settings showing top interface spacing 0.8mm, support to object XY distance 0.65mm, first layer gap 0.2mm, and independent support layer height enabled" src="../drafts/03-interface-xy-900w.png"></p>
+<p><strong>Top interface spacing: 0.8mm.</strong> This is the one that surprised me. A solid interface, which is what you get at spacing 0, is a continuous sheet directly under the overhang. It gives the best surface finish and it is the hardest thing in the world to remove. At 0.8mm with a 0.4mm nozzle the interface lines are laid down with roughly a line width of air between them, so the contact with the model above is a series of ridges rather than a plane. Surface finish drops slightly. Removal changes character completely, because there is now somewhere for the break to start.</p>
+<p><strong>Support/object XY distance: 0.65mm.</strong> The horizontal clearance where a support runs alongside a vertical wall. Too small and the support fuses to the side of the part.</p>
+<p><strong>Z overrides X/Y: unchecked.</strong> Left off so the XY value stands on its own rather than being derived from the Z gap.</p>
+<p><strong>Support/object first layer gap: 0.2mm.</strong> The equivalent clearance on the very first layer, where the squish is highest and fusing is most likely.</p>
+<p><strong>Max bridge length: 0.</strong> This is the longest bridge allowed to print with nothing underneath it. At 0 no bridge counts as self-supporting, so every one of them gets support. It is the only setting in this profile that adds support rather than removing it, and it is deliberate: a sagging bridge is a defect I cannot sand out, whereas the support under it comes off with everything else. Raise it if your parts have long spans that do not need to look good.</p>
+<p><strong>Independent support layer height: enabled.</strong> Here is the reason 0.25mm works as a top Z distance at a 0.16mm layer height.</p>
+<p>Without this option, the support is printed on the same layer grid as the model, so the air gap can only ever be a whole number of layers. At 0.16mm your choices are 0.16mm, which welds, or 0.32mm, which sags. The value you actually want sits between the two and is unreachable. That is why so much support tuning advice ends in "try one layer, then try two" and why neither ever quite works.</p>
+<p>With independent support layer height on, the support is free to use its own layer heights, so it can stop wherever it needs to in order to leave the gap you asked for. The gap becomes a real dimension in millimetres rather than a rounded multiple. Tuning support removal is not a matter of finding the right number of layers, it is a matter of getting off the layer grid entirely so that a number in between becomes available.</p>
+<p>One caveat, and it is the reason this profile is single colour: the option is ignored when the prime tower is enabled. Turn on a multi-colour print and the supports go back on the model's layer grid, which puts you back to choosing between 0.16mm and 0.32mm.</p>
+<h2>The values, in one place</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td>tree (auto)</td>
+</tr>
+<tr>
+<td>Style</td>
+<td>Tree Slim</td>
+</tr>
+<tr>
+<td>Threshold angle</td>
+<td>25 degrees</td>
+</tr>
+<tr>
+<td>On build plate only</td>
+<td>on</td>
+</tr>
+<tr>
+<td>Support critical regions only</td>
+<td>on</td>
+</tr>
+<tr>
+<td>Remove small overhangs</td>
+<td>on</td>
+</tr>
+<tr>
+<td>Initial layer density</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>Initial layer expansion</td>
+<td>-1mm</td>
+</tr>
+<tr>
+<td>Support wall loops</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Top Z distance</td>
+<td>0.25mm</td>
+</tr>
+<tr>
+<td>Bottom Z distance</td>
+<td>0.2mm</td>
+</tr>
+<tr>
+<td>Base pattern</td>
+<td>Hollow</td>
+</tr>
+<tr>
+<td>Base pattern spacing</td>
+<td>2.5mm</td>
+</tr>
+<tr>
+<td>Pattern angle</td>
+<td>0 degrees</td>
+</tr>
+<tr>
+<td>Top interface layers</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Interface pattern</td>
+<td>Default</td>
+</tr>
+<tr>
+<td>Top interface spacing</td>
+<td>0.8mm</td>
+</tr>
+<tr>
+<td>Normal support expansion</td>
+<td>0mm</td>
+</tr>
+<tr>
+<td>Support/object XY distance</td>
+<td>0.65mm</td>
+</tr>
+<tr>
+<td>Z overrides X/Y</td>
+<td>off</td>
+</tr>
+<tr>
+<td>Support/object first layer gap</td>
+<td>0.2mm</td>
+</tr>
+<tr>
+<td>Max bridge length</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Independent support layer height</td>
+<td>on</td>
+</tr>
+</tbody>
+</table>
+<h2>If you change one thing</h2>
+<p>Change the top Z distance, and change it by 0.01mm at a time.</p>
+<p>Every other value on that list shifts the result a little. That one decides whether the support comes off in your hand or comes off with a scalpel, and the useful range on a 0.4mm nozzle is narrow enough that 0.24mm and 0.26mm are genuinely different prints. Get it right for your filament, then leave the rest alone.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

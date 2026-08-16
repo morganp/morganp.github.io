@@ -1,5 +1,350 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Engineering</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-06T00:00:00+01:00</updated><entry><title>SoC Intermediate 02: Cache coherency protocols</title><link href="http://lizard-spock.co.uk/soc-intermediate-02-cache-coherency-protocols.html" rel="alternate"></link><published>2026-08-06T00:00:00+01:00</published><updated>2026-08-06T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-06:/soc-intermediate-02-cache-coherency-protocols.html</id><summary type="html">&lt;p&gt;Why two threads with separate counters can run slower than one thread, and the coherency machinery that explains it: the single-writer rule, MESI states, read-for-ownership, snooping, directories, snoop filters, and the cache line granularity that no amount of reading the source code reveals.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-coherency-hero-HQ.png"&gt;&lt;img alt="A multicore cache coherency fabric on a system on chip, with four processor caches around a shared interconnect that carries snoop and ownership traffic to a directory and a memory controller" src="http://lizard-spock.co.uk/00-coherency-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Engineering</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-16T00:00:00+01:00</updated><entry><title>SoC Intermediate 03: Pipeline design and hazards</title><link href="http://lizard-spock.co.uk/soc-intermediate-03-pipeline-design-and-hazards.html" rel="alternate"></link><published>2026-08-16T00:00:00+01:00</published><updated>2026-08-16T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-16:/soc-intermediate-03-pipeline-design-and-hazards.html</id><summary type="html">&lt;p&gt;Why adding a pipeline stage can make a processor slower, and the hazard machinery that decides the outcome: forwarding paths, load-use stalls, branch prediction and flush, structural conflicts, multi-cycle units, and the valid bits that keep exceptions precise.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-pipeline-hero-HQ.png"&gt;&lt;img alt="A processor pipeline drawn as a transparent assembly line, with several instructions in flight at once moving through fetch, decode, execute, memory and writeback stages" src="http://lizard-spock.co.uk/00-pipeline-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Series: Intermediate SoC Design | Article 3 of 10&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The stage that made it slower&lt;/h2&gt;
+&lt;p&gt;The timing report said the execute stage was the critical path. You split it in
+two, added a pipeline register, and closed timing at 1.3 GHz instead of 1.2. An
+extra eight per cent of clock, for one register stage and a week of work.&lt;/p&gt;
+&lt;p&gt;Three of the four benchmarks gained around eight per cent, exactly as the
+frequency did. The fourth, a pointer-heavy workload full of branches that go
+whichever way the data feels like, lost four per cent. Same RTL, same compiler,
+same test, faster clock, less work done.&lt;/p&gt;
+&lt;p&gt;This article is about pipeline hazards: the conflicts that appear the moment
+instructions overlap, the hardware that resolves them, and the reason stage
+count is such a fraught number. It targets engineers designing or verifying a
+processor pipeline, and anyone reading a microarchitecture manual and wondering
+why nobody simply builds a forty-stage machine.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;What overlapping actually buys&lt;/h2&gt;
+&lt;p&gt;Classic reduced instruction set computer (RISC) pipelines are usually explained
+with five stages, and the explanation is worth keeping because every later
+complication attaches to one of them.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Stage&lt;/th&gt;
+&lt;th&gt;Name&lt;/th&gt;
+&lt;th&gt;Work&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;IF&lt;/td&gt;
+&lt;td&gt;Instruction fetch&lt;/td&gt;
+&lt;td&gt;Read instruction memory or the instruction cache&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ID&lt;/td&gt;
+&lt;td&gt;Decode and register read&lt;/td&gt;
+&lt;td&gt;Decode the opcode, read the register file&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;EX&lt;/td&gt;
+&lt;td&gt;Execute&lt;/td&gt;
+&lt;td&gt;Arithmetic logic unit operation or address calculation&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;MEM&lt;/td&gt;
+&lt;td&gt;Memory&lt;/td&gt;
+&lt;td&gt;Data memory or data cache access&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;WB&lt;/td&gt;
+&lt;td&gt;Write back&lt;/td&gt;
+&lt;td&gt;Write the result to the register file&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;A single instruction still takes five cycles from fetch to writeback. Nothing
+about pipelining makes one instruction faster. What it changes is how many
+instructions can be in progress at the same time.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_626cdeae0d4b7eb82e91a09ed0d04b0d.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Latency is five cycles. Throughput approaches one instruction per cycle. Every
+stage boundary you add shortens the critical path between registers, which is
+why the timing report kept suggesting more of them.&lt;/p&gt;
+&lt;p&gt;The diagram above is also a lie of omission. It shows four instructions that
+have nothing to do with each other. Real code is not like that.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Three ways instructions collide&lt;/h2&gt;
+&lt;p&gt;An instruction in a pipeline is no longer isolated. It may need a value, a
+decision, or a piece of hardware that an older instruction has not finished
+with. Those conflicts are pipeline hazards, and they come in three kinds.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Data hazards.&lt;/strong&gt; An instruction needs a value that is not available yet.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Control hazards.&lt;/strong&gt; The next program counter depends on a branch or an
+  exception that has not resolved yet.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Structural hazards.&lt;/strong&gt; Two stages want the same piece of hardware in the
+  same cycle.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Everything else in this article is the disciplined handling of those three,
+without producing wrong results and without stalling more than necessary.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Data hazards and the bypass network&lt;/h2&gt;
+&lt;p&gt;Take the shortest dependent pair in any instruction set:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;add&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="c1"&gt;// x3 = x1 + x2&lt;/span&gt;
+&lt;span class="nf"&gt;sub&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x4&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="c1"&gt;// needs x3 immediately&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;add&lt;/code&gt; writes &lt;code&gt;x3&lt;/code&gt; in WB, in cycle 4. The &lt;code&gt;sub&lt;/code&gt; reads its operands in ID, in
+cycle 2, and needs them in EX in cycle 3. Left alone, the &lt;code&gt;sub&lt;/code&gt; reads the old
+value of &lt;code&gt;x3&lt;/code&gt; and quietly computes the wrong answer.&lt;/p&gt;
+&lt;p&gt;Waiting is one answer, and it costs three cycles on a pattern that appears in
+almost every basic block. The better answer is that the value already exists.
+It sits in the EX/MEM pipeline register at the end of cycle 3, fully computed.
+It is simply not in the register file yet.&lt;/p&gt;
+&lt;p&gt;Forwarding, also called bypassing, routes that result straight back to the
+input of the execute stage instead of waiting for writeback.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_9d743a3ee62322c0ccdb0c65f4d1014f.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Each execute-stage operand becomes a multiplexer choosing between three
+sources: the register file value, the result of the immediately preceding
+instruction sitting in EX/MEM, and the result of the instruction before that
+sitting in MEM/WB. Priority matters. If both bypass sources match, the younger
+one wins, because it holds the more recent value.&lt;/p&gt;
+&lt;p&gt;With those two paths in place, back-to-back arithmetic dependencies cost
+nothing at all. This is the single highest-value structure in an in-order
+pipeline, and it is why a naive stall-on-dependency design performs so badly by
+comparison.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The one it cannot fix&lt;/h2&gt;
+&lt;p&gt;Forwarding works because the value exists somewhere earlier than the register
+file. Loads break that assumption.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;lw&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="no"&gt;x3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;add&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;x4&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The load data arrives from the data cache at the end of MEM, in cycle 3. The
+dependent &lt;code&gt;add&lt;/code&gt; wants it in EX, also in cycle 3, and no wire runs backwards in
+time. One cycle of stall is unavoidable.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_5c53e275ae3630fadbd4e968b000bc2e.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The pipeline holds IF and ID in place for a cycle and injects a bubble into EX.
+After the stall, the ordinary MEM/WB bypass path delivers the value and the
+&lt;code&gt;add&lt;/code&gt; proceeds.&lt;/p&gt;
+&lt;p&gt;Detecting it is a comparison between the instruction in ID and the load already
+in EX:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;load_use_hazard&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;ex_is_load&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ex_rd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;!=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;5&lt;/span&gt;&lt;span class="mi"&gt;&amp;#39;d0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;ex_rd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id_rs1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ex_rd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id_rs2&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;stall_if&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;load_use_hazard&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;stall_id&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;load_use_hazard&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;insert_bubble_ex&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;load_use_hazard&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;ex_rd != 5'd0&lt;/code&gt; term earns its place. On RISC-V, register &lt;code&gt;x0&lt;/code&gt; reads as
+zero and discards writes, so a load into &lt;code&gt;x0&lt;/code&gt; produces no value anybody can
+depend on. Without the check, every discarded load stalls a following
+instruction that reads &lt;code&gt;x0&lt;/code&gt;, which is a common idiom. Whatever your instruction
+set, find its equivalent and prove it does not create phantom hazards.&lt;/p&gt;
+&lt;p&gt;Compilers know about this stall and schedule an independent instruction into
+the gap when they can find one. When they cannot, the cost is real, and it
+scales with how many cycles late the load data is.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Control hazards and the cost of guessing&lt;/h2&gt;
+&lt;p&gt;A branch changes the program counter, and the pipeline has already fetched past
+it. In a five-stage design the condition resolves in EX, by which point two
+younger instructions are in flight.&lt;/p&gt;
+&lt;p&gt;Waiting for the branch is the honest option and the slow one. It costs two
+cycles on roughly one instruction in five. Resolving the branch earlier in ID
+helps, at the price of a comparator on the critical path and a new forwarding
+problem for the values being compared.&lt;/p&gt;
+&lt;p&gt;Every high-performance pipeline takes the third option: guess, and clean up
+when the guess is wrong.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_fc084bf1517c1aff459cfa6709eb16c9.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Two fetched instructions become bubbles. Note what determines that number: it
+is the distance between the fetch stage and the stage where the branch
+resolves. Not the total pipeline depth, and not the branch itself.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Predictors, and why two bits&lt;/h2&gt;
+&lt;p&gt;A static predictor guesses from the instruction alone. Backward branches are
+assumed taken and forward branches not taken, which is a decent guess because
+backward branches are usually loops. It costs almost nothing and is right about
+two thirds of the time.&lt;/p&gt;
+&lt;p&gt;Dynamic prediction learns from what the branch did before. The smallest useful
+structure is a two-bit saturating counter per branch.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_2010cf533c92c3da59f14a344ae185cb.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The second bit is the whole point. A loop that runs a hundred times and exits
+once would, with a one-bit predictor, mispredict twice per execution of the
+loop: once on the exit, and once again on the next entry, because the single
+bit was flipped by that exit. The two-bit counter absorbs the anomaly, drops
+from strong to weak, and keeps predicting taken.&lt;/p&gt;
+&lt;p&gt;Real branch prediction units go much further, with global history, tagged
+geometric-length tables, branch target buffers, and return address stacks. They
+all rest on the same trade: storage and complexity in exchange for a lower
+misprediction rate, because misprediction is the thing that costs cycles.&lt;/p&gt;
+&lt;p&gt;When the guess is wrong, the younger instructions have to disappear:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;flush_if_id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;branch_resolved&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;branch_mispredict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;flush_id_ex&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;branch_resolved&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;branch_mispredict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;next_pc&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;branch_mispredict&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;?&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;branch_target&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;pc_plus_4&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A flush turns wrong-path instructions into bubbles. It must also suppress every
+side effect they could have had: register writes, memory writes, control and
+status register updates, and any outstanding request already issued to a
+multi-cycle unit. A flush that clears the valid bit but leaves a store enable
+asserted is a memory corruption bug, and it will only appear when the branch
+and the store line up in one specific way.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;What the extra stage actually bought&lt;/h2&gt;
+&lt;p&gt;Now the opening result. Return to that pointer-heavy benchmark, and put numbers
+against the two designs.&lt;/p&gt;
+&lt;p&gt;Cycles per instruction (CPI) starts at 1.0 for a full pipeline and gets worse
+from there. On this workload, a quarter of instructions are branches, a fifth
+of those branches are mispredicted because the data decides them, and loads
+feed a dependent instruction immediately about half the time.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Contribution&lt;/th&gt;
+&lt;th&gt;Five-stage&lt;/th&gt;
+&lt;th&gt;Six-stage&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Base&lt;/td&gt;
+&lt;td&gt;1.00&lt;/td&gt;
+&lt;td&gt;1.00&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Branch mispredict penalty&lt;/td&gt;
+&lt;td&gt;3 cycles, 0.15&lt;/td&gt;
+&lt;td&gt;5 cycles, 0.25&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Load-use stall&lt;/td&gt;
+&lt;td&gt;1 cycle, 0.075&lt;/td&gt;
+&lt;td&gt;2 cycles, 0.15&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Cache misses and other&lt;/td&gt;
+&lt;td&gt;0.10&lt;/td&gt;
+&lt;td&gt;0.10&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;CPI&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;1.325&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;1.50&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Clock&lt;/td&gt;
+&lt;td&gt;1.2 GHz&lt;/td&gt;
+&lt;td&gt;1.3 GHz&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Instructions per second&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;906 M&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;867 M&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The extra register stage did exactly what it was asked to do. It shortened the
+critical path and the clock went up. It also moved branch resolution one stage
+further from fetch and put the load data one cycle further from the consumer,
+so every mistake got more expensive at the same time.&lt;/p&gt;
+&lt;p&gt;Here is the reframe. A pipeline stage costs nothing while the pipeline is
+right, and costs the entire pipeline when it is wrong. You are not buying
+throughput with depth. You are buying frequency, and paying for it with the
+penalty on every event that discards work.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/01-depth-penalty-HQ.png"&gt;&lt;img alt="Two pipelines drawn side by side, a short one and a long one, each flushing after a mispredicted branch, with the long pipeline discarding many more instructions than the short one" src="http://lizard-spock.co.uk/01-depth-penalty-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;That explains the split in the results. The three benchmarks that gained were
+predictable ones, where the pipeline is right almost all the time and depth is
+nearly free. The one that lost was the one that is wrong constantly, where
+depth is charged on every mistake.&lt;/p&gt;
+&lt;p&gt;It also explains the shape of the industry. The deepest commercial pipelines
+appeared alongside the most elaborate branch predictors ever built, and that is
+not a coincidence. Depth is only affordable if you are right.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Structural hazards&lt;/h2&gt;
+&lt;p&gt;The third class is the most mundane and the easiest to design out, if you find
+it before tape-out. A structural hazard is hardware oversubscription: two
+stages wanting one resource in one cycle.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/02-structural-hazard-HQ.png"&gt;&lt;img alt="A single memory port with two arrows arriving at once, one from instruction fetch and one from a data load, with only one able to proceed" src="http://lizard-spock.co.uk/02-structural-hazard-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The classic examples:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;One memory port serving both instruction fetch and data access, so every load
+  or store stalls a fetch. This is the reason for separate instruction and data
+  caches.&lt;/li&gt;
+&lt;li&gt;A single register-file write port with two instructions completing at once,
+  which happens as soon as any operation has a different latency from the rest.&lt;/li&gt;
+&lt;li&gt;A shared multiplier still busy with a multi-cycle operation.&lt;/li&gt;
+&lt;li&gt;Cache miss handling resources, such as miss status holding registers, already
+  fully allocated.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The remedies are duplication, banking, arbitration, or stalling one user.
+Choosing to stall is legitimate, and choosing it by accident is not. Every
+resource with more than one potential claimant needs a documented arbitration
+policy, including what happens when the loser is starved.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Units that take their time&lt;/h2&gt;
+&lt;p&gt;Multipliers, dividers, and floating-point units do not fit the one-cycle
+execute model. They need their own small state machine, and the pipeline needs
+to know when the result is coming.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_515468dcbe2623fe5235bef0fdd08d19.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The amber edge is the one that gets forgotten. If a branch flush or an
+exception can kill an operation while the unit is mid-calculation, the unit
+needs a valid bit or a transaction tag so a stale result cannot commit three
+cycles later against a program counter that no longer exists. Divider results
+arriving after the flush that should have killed them is a bug class of its
+own, and it is invisible until a divide happens to sit just before an
+unpredictable branch.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Precise exceptions&lt;/h2&gt;
+&lt;p&gt;Software expects an exception to look instantaneous: every older instruction
+complete, no younger instruction having changed any architectural state, and a
+program counter that says exactly where to resume. The hardware, meanwhile, has
+five instructions in flight and has been speculating for the last three cycles.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/03-commit-point-HQ.png"&gt;&lt;img alt="A pipeline with a single commit point marked, where instructions before it have changed architectural state and instructions after it are still speculative and can be discarded" src="http://lizard-spock.co.uk/03-commit-point-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Even an in-order pipeline has to work at this:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A faulting load must not be followed by a younger register write.&lt;/li&gt;
+&lt;li&gt;Wrong-path instructions must not perform stores.&lt;/li&gt;
+&lt;li&gt;Control and status register writes must be ordered with respect to
+  exceptions.&lt;/li&gt;
+&lt;li&gt;The flush must clear every side-effect enable, not just the valid bits.&lt;/li&gt;
+&lt;li&gt;If two instructions fault in the same cycle, the older one wins, always.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Out-of-order processors solve this with a reorder buffer and an explicit commit
+stage. In-order pipelines solve it with valid bits and a clearly designated
+point past which effects become visible. The mechanism differs, the rule does
+not: pick one place where speculation ends, and let nothing escape it early.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Design checklist&lt;/h2&gt;
+&lt;p&gt;Settle these before writing the datapath, because retrofitting any of them is
+painful:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Put a valid bit beside every pipeline register and treat it as the only
+   thing that makes a stage's contents real.&lt;/li&gt;
+&lt;li&gt;Name the exact stage that commits register writes, memory writes, and
+   control register side effects. Write it in the specification.&lt;/li&gt;
+&lt;li&gt;Add forwarding paths only where the value genuinely exists in time, and
+   check each one against the timing report before committing to it.&lt;/li&gt;
+&lt;li&gt;Prove the zero register, and any other write-discarding destination, cannot
+   create a false hazard.&lt;/li&gt;
+&lt;li&gt;Treat branch flush, exception flush, and debug halt as three cases of one
+   mechanism, and verify all three.&lt;/li&gt;
+&lt;li&gt;Give every multi-cycle unit a kill path, and test that a result cannot
+   commit after the instruction that produced it was flushed.&lt;/li&gt;
+&lt;li&gt;Test the interactions, not the cases: a stall and a flush arriving in the
+   same cycle, a load-use pair straddling a mispredicted branch, an exception
+   on the instruction directly behind a stalled load.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2&gt;Count the penalties before adding the stage&lt;/h2&gt;
+&lt;p&gt;The design question is never "how deep should the pipeline be". It is "what
+does this stage add to the branch resolution distance and the load-use
+distance, and what is that worth on the code we actually run".&lt;/p&gt;
+&lt;p&gt;Both numbers are countable on a whiteboard before any RTL exists. Multiply each
+by how often the event happens in your workload, add them to the base CPI, and
+divide the new clock frequency by the result. If that number is not comfortably
+larger than the old one, the stage is not worth the week.&lt;/p&gt;
+&lt;p&gt;Point 7 of the checklist is where the real bugs live, and it is the point most
+often skipped. Stall-and-flush in the same cycle is one line in a verification
+plan and, judging by errata sheets, several months of somebody's life.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/soc-intermediate-02-cache-coherency-protocols.html"&gt;Article I-02: Cache coherency protocols&lt;/a&gt;&lt;/em&gt;
+&lt;em&gt;Next: Intermediate Article 04, RTL Synthesis and Timing Closure&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Computer Architecture"></category><category term="Electronics"></category><category term="RISC-V"></category><category term="Pipelines"></category><category term="Branch Prediction"></category><category term="RTL"></category><category term="Verification"></category></entry><entry><title>SoC Intermediate 02: Cache coherency protocols</title><link href="http://lizard-spock.co.uk/soc-intermediate-02-cache-coherency-protocols.html" rel="alternate"></link><published>2026-08-06T00:00:00+01:00</published><updated>2026-08-06T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-06:/soc-intermediate-02-cache-coherency-protocols.html</id><summary type="html">&lt;p&gt;Why two threads with separate counters can run slower than one thread, and the coherency machinery that explains it: the single-writer rule, MESI states, read-for-ownership, snooping, directories, snoop filters, and the cache line granularity that no amount of reading the source code reveals.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-coherency-hero-HQ.png"&gt;&lt;img alt="A multicore cache coherency fabric on a system on chip, with four processor caches around a shared interconnect that carries snoop and ownership traffic to a directory and a memory controller" src="http://lizard-spock.co.uk/00-coherency-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Series: Intermediate SoC Design | Article 2 of 10&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Two counters that will not scale&lt;/h2&gt;
@@ -295,7 +640,7 @@ perf&lt;span class="w"&gt; &lt;/span&gt;c2c&lt;span class="w"&gt; &lt;/span&gt;r
 counters that fight are rarely the ones anybody suspects.&lt;/p&gt;
 &lt;hr&gt;
 &lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/soc-intermediate-01-axi4-protocol-deep-dive.html"&gt;Article I-01: AXI4 protocol deep dive&lt;/a&gt;&lt;/em&gt;
-&lt;em&gt;Next: Intermediate Article 03, Pipeline Design and Hazards&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Computer Architecture"></category><category term="Electronics"></category><category term="Multicore"></category><category term="Caches"></category><category term="MESI"></category><category term="Coherency"></category><category term="ARM"></category><category term="Verification"></category></entry><entry><title>SoC Intermediate 01: AXI4 protocol deep dive</title><link href="http://lizard-spock.co.uk/soc-intermediate-01-axi4-protocol-deep-dive.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/soc-intermediate-01-axi4-protocol-deep-dive.html</id><summary type="html">&lt;p&gt;The mechanisms behind AXI4 throughput and the bugs each one creates: burst encoding, transaction identifiers, out-of-order completion, outstanding transaction tracking, quality of service signalling, and the handshake rules that hand-written bridges break most often.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-axi4-hero-HQ.png"&gt;&lt;img alt="An AXI4 interconnect at the centre of a system on chip, with a processor, a direct memory access engine, a graphics processor and a memory controller exchanging tagged read and write transactions along coloured channel paths" src="http://lizard-spock.co.uk/00-axi4-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;em&gt;Next: &lt;a href="http://lizard-spock.co.uk/soc-intermediate-03-pipeline-design-and-hazards.html"&gt;Article I-03: Pipeline design and hazards&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Computer Architecture"></category><category term="Electronics"></category><category term="Multicore"></category><category term="Caches"></category><category term="MESI"></category><category term="Coherency"></category><category term="ARM"></category><category term="Verification"></category></entry><entry><title>SoC Intermediate 01: AXI4 protocol deep dive</title><link href="http://lizard-spock.co.uk/soc-intermediate-01-axi4-protocol-deep-dive.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/soc-intermediate-01-axi4-protocol-deep-dive.html</id><summary type="html">&lt;p&gt;The mechanisms behind AXI4 throughput and the bugs each one creates: burst encoding, transaction identifiers, out-of-order completion, outstanding transaction tracking, quality of service signalling, and the handshake rules that hand-written bridges break most often.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-axi4-hero-HQ.png"&gt;&lt;img alt="An AXI4 interconnect at the centre of a system on chip, with a processor, a direct memory access engine, a graphics processor and a memory controller exchanging tagged read and write transactions along coloured channel paths" src="http://lizard-spock.co.uk/00-axi4-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Series: Intermediate SoC Design | Article 1 of 10&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;

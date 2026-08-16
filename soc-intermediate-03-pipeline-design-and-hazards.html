@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Intermediate 03: Pipeline design and hazards</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Why adding a pipeline stage can make a processor slower, and the hazard machinery that decides the outcome: forwarding paths, load-use stalls,..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                <li class="active"><a href="./category/engineering.html">Engineering</a></li>
+                                                <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="./category/music.html">Music</a></li>
+                                                <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="./category/photography.html">Photography</a></li>
+                                                <li><a href="./category/programming.html">Programming</a></li>
+                                                <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./soc-intermediate-03-pipeline-design-and-hazards.html" rel="bookmark"
+             title="Permalink to SoC Intermediate 03: Pipeline design and hazards">SoC Intermediate 03: Pipeline design and hazards</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-16T00:00:00+01:00">
+                Published: Sun 16 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/computer-architecture.html">Computer Architecture</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/risc-v.html">RISC-V</a> <a href="./tag/pipelines.html">Pipelines</a> <a href="./tag/branch-prediction.html">Branch Prediction</a> <a href="./tag/rtl.html">RTL</a> <a href="./tag/verification.html">Verification</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="./00-pipeline-hero-HQ.png"><img alt="A processor pipeline drawn as a transparent assembly line, with several instructions in flight at once moving through fetch, decode, execute, memory and writeback stages" src="./00-pipeline-hero-900w.png"></a></p>
+<p><em>Series: Intermediate SoC Design | Article 3 of 10</em></p>
+<hr>
+<h2>The stage that made it slower</h2>
+<p>The timing report said the execute stage was the critical path. You split it in
+two, added a pipeline register, and closed timing at 1.3 GHz instead of 1.2. An
+extra eight per cent of clock, for one register stage and a week of work.</p>
+<p>Three of the four benchmarks gained around eight per cent, exactly as the
+frequency did. The fourth, a pointer-heavy workload full of branches that go
+whichever way the data feels like, lost four per cent. Same RTL, same compiler,
+same test, faster clock, less work done.</p>
+<p>This article is about pipeline hazards: the conflicts that appear the moment
+instructions overlap, the hardware that resolves them, and the reason stage
+count is such a fraught number. It targets engineers designing or verifying a
+processor pipeline, and anyone reading a microarchitecture manual and wondering
+why nobody simply builds a forty-stage machine.</p>
+<hr>
+<h2>What overlapping actually buys</h2>
+<p>Classic reduced instruction set computer (RISC) pipelines are usually explained
+with five stages, and the explanation is worth keeping because every later
+complication attaches to one of them.</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Name</th>
+<th>Work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IF</td>
+<td>Instruction fetch</td>
+<td>Read instruction memory or the instruction cache</td>
+</tr>
+<tr>
+<td>ID</td>
+<td>Decode and register read</td>
+<td>Decode the opcode, read the register file</td>
+</tr>
+<tr>
+<td>EX</td>
+<td>Execute</td>
+<td>Arithmetic logic unit operation or address calculation</td>
+</tr>
+<tr>
+<td>MEM</td>
+<td>Memory</td>
+<td>Data memory or data cache access</td>
+</tr>
+<tr>
+<td>WB</td>
+<td>Write back</td>
+<td>Write the result to the register file</td>
+</tr>
+</tbody>
+</table>
+<p>A single instruction still takes five cycles from fetch to writeback. Nothing
+about pipelining makes one instruction faster. What it changes is how many
+instructions can be in progress at the same time.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_626cdeae0d4b7eb82e91a09ed0d04b0d.svg"></p>
+<p>Latency is five cycles. Throughput approaches one instruction per cycle. Every
+stage boundary you add shortens the critical path between registers, which is
+why the timing report kept suggesting more of them.</p>
+<p>The diagram above is also a lie of omission. It shows four instructions that
+have nothing to do with each other. Real code is not like that.</p>
+<hr>
+<h2>Three ways instructions collide</h2>
+<p>An instruction in a pipeline is no longer isolated. It may need a value, a
+decision, or a piece of hardware that an older instruction has not finished
+with. Those conflicts are pipeline hazards, and they come in three kinds.</p>
+<ul>
+<li><strong>Data hazards.</strong> An instruction needs a value that is not available yet.</li>
+<li><strong>Control hazards.</strong> The next program counter depends on a branch or an
+  exception that has not resolved yet.</li>
+<li><strong>Structural hazards.</strong> Two stages want the same piece of hardware in the
+  same cycle.</li>
+</ul>
+<p>Everything else in this article is the disciplined handling of those three,
+without producing wrong results and without stalling more than necessary.</p>
+<hr>
+<h2>Data hazards and the bypass network</h2>
+<p>Take the shortest dependent pair in any instruction set:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">add</span><span class="w"> </span><span class="no">x3</span><span class="p">,</span><span class="w"> </span><span class="no">x1</span><span class="p">,</span><span class="w"> </span><span class="no">x2</span><span class="w">     </span><span class="c1">// x3 = x1 + x2</span>
+<span class="nf">sub</span><span class="w"> </span><span class="no">x5</span><span class="p">,</span><span class="w"> </span><span class="no">x3</span><span class="p">,</span><span class="w"> </span><span class="no">x4</span><span class="w">     </span><span class="c1">// needs x3 immediately</span>
+</code></pre></div>
+
+<p>The <code>add</code> writes <code>x3</code> in WB, in cycle 4. The <code>sub</code> reads its operands in ID, in
+cycle 2, and needs them in EX in cycle 3. Left alone, the <code>sub</code> reads the old
+value of <code>x3</code> and quietly computes the wrong answer.</p>
+<p>Waiting is one answer, and it costs three cycles on a pattern that appears in
+almost every basic block. The better answer is that the value already exists.
+It sits in the EX/MEM pipeline register at the end of cycle 3, fully computed.
+It is simply not in the register file yet.</p>
+<p>Forwarding, also called bypassing, routes that result straight back to the
+input of the execute stage instead of waiting for writeback.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_9d743a3ee62322c0ccdb0c65f4d1014f.svg"></p>
+<p>Each execute-stage operand becomes a multiplexer choosing between three
+sources: the register file value, the result of the immediately preceding
+instruction sitting in EX/MEM, and the result of the instruction before that
+sitting in MEM/WB. Priority matters. If both bypass sources match, the younger
+one wins, because it holds the more recent value.</p>
+<p>With those two paths in place, back-to-back arithmetic dependencies cost
+nothing at all. This is the single highest-value structure in an in-order
+pipeline, and it is why a naive stall-on-dependency design performs so badly by
+comparison.</p>
+<hr>
+<h2>The one it cannot fix</h2>
+<p>Forwarding works because the value exists somewhere earlier than the register
+file. Loads break that assumption.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">lw</span><span class="w">  </span><span class="no">x3</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">(</span><span class="no">x1</span><span class="p">)</span>
+<span class="nf">add</span><span class="w"> </span><span class="no">x5</span><span class="p">,</span><span class="w"> </span><span class="no">x3</span><span class="p">,</span><span class="w"> </span><span class="no">x4</span>
+</code></pre></div>
+
+<p>The load data arrives from the data cache at the end of MEM, in cycle 3. The
+dependent <code>add</code> wants it in EX, also in cycle 3, and no wire runs backwards in
+time. One cycle of stall is unavoidable.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_5c53e275ae3630fadbd4e968b000bc2e.svg"></p>
+<p>The pipeline holds IF and ID in place for a cycle and injects a bubble into EX.
+After the stall, the ordinary MEM/WB bypass path delivers the value and the
+<code>add</code> proceeds.</p>
+<p>Detecting it is a comparison between the instruction in ID and the load already
+in EX:</p>
+<div class="highlight"><pre><span></span><code><span class="k">assign</span><span class="w"> </span><span class="n">load_use_hazard</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">ex_is_load</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">    </span><span class="p">(</span><span class="n">ex_rd</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mh">5</span><span class="mi">&#39;d0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">    </span><span class="p">((</span><span class="n">ex_rd</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">id_rs1</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">ex_rd</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">id_rs2</span><span class="p">));</span>
+
+<span class="k">assign</span><span class="w"> </span><span class="n">stall_if</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">load_use_hazard</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">stall_id</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">load_use_hazard</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">insert_bubble_ex</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">load_use_hazard</span><span class="p">;</span>
+</code></pre></div>
+
+<p>The <code>ex_rd != 5'd0</code> term earns its place. On RISC-V, register <code>x0</code> reads as
+zero and discards writes, so a load into <code>x0</code> produces no value anybody can
+depend on. Without the check, every discarded load stalls a following
+instruction that reads <code>x0</code>, which is a common idiom. Whatever your instruction
+set, find its equivalent and prove it does not create phantom hazards.</p>
+<p>Compilers know about this stall and schedule an independent instruction into
+the gap when they can find one. When they cannot, the cost is real, and it
+scales with how many cycles late the load data is.</p>
+<hr>
+<h2>Control hazards and the cost of guessing</h2>
+<p>A branch changes the program counter, and the pipeline has already fetched past
+it. In a five-stage design the condition resolves in EX, by which point two
+younger instructions are in flight.</p>
+<p>Waiting for the branch is the honest option and the slow one. It costs two
+cycles on roughly one instruction in five. Resolving the branch earlier in ID
+helps, at the price of a comparator on the critical path and a new forwarding
+problem for the values being compared.</p>
+<p>Every high-performance pipeline takes the third option: guess, and clean up
+when the guess is wrong.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_fc084bf1517c1aff459cfa6709eb16c9.svg"></p>
+<p>Two fetched instructions become bubbles. Note what determines that number: it
+is the distance between the fetch stage and the stage where the branch
+resolves. Not the total pipeline depth, and not the branch itself.</p>
+<hr>
+<h2>Predictors, and why two bits</h2>
+<p>A static predictor guesses from the instruction alone. Backward branches are
+assumed taken and forward branches not taken, which is a decent guess because
+backward branches are usually loops. It costs almost nothing and is right about
+two thirds of the time.</p>
+<p>Dynamic prediction learns from what the branch did before. The smallest useful
+structure is a two-bit saturating counter per branch.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_2010cf533c92c3da59f14a344ae185cb.svg"></p>
+<p>The second bit is the whole point. A loop that runs a hundred times and exits
+once would, with a one-bit predictor, mispredict twice per execution of the
+loop: once on the exit, and once again on the next entry, because the single
+bit was flipped by that exit. The two-bit counter absorbs the anomaly, drops
+from strong to weak, and keeps predicting taken.</p>
+<p>Real branch prediction units go much further, with global history, tagged
+geometric-length tables, branch target buffers, and return address stacks. They
+all rest on the same trade: storage and complexity in exchange for a lower
+misprediction rate, because misprediction is the thing that costs cycles.</p>
+<p>When the guess is wrong, the younger instructions have to disappear:</p>
+<div class="highlight"><pre><span></span><code><span class="k">assign</span><span class="w"> </span><span class="n">flush_if_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">branch_resolved</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">branch_mispredict</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">flush_id_ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">branch_resolved</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">branch_mispredict</span><span class="p">;</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">next_pc</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">branch_mispredict</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">branch_target</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">pc_plus_4</span><span class="p">;</span>
+</code></pre></div>
+
+<p>A flush turns wrong-path instructions into bubbles. It must also suppress every
+side effect they could have had: register writes, memory writes, control and
+status register updates, and any outstanding request already issued to a
+multi-cycle unit. A flush that clears the valid bit but leaves a store enable
+asserted is a memory corruption bug, and it will only appear when the branch
+and the store line up in one specific way.</p>
+<hr>
+<h2>What the extra stage actually bought</h2>
+<p>Now the opening result. Return to that pointer-heavy benchmark, and put numbers
+against the two designs.</p>
+<p>Cycles per instruction (CPI) starts at 1.0 for a full pipeline and gets worse
+from there. On this workload, a quarter of instructions are branches, a fifth
+of those branches are mispredicted because the data decides them, and loads
+feed a dependent instruction immediately about half the time.</p>
+<table>
+<thead>
+<tr>
+<th>Contribution</th>
+<th>Five-stage</th>
+<th>Six-stage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>Branch mispredict penalty</td>
+<td>3 cycles, 0.15</td>
+<td>5 cycles, 0.25</td>
+</tr>
+<tr>
+<td>Load-use stall</td>
+<td>1 cycle, 0.075</td>
+<td>2 cycles, 0.15</td>
+</tr>
+<tr>
+<td>Cache misses and other</td>
+<td>0.10</td>
+<td>0.10</td>
+</tr>
+<tr>
+<td><strong>CPI</strong></td>
+<td><strong>1.325</strong></td>
+<td><strong>1.50</strong></td>
+</tr>
+<tr>
+<td>Clock</td>
+<td>1.2 GHz</td>
+<td>1.3 GHz</td>
+</tr>
+<tr>
+<td><strong>Instructions per second</strong></td>
+<td><strong>906 M</strong></td>
+<td><strong>867 M</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The extra register stage did exactly what it was asked to do. It shortened the
+critical path and the clock went up. It also moved branch resolution one stage
+further from fetch and put the load data one cycle further from the consumer,
+so every mistake got more expensive at the same time.</p>
+<p>Here is the reframe. A pipeline stage costs nothing while the pipeline is
+right, and costs the entire pipeline when it is wrong. You are not buying
+throughput with depth. You are buying frequency, and paying for it with the
+penalty on every event that discards work.</p>
+<p><a href="./01-depth-penalty-HQ.png"><img alt="Two pipelines drawn side by side, a short one and a long one, each flushing after a mispredicted branch, with the long pipeline discarding many more instructions than the short one" src="./01-depth-penalty-900w.png"></a></p>
+<p>That explains the split in the results. The three benchmarks that gained were
+predictable ones, where the pipeline is right almost all the time and depth is
+nearly free. The one that lost was the one that is wrong constantly, where
+depth is charged on every mistake.</p>
+<p>It also explains the shape of the industry. The deepest commercial pipelines
+appeared alongside the most elaborate branch predictors ever built, and that is
+not a coincidence. Depth is only affordable if you are right.</p>
+<hr>
+<h2>Structural hazards</h2>
+<p>The third class is the most mundane and the easiest to design out, if you find
+it before tape-out. A structural hazard is hardware oversubscription: two
+stages wanting one resource in one cycle.</p>
+<p><a href="./02-structural-hazard-HQ.png"><img alt="A single memory port with two arrows arriving at once, one from instruction fetch and one from a data load, with only one able to proceed" src="./02-structural-hazard-900w.png"></a></p>
+<p>The classic examples:</p>
+<ul>
+<li>One memory port serving both instruction fetch and data access, so every load
+  or store stalls a fetch. This is the reason for separate instruction and data
+  caches.</li>
+<li>A single register-file write port with two instructions completing at once,
+  which happens as soon as any operation has a different latency from the rest.</li>
+<li>A shared multiplier still busy with a multi-cycle operation.</li>
+<li>Cache miss handling resources, such as miss status holding registers, already
+  fully allocated.</li>
+</ul>
+<p>The remedies are duplication, banking, arbitration, or stalling one user.
+Choosing to stall is legitimate, and choosing it by accident is not. Every
+resource with more than one potential claimant needs a documented arbitration
+policy, including what happens when the loser is starved.</p>
+<hr>
+<h2>Units that take their time</h2>
+<p>Multipliers, dividers, and floating-point units do not fit the one-cycle
+execute model. They need their own small state machine, and the pipeline needs
+to know when the result is coming.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_515468dcbe2623fe5235bef0fdd08d19.svg"></p>
+<p>The amber edge is the one that gets forgotten. If a branch flush or an
+exception can kill an operation while the unit is mid-calculation, the unit
+needs a valid bit or a transaction tag so a stale result cannot commit three
+cycles later against a program counter that no longer exists. Divider results
+arriving after the flush that should have killed them is a bug class of its
+own, and it is invisible until a divide happens to sit just before an
+unpredictable branch.</p>
+<hr>
+<h2>Precise exceptions</h2>
+<p>Software expects an exception to look instantaneous: every older instruction
+complete, no younger instruction having changed any architectural state, and a
+program counter that says exactly where to resume. The hardware, meanwhile, has
+five instructions in flight and has been speculating for the last three cycles.</p>
+<p><a href="./03-commit-point-HQ.png"><img alt="A pipeline with a single commit point marked, where instructions before it have changed architectural state and instructions after it are still speculative and can be discarded" src="./03-commit-point-900w.png"></a></p>
+<p>Even an in-order pipeline has to work at this:</p>
+<ul>
+<li>A faulting load must not be followed by a younger register write.</li>
+<li>Wrong-path instructions must not perform stores.</li>
+<li>Control and status register writes must be ordered with respect to
+  exceptions.</li>
+<li>The flush must clear every side-effect enable, not just the valid bits.</li>
+<li>If two instructions fault in the same cycle, the older one wins, always.</li>
+</ul>
+<p>Out-of-order processors solve this with a reorder buffer and an explicit commit
+stage. In-order pipelines solve it with valid bits and a clearly designated
+point past which effects become visible. The mechanism differs, the rule does
+not: pick one place where speculation ends, and let nothing escape it early.</p>
+<hr>
+<h2>Design checklist</h2>
+<p>Settle these before writing the datapath, because retrofitting any of them is
+painful:</p>
+<ol>
+<li>Put a valid bit beside every pipeline register and treat it as the only
+   thing that makes a stage's contents real.</li>
+<li>Name the exact stage that commits register writes, memory writes, and
+   control register side effects. Write it in the specification.</li>
+<li>Add forwarding paths only where the value genuinely exists in time, and
+   check each one against the timing report before committing to it.</li>
+<li>Prove the zero register, and any other write-discarding destination, cannot
+   create a false hazard.</li>
+<li>Treat branch flush, exception flush, and debug halt as three cases of one
+   mechanism, and verify all three.</li>
+<li>Give every multi-cycle unit a kill path, and test that a result cannot
+   commit after the instruction that produced it was flushed.</li>
+<li>Test the interactions, not the cases: a stall and a flush arriving in the
+   same cycle, a load-use pair straddling a mispredicted branch, an exception
+   on the instruction directly behind a stalled load.</li>
+</ol>
+<hr>
+<h2>Count the penalties before adding the stage</h2>
+<p>The design question is never "how deep should the pipeline be". It is "what
+does this stage add to the branch resolution distance and the load-use
+distance, and what is that worth on the code we actually run".</p>
+<p>Both numbers are countable on a whiteboard before any RTL exists. Multiply each
+by how often the event happens in your workload, add them to the base CPI, and
+divide the new clock frequency by the result. If that number is not comfortably
+larger than the old one, the stage is not worth the week.</p>
+<p>Point 7 of the checklist is where the real bugs live, and it is the point most
+often skipped. Stall-and-flush in the same cycle is one line in a verification
+plan and, judging by errata sheets, several months of somebody's life.</p>
+<hr>
+<p><em>Previous: <a href="./soc-intermediate-02-cache-coherency-protocols.html">Article I-02: Cache coherency protocols</a></em>
+<em>Next: Intermediate Article 04, RTL Synthesis and Timing Closure</em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

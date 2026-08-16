@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Mirroring a remote herdr server into your local sidebar</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="The herdr-mirror plugin turns workspaces on a remote herdr server into real local workspaces with live panes, so one window shows every agent on..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li class="active"><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/herdr-mirror-remote-sidebar.html" rel="bookmark"
+             title="Permalink to Mirroring a remote herdr server into your local sidebar">Mirroring a remote herdr server into your local sidebar</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-14T00:00:00+01:00">
+                Published: Fri 14 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="../tag/herdr.html">herdr</a> <a href="../tag/ssh.html">ssh</a> <a href="../tag/systemd.html">systemd</a> <a href="../tag/homelab.html">homelab</a> <a href="../tag/terminal.html">terminal</a> <a href="../tag/dotfiles.html">dotfiles</a> </p>        
+</footer><!-- /.post-info -->        <p>The agent on the homelab box finished eleven minutes ago. Nothing told you,
+because its terminal lives behind an ssh session in a window you are not
+looking at. Meanwhile the sidebar in front of you shows four local agents and
+reports their state perfectly.</p>
+<p>This post is for anyone who runs coding agents on more than one machine and
+wants a single window that shows all of them. It covers the <code>herdr-mirror</code>
+plugin: what each end of the link needs, how to set up the access it depends
+on, and how the connection starts. This setup uses a laptop as the local
+machine and a homelab server called <code>homelab</code> as the remote.</p>
+<p>The plugin makes each remote workspace a real local workspace named
+<code>&lt;host&gt;: &lt;name&gt;</code>. Its panes stream the remote terminal live, and its agents
+report their true state in the sidebar. Mirroring is one way, but you can type
+into any mirror pane to drive the remote session.</p>
+<h2>What you need on each machine</h2>
+<p>The requirements are lopsided, and that is the most useful thing to know
+before starting. Almost everything happens on the local machine. The remote
+runs stock herdr and nothing else.</p>
+<h3>Requirements on the local machine</h3>
+<p>The local machine carries the plugin, the configuration, and the daemon that
+holds the connection open.</p>
+<ul>
+<li>herdr, on a build whose command line offers <code>herdr terminal session</code>.</li>
+<li>macOS or Linux on x86_64 or aarch64, because the installer fetches a
+  prebuilt binary.</li>
+<li>The <code>herdr-mirror</code> plugin, installed and enabled.</li>
+<li>A <code>hosts.toml</code> file listing each remote you want to mirror.</li>
+<li>Non interactive ssh key access outbound to every host in that file.</li>
+</ul>
+<p>Check the stream support first, because it is the one requirement that a
+version number does not answer clearly:</p>
+<div class="highlight"><pre><span></span><code>herdr<span class="w"> </span>terminal<span class="w"> </span>--help
+</code></pre></div>
+
+<p>The output must list a <code>session</code> subcommand. If it does not, the build is too
+old and no amount of configuration helps.</p>
+<h3>Requirements on the remote machine</h3>
+<p>The remote needs herdr and a way in. It does not need the plugin, a
+configuration file, an open port, or any knowledge that mirroring exists.</p>
+<ul>
+<li>herdr installed, on a build that also offers <code>herdr terminal session</code>.</li>
+<li>A herdr server actually running, which is the requirement people miss.</li>
+<li>Your public key in <code>~/.ssh/authorized_keys</code>.</li>
+<li><code>socat</code> or <code>python3</code>, but only if the ssh daemon refuses socket forwards.</li>
+</ul>
+<p>That last point deserves a sentence. The plugin reaches the remote API socket
+through an <code>ssh -L</code> forward by default. Some ssh daemons accept the forward
+and then never move a byte, so the plugin falls back to a relay over <code>ssh</code>
+exec, which needs <code>socat</code> or <code>python3</code> on the remote. Almost every system has
+one of them.</p>
+<p>Keep both ends on the same herdr build. The streaming protocol is the moving
+part, and a mismatch shows up as a version complaint from the daemon rather
+than a broken pane.</p>
+<h2>Setting up key based access</h2>
+<p>The plugin runs unattended, so it cannot answer a password prompt. Its access
+test is exact:</p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>-o<span class="w"> </span><span class="nv">BatchMode</span><span class="o">=</span>yes<span class="w"> </span>homelab<span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+
+<p>That command must exit zero and print nothing. A dedicated key keeps this
+access separate from your general ssh identity, which means you can revoke it
+by deleting one line on the remote.</p>
+<p>Generate the key on the local machine:</p>
+<div class="highlight"><pre><span></span><code>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-f<span class="w"> </span>~/.ssh/id_ed25519_herdr<span class="w"> </span>-N<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;herdr-mirror&quot;</span>
+</code></pre></div>
+
+<p>The empty passphrase is a real trade off, not an oversight. A daemon that
+reconnects on its own cannot prompt you, so the choice is an unencrypted key
+or a passphrase held by an agent that must stay loaded. On macOS the agent
+route works well with <code>UseKeychain yes</code> and <code>AddKeysToAgent yes</code>. The
+unencrypted key is simpler and survives agent problems, at the cost that
+anyone who reads the file gains shell access to the remote.</p>
+<p>Copy the public half to the remote. This step prompts for the remote account
+password, so run it yourself in a terminal:</p>
+<div class="highlight"><pre><span></span><code>ssh-copy-id<span class="w"> </span>-i<span class="w"> </span>~/.ssh/id_ed25519_herdr.pub<span class="w"> </span>user@homelab
+</code></pre></div>
+
+<p>Then name the target in <code>~/.ssh/config</code> so the dedicated key is always the one
+offered:</p>
+<div class="highlight"><pre><span></span><code>Host herdr-homelab homelab
+    HostName homelab.lan
+    User user
+    IdentityFile ~/.ssh/id_ed25519_herdr
+    IdentitiesOnly yes
+</code></pre></div>
+
+<p><code>IdentitiesOnly yes</code> matters more than it looks. Without it, ssh offers every
+identity the agent holds, and a server with a low <code>MaxAuthTries</code> can reject
+you before it reaches the right key.</p>
+<p>Now run the access test again. Nothing later works until it passes silently.</p>
+<h2>Keeping the remote server alive</h2>
+<p>A herdr server on the remote is a requirement, not a detail, and a server
+started by hand disappears at the next reboot. A systemd user unit fixes both
+problems.</p>
+<p>Write <code>~/.config/systemd/user/herdr.service</code> on the remote:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[Unit]</span>
+<span class="na">Description</span><span class="o">=</span><span class="s">herdr server</span>
+<span class="na">After</span><span class="o">=</span><span class="s">network.target</span>
+
+<span class="k">[Service]</span>
+<span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
+<span class="na">ExecStart</span><span class="o">=</span><span class="s">/home/user/.local/bin/herdr server</span>
+<span class="na">Restart</span><span class="o">=</span><span class="s">on-failure</span>
+<span class="na">RestartSec</span><span class="o">=</span><span class="s">5</span>
+
+<span class="k">[Install]</span>
+<span class="na">WantedBy</span><span class="o">=</span><span class="s">default.target</span>
+</code></pre></div>
+
+<p>Use an absolute path in <code>ExecStart</code>. Systemd does not read your shell profile,
+so a bare <code>herdr</code> fails when the binary lives in <code>~/.local/bin</code>. Find the real
+path with <code>command -v herdr</code>.</p>
+<p>Enable and start it:</p>
+<div class="highlight"><pre><span></span><code>systemctl<span class="w"> </span>--user<span class="w"> </span>daemon-reload
+systemctl<span class="w"> </span>--user<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>herdr.service
+herdr<span class="w"> </span>status<span class="w"> </span>server
+</code></pre></div>
+
+<p>The status output should report <code>status: running</code> along with a protocol
+number and a socket path.</p>
+<p>One step remains, and it needs root:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>loginctl<span class="w"> </span>enable-linger<span class="w"> </span>user
+</code></pre></div>
+
+<p>Lingering keeps the systemd user manager running when you have no login
+session on the machine. Without it, the user manager exits after your last
+session closes and takes the herdr server with it. The setup appears to work
+for a while, because the mirror daemon keeps connecting over ssh and creating
+sessions, then fails after a reboot. Enable lingering and the problem never
+appears.</p>
+<h2>Installing and configuring the plugin</h2>
+<p>Everything in this section happens on the local machine.</p>
+<div class="highlight"><pre><span></span><code>herdr<span class="w"> </span>plugin<span class="w"> </span>install<span class="w"> </span>nikok6/herdr-mirror
+herdr<span class="w"> </span>server<span class="w"> </span>reload-config
+</code></pre></div>
+
+<p>The install prints a preview of what the plugin registers, including its
+actions and its event hooks, then builds the binary. It also links a command
+at <code>~/.local/bin/herdr-mirror</code>, which gives shell use and key bindings one
+stable path that survives updates.</p>
+<p>Next, list your hosts:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[hosts.homelab]</span>
+<span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;herdr-homelab&quot;</span>
+</code></pre></div>
+
+<p>The key on the left, <code>homelab</code>, becomes the sidebar prefix, so mirrored
+workspaces appear as <code>homelab: &lt;name&gt;</code>. The <code>target</code> value accepts anything
+ssh accepts, which includes an alias from <code>~/.ssh/config</code>. Pointing it at the
+alias rather than at <code>user@host</code> guarantees the dedicated key applies.</p>
+<p>The file belongs at <code>~/.config/herdr-mirror/hosts.toml</code>, and that path is
+literal. The plugin does not honour <code>XDG_CONFIG_HOME</code>, so a configuration
+directory relocated by that variable is not searched. This matters if you keep
+your configuration in a repository and point <code>XDG_CONFIG_HOME</code> at it, which is
+a common dotfiles pattern. Run <code>herdr-mirror status</code> to see the exact paths it
+searches and the file it loaded.</p>
+<h2>Starting the connection</h2>
+<p>There is no connect command, which surprises most people. Three layers stack
+up, and each one only needs the layer under it:</p>
+<ol>
+<li><strong>The remote server</strong>: a running herdr server publishes an API socket. The
+   plugin reads workspace and pane state from it.</li>
+<li><strong>The transport</strong>: the local daemon opens an ssh master connection, then
+   forwards that API socket over it. The <code>api_transport</code> setting selects the
+   method, and its default of <code>auto</code> tries the socket forward first and falls
+   back to the exec relay.</li>
+<li><strong>The daemon</strong>: one local process reconciles remote workspaces into local
+   mirrors and pushes agent status into the sidebar.</li>
+</ol>
+<p>Only the third layer needs starting, and it starts itself. The default
+<code>autostart = true</code> means that focusing any workspace starts the daemon. To
+start or resume it by hand:</p>
+<div class="highlight"><pre><span></span><code>herdr-mirror<span class="w"> </span>start
+</code></pre></div>
+
+<p>Reconnection is automatic. The daemon retries on a ladder rather than giving
+up, so a remote that reboots comes back on its own. A manual <code>herdr-mirror
+pause</code> is sticky until you run <code>start</code> again, while a crash recovers at the
+next workspace focus.</p>
+<h2>Verifying the setup</h2>
+<p>Work through these checks in order. Each one isolates a different layer, so
+the first failure tells you where the problem lives.</p>
+<ol>
+<li>Confirm silent key access with <code>ssh -o BatchMode=yes homelab true</code>.</li>
+<li>Confirm the remote server with <code>ssh homelab 'herdr status server'</code>.</li>
+<li>Confirm the local server with <code>herdr status server</code>.</li>
+<li>Confirm the plugin loaded with <code>herdr-mirror status</code>.</li>
+<li>Create a workspace on the remote and watch it appear locally.</li>
+</ol>
+<p>The fourth check is the informative one. A healthy daemon reports the host as
+connected and prints the recent log:</p>
+<div class="highlight"><pre><span></span><code><span class="nl">daemon</span><span class="p">:</span><span class="w"> </span><span class="n">running</span><span class="w"> </span><span class="p">(</span><span class="n">pid</span><span class="w"> </span><span class="mi">45137</span><span class="p">)</span>
+<span class="nl">config</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="k">user</span><span class="o">/</span><span class="p">.</span><span class="n">config</span><span class="o">/</span><span class="n">herdr</span><span class="o">-</span><span class="n">mirror</span><span class="o">/</span><span class="n">hosts</span><span class="p">.</span><span class="n">toml</span>
+<span class="k">host</span><span class="w"> </span><span class="n">homelab</span><span class="w"> </span><span class="p">(</span><span class="n">herdr</span><span class="o">-</span><span class="n">homelab</span><span class="p">)</span><span class="err">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="n">mirror</span><span class="w"> </span><span class="n">workspaces</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="n">mirror</span><span class="w"> </span><span class="n">panes</span>
+<span class="n">recent</span><span class="w"> </span><span class="nf">log</span><span class="err">:</span>
+<span class="w">  </span><span class="mi">2026</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">14</span><span class="nl">T11</span><span class="p">:</span><span class="mi">35</span><span class="err">:</span><span class="mf">25.997</span><span class="n">Z</span><span class="w"> </span><span class="o">[</span><span class="n">homelab</span><span class="o">]</span><span class="w"> </span><span class="n">connected</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">synced</span>
+</code></pre></div>
+
+<p>Zero mirror workspaces is correct on a fresh remote server, not a fault. The
+plugin mirrors what exists, and a new server holds nothing. Create something
+for it to mirror:</p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>homelab<span class="w"> </span><span class="s1">&#39;herdr workspace create --label mirror-test --no-focus&#39;</span>
+</code></pre></div>
+
+<p>Within a few seconds the daemon log records the result, and <code>homelab:
+mirror-test</code> appears in the local sidebar:</p>
+<div class="highlight"><pre><span></span><code><span class="mf">2026</span><span class="o">-</span><span class="mf">08</span><span class="o">-</span><span class="mf">14</span><span class="n">T11</span><span class="p">:</span><span class="mf">38</span><span class="p">:</span><span class="mf">41.106</span><span class="n">Z</span><span class="w"> </span><span class="n">creating</span><span class="w"> </span><span class="n">mirror</span><span class="w"> </span><span class="n">workspace</span><span class="w"> </span><span class="n">homelab</span><span class="p">:</span><span class="w"> </span><span class="n">mirror</span><span class="o">-</span><span class="n">test</span>
+<span class="n">host</span><span class="w"> </span><span class="n">homelab</span><span class="w"> </span><span class="p">(</span><span class="n">herdr</span><span class="o">-</span><span class="n">homelab</span><span class="p">):</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="n">mirror</span><span class="w"> </span><span class="n">workspaces</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="n">mirror</span><span class="w"> </span><span class="n">panes</span>
+</code></pre></div>
+
+<h2>Keeping new tabs on the remote</h2>
+<p>A mirror workspace is a genuine local workspace, and herdr has no concept of
+mirroring. Every native command inside that workspace therefore acts locally,
+which produces the most common surprise in this setup.</p>
+<p>This post calls herdr's modifier key the leader, following vim. The
+configuration file spells it <code>prefix</code>, so the key bindings in this section
+read <code>prefix+c</code> while the prose says leader and <code>c</code>.</p>
+<p>Open a mirror, press leader and <code>c</code> for a new tab, and you get a local tab. It
+runs a shell on your own machine, inside a workspace whose other panes live on the
+remote. The plugin never created that tab, so it never syncs it. The tab
+counts give the mismatch away:</p>
+<div class="highlight"><pre><span></span><code>local  homelab: ~   2 tabs, 2 panes
+remote w2           1 tab,  1 pane
+</code></pre></div>
+
+<p>The plus button in the tab bar behaves the same way. It calls herdr's native
+new tab action directly rather than passing through a key binding, so it
+always creates a local tab. No configuration changes that. Treat the plus
+button as the local option and use a key for the remote one.</p>
+<p>The fix is to bind the plugin's remote actions. Each one falls back to the
+plain local action when you invoke it outside a mirror, so the native keys can
+point at them and cover both cases:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[keys]</span>
+<span class="n">new_tab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+shift+c&quot;</span>
+<span class="n">split_vertical</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+shift+v&quot;</span>
+<span class="n">split_horizontal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+shift+minus&quot;</span>
+
+<span class="k">[[keys.command]]</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+c&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;plugin_action&quot;</span>
+<span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mirror.remote-new-tab&quot;</span>
+
+<span class="k">[[keys.command]]</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+v&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;plugin_action&quot;</span>
+<span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mirror.remote-split-right&quot;</span>
+
+<span class="k">[[keys.command]]</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+minus&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;plugin_action&quot;</span>
+<span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mirror.remote-split-down&quot;</span>
+</code></pre></div>
+
+<p>Declare the <code>[keys]</code> table before the <code>[[keys.command]]</code> blocks. Placing it
+after them risks a table redefinition error, because the array entries create
+the <code>keys</code> table implicitly.</p>
+<p>After a <code>herdr server reload-config</code>, leader and <code>c</code> creates a tab on the
+mirrored host, and the plus button still creates a local one. The natives
+remain available on their shift variants.</p>
+<p>This scheme has one cost. The remapped keys now depend on the plugin staying
+installed and enabled, because no native binding sits behind them any more.
+The shift variants remain as the escape hatch.</p>
+<p>Splits carry an extra rule. On a non mirrored pane inside a mirror workspace,
+<code>remote-split-right</code> and <code>remote-split-down</code> report an error rather than
+splitting locally. A local split there would desync the mirrored layout, so
+the plugin refuses instead of making the mismatch worse.</p>
+<h2>Reading the daemon log when it fails</h2>
+<p>The daemon log names the layer that failed, which makes it faster than
+guessing. Three messages cover most first time setups.</p>
+<p><strong><code>ssh master to user@host failed: Permission denied (publickey,password)</code></strong>
+tells you the transport layer cannot authenticate. The key is missing from the
+remote, or ssh offers the wrong identity. Reproduce it outside the plugin with
+<code>ssh -o BatchMode=yes homelab true</code>, which fails the same way and reports more
+detail with <code>-v</code>.</p>
+<p><strong><code>remote herdr server is not running</code></strong> tells you the transport works and the
+remote server does not. Authentication has already succeeded at this point, so
+this message is progress. Check the systemd unit with
+<code>systemctl --user status herdr.service</code> on the remote.</p>
+<p><strong><code>connected and synced</code></strong> with zero mirrors tells you everything works and
+the remote has no workspaces yet. Create one and watch the count change.</p>
+<p>A renamed host key needs a daemon restart, because the running daemon holds
+the loaded configuration. Run <code>herdr-mirror pause</code> followed by
+<code>herdr-mirror start</code>, then check that the log lines carry the new prefix.</p>
+<h2>Limitations</h2>
+<p>Four constraints are worth knowing before you commit to this setup.</p>
+<ul>
+<li>The plugin tracks the streaming protocol, so both ends need matching builds.</li>
+<li>Keystroke echo costs a frame round trip, which adds a small constant delay
+  compared with raw ssh.</li>
+<li>Mirror workspaces show no git information, because herdr derives the sidebar
+  branch from a local working directory.</li>
+<li>A mirror is only as reachable as its host, and the daemon reports a
+  readable status when a host goes away.</li>
+</ul>
+<p>None of these change the reason to run it. The value is the sidebar: one
+window, every machine, and an agent that finished eleven minutes ago telling
+you so at the moment it happened.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
