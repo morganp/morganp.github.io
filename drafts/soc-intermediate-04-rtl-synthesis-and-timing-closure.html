@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Intermediate 04: RTL synthesis and timing closure</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Why a design can pass sign-off timing and still fail in silicon, and the machinery that decides it: what synthesis optimises, what static timing..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/soc-intermediate-04-rtl-synthesis-and-timing-closure.html" rel="bookmark"
+             title="Permalink to SoC Intermediate 04: RTL synthesis and timing closure">SoC Intermediate 04: RTL synthesis and timing closure</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-20T00:00:00+01:00">
+                Published: Thu 20 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/rtl.html">RTL</a> <a href="../tag/synthesis.html">Synthesis</a> <a href="../tag/static-timing-analysis.html">Static Timing Analysis</a> <a href="../tag/sdc.html">SDC</a> <a href="../tag/timing-closure.html">Timing Closure</a> <a href="../tag/asic.html">ASIC</a> <a href="../tag/fpga.html">FPGA</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="../drafts/00-closure-hero-HQ.png"><img alt="An RTL to silicon workflow drawn as connected engineering stations, moving from source code through synthesis, gates, placement, routing and timing reports, with a feedback loop returning to the start" src="../drafts/00-closure-hero-900w.png"></a></p>
+<p><em>Series: Intermediate SoC Design | Article 4 of 10</em></p>
+<hr>
+<h2>The report was green</h2>
+<p>Sign-off timing passed. Worst negative slack across every corner was positive,
+by a comfortable margin on setup and a thin one on hold. The block had been the
+hardest one in the project, and it was finally done. Somebody put a chart in
+the review deck showing the slack climbing out of the red over six weeks.</p>
+<p>The chip came back and mostly worked. In the cold chamber, one part in a few
+hundred returned bad data from a configuration register, but only when the
+register was written while a particular unrelated interface was active. Nobody
+could reproduce it in simulation, because in simulation the design is exactly
+as correct as the day it was signed off.</p>
+<p>This article is about synthesis and timing closure: what the tools genuinely
+prove, what they only appear to prove, and where the gap between the two
+usually opens up. It targets engineers writing register transfer level (RTL)
+code that has to meet a frequency target, and anybody who has inherited a
+constraint file and is wondering how much of it to trust.</p>
+<hr>
+<h2>What synthesis is being asked to do</h2>
+<p>Synthesis maps RTL onto standard cells from a technology library: flip-flops
+and latches, combinational gates, arithmetic structures, clock gating cells,
+and in low-power flows the isolation and retention cells that survive a
+powered-down domain.</p>
+<p>It does that mapping while trying to satisfy your constraints and minimise
+area, power, and delay. The word to notice is <em>your</em>. The tool has no
+independent notion of what the design is supposed to do at speed. It optimises
+against the constraint file, and if the constraint file is wrong it will
+produce an efficient, well-optimised implementation of the wrong intent.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_290e9a469cd346dbfaf0af140e17d679.svg"></p>
+<p>Two stages on that path are marked in purple because they are the only two that
+read the constraints. Everything downstream inherits whatever those two were
+told.</p>
+<hr>
+<h2>What static timing analysis proves</h2>
+<p>Static timing analysis (STA) checks every path in the design without
+simulating a single input vector. It builds a graph from register clock pins,
+combinational arcs through cells, net delays extracted after routing, clock
+tree delays and skew, library setup and hold requirements, and your
+constraints.</p>
+<p>For a path to work, the data launched by one edge has to arrive and settle
+before the edge that captures it:</p>
+<div class="highlight"><pre><span></span><code>launch edge + clock-to-Q + data path delay + setup time
+    &lt;=
+capture edge + useful skew - uncertainty
+</code></pre></div>
+
+<p>Hold is the same relationship read from the other end. The data must not arrive
+so early that it overwrites the value the capture flip-flop is still reading
+from the previous edge.</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_beb274344f0a264790617348ac3d01b0.svg"></p>
+<p>The two failures have opposite personalities, and it is worth internalising
+which corner makes each one worse.</p>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Meaning</th>
+<th>Worst at</th>
+<th>Common fixes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Setup</td>
+<td>Data arrives too late</td>
+<td>Slow silicon, low voltage, high temperature</td>
+<td>Reduce logic depth, resize cells, pipeline, improve placement</td>
+</tr>
+<tr>
+<td>Hold</td>
+<td>Data arrives too early</td>
+<td>Fast silicon, high voltage, low temperature</td>
+<td>Add delay cells, adjust clock skew, correct the constraint</td>
+</tr>
+</tbody>
+</table>
+<p>Setup failures are a performance problem: run the part slower and they go away.
+Hold failures are not. A hold violation is broken at every frequency, including
+zero, which is why a hold bug in silicon is usually a respin and a setup bug
+is usually a de-rated data sheet.</p>
+<hr>
+<h2>The constraint file is the specification</h2>
+<p>Most ASIC and FPGA flows describe timing intent in Synopsys Design Constraints
+(SDC) syntax. A minimal block might start like this:</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Primary clock: 1 GHz</span>
+<span class="nv">create_clock</span><span class="w"> </span><span class="o">-</span>name<span class="w"> </span>core_clk<span class="w"> </span><span class="o">-</span>period<span class="w"> </span><span class="mf">1.000</span><span class="w"> </span><span class="k">[</span><span class="nv">get_ports</span><span class="w"> </span>core_clk<span class="k">]</span>
+
+<span class="c"># External interface timing, relative to that clock</span>
+<span class="nv">set_input_delay</span><span class="w">  </span><span class="mf">0.250</span><span class="w"> </span><span class="o">-</span>clock<span class="w"> </span>core_clk<span class="w"> </span><span class="k">[</span><span class="nv">get_ports</span><span class="w"> </span>rx_data<span class="o">*</span><span class="k">]</span>
+<span class="nv">set_output_delay</span><span class="w"> </span><span class="mf">0.300</span><span class="w"> </span><span class="o">-</span>clock<span class="w"> </span>core_clk<span class="w"> </span><span class="k">[</span><span class="nv">get_ports</span><span class="w"> </span>tx_data<span class="o">*</span><span class="k">]</span>
+
+<span class="c"># Jitter and analysis margin</span>
+<span class="nv">set_clock_uncertainty</span><span class="w"> </span><span class="mf">0.050</span><span class="w"> </span><span class="k">[</span><span class="nv">get_clocks</span><span class="w"> </span>core_clk<span class="k">]</span>
+
+<span class="c"># Asynchronous reset assertion is not a functional timing path</span>
+<span class="nv">set_false_path</span><span class="w"> </span><span class="o">-</span>from<span class="w"> </span><span class="k">[</span><span class="nv">get_ports</span><span class="w"> </span>reset_n<span class="k">]</span>
+</code></pre></div>
+
+<p>Five commands, and every one of them is a claim about the world outside the
+block. The period claims what the clock generator will produce. The input delay
+claims when the upstream block launches. The uncertainty claims how much jitter
+the phase-locked loop contributes. The false path claims that reset assertion
+never needs to be captured on a specific edge.</p>
+<p>None of those claims are checked by anything. They are inputs.</p>
+<p>That is the reason a constraint file deserves the same review a piece of RTL
+gets: an owner, a version history, a comment on every non-obvious line, and a
+reviewer who is allowed to ask "how do you know?".</p>
+<hr>
+<h2>Exceptions, and the damage they hide</h2>
+<p>Three SDC commands exist to tell STA to relax. All three are legitimate. All
+three are also the standard way to make a report turn green without changing a
+gate.</p>
+<p><strong>A false path</strong> says the path is not real and should not be analysed. A
+configuration register that only changes during reset, a scan-mode path that is
+inactive functionally, a test observation output nobody samples at speed.</p>
+<p><strong>A multicycle path</strong> says the path is real but has more than one clock period
+to complete.</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Data launched by stage_a is captured by stage_b two cycles later</span>
+<span class="nv">set_multicycle_path</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">-</span>setup<span class="w"> </span><span class="err">\</span>
+<span class="w">    </span><span class="nv">-from</span><span class="w"> </span><span class="k">[</span><span class="nv">get_cells</span><span class="w"> </span>stage_a_reg<span class="o">*</span><span class="k">]</span><span class="w"> </span><span class="err">\</span>
+<span class="w">    </span><span class="nv">-to</span><span class="w">   </span><span class="k">[</span><span class="nv">get_cells</span><span class="w"> </span>stage_b_reg<span class="o">*</span><span class="k">]</span>
+
+<span class="c"># The hold check has to move with it</span>
+<span class="nv">set_multicycle_path</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">-</span>hold<span class="w"> </span><span class="err">\</span>
+<span class="w">    </span><span class="nv">-from</span><span class="w"> </span><span class="k">[</span><span class="nv">get_cells</span><span class="w"> </span>stage_a_reg<span class="o">*</span><span class="k">]</span><span class="w"> </span><span class="err">\</span>
+<span class="w">    </span><span class="nv">-to</span><span class="w">   </span><span class="k">[</span><span class="nv">get_cells</span><span class="w"> </span>stage_b_reg<span class="o">*</span><span class="k">]</span>
+</code></pre></div>
+
+<p>That second command is the one that gets left out, and leaving it out is worse
+than not writing the exception at all. A setup relaxation without the matching
+hold adjustment tells the tool the data may arrive a cycle late, while still
+requiring it not to arrive early relative to the original edge. The tool will
+happily insert delay to satisfy a hold check that was never the real
+requirement, or fail to insert it where it was.</p>
+<p>A multicycle constraint is only true if the destination register genuinely
+cannot capture every cycle. That means an enable, and the enable has to be
+provably sparse:</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_554c2dcda9c10709d730c7ecdf34cead.svg"></p>
+<p>If a later revision adds a bypass mode that asserts <code>capture_en</code> every cycle,
+the RTL change is one line, the constraint is still in the file, and the timing
+report still passes.</p>
+<p><strong>A clock group</strong> says two clocks have no known phase relationship:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">set_clock_groups</span><span class="w"> </span><span class="o">-</span>asynchronous<span class="w"> </span><span class="err">\</span>
+<span class="w">    </span><span class="nv">-group</span><span class="w"> </span><span class="k">[</span><span class="nv">get_clocks</span><span class="w"> </span>cpu_clk<span class="k">]</span><span class="w"> </span><span class="err">\</span>
+<span class="w">    </span><span class="nv">-group</span><span class="w"> </span><span class="k">[</span><span class="nv">get_clocks</span><span class="w"> </span>periph_clk<span class="k">]</span>
+</code></pre></div>
+
+<p>This is the most misread of the three. It does not make the crossing safe. It
+does not add a synchroniser. It tells STA to stop analysing a relationship that
+was never meaningful, and the correctness of the crossing is now entirely the
+job of clock domain crossing (CDC) analysis and the synchronisers in the RTL.
+Declaring the group and skipping the CDC review removes the only check that was
+looking.</p>
+<hr>
+<h2>The gap</h2>
+<p>Here is the reframe, and it is the whole article.</p>
+<p>Static timing analysis never tells you whether the chip works. It tells you
+whether the implementation matches the constraints. Those are the same
+statement only to the extent that the constraints are true, and nothing in the
+flow verifies that they are.</p>
+<p><a href="../drafts/01-map-and-terrain-HQ.png"><img alt="A constraint file drawn as a simplified map laid over the more complicated terrain of a real chip, with a few places where the map and the terrain disagree marked as gaps" src="../drafts/01-map-and-terrain-900w.png"></a></p>
+<p>Read the failure at the top of the article again with that in mind. The
+configuration register had a <code>set_false_path</code> on it, added early, when the
+register really was written only during reset. Two years later a feature landed
+that reprogrammed it at runtime while the interface was live. The RTL review
+covered the new write path. Nothing in the flow re-examined the exception,
+because an exception is not code, it produces no warning, and it fails silently
+by making a real path invisible.</p>
+<p>That is the shape of nearly every timing bug that reaches silicon. Not a path
+the tool got wrong, but a path the tool was told not to look at.</p>
+<p>Which is why the useful question during a closure review is not "what is the
+worst negative slack". It is "how many paths are we not analysing, who decided
+that, and is the reason still true".</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Worth running, and reviewing line by line, before every sign-off</span>
+<span class="nv">report_exceptions</span><span class="w"> </span><span class="o">-</span>ignored
+<span class="nv">report_disable_timing</span>
+<span class="nv">report_clock_properties</span>
+</code></pre></div>
+
+<p>An exception with no comment and no owner should be treated as a bug until
+somebody re-derives the argument for it.</p>
+<hr>
+<h2>Reading a report</h2>
+<p>When a path genuinely fails, the report tells you what kind of problem it is,
+provided you read past the slack number.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Startpoint</span><span class="o">:</span><span class="w"> </span><span class="n">u_decode</span><span class="o">/</span><span class="n">op_reg</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span>
+<span class="n">Endpoint</span><span class="o">:</span><span class="w">   </span><span class="n">u_execute</span><span class="o">/</span><span class="n">alu_result_reg</span><span class="o">[</span><span class="mi">17</span><span class="o">]</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">group</span><span class="o">:</span><span class="w"> </span><span class="n">core_clk</span>
+<span class="n">Slack</span><span class="o">:</span><span class="w">      </span><span class="o">-</span><span class="mf">0.083</span><span class="w"> </span><span class="n">ns</span>
+
+<span class="w">  </span><span class="n">clock</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">Q</span><span class="w">              </span><span class="mf">0.061</span>
+<span class="w">  </span><span class="n">decode</span><span class="w"> </span><span class="n">mux</span><span class="w">              </span><span class="mf">0.142</span>
+<span class="w">  </span><span class="n">compare</span><span class="w">                 </span><span class="mf">0.188</span>
+<span class="w">  </span><span class="n">operand</span><span class="w"> </span><span class="n">mux</span><span class="w">             </span><span class="mf">0.221</span>
+<span class="w">  </span><span class="n">adder</span><span class="w">                   </span><span class="mf">0.364</span>
+<span class="w">  </span><span class="n">route</span><span class="w">                   </span><span class="mf">0.177</span>
+<span class="w">  </span><span class="n">setup</span><span class="w">                   </span><span class="mf">0.043</span>
+<span class="w">  </span><span class="n">required</span><span class="w">                </span><span class="mf">1.000</span>
+</code></pre></div>
+
+<p>The distribution matters more than the total. Here the logic dominates and no
+single cell is pathological, which means this is a microarchitecture problem
+and cell sizing will not save it. A different failure profile would call for a
+different response:</p>
+<table>
+<thead>
+<tr>
+<th>What dominates</th>
+<th>What it usually means</th>
+<th>Where to fix it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Many small logic stages</td>
+<td>Logic depth</td>
+<td>RTL: split the chain, add a stage</td>
+</tr>
+<tr>
+<td>One large cell delay</td>
+<td>Weak drive, high fanout</td>
+<td>Tools: sizing, buffering, cloning</td>
+</tr>
+<tr>
+<td>Routing delay</td>
+<td>Placement or floorplan</td>
+<td>Physical: placement constraints, partitioning</td>
+</tr>
+<tr>
+<td>Clock skew or uncertainty</td>
+<td>Clock tree or margin</td>
+<td>Clock tree synthesis, useful skew</td>
+</tr>
+<tr>
+<td>Required time surprises you</td>
+<td>The constraint is wrong</td>
+<td>The SDC</td>
+</tr>
+</tbody>
+</table>
+<p>That last row is the one worth checking first, because it is the cheapest to
+fix and the most embarrassing to find late. If the required time is not the
+number you expected, stop looking at the data path.</p>
+<hr>
+<h2>Fixing it in RTL</h2>
+<p>The fixes available in RTL are the ones that change how much work sits between
+two registers:</p>
+<ul>
+<li>Register the output of a wide multiplexer rather than the input of the next
+  stage's logic.</li>
+<li>Split long add, compare, and select chains, especially where a comparison
+  result selects an operand for an addition in the same cycle.</li>
+<li>Avoid the accidental priority encoder. A <code>case</code> with overlapping conditions
+  or a long <code>if / else if</code> chain in a datapath synthesises into a serial
+  structure, and one-hot control costs area but flattens the delay.</li>
+<li>Duplicate a high-fanout control register into local copies near its
+  consumers, rather than asking the tool to buffer one signal across the block.</li>
+<li>Move work across an existing stage boundary before adding a new one, since
+  the free rebalance is always better than the stage that costs a cycle of
+  latency.</li>
+</ul>
+<p>The pattern behind all five is the same: timing closure is easy when the
+microarchitecture already has clean stage boundaries, and the earlier article
+in this series on pipeline hazards is the reason those boundaries are not free
+to add later.</p>
+<hr>
+<h2>Fixing it in the tools</h2>
+<p>Implementation tools have their own set of moves: cell sizing, buffer
+insertion, logic restructuring, register retiming, placement constraints,
+useful skew, and clock tree adjustment.</p>
+<p>They are genuinely powerful, and retiming in particular can rebalance logic
+across register boundaries in ways that would be tedious by hand. But they all
+work within the structure the RTL gave them. No amount of sizing will fit two
+cycles of logic into a one-cycle budget, and a path that needs a
+microarchitecture change will keep coming back on every run, slightly
+differently each time, consuming a week per iteration.</p>
+<p>The tell is a path that oscillates. Fix it, and it closes, and something
+adjacent opens. That is not a tool failure. That is a design that has no slack
+anywhere in a region, and the tool is moving a fixed shortage around.</p>
+<hr>
+<h2>Every corner, every mode</h2>
+<p>A single timing run is one point in a space the chip has to survive all of.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Slow</span><span class="w"> </span><span class="n">silicon</span><span class="p">,</span><span class="w"> </span><span class="n">low</span><span class="w"> </span><span class="n">voltage</span><span class="p">,</span><span class="w"> </span><span class="n">high</span><span class="w"> </span><span class="n">temperature</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">setup</span><span class="w"> </span><span class="n">worst</span><span class="w"> </span><span class="n">case</span>
+<span class="n">Fast</span><span class="w"> </span><span class="n">silicon</span><span class="p">,</span><span class="w"> </span><span class="n">high</span><span class="w"> </span><span class="n">voltage</span><span class="p">,</span><span class="w"> </span><span class="n">low</span><span class="w"> </span><span class="n">temperature</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="n">worst</span><span class="w"> </span><span class="n">case</span>
+<span class="n">Functional</span><span class="p">,</span><span class="w"> </span><span class="n">scan</span><span class="p">,</span><span class="w"> </span><span class="n">retention</span><span class="p">,</span><span class="w"> </span><span class="n">low</span><span class="o">-</span><span class="n">power</span><span class="w"> </span><span class="n">modes</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">different</span><span class="w"> </span><span class="n">constraints</span><span class="w"> </span><span class="n">each</span>
+</code></pre></div>
+
+<p>Multiply the process, voltage, and temperature corners by the operating modes
+and the analysis views multiply with them. The sign-off question is not "does
+the design meet timing", it is "does every mode meet timing at every corner it
+can be in".</p>
+<p><a href="../drafts/02-corners-modes-HQ.png"><img alt="A grid of process, voltage and temperature corners crossed with operating modes, with the slow hot corner and the fast cold corner marked as the ones that fail first" src="../drafts/02-corners-modes-900w.png"></a></p>
+<p>Two practical consequences. First, a corner nobody enabled is a corner nobody
+checked, so the list of analysis views is itself a review item. Second,
+low-temperature inversion means the fast corner is not simply "everything is
+quicker": at modern nodes some cells get slower at low voltage as temperature
+drops, so the intuition that cold silicon is fast silicon is not reliable and
+the corner list has to come from the library characterisation, not from
+reasoning.</p>
+<hr>
+<h2>The ECO loop</h2>
+<p>Late fixes go in as an engineering change order: a small, surgical patch to a
+design that is otherwise finished.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_c4ea275c003f6ce077d09ce07cad34fc.svg"></p>
+<p>The purple node carries the risk. An ECO is small in the netlist and unbounded
+in what it can invalidate: timing on adjacent paths, logical equivalence
+against the RTL, CDC structures, power intent, and any software-visible
+behaviour that verification signed off weeks earlier. Every ECO needs the full
+check set re-run, and the discipline that makes late ECOs survivable is keeping
+them small enough that the re-run is credible.</p>
+<hr>
+<h2>Closure checklist</h2>
+<ol>
+<li>Give the constraint file an owner and a version history, and review it like
+   RTL.</li>
+<li>List every exception in the design with a one-line justification and the
+   name of the person who made the argument.</li>
+<li>Re-derive those justifications whenever the RTL around them changes, because
+   nothing else will.</li>
+<li>Pair every <code>-setup</code> multicycle with its matching <code>-hold</code>, and prove the
+   capture enable is as sparse as the constraint claims.</li>
+<li>Treat <code>set_clock_groups -asynchronous</code> as a note to STA, never as a CDC
+   solution, and check the synchronisers separately.</li>
+<li>Track worst negative slack and total negative slack per path group, since a
+   single bad path and a thousand marginal ones need different responses.</li>
+<li>Confirm the analysis view list covers every corner and mode the part can
+   actually be in, including the ones only test or retention can reach.</li>
+<li>Re-run lint, CDC, logical equivalence, and STA after every ECO, without
+   exception, however small the patch.</li>
+</ol>
+<hr>
+<h2>Ask what is not being analysed</h2>
+<p>The number at the top of the timing report tells you how the paths under
+analysis are doing. It says nothing at all about the paths that were removed
+from analysis, and those are the ones with a history of reaching silicon.</p>
+<p>Before the next sign-off, dump the exception list and read it end to end. On a
+mature design it will be longer than you expect, and some fraction of it will
+be constraints written by people who have left, against RTL that has since
+changed, for reasons nobody recorded. That fraction is your actual risk, and it
+is countable in an afternoon.</p>
+<hr>
+<p><em>Previous: <a href="../soc-intermediate-03-pipeline-design-and-hazards.html">Article I-03: Pipeline design and hazards</a></em>
+<em>Next: Intermediate Article 05, Clock domain crossing techniques</em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

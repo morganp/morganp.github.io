@@ -1,5 +1,466 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-16T00:00:00+01:00</updated><entry><title>SoC Intermediate 03: Pipeline design and hazards</title><link href="http://lizard-spock.co.uk/soc-intermediate-03-pipeline-design-and-hazards.html" rel="alternate"></link><published>2026-08-16T00:00:00+01:00</published><updated>2026-08-16T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-16:/soc-intermediate-03-pipeline-design-and-hazards.html</id><summary type="html">&lt;p&gt;Why adding a pipeline stage can make a processor slower, and the hazard machinery that decides the outcome: forwarding paths, load-use stalls, branch prediction and flush, structural conflicts, multi-cycle units, and the valid bits that keep exceptions precise.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-pipeline-hero-HQ.png"&gt;&lt;img alt="A processor pipeline drawn as a transparent assembly line, with several instructions in flight at once moving through fetch, decode, execute, memory and writeback stages" src="http://lizard-spock.co.uk/00-pipeline-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-18T00:00:00+01:00</updated><entry><title>Digital Design 01: Mask sets, and how a transistor gets built</title><link href="http://lizard-spock.co.uk/digital-design-01-mask-sets-and-how-a-transistor-gets-built.html" rel="alternate"></link><published>2026-08-18T00:00:00+01:00</published><updated>2026-08-18T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-18:/digital-design-01-mask-sets-and-how-a-transistor-gets-built.html</id><summary type="html">&lt;p&gt;What a photomask is, the sequence of masks that turns a blank wafer into a MOSFET, why the mask count keeps climbing, the approximate cost of a mask set at each geometry from 250 nm down to 3 nm, and what an A1 metal spin costs against a B0 all-layer respin.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-mask-hero-HQ.png"&gt;&lt;img alt="Four photomask plates floating in an exploded stack above a silicon wafer, with a single beam of light passing down through them onto the dies below" src="http://lizard-spock.co.uk/00-mask-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Series: Digital Design Fundamentals | Article 1&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The forty pence chip&lt;/h2&gt;
+&lt;p&gt;A small microcontroller in a reel of three thousand costs about forty pence. It
+holds a processor, flash, RAM, a handful of timers and a bootloader, and the
+supplier will happily sell you one.&lt;/p&gt;
+&lt;p&gt;The set of photomasks used to make it cost somewhere north of a quarter of a
+million pounds, paid once, years ago, before a single working part existed.
+Nothing about the forty pence recovers that. The forty pence is glass, gas,
+electricity, packaging and test, spread over tens of millions of parts. The
+quarter of a million was the price of being allowed to start.&lt;/p&gt;
+&lt;p&gt;This article is about that gap. It covers the photomask itself, the sequence of
+masks that builds a metal-oxide-semiconductor field-effect transistor (MOSFET)
+out of a blank wafer, why the number of masks keeps rising, the approximate cost
+of a mask set at each process geometry, and what a respin costs when the first
+attempt is wrong. It targets anyone
+learning digital design who has been told "the transistor is a switch" and
+would like to know where the switch comes from, and anyone weighing a custom
+chip against a field-programmable gate array (FPGA).&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;A mask is a stencil, and there is one per patterned layer&lt;/h2&gt;
+&lt;p&gt;A chip is not carved. It is built up in layers, and every layer that needs a
+pattern gets that pattern from a &lt;strong&gt;photomask&lt;/strong&gt;: a flat plate of fused silica,
+usually a 6 inch square a quarter of an inch thick, carrying an opaque chrome
+image of the shapes for that one layer. Fused silica is amorphous silicon
+dioxide, chosen because it is transparent at the exposure wavelength and barely
+expands when the plate warms up. In the trade it is often called a quartz plate,
+though it is not quartz: quartz is crystalline, fused silica is not. The mask is
+glass. The wafer it prints onto is single-crystal silicon. They are not the same
+material.&lt;/p&gt;
+&lt;p&gt;Three facts about the mask decide most of the economics that follow.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;It is not the same size as the chip.&lt;/strong&gt; In a modern scanner the mask, called a
+&lt;strong&gt;reticle&lt;/strong&gt;, is drawn four times larger than the pattern it prints. The optics
+demagnify the image by four on its way to the wafer, so a 1 micrometre chrome
+feature on the plate prints a 250 nanometre feature in resist. Making the plate is
+therefore easier than making the chip, which is the only reason the plate can
+be made at all.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;One exposure covers a small area.&lt;/strong&gt; The reticle field is roughly 26 mm by
+33 mm at the wafer. A 300 mm wafer holds a few hundred of those fields, and the
+scanner steps across the wafer exposing them one at a time. A die larger than
+the reticle field cannot be printed in one shot, which is a hard ceiling on
+single-die size and one of the arguments for chiplets.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;One mask means one layer, one shot.&lt;/strong&gt; The mask has no adjustments. Every
+change to the design, however small, on whatever layer, means a new plate for
+that layer. This is why a bug found after tape-out is expensive in a way that
+software bugs are not.&lt;/p&gt;
+&lt;p&gt;The resolution the scanner can print follows the Rayleigh relation:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;smallest half-pitch  =  k1 x wavelength / numerical aperture
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;with &lt;code&gt;k1&lt;/code&gt; a process factor around 0.3 in practice. Deep ultraviolet immersion
+lithography uses 193 nm light and a numerical aperture of about 1.35, giving
+roughly a 40 nm half-pitch in a single exposure. That number is the wall the
+industry has been climbing over since 2005, and the way it climbed over is the
+reason mask counts exploded. More on that below.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Building an inverter's transistors, one mask at a time&lt;/h2&gt;
+&lt;p&gt;The complementary metal-oxide-semiconductor (CMOS) process needs two kinds of
+transistor: an &lt;strong&gt;nMOS&lt;/strong&gt;, which conducts when its gate is high, and a &lt;strong&gt;pMOS&lt;/strong&gt;,
+which conducts when its gate is low. Both are built simultaneously on the same
+wafer, and the sequence below produces one of each.&lt;/p&gt;
+&lt;p&gt;The starting material is a polished slice of single-crystal silicon, lightly
+doped p-type, 300 mm across and under a millimetre thick.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. n-well (mask 1).&lt;/strong&gt; A pMOS needs to sit in n-type silicon. The n-well mask
+opens windows where phosphorus or arsenic is implanted and driven in, creating
+tubs of n-type material inside the p-type wafer. Every pMOS on the chip lives
+in one of these.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. Isolation (mask 2).&lt;/strong&gt; Trenches are etched between the regions that will
+become transistors and filled with oxide. This is &lt;strong&gt;shallow trench isolation&lt;/strong&gt;,
+and it stops neighbouring devices leaking into each other. The mask defines the
+&lt;strong&gt;active&lt;/strong&gt; areas, meaning everywhere a trench is not.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. Gate oxide.&lt;/strong&gt; A thin insulating layer is grown over the whole active area,
+a few atoms thick at modern nodes. No mask: it is grown everywhere and removed
+later where it is not wanted. This layer is the "oxide" in MOSFET, and the
+capacitor it forms lets a voltage on the gate control the silicon
+underneath without any current flowing into the gate.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4. Gate (mask 3).&lt;/strong&gt; Polysilicon is deposited over the whole wafer, then
+patterned. What survives is the gate electrode. The width of that stripe where
+it crosses an active area is the &lt;strong&gt;channel length&lt;/strong&gt;, historically the number a
+process is named after: the 130 nm process drew a 130 nm gate.&lt;/p&gt;
+&lt;p&gt;This is the most critical mask in the set. Channel length sets drive current and
+switching speed, so its dimensional control drives the entire process.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;5. Source and drain (masks 4 and 5).&lt;/strong&gt; Dopant is implanted on both sides of
+the gate: n-type for the nMOS regions, p-type for the pMOS regions, so two
+masks, each blocking the areas the other one implants. The gate itself blocks
+the implant from the silicon directly beneath it, so the source and drain end up
+self-aligned to the gate rather than aligned by the scanner. That trick,
+introduced around 1970, removed alignment tolerance from the most sensitive
+dimension on the chip and is the reason the polysilicon gate replaced the
+earlier aluminium one.&lt;/p&gt;
+&lt;p&gt;At this point there are transistors, and they are connected to nothing.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;6. Contacts (mask 6).&lt;/strong&gt; Oxide is deposited over everything and holes are
+etched down to each source, drain and gate, then filled with tungsten. These
+are the plugs the wiring connects to.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;7. Metal 1 (mask 7), via 1 (mask 8), metal 2 (mask 9), and so on.&lt;/strong&gt; Each
+metal layer is a mask, and each layer of vias joining two metals is another
+mask. Modern logic processes stack ten to fifteen metal layers: the lowest are
+thin and dense for wiring inside a standard cell, the highest are thick and wide
+for power distribution and long-distance signals.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;8. Passivation and pads (final masks).&lt;/strong&gt; A protective layer over the whole
+die, with openings where bond pads or bumps need to make contact with the
+outside world.&lt;/p&gt;
+&lt;p&gt;Counting: two masks before the transistors exist, three to make them, one for
+contacts, and then two per metal level for the rest. A simple two-metal process
+lands around twelve masks. A fifteen-metal modern logic process is already past
+forty before any of the complications below.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/01-mosfet-cross-section-HQ.png"&gt;&lt;img alt="Cross-section of a CMOS inverter showing the p-type substrate, n-well, shallow trench isolation, n-plus and p-plus source and drain regions, gate oxide, polysilicon gates, contacts and metal 1, with each feature numbered by the mask that creates it" src="http://lizard-spock.co.uk/01-mosfet-cross-section-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;What one masking step actually involves&lt;/h2&gt;
+&lt;p&gt;Every one of those numbered steps expands into the same loop. The mask count
+multiplies its cost and its yield risk.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_7bc80acf6aa7aaf0f9daafc114aa512e.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Photoresist is a polymer whose solubility changes where light hits it. Expose,
+develop, and the mask pattern now exists in resist on the wafer. Etch, and it
+exists in the film underneath. Strip the resist, and the layer is finished.&lt;/p&gt;
+&lt;p&gt;Two consequences fall out of the loop.&lt;/p&gt;
+&lt;p&gt;A wafer visits the scanner once per mask, and the scanner is the most expensive
+tool in the fab. Mask count therefore drives cycle time and wafer cost together,
+not just the one-off cost of the plates. A forty-mask flow takes six to eight
+weeks of processing; an eighty-mask flow takes three months or more.&lt;/p&gt;
+&lt;p&gt;Every step is an opportunity to lose the die. A single particle in one exposure
+kills the chips it lands on. With eighty steps, per-step yield has to be
+extraordinary before the product of them is usable, which is why fabs are
+obsessive about contamination and why defect density, not lithography, usually
+limits how large a die can economically be.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Why the mask count keeps climbing&lt;/h2&gt;
+&lt;p&gt;Single-exposure 193 nm immersion lithography stops at roughly 40 nm half-pitch,
+and the industry reached that around the 32 nm node. The features kept
+shrinking anyway. Three mechanisms did it, and all three cost masks.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Multiple patterning.&lt;/strong&gt; Split one dense layer into two or more sparser layers,
+each printable on its own, and superimpose them. Litho-etch-litho-etch (LELE)
+turns one mask into two, LELELE into three. Self-aligned double and quadruple
+patterning (SADP, SAQP) print a sparse grid and use deposited spacers to halve
+the pitch, then need &lt;strong&gt;cut masks&lt;/strong&gt; to remove the unwanted segments. A single
+logical layer such as metal 1 can consume four or five plates at 10 nm and 7 nm.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;More structure per transistor.&lt;/strong&gt; A planar transistor is a stripe of poly over
+a flat active area. A FinFET is a set of vertical fins, needing a fin-definition
+mask and fin-cut masks. A gate-all-around nanosheet device stacks channels
+vertically and adds its own patterning steps. Extra masks buy tighter electrostatic
+control of the channel, which keeps the switch behaving like a switch at these
+dimensions.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Extreme ultraviolet lithography pushes the other way.&lt;/strong&gt; EUV uses 13.5 nm
+light prints in a single exposure a pattern that deep ultraviolet needed three
+or four exposures to build up, so it removes masks from the critical layers even as
+it raises the cost per mask sharply. It also abandons the quartz plate. Nothing
+is usefully transparent at 13.5 nm, so an EUV mask is a mirror rather than a
+stencil: a low-expansion glass blank, about forty alternating molybdenum and
+silicon layers to reflect the light, and a tantalum-based absorber patterned on
+top. That construction is a large part of an EUV plate's price. It also explains
+why 7 nm and 5 nm did not carry on doubling their mask counts: EUV collapsed several of the worst
+multi-patterned layers back into one plate each.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Node&lt;/th&gt;
+&lt;th&gt;Typical mask count&lt;/th&gt;
+&lt;th&gt;Metal layers&lt;/th&gt;
+&lt;th&gt;Masks in the metal stack&lt;/th&gt;
+&lt;th&gt;What is driving it&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;250 nm&lt;/td&gt;
+&lt;td&gt;20 to 24&lt;/td&gt;
+&lt;td&gt;4 to 5&lt;/td&gt;
+&lt;td&gt;8 to 10&lt;/td&gt;
+&lt;td&gt;Planar, aluminium wiring, single exposure everywhere&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;180 nm&lt;/td&gt;
+&lt;td&gt;24 to 28&lt;/td&gt;
+&lt;td&gt;5 to 6&lt;/td&gt;
+&lt;td&gt;10 to 12&lt;/td&gt;
+&lt;td&gt;More metal layers&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;130 nm&lt;/td&gt;
+&lt;td&gt;28 to 32&lt;/td&gt;
+&lt;td&gt;6 to 8&lt;/td&gt;
+&lt;td&gt;12 to 16&lt;/td&gt;
+&lt;td&gt;Copper interconnect arrives&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;90 nm&lt;/td&gt;
+&lt;td&gt;32 to 36&lt;/td&gt;
+&lt;td&gt;7 to 9&lt;/td&gt;
+&lt;td&gt;14 to 18&lt;/td&gt;
+&lt;td&gt;Strained silicon&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;65 nm&lt;/td&gt;
+&lt;td&gt;36 to 40&lt;/td&gt;
+&lt;td&gt;8 to 10&lt;/td&gt;
+&lt;td&gt;16 to 20&lt;/td&gt;
+&lt;td&gt;Immersion lithography arrives&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;40 nm&lt;/td&gt;
+&lt;td&gt;40 to 45&lt;/td&gt;
+&lt;td&gt;9 to 11&lt;/td&gt;
+&lt;td&gt;18 to 22&lt;/td&gt;
+&lt;td&gt;Immersion at the limit, more resolution enhancement&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;28 nm&lt;/td&gt;
+&lt;td&gt;45 to 50&lt;/td&gt;
+&lt;td&gt;10 to 12&lt;/td&gt;
+&lt;td&gt;20 to 25&lt;/td&gt;
+&lt;td&gt;Last node before multiple patterning is unavoidable&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;16 nm&lt;/td&gt;
+&lt;td&gt;55 to 65&lt;/td&gt;
+&lt;td&gt;11 to 13&lt;/td&gt;
+&lt;td&gt;24 to 32&lt;/td&gt;
+&lt;td&gt;FinFET, and double patterning on the lower metals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7 nm&lt;/td&gt;
+&lt;td&gt;75 to 85&lt;/td&gt;
+&lt;td&gt;13 to 15&lt;/td&gt;
+&lt;td&gt;32 to 42&lt;/td&gt;
+&lt;td&gt;Multi-patterning at its worst, early EUV&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5 nm&lt;/td&gt;
+&lt;td&gt;80 to 90&lt;/td&gt;
+&lt;td&gt;14 to 16&lt;/td&gt;
+&lt;td&gt;34 to 44&lt;/td&gt;
+&lt;td&gt;EUV on many critical layers, extra device-level masks&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3 nm&lt;/td&gt;
+&lt;td&gt;85 to 100&lt;/td&gt;
+&lt;td&gt;15 to 18&lt;/td&gt;
+&lt;td&gt;36 to 48&lt;/td&gt;
+&lt;td&gt;More EUV layers, gate-all-around structures&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The metal stack is the reason the totals climb so steadily. Each metal level
+needs a mask for the wires and another for the vias beneath them, so a level
+costs two plates, and the lowest two or three levels need multiple patterning
+at 16 nm and below. Roughly half of a modern mask set is wiring.&lt;/p&gt;
+&lt;p&gt;Treat these as ranges, not specifications. Every foundry has several flavours of
+each node, and options such as extra metal layers, embedded flash, high-voltage
+devices or radio-frequency passives add masks on top.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Mask set cost, in round numbers&lt;/h2&gt;
+&lt;p&gt;Mask cost is not published in any consistent way, and real quotes are covered by
+non-disclosure. What follows are the orders of magnitude generally cited in the
+public literature and in multi-project wafer programme pricing. Use them for
+deciding which node to think about, and never for a purchase order.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Node&lt;/th&gt;
+&lt;th&gt;Full mask set (A0)&lt;/th&gt;
+&lt;th&gt;Metal-only spin (A1)&lt;/th&gt;
+&lt;th&gt;Per-plate feel&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;250 nm&lt;/td&gt;
+&lt;td&gt;£50k to £120k&lt;/td&gt;
+&lt;td&gt;£15k to £40k&lt;/td&gt;
+&lt;td&gt;A few thousand each, no resolution enhancement&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;180 nm&lt;/td&gt;
+&lt;td&gt;£100k to £250k&lt;/td&gt;
+&lt;td&gt;£30k to £80k&lt;/td&gt;
+&lt;td&gt;Still cheap plates, more of them&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;130 nm&lt;/td&gt;
+&lt;td&gt;£200k to £400k&lt;/td&gt;
+&lt;td&gt;£60k to £140k&lt;/td&gt;
+&lt;td&gt;Optical proximity correction starts to matter&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;90 nm&lt;/td&gt;
+&lt;td&gt;£400k to £800k&lt;/td&gt;
+&lt;td&gt;£120k to £250k&lt;/td&gt;
+&lt;td&gt;Correction on most layers, phase shift on critical ones&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;65 nm&lt;/td&gt;
+&lt;td&gt;£700k to £1.5M&lt;/td&gt;
+&lt;td&gt;£200k to £450k&lt;/td&gt;
+&lt;td&gt;Heavy resolution enhancement&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;40 nm&lt;/td&gt;
+&lt;td&gt;£1.5M to £3M&lt;/td&gt;
+&lt;td&gt;£400k to £900k&lt;/td&gt;
+&lt;td&gt;Critical plates cost tens of thousands each&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;28 nm&lt;/td&gt;
+&lt;td&gt;£2M to £4M&lt;/td&gt;
+&lt;td&gt;£600k to £1.2M&lt;/td&gt;
+&lt;td&gt;The value node, still popular for exactly this reason&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;16 nm&lt;/td&gt;
+&lt;td&gt;£4M to £8M&lt;/td&gt;
+&lt;td&gt;£1.2M to £2.5M&lt;/td&gt;
+&lt;td&gt;FinFET plus double patterning&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7 nm&lt;/td&gt;
+&lt;td&gt;£8M to £15M&lt;/td&gt;
+&lt;td&gt;£2.5M to £5M&lt;/td&gt;
+&lt;td&gt;Mask count and plate cost rise together&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5 nm&lt;/td&gt;
+&lt;td&gt;£12M to £25M&lt;/td&gt;
+&lt;td&gt;£4M to £8M&lt;/td&gt;
+&lt;td&gt;EUV plates alone are six figures each&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3 nm&lt;/td&gt;
+&lt;td&gt;£20M to £40M&lt;/td&gt;
+&lt;td&gt;£6M to £12M&lt;/td&gt;
+&lt;td&gt;Where "who is this for" becomes the real question&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Two things drive the climb. The plates get more numerous, as the previous table
+shows. And each critical plate gets more expensive, because the chrome pattern
+is no longer a copy of the drawn layout: &lt;strong&gt;optical proximity correction&lt;/strong&gt;
+deliberately distorts it, adding serifs, hammerheads and scattering bars so that
+the diffracted image on the wafer comes out the shape you wanted. Those
+corrections are computed for every polygon on the layer, which is why a single
+advanced critical mask can take days of compute and a six-figure sum before it
+is written.&lt;/p&gt;
+&lt;p&gt;And the mask set is only one line in the total. Design tool licences,
+intellectual property blocks, engineering time, packaging, test development and
+qualification are usually larger. A 28 nm project is commonly quoted in the tens
+of millions all-in; a 5 nm one in the hundreds of millions. The mask set is the
+part that is easiest to point at, not the part that dominates.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Not every project buys a set.&lt;/strong&gt; A &lt;strong&gt;multi-project wafer&lt;/strong&gt; run shares one
+reticle between many customers, each taking a few square millimetres, and splits
+the mask cost accordingly. University and small-company shuttles at 180 nm or
+130 nm come in at low tens of thousands, and open-source shuttles on a 130 nm
+process have put a small design on real silicon for a few hundred. You get a few
+tens of packaged parts, not a product, but for learning, for research, and for
+proving an idea, prototyping never touches a full mask set.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;A0, A1, B0: the price of being wrong&lt;/h2&gt;
+&lt;p&gt;Silicon revisions are named by a convention borrowed from the processor
+vendors, and it encodes exactly the distinction the two columns above draw.&lt;/p&gt;
+&lt;p&gt;A stepping name is a letter and a digit. The letter counts base layer
+revisions, meaning the transistors themselves. The digit counts metal
+revisions on top of those base layers.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Stepping&lt;/th&gt;
+&lt;th&gt;Meaning&lt;/th&gt;
+&lt;th&gt;Letter&lt;/th&gt;
+&lt;th&gt;Digit&lt;/th&gt;
+&lt;th&gt;Masks needed&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;A0&lt;/td&gt;
+&lt;td&gt;First silicon&lt;/td&gt;
+&lt;td&gt;A, the first&lt;/td&gt;
+&lt;td&gt;0, no metal revisions yet&lt;/td&gt;
+&lt;td&gt;Full set, every layer&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A1&lt;/td&gt;
+&lt;td&gt;Metal-only spin&lt;/td&gt;
+&lt;td&gt;A, unchanged&lt;/td&gt;
+&lt;td&gt;increments to 1&lt;/td&gt;
+&lt;td&gt;Metal and via layers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;B0&lt;/td&gt;
+&lt;td&gt;All-layer spin&lt;/td&gt;
+&lt;td&gt;increments to B&lt;/td&gt;
+&lt;td&gt;resets to 0&lt;/td&gt;
+&lt;td&gt;Full set again&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The digit climbs while the transistors stay as they are: A0, A1, A2. The moment
+a fix needs a different transistor rather than a different wire, the letter
+increments, the digit resets, and the part becomes B0 at full mask set cost.
+Metal spins on the new base layers then start again at B1.&lt;/p&gt;
+&lt;p&gt;A &lt;strong&gt;metal-only spin&lt;/strong&gt; works because the fault is in the connections, not the
+devices. The fab holds partly processed wafers at the point where the
+transistors are finished and the wiring has not started, a stage usually called
+the wafer bank. A new set of metal and via plates goes on top of banked
+material, so an A1 pays for a fraction of the plates and skips a fraction of the
+processing.&lt;/p&gt;
+&lt;p&gt;Two consequences follow, and both are decisions taken long before the bug
+exists.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;It has to be designed for.&lt;/strong&gt; A metal fix can only rewire gates that are
+already on the die. Teams scatter spare cells across the floorplan, or use a
+gate-array style fabric, precisely so that an engineering change order has
+something to connect. Without that, every fix is a B0.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The time matters more than the money.&lt;/strong&gt; An all-layer spin repeats the full
+flow: ten to fourteen weeks at an advanced node, six to eight at a mature one,
+before packaged parts come back. A metal-only spin starts from banked wafers and
+turns around in three to six weeks. In a market with a launch date, the schedule
+usually decides the argument, not the several million pounds.&lt;/p&gt;
+&lt;p&gt;This is the real reason verification budgets look the way they do. The
+alternative to finding a bug in simulation is a number from one of those two
+columns, plus a quarter of a year.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The thing the price tag is actually measuring&lt;/h2&gt;
+&lt;p&gt;The natural reading of that table is that advanced silicon is expensive. Turned
+around, it says something closer to the truth.&lt;/p&gt;
+&lt;p&gt;Cost per transistor has fallen for fifty years. Cost per &lt;strong&gt;design&lt;/strong&gt; has risen
+for the same fifty years. The mask set is not the price of a chip. It is the
+price of the decision to make a chip that is different from every other chip,
+paid before you know whether the design is correct.&lt;/p&gt;
+&lt;p&gt;Every structural feature of the industry follows from those two curves crossing.
+System on chip integration exists because once you are paying for a mask set,
+adding more function to the same die is nearly free, while a second die means a
+second set. FPGAs exist because someone else already paid for the mask set and
+sells you a share of it. Chiplets exist because splitting a system lets the
+parts that need 3 nm go there while the parts that do not stay on 28 nm and keep
+their cheap masks. Mature nodes stay busy for decades because a design that fits
+in 130 nm has no reason to pay 5 nm mask costs. The forty pence microcontroller
+is a mask set from years ago, fully amortised, still printing.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Before you pick a node&lt;/h2&gt;
+&lt;p&gt;A short checklist for the moment this stops being theory.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Work out the mask cost per unit at your expected volume first. A £3M mask set
+  over 10,000 parts is £300 per part before anything else. Over 10 million it is
+  30 pence.&lt;/li&gt;
+&lt;li&gt;Ask whether you need the density. If the design fits comfortably in 130 nm or
+  65 nm, the cheap masks and the mature yield are worth more than the transistor
+  count.&lt;/li&gt;
+&lt;li&gt;Check whether a multi-project wafer covers your prototype. Two shuttle runs
+  and a full set afterwards is usually cheaper than getting a full set wrong.&lt;/li&gt;
+&lt;li&gt;Count your metal layers. They are two masks each, they are around half the
+  set, and an over-generous stack is a quiet line item.&lt;/li&gt;
+&lt;li&gt;Decide before tape-out whether you want the option of a metal-only spin, and
+  put the spare cells in to support it. That choice separates a three week A1
+  from a three month B0.&lt;/li&gt;
+&lt;li&gt;Treat tape-out as irreversible. There is no patch. Everything the verification
+  and sign-off effort costs is being compared against the numbers in that table.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The masks make transistors. The next article wires two kinds of transistor into
+the smallest useful circuits: the inverter, the NAND and the NOR, and the
+pull-up and pull-down networks that decide why those three are the gates the
+libraries are built from.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;Next in the series: pull-up and pull-down networks, and why a static CMOS gate is always inverting.&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="Digital Design"></category><category term="Electronics"></category><category term="Semiconductors"></category><category term="CMOS"></category><category term="MOSFET"></category><category term="Photolithography"></category><category term="Photomask"></category><category term="Fabrication"></category><category term="ASIC"></category></entry><entry><title>SoC Intermediate 03: Pipeline design and hazards</title><link href="http://lizard-spock.co.uk/soc-intermediate-03-pipeline-design-and-hazards.html" rel="alternate"></link><published>2026-08-16T00:00:00+01:00</published><updated>2026-08-16T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-16:/soc-intermediate-03-pipeline-design-and-hazards.html</id><summary type="html">&lt;p&gt;Why adding a pipeline stage can make a processor slower, and the hazard machinery that decides the outcome: forwarding paths, load-use stalls, branch prediction and flush, structural conflicts, multi-cycle units, and the valid bits that keep exceptions precise.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-pipeline-hero-HQ.png"&gt;&lt;img alt="A processor pipeline drawn as a transparent assembly line, with several instructions in flight at once moving through fetch, decode, execute, memory and writeback stages" src="http://lizard-spock.co.uk/00-pipeline-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Series: Intermediate SoC Design | Article 3 of 10&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;The stage that made it slower&lt;/h2&gt;
@@ -10691,21 +11152,4 @@ http://apple.stackexchange.com&lt;/a&gt;.&lt;/p&gt;</content><category term="Uni
 &lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;input&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;$clog2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;M&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;val&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
 &lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;begin&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;0&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;i&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verilog"></category></entry><entry><title>"Vim: Macro"</title><link href="http://lizard-spock.co.uk/vim-macro.html" rel="alternate"></link><published>2015-02-18T16:41:40+00:00</published><updated>2015-02-18T16:41:40+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-02-18:/vim-macro.html</id><summary type="html">&lt;p&gt;When &lt;code&gt;.&lt;/code&gt; just will not do (repeats last action) because you need to capture  a movement as well, macros are quick …&lt;/p&gt;</summary><content type="html">&lt;p&gt;When &lt;code&gt;.&lt;/code&gt; just will not do (repeats last action) because you need to capture  a movement as well, macros are quick to create and use.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;q&amp;lt;number&amp;gt;&amp;lt;actions&amp;gt;q
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Replay macro&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;@&amp;lt;number&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Replay macro 10 times&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;10&lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;number&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Example
-Yank and put line, then repeat 10 times.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;q1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;yyP&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;q&lt;/span&gt;
-
-&lt;span class="mi"&gt;10@1&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Unix &amp; Tools"></category><category term="Vim"></category></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verilog"></category></entry></feed>

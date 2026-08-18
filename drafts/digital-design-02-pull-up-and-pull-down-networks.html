@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Digital Design 02: Pull-up and pull-down networks</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Why a static CMOS gate is always inverting, how series and parallel transistor networks turn into NAND and NOR, why NOR2 is the slower of the..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/digital-design-02-pull-up-and-pull-down-networks.html" rel="bookmark"
+             title="Permalink to Digital Design 02: Pull-up and pull-down networks">Digital Design 02: Pull-up and pull-down networks</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-22T00:00:00+01:00">
+                Published: Sat 22 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/digital-design.html">Digital Design</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/cmos.html">CMOS</a> <a href="../tag/mosfet.html">MOSFET</a> <a href="../tag/logic-gates.html">Logic Gates</a> <a href="../tag/nand.html">NAND</a> <a href="../tag/nor.html">NOR</a> <a href="../tag/standard-cells.html">Standard Cells</a> <a href="../tag/transistors.html">Transistors</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="../drafts/00-pullup-pulldown-hero-HQ.png"><img alt="An output wire strung between a supply rail and a ground rail, with a closed switch pulling it up and an open switch below it, and arrows pointing up to the supply and down to ground" src="../drafts/00-pullup-pulldown-hero-900w.png"></a></p>
+<p><em>Series: Digital Design Fundamentals | Article 2</em></p>
+<hr>
+<h2>The AND gate that was not there</h2>
+<p>You wrote <code>assign y = a &amp; b;</code>, ran synthesis, and opened the gate-level netlist
+to check something unrelated. There is no AND gate in it. There is a NAND2
+feeding an inverter.</p>
+<p>Look up both cells in the library databook and it gets stranger. The NAND2 is
+four transistors. The AND2, which exists, is six, and it is slower. The
+synthesiser did nothing unusual. It used the AND2 cell, and
+the AND2 cell <strong>is</strong> a NAND2 followed by an inverter, because in static CMOS
+there is no other way to build one.</p>
+<p>This article is about why. It covers the two transistors as switches, the
+pull-down and pull-up networks made from them, why those networks always
+produce an inverting function, how NAND and NOR fall out of series and parallel
+arrangements, and why the two are not equally good. It targets anyone who has
+been handed a standard cell library and wants to know what the numbers in it
+mean, and anyone learning digital design who wants gates to stop being symbols
+on a page. It follows on from
+<a href="../digital-design-01-mask-sets-and-how-a-transistor-gets-built.html">Digital Design 01</a>,
+which built the transistors these gates are made of.</p>
+<hr>
+<h2>Two switches, each good at one thing</h2>
+<p>The metal-oxide-semiconductor field-effect transistor (MOSFET) has three
+terminals that matter here: <strong>gate</strong>, <strong>source</strong> and <strong>drain</strong>. Voltage on the
+gate controls whether current can flow between source and drain. No current
+flows into the gate itself; it is a capacitor plate over an insulator. That is
+the whole reason complementary metal-oxide-semiconductor (CMOS) logic can drive
+thousands of inputs without a power budget for it.</p>
+<p>There are two flavours, and they are opposites.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>nMOS</th>
+<th>pMOS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conducts when the gate is</td>
+<td>high</td>
+<td>low</td>
+</tr>
+<tr>
+<td>Turns on at</td>
+<td>gate above source by the threshold voltage</td>
+<td>gate below source by the threshold voltage</td>
+</tr>
+<tr>
+<td>Passes a good</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Passes a poor</td>
+<td>1, stopping a threshold below the supply</td>
+<td>0, stopping a threshold above ground</td>
+</tr>
+<tr>
+<td>Carrier</td>
+<td>electrons</td>
+<td>holes</td>
+</tr>
+<tr>
+<td>Speed for the same width</td>
+<td>faster</td>
+<td>slower, by roughly two to three times</td>
+</tr>
+</tbody>
+</table>
+<p><a href="../drafts/01-mos-switches-HQ.png"><img alt="Side by side schematics of an nMOS transistor connected between the output node and ground and a pMOS transistor connected between the supply and the output node, annotated with which logic level each one passes well" src="../drafts/01-mos-switches-900w.png"></a></p>
+<p>The two rows in the middle of that table are the ones everything else is built
+on.</p>
+<p>Try to pull an output up to the supply through an nMOS. The output rises, and as
+it rises the gate-to-source voltage falls, because the source is the rising
+node. When the output gets within one threshold voltage of the gate, the
+transistor stops conducting. The output sits at roughly the supply minus a
+threshold: a weak, degraded 1 that costs noise margin and leaks current in the
+gate it feeds. The pMOS has the mirror-image problem pulling down to ground.</p>
+<p>So the transistors get used the way they are good:</p>
+<ul>
+<li><strong>nMOS transistors connect the output to ground.</strong> They form the <strong>pull-down
+  network</strong>, and their job is producing a solid 0.</li>
+<li><strong>pMOS transistors connect the output to the supply.</strong> They form the
+  <strong>pull-up network</strong>, and their job is producing a solid 1.</li>
+</ul>
+<p>Every static CMOS gate is those two networks, sharing the same inputs, sharing
+the same output node, and arranged so exactly one of them conducts for any
+combination of inputs. That last property is what "complementary" means, and it
+has a consequence: when the output is settled, there is no path
+from supply to ground, so a settled gate draws no current beyond leakage. CMOS
+burns power when it switches, not when it sits.</p>
+<hr>
+<h2>The inverter, in full</h2>
+<p>One nMOS, one pMOS, gates tied together as the input, drains tied together as
+the output.</p>
+<p><a href="../drafts/02-inverter-HQ.png"><img alt="A CMOS inverter schematic with a pMOS above and an nMOS below, plus two smaller versions showing which transistor conducts for a low input and for a high input" src="../drafts/02-inverter-900w.png"></a></p>
+<p>Input low: the pMOS conducts and the nMOS is off, so the output is connected to
+the supply and pulled to a solid 1. Input high: the nMOS conducts and the pMOS
+is off, so the output is connected to ground and pulled to a solid 0. Each
+transistor is used only in the direction it is good at, and in neither state is
+there a path from supply to ground.</p>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>pMOS</th>
+<th>nMOS</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>on</td>
+<td>off</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>off</td>
+<td>on</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Two practical points come straight out of the picture.</p>
+<p><strong>The pMOS is drawn wider than the nMOS.</strong> Holes are slower than electrons by
+about a factor of two to three, so a pMOS of the same width delivers less
+current and pulls up more slowly than the nMOS pulls down. Cell libraries
+compensate by making the pMOS roughly twice the width, which balances rise and
+fall times at the cost of area and input capacitance. Look at any standard cell
+layout and the top row of transistors is visibly fatter than the bottom row.</p>
+<p><strong>Drive strength is width.</strong> An INVX4 is not a different circuit from an INVX1.
+It is the same two transistors, four times as wide, sourcing four times the
+current into whatever it drives, and presenting four times the capacitance to
+whatever drives it. That trade is the entire content of buffer insertion during
+synthesis: pay input capacitance here to gain drive strength there.</p>
+<hr>
+<h2>Series and parallel are AND and OR</h2>
+<p>Now build a network out of more than one transistor. Two rules, and they are the
+whole of it, because a transistor is a switch and switches in series and in
+parallel behave the way you would expect.</p>
+<ul>
+<li><strong>In series</strong>: the path conducts only if <strong>both</strong> transistors conduct.</li>
+<li><strong>In parallel</strong>: the path conducts if <strong>either</strong> transistor conducts.</li>
+</ul>
+<p>Take the pull-down network, made of nMOS, so each transistor conducts when its
+input is high. Then:</p>
+<table>
+<thead>
+<tr>
+<th>Pull-down arrangement</th>
+<th>Conducts when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A in series with B</td>
+<td>A AND B</td>
+</tr>
+<tr>
+<td>A in parallel with B</td>
+<td>A OR B</td>
+</tr>
+</tbody>
+</table>
+<p>And here is the step that decides the shape of every gate that follows. The
+pull-down network pulls the output <strong>low</strong>. So when the network conducts, the
+output is 0, and when it does not, the pull-up has it at 1:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">output</span><span class="w">  </span><span class="o">=</span><span class="w">  </span><span class="nv">NOT</span><span class="w"> </span><span class="ss">(</span><span class="w"> </span><span class="nv">function</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">pull</span><span class="o">-</span><span class="nv">down</span><span class="w"> </span><span class="nv">network</span><span class="w"> </span><span class="nv">conducts</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="ss">)</span>
+</code></pre></div>
+
+<p>The pull-down network computes AND and OR of its inputs, and then the output
+node inverts the answer, because conducting means pulling low. There is no
+arrangement of nMOS transistors between the output and ground that produces a
+non-inverting function. Pulling the output down is the only thing such a network
+can do.</p>
+<p>The pull-up network has to be the complement, so that exactly one network
+conducts at a time. Since pMOS transistors conduct on a <strong>low</strong> input, the
+complement comes out as the series-parallel dual: wherever the pull-down has
+transistors in series, the pull-up has them in parallel, and the other way
+round. That is De Morgan's theorem drawn as wiring rather than written as
+algebra.</p>
+<p><a href="../drafts/04-series-parallel-HQ.png"><img alt="Two switch networks, one series pair conducting only when both switches are on and one parallel pair conducting when either is on, with the rule that the pull-up network uses the opposite arrangement" src="../drafts/04-series-parallel-900w.png"></a></p>
+<p>The recipe for any static CMOS gate is now mechanical:</p>
+<ol>
+<li>Write the function you want as an inverted expression, <code>y = NOT(f)</code>.</li>
+<li>Build <code>f</code> in nMOS between output and ground: AND becomes series, OR becomes
+   parallel.</li>
+<li>Build the dual of that network in pMOS between output and supply: series
+   becomes parallel, parallel becomes series.</li>
+<li>Count the transistors. Two per input, always.</li>
+</ol>
+<hr>
+<h2>NAND2 and NOR2</h2>
+<p>Apply the recipe to the two simplest cases and the standard cell library appears.</p>
+<p><strong>NAND2</strong> is <code>y = NOT(A AND B)</code>. AND becomes two nMOS in series to ground. The
+dual is two pMOS in parallel to the supply.</p>
+<p><strong>NOR2</strong> is <code>y = NOT(A OR B)</code>. OR becomes two nMOS in parallel to ground. The
+dual is two pMOS in series to the supply.</p>
+<p><a href="../drafts/03-nand2-nor2-HQ.png"><img alt="NAND2 and NOR2 transistor schematics side by side, showing series nMOS with parallel pMOS for the NAND and parallel nMOS with series pMOS for the NOR, with the transistor sizing noted for each" src="../drafts/03-nand2-nor2-900w.png"></a></p>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+<th>NAND2 pull-down</th>
+<th>NAND2 out</th>
+<th>NOR2 pull-down</th>
+<th>NOR2 out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>off</td>
+<td>1</td>
+<td>off</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>off</td>
+<td>1</td>
+<td>on</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>off</td>
+<td>1</td>
+<td>on</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>on</td>
+<td>0</td>
+<td>on</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Four transistors each, symmetric on paper. They are not symmetric in silicon.</p>
+<p>In NAND2 the <strong>slow</strong> transistors, the pMOS pair, are in parallel, so either one
+alone can pull the output up, and each can stay near the minimum practical width
+that balances the gate. The nMOS pair is in series, so two channel resistances
+add on the pull-down, and each nMOS is roughly doubled in width to compensate.
+Electrons are cheap to widen.</p>
+<p>In NOR2 it is the other way round, and the arrangement falls the wrong way. The pMOS pair
+is in <strong>series</strong>, so two already-slow devices add their resistances, and getting
+a rise time to match the fall time means widening each of them by something like
+four times the nMOS width. That is a bigger cell, more input capacitance
+presented to whatever drives it, and a worse delay for the same logical work.</p>
+<p>This is why libraries and synthesis are NAND-heavy. Given a choice between two
+logically equivalent structures, the one built from NAND2 and inverters is
+usually smaller and faster than the one built from NOR2. It is also why a
+four-input NOR is rare, and a four-input NAND uncommon: stacking four pMOS in
+series produces a cell whose pull-up is several times slower than its pull-down,
+and stacking any four devices runs into the <strong>body effect</strong>, where transistors part-way up a
+stack see a raised source voltage, an effectively higher threshold, and less
+current than the one at the bottom. Practical libraries stop at three or four
+inputs and let synthesis build trees from there.</p>
+<hr>
+<h2>Where the AND gate's extra transistors went</h2>
+<p>Back to the netlist that started this. The recipe produces <code>y = NOT(f)</code>, always.
+The output node is pulled low by a conducting network, and there is no way to
+arrange switches so that conducting pulls it high while still using nMOS below
+and pMOS above. <strong>A single-stage static CMOS gate is inverting by construction.</strong></p>
+<p>So AND2 is NAND2 plus an inverter: 4 + 2 = 6 transistors, two stages of delay
+rather than one. OR2 is NOR2 plus an inverter, and inherits the NOR2 pull-up
+problem as well. A buffer is two inverters, for the same reason. Nothing in the
+library is non-inverting for free.</p>
+<p>NAND and NOR are not
+"universal gates" because of a tidy algebraic fact about being able to express
+everything with them. They are the gates the libraries are built from because
+a pull-down network and its dual produce them naturally, and AND and OR
+are the compound cells, sold at a two-transistor and one-stage premium. The
+Boolean operators you write in a hardware description language are the
+abstraction. The inverting cells are the hardware.</p>
+<p>Two habits follow from it.</p>
+<p><strong>Push the inversions around instead of paying for them.</strong> De Morgan says a
+NAND with inverted inputs is an OR, and a NOR with inverted inputs is an AND.
+An inverter that cancels another inverter is free once the netlist is optimised,
+and a bubble that moves to a place where something else already inverts costs
+nothing at all. Synthesis does this automatically, which is why the netlist so
+rarely resembles the RTL structurally.</p>
+<p><strong>Compound functions can stay in one stage.</strong> The recipe never said the network
+had to be two transistors. <code>y = NOT((A AND B) OR C)</code> is an <strong>and-or-invert</strong>
+gate, AOI21: two nMOS in series for the AND, that pair in parallel with a third
+for the OR, and the dual above it. Six transistors, one stage of delay, and it
+does the work of an AND2 feeding a NOR2, which would have cost ten
+transistors and three stages.</p>
+<p><a href="../drafts/05-aoi21-HQ.png"><img alt="An AOI21 gate schematic with two nMOS in series in parallel with a third in the pull-down network, and the dual arrangement of pMOS in the pull-up network, six transistors in one stage" src="../drafts/05-aoi21-900w.png"></a></p>
+<p>Libraries carry a whole family of these: AOI21, AOI22, OAI21, OAI221 and more.
+Technology mapping during synthesis is largely the business of spotting where
+one of them fits, and it is a large part of why hand-instantiated gate-level
+logic so seldom beats the tool.</p>
+<hr>
+<h2>The two things static CMOS is bad at</h2>
+<p>Two functions resist the recipe, and both are common enough that libraries solve
+them another way.</p>
+<p><strong>The multiplexer.</strong> Selecting between two inputs as a static CMOS gate is an
+AOI22 at eight transistors, one inverter to make the complement of the select
+and another to restore the polarity: twelve transistors for a function that only
+has to connect one of two wires to an output. The
+alternative is a <strong>transmission gate</strong>: an nMOS and a pMOS in parallel, driven
+by complementary select signals, acting as a switch that passes a full-strength
+signal in either direction. The nMOS covers the low end, the pMOS covers the
+high end, and between them the weak-1 and weak-0 problems cancel. Two
+transmission gates and an inverter make a clean two-way multiplexer.</p>
+<p><strong>Exclusive-OR.</strong> In pure static CMOS, XOR needs both inputs and their
+complements and lands at ten to twelve transistors. Built from transmission
+gates it comes down to six or eight. Since XOR is the core of every adder and
+every parity tree, that saving justifies the library carrying special cells for
+it, and it is why an adder's transistor count never quite matches the figure the
+gate count suggests.</p>
+<p>The catch with transmission gates is that they pass signals rather than drive
+them. A chain of them accumulates resistance quadratically and has no gain to
+restore a degraded edge, so a buffer has to appear every couple of stages.
+Transmission-gate logic is a local optimisation inside a cell, not a style for
+building a whole design.</p>
+<hr>
+<h2>Reading a cell library like a circuit</h2>
+<p>The next time a databook is open, the numbers have physical meanings.</p>
+<ul>
+<li><strong>Transistor count</strong>, or the area column standing in for it: two per input for
+  a simple gate, plus two for every inversion the function needs at the output.
+  A six-transistor two-input cell is a compound gate with an inverter on it.</li>
+<li><strong>Input capacitance</strong> differs per pin on the same cell. In a NAND2 the input
+  nearest the output in the nMOS stack switches faster than the one nearest
+  ground, which is why the timing model gives per-pin arcs and why synthesis
+  cares which signal lands on which pin.</li>
+<li><strong>A NOR2 that is larger than the NAND2</strong> of the same drive strength is the
+  series pMOS stack, sized up. If a design is NOR-heavy, that is showing up in
+  both area and timing.</li>
+<li><strong>Drive strength suffixes</strong> are transistor width. More output current, more
+  input capacitance, no change to the logic.</li>
+<li><strong>Rise and fall times that differ</strong> mean the pull-up and pull-down networks
+  are not balanced, either by design or because the cell was optimised for area.</li>
+</ul>
+<p>Every one of those numbers is a pull-up network and a pull-down network, drawn
+as polygons on the masks from the previous article, and the standard cell layout
+is where the two articles meet: the p-type row along the top under a supply
+rail, the n-type row along the bottom over a ground rail, polysilicon stripes
+crossing both to form the gates, and metal 1 stitching the drains together into
+the output.</p>
+<p>The next article in the series takes these cells and starts combining them:
+Boolean algebra as a tool for restructuring logic before it ever reaches a
+transistor.</p>
+<hr>
+<p><em>Previous: <a href="../digital-design-01-mask-sets-and-how-a-transistor-gets-built.html">Digital Design 01: Mask sets, and how a transistor gets built</a></em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

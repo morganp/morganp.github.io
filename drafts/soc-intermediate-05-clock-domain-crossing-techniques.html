@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Intermediate 05: Clock domain crossing techniques</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Why a bus can cross a clock domain through correct synchronisers and still deliver a value that never existed, and the structures that prevent it:..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                <li class="active"><a href="../category/engineering.html">Engineering</a></li>
+                                                <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                <li><a href="../category/music.html">Music</a></li>
+                                                <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                <li><a href="../category/photography.html">Photography</a></li>
+                                                <li><a href="../category/programming.html">Programming</a></li>
+                                                <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/soc-intermediate-05-clock-domain-crossing-techniques.html" rel="bookmark"
+             title="Permalink to SoC Intermediate 05: Clock domain crossing techniques">SoC Intermediate 05: Clock domain crossing techniques</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-24T00:00:00+01:00">
+                Published: Mon 24 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/rtl.html">RTL</a> <a href="../tag/cdc.html">CDC</a> <a href="../tag/metastability.html">Metastability</a> <a href="../tag/synchronisers.html">Synchronisers</a> <a href="../tag/fifo.html">FIFO</a> <a href="../tag/verification.html">Verification</a> <a href="../tag/asic.html">ASIC</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="../drafts/00-two-domains-hero-HQ.png"><img alt="Two clock domains on a system on chip beating at different rhythms, joined by a bridge carrying synchroniser, handshake and FIFO structures between them" src="../drafts/00-two-domains-hero-900w.png"></a></p>
+<p><em>Series: Intermediate SoC Design | Article 5 of 10</em></p>
+<hr>
+<h2>The value that never existed</h2>
+<p>The failure happened about once every eleven hours. A timestamp counter,
+maintained in a 300 MHz domain and read by software running at 100 MHz, would
+very occasionally return a number that was wrong by a large power of two.
+Wrong, then correct again on the next read, then correct for another eleven
+hours.</p>
+<p>The crossing had been reviewed. Every bit of that counter went through a proper
+two-flop synchroniser in the destination domain. The clock domain crossing
+(CDC) tool reported no unsynchronised crossings anywhere in the block.</p>
+<p>This article is about what those two flops actually buy, what they do not buy,
+and how to pick the right structure for each kind of crossing. It targets
+engineers writing register transfer level (RTL) code that spans more than one
+clock, and anybody who has been handed a CDC report and a list of waivers and
+asked whether the design is safe.</p>
+<hr>
+<h2>Why a flip-flop can hesitate</h2>
+<p>A flip-flop is specified to capture its input reliably provided the input is
+stable for a setup time before the clock edge and a hold time after it. A
+signal arriving from another clock domain has no relationship to that edge and
+will eventually violate the window.</p>
+<p>When it does, the flop can enter metastability: an internal balanced state
+where the output sits between valid logic levels and takes an unbounded time to
+resolve one way or the other.</p>
+<p><a href="../drafts/01-metastability-HQ.png"><img alt="A coin landing on its edge and slowly toppling, shown as the balanced state a flip-flop enters when data arrives too close to a clock edge" src="../drafts/01-metastability-900w.png"></a></p>
+<p>It does resolve. The balance is unstable, and the internal feedback amplifies
+whichever way it tips, exponentially. That exponential is the entire basis of
+synchroniser design, because it means the probability of still being undecided
+falls off exponentially with the time you allow.</p>
+<div class="highlight"><pre><span></span><code>              e^(t_r / tau)
+MTBF  =  ---------------------------
+          T0 <span class="gs">* f_clock *</span> f_data
+</code></pre></div>
+
+<p><code>t_r</code> is the time the design gives the flop to resolve before anything reads
+it. <code>tau</code> and <code>T0</code> characterise the flop and come from the library. The two
+frequencies set how often the opportunity to fail arises.</p>
+<p>Put illustrative numbers in. With <code>tau</code> of 20 ps, a destination clock of
+500 MHz, data changing at 10 MHz, and a single flop leaving 0.3 ns of slack for
+resolution, the exponent is 15 and the mean time between failures is about half
+a minute. That is not a design, it is a fault generator.</p>
+<p>Add a second flop and the resolution time gains most of a clock period. The
+exponent moves from 15 to around 115, and since <code>e</code> to the 100 is roughly ten
+to the 43, the mean time between failures leaves the domain of engineering
+entirely.</p>
+<p>Two things follow, and both matter. The failure rate can be made arbitrarily
+small, and it can never be made zero. Metastability is managed, not eliminated,
+and the number of stages is a calculation against your library and your
+frequencies, not a convention. Above roughly a gigahertz, or with a fast data
+rate, three stages start to earn their place.</p>
+<hr>
+<h2>The structure everyone knows</h2>
+<p>The two-flop synchroniser is two flip-flops in the destination domain, back to
+back, with nothing combinational between them.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_ee9025e575475e524edfec589b943cde.svg"></p>
+<p>The amber edge is a rule, not a drawing convenience. Any combinational logic
+between FF1 and FF2 consumes the resolution time the second flop exists to
+provide, and a synthesis tool that is not told otherwise will happily place
+some there. Real flows mark the structure explicitly, through a synchroniser
+cell from the library, a naming convention the CDC tool recognises, or a
+constraint that keeps the pair together.</p>
+<p>The cost is latency, and it is worth being precise about how much.</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_b283a2cc0142562edb294bcb2f6a1909.svg"></p>
+<p>That is the correct structure for a single bit that changes slowly relative to
+the destination clock: a status level, an enable, a mode bit that settles long
+before anybody acts on it.</p>
+<p>It is the wrong structure for everything else, and the rest of this article is
+the everything else.</p>
+<hr>
+<h2>Pulses that are not there long enough</h2>
+<p>A one-cycle pulse in a 300 MHz domain lasts about 3.3 ns. A destination clock
+at 100 MHz looks every 10 ns. The pulse can arrive and leave between two
+destination edges, and no amount of synchronisation recovers a signal that was
+never present when anybody sampled.</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_ff7f110ee68de1e2fc933fb242e3d7a8.svg"></p>
+<p>The fix is to stop crossing a pulse and start crossing a level. A toggle
+synchroniser converts each event into a permanent change of state, which the
+destination cannot miss, then converts it back into a pulse locally.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Source domain: each event flips the level</span>
+<span class="k">always_ff</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">src_clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">src_reset_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">src_reset_n</span><span class="p">)</span>
+<span class="w">        </span><span class="n">req_toggle</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">src_pulse</span><span class="p">)</span>
+<span class="w">        </span><span class="n">req_toggle</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="o">~</span><span class="n">req_toggle</span><span class="p">;</span>
+<span class="k">end</span>
+
+<span class="c1">// Destination domain: synchronise, then edge detect</span>
+<span class="k">always_ff</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">dst_clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">dst_reset_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">dst_reset_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">sync1</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">sync2</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">sync3</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">sync1</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">req_toggle</span><span class="p">;</span>
+<span class="w">        </span><span class="n">sync2</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">sync1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">sync3</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">sync2</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">assign</span><span class="w"> </span><span class="n">dst_pulse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sync2</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">sync3</span><span class="p">;</span>
+</code></pre></div>
+
+<p>The third flop is not a third synchroniser stage. It is a delayed copy so the
+exclusive OR can spot the edge. Two stages resolve metastability, the third
+recovers the event.</p>
+<p>This structure carries events, not data, and it has a rate limit. Events must
+arrive no faster than the destination can observe separate toggles, which means
+at least two or three destination clock periods apart. Push events in faster
+than that and toggles cancel silently, which looks exactly like an interrupt
+that occasionally does not fire.</p>
+<hr>
+<h2>Buses, and the failure at the top</h2>
+<p>Now the counter. Each bit went through a correct two-flop synchroniser, and
+each of those synchronisers did its job perfectly.</p>
+<p>Consider the counter stepping from 0x0FFF to 0x1000. Twelve bits fall and one
+bit rises, all in the same source cycle, but not at exactly the same instant:
+different flops, different clock arrival, different routing, tens of
+picoseconds apart. In the destination domain each synchroniser makes its own
+independent decision about which side of the edge its bit landed on.</p>
+<p>If the new value of bit 12 is captured and the old values of bits 0 to 11 are
+also captured, the destination reads 0x1FFF. Not the old value, not the new
+value. A number the source counter never held, and never will.</p>
+<p><a href="../drafts/02-multibit-incoherence-HQ.png"><img alt="A multi-bit bus crossing between two clock domains where individual bits land in different destination cycles, producing a captured value that matches neither the old nor the new source value" src="../drafts/02-multibit-incoherence-900w.png"></a></p>
+<p>Here is the reframe. A synchroniser does not transfer data. It protects one bit
+against one flop's uncertainty, and that is the entire scope of what it does.
+Nothing about it coordinates one bit with another, so the moment two bits are
+supposed to mean something together, the two-flop structure has no opinion and
+provides no protection.</p>
+<p>Metastability is the part of CDC that has a standard answer. Coherency is the
+part that has to be designed, crossing by crossing, and it is where the bugs
+that survive to silicon come from. That is also why the CDC tool was quiet: it
+was asked whether the crossings were synchronised, and they were.</p>
+<p>It explains the eleven hours too. The bad read needs a carry across many bits
+to line up with a read in the other domain, inside a window tens of
+picoseconds wide. Rare, and completely inevitable given enough time. Every CDC
+bug has that signature: it does not happen in simulation, it does not happen on
+the bench, and it happens in the field on a schedule.</p>
+<hr>
+<h2>Structures that preserve meaning</h2>
+<p>Once the problem is stated as coherency, the choice of structure follows from
+what the signals mean together.</p>
+<table>
+<thead>
+<tr>
+<th>What is crossing</th>
+<th>Structure</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One slow-changing level</td>
+<td>Two-flop synchroniser</td>
+<td>Only metastability is at stake</td>
+</tr>
+<tr>
+<td>An event or pulse</td>
+<td>Toggle synchroniser</td>
+<td>Turns a moment into a state</td>
+</tr>
+<tr>
+<td>A register-like value, written occasionally</td>
+<td>Request and acknowledge handshake</td>
+<td>Data held stable while it is read</td>
+</tr>
+<tr>
+<td>A counter or pointer</td>
+<td>Gray code plus synchronisers</td>
+<td>Only one bit changes per step</td>
+</tr>
+<tr>
+<td>A stream of data</td>
+<td>Asynchronous FIFO</td>
+<td>Decouples rates as well as clocks</td>
+</tr>
+<tr>
+<td>A value that is cheap to derive</td>
+<td>Recompute in the destination</td>
+<td>The best crossing is no crossing</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Handshake.</strong> The source presents the data and asserts request. The data does
+not move until acknowledge comes back, which means the bus is stable through
+every destination sample, so no synchroniser sees a changing input at all.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_ad2f97ae8114007662ae8f2053df5e62.svg"></p>
+<p>The round trip costs roughly two synchroniser delays in each direction, so
+throughput is low. For a configuration register written once at boot that is
+irrelevant, and the simplicity is worth more than the cycles.</p>
+<p><strong>Gray code.</strong> Only one bit changes between consecutive values, so the worst
+case at the destination is capturing the old value or the new one. Both are
+values that existed.</p>
+<div class="highlight"><pre><span></span><code><span class="k">assign</span><span class="w"> </span><span class="n">gray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">binary</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="p">(</span><span class="n">binary</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mh">1</span><span class="p">);</span>
+</code></pre></div>
+
+<p>The property holds only for values that step by one. A counter that can jump,
+be loaded, or be cleared to zero from an arbitrary value breaks it immediately,
+and that is a real bug pattern rather than a theoretical one.</p>
+<p><strong>Asynchronous FIFO.</strong> For streaming data, the standard structure combines both
+ideas: the data sits in dual-port memory and never crosses a domain at all,
+while the pointers cross as Gray-coded values.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_25af9c0f9e05cca264ee36cd6dee21f3.svg"></p>
+<p>Note which way each pointer travels. The write pointer is synchronised into the
+read domain to compute empty, and the read pointer into the write domain to
+compute full. Both are late by a synchroniser delay, and the direction of that
+staleness is what makes the design safe: full is computed from a read pointer
+that may be older than reality, so the FIFO can only declare itself full early,
+never late. Empty is conservative in the same direction. Getting either
+comparison backwards produces a FIFO that overruns once a week.</p>
+<hr>
+<h2>Reset is a crossing too</h2>
+<p>Reset gets forgotten because it does not look like data. It is a signal that
+one domain drives and another domain's flops obey, which is the definition.</p>
+<p>Assertion is usually asynchronous on purpose, because reset must work with no
+clock running. Release is the dangerous edge: if reset deasserts near a clock
+edge, some flops in a domain leave reset one cycle before others, and a state
+machine can start in a state its encoding does not allow.</p>
+<p>The standard answer is to assert asynchronously and deassert synchronously, per
+domain:</p>
+<div class="highlight"><pre><span></span><code><span class="k">always_ff</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">arst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">arst_n</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">rst_sync1</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">rst_sync2</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">rst_sync1</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">rst_sync2</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">rst_sync1</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">assign</span><span class="w"> </span><span class="n">reset_n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rst_sync2</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Every clock domain needs its own instance. Sharing one reset synchroniser
+across domains reintroduces exactly the crossing it was built to remove.</p>
+<hr>
+<h2>Reconvergence</h2>
+<p>The last structural trap is two signals that are synchronised correctly and
+separately, then combined in destination logic.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_52f740af577b4d7ded9d81ca5a8bd20c.svg"></p>
+<p>Each synchroniser independently decides which destination cycle its signal
+arrived in. If the two source signals are related, and a one-cycle skew between
+them describes a state the source never occupied, the destination logic acts on
+a combination that does not exist. It is the multi-bit problem again, wearing
+control-signal clothing, and it is harder to spot because the signals are
+declared separately and often synchronised in different modules.</p>
+<p>The rule is that anything which must be interpreted together must cross
+together, through one handshake or one FIFO.</p>
+<hr>
+<h2>Tools, and what a waiver means</h2>
+<p>CDC tools are structural analysers. They find crossings, classify them, and
+flag the unsafe shapes: unsynchronised multi-bit buses, combinational logic
+inside synchronisers, reconvergent paths, clock multiplexers, generated clocks,
+and reset crossings. On a large SoC they will find thousands, most benign.</p>
+<p>That volume is what makes waivers dangerous. A waiver reading "known crossing"
+records only that somebody looked. A waiver should carry the argument: why the
+crossing is safe, what property makes it safe, and what change would break it.</p>
+<p>The parallel with the previous article in this series is exact. A timing
+exception hides a real path from static timing analysis; a CDC waiver hides a
+real crossing from CDC analysis. Both are written once, by someone who
+understood the design at that moment, and both stay in the file long after the
+RTL around them has changed.</p>
+<p>Simulation will not cover the gap. Standard simulation samples on ideal edges
+and shows none of this. Randomising clock ratios and injecting synchroniser
+delay in the model finds a useful fraction, and formal CDC analysis finds more,
+but the structural argument for each crossing is what actually makes the design
+safe.</p>
+<hr>
+<h2>CDC checklist</h2>
+<ol>
+<li>Enumerate every clock, including generated, divided, gated, and
+   multiplexed ones, before enumerating crossings.</li>
+<li>Match each crossing to its semantics: level, event, register value, pointer,
+   stream, or reset. Write the choice down next to the code.</li>
+<li>Reserve the two-flop synchroniser for single-bit levels, and calculate the
+   stage count against library <code>tau</code> and the real frequencies rather than
+   assuming two is always enough.</li>
+<li>Never synchronise the bits of a bus independently, and treat any bus
+   arriving at more than one synchroniser as a bug until proven otherwise.</li>
+<li>Give every clock domain its own reset synchroniser and check the deassertion
+   edge specifically.</li>
+<li>Bundle related control signals into one crossing so reconvergence cannot
+   invent states.</li>
+<li>Confirm the FIFO full and empty comparisons use the pointer that makes each
+   one conservative.</li>
+<li>Require a written argument on every waiver, with an owner, and re-derive it
+   whenever the surrounding RTL changes.</li>
+</ol>
+<hr>
+<h2>Ask what each crossing means</h2>
+<p>The useful question at a CDC review is not "is this crossing synchronised". It
+is "what do these signals mean together, and what structure preserves that".</p>
+<p>The counter needed a handshake or a Gray code, and it got two flops per bit
+because two flops per bit is what CDC looks like in most people's heads. The
+review asked the wrong question, the tool answered the question it was given,
+and the design shipped with a fault that arrived on a timetable.</p>
+<p>Every crossing in a design has an answer to the meaning question. It is worth
+writing that answer in a comment beside the code, because the next person to
+touch it will otherwise see two flops, recognise the shape, and assume the
+thinking was done.</p>
+<hr>
+<p><em>Previous: <a href="../drafts/soc-intermediate-04-rtl-synthesis-and-timing-closure.html">Article I-04: RTL synthesis and timing closure</a></em>
+<em>Next: Intermediate Article 06, SoC verification with UVM</em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
