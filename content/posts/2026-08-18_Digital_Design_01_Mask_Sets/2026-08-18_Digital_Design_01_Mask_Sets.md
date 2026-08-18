@@ -148,6 +148,87 @@ forty before any of the complications below.
 
 ---
 
+## How the switch actually switches
+
+The masks have produced a structure. Nothing so far explains why a voltage on a
+plate of metal sitting over an insulator should control a current flowing
+underneath it, several nanometres away, through material the plate never
+touches.
+
+Start with the device at rest. The source and drain are islands of n-type
+silicon in a p-type substrate, which makes two diodes back to back. Put a
+voltage across them and one of the two is always reverse biased, so no useful
+current flows between source and drain no matter what the drain voltage does.
+The transistor is off, and it is off because there is nothing joining the two
+islands.
+
+Now raise the gate. The gate, the oxide and the silicon underneath form a
+capacitor: two conductors separated by an insulator. Charge on the gate
+therefore pulls an equal and opposite charge to the silicon surface, without a
+single electron crossing the oxide.
+
+That induced charge arrives in two stages.
+
+**Below the threshold, the surface merely empties.** A positive gate repels the
+holes that a p-type substrate is full of, pushing them down and away. What is
+left behind is a depleted layer, carrying no mobile charge at all. There is
+still no path from source to drain.
+
+**Above the threshold, the surface changes type.** Push harder and the gate
+starts attracting electrons rather than just repelling holes. They gather in a
+thin sheet at the oxide interface, and where there was p-type silicon there is
+now a film of n-type silicon a few nanometres thick. That film is the
+**channel**, and it joins the source island to the drain island. The gate
+voltage at which this happens is the **threshold voltage**, and it is one of the
+numbers a process is built around.
+
+![Animated cross-section of an nMOS transistor. The gate voltage rises from zero, first pushing holes away from the surface to leave a depleted layer, then pulling electrons to the surface to form an n-type channel joining source to drain, after which electrons drift along the channel]({attach}/images/DigitalDesign/Article01/02-channel-formation.svg)
+
+Once the channel exists, a voltage between drain and source moves electrons
+along it. More gate voltage pulls in more electrons, which lowers the channel
+resistance and raises the current. The transistor is not a mechanical contact
+being closed. It is a resistor whose value is set by a voltage on a capacitor
+plate.
+
+Four consequences run through everything in this series.
+
+**The gate draws no steady current.** It is one plate of a capacitor, so a
+finished logic gate can hold its inputs at a value forever and spend nothing
+doing it. Only the transitions cost energy, because each one charges or
+discharges that capacitance. This is why complementary metal-oxide-semiconductor
+logic displaced the alternatives, and why power scales with switching activity.
+
+**Thin oxide means a stronger grip.** Bring the plate closer and the same
+voltage induces more charge, so the device switches at a lower voltage and
+carries more current. Hence gate oxides a handful of atoms thick, and hence the
+industry moving to hafnium-based insulators once silicon dioxide could get no
+thinner without leaking outright.
+
+**Short channels are fast and leaky.** A shorter channel is a shorter distance
+for electrons to cross, so the device is quicker, which is the whole point of
+shrinking. It also means the drain sits closer to the source and starts
+influencing the channel that the gate is supposed to control alone. Every
+structure in the modern device list, from FinFETs to gate-all-around
+nanosheets, exists to wrap the gate further around the channel and win that
+argument back.
+
+**Off is not zero.** Below the threshold the current falls exponentially rather
+than to nothing, so several billion transistors that are all switched off still
+add up to a measurable leakage current. Standby battery life is largely a fight
+with that number.
+
+The pMOS works the same way with every sign reversed. It sits in the n-well from
+mask 1, its source and drain are p-type, and pulling the gate **below** its
+source attracts holes to the surface to form a p-type channel. An nMOS conducts
+when its gate is high; a pMOS conducts when its gate is low.
+
+That pair of sentences is the entire input to the next article. Two switches,
+each closed by the opposite condition, each with an insulated gate that costs
+nothing to hold. Everything in a logic library is built by wiring those two
+kinds of switch into networks.
+
+---
+
 ## What one masking step actually involves
 
 Every one of those numbered steps expands into the same loop. The mask count
