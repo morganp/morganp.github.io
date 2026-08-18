@@ -76,7 +76,26 @@ been handed a standard cell library and wants to know what the numbers in it
 mean, and anyone learning digital design who wants gates to stop being symbols
 on a page. It follows on from
 <a href="../digital-design-01-mask-sets-and-how-a-transistor-gets-built.html">Digital Design 01</a>,
-which built the transistors these gates are made of.</p>
+which built the transistors these gates are made of and showed how a gate
+voltage forms the channel that makes one conduct.</p>
+<hr>
+<h2>A 1 is a voltage</h2>
+<p>One thing to settle before any of the schematics make sense: a logic value is
+not an abstraction sitting on top of the circuit. It is a voltage on a wire.</p>
+<p><strong>A digital 1 is the supply voltage, VDD.</strong> <strong>A digital 0 is ground, 0 V.</strong> In
+these schematics the rail marked VDD and the value 1 are the same thing, and the
+rail marked GND and the value 0 are the same thing. Saying a gate "outputs a 1"
+and saying it "connects its output to VDD" describe one event.</p>
+<p>VDD is whatever the process runs at, and it has fallen steadily with each node:
+5 V in the 1980s, 3.3 V, 1.8 V, and around 0.7 to 0.9 V on a modern logic
+process. The logic does not care about the number. It cares that there are two
+rails, that every output can be tied to one of them, and that the receiving gate
+can tell which.</p>
+<p>Real circuits leave margin around both values. Anything above roughly 70 per
+cent of VDD reads as a 1, anything below roughly 30 per cent reads as a 0, and
+the band between is the noise margin. A "weak" or "degraded" level later in this
+article means a voltage that has drifted towards that middle band, where the
+next gate has to work harder to decide.</p>
 <hr>
 <h2>Two switches, each good at one thing</h2>
 <p>The metal-oxide-semiconductor field-effect transistor (MOSFET) has three
@@ -134,8 +153,8 @@ on.</p>
 it rises the gate-to-source voltage falls, because the source is the rising
 node. When the output gets within one threshold voltage of the gate, the
 transistor stops conducting. The output sits at roughly the supply minus a
-threshold: a weak, degraded 1 that costs noise margin and leaks current in the
-gate it feeds. The pMOS has the mirror-image problem pulling down to ground.</p>
+threshold: a 1 that is a few hundred millivolts short of VDD, eating into the
+noise margin above and leaking current in the gate it feeds. The pMOS has the mirror-image problem pulling down to ground.</p>
 <p>So the transistors get used the way they are good:</p>
 <ul>
 <li><strong>nMOS transistors connect the output to ground.</strong> They form the <strong>pull-down
