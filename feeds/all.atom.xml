@@ -1,5 +1,381 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-19T00:00:00+01:00</updated><entry><title>Lashing a tripod</title><link href="http://lizard-spock.co.uk/lashing-a-tripod.html" rel="alternate"></link><published>2026-08-19T00:00:00+01:00</published><updated>2026-08-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-19:/lashing-a-tripod.html</id><summary type="html">&lt;p&gt;How to tie a clove hitch and a tripod lashing, and the wrap and frapping counts that let three poles open into a tripod.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-tripod-hero-HQ.png"&gt;&lt;img alt="Two lashed tripods standing apart, carrying a horizontal spar between their apexes with kit hung from it" src="http://lizard-spock.co.uk/00-tripod-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-19T00:00:00+01:00</updated><entry><title>Digital Design 02: Pull-up and pull-down networks</title><link href="http://lizard-spock.co.uk/digital-design-02-pull-up-and-pull-down-networks.html" rel="alternate"></link><published>2026-08-19T00:00:00+01:00</published><updated>2026-08-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-19:/digital-design-02-pull-up-and-pull-down-networks.html</id><summary type="html">&lt;p&gt;Why a static CMOS gate is always inverting, how series and parallel transistor networks turn into NAND and NOR, why NOR2 is the slower of the pair, and where the extra two transistors in an AND gate go.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-pullup-pulldown-hero-HQ.png"&gt;&lt;img alt="An output wire strung between a supply rail and a ground rail, with a closed switch pulling it up and an open switch below it, and arrows pointing up to the supply and down to ground" src="http://lizard-spock.co.uk/00-pullup-pulldown-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Series: Digital Design Fundamentals | Article 2&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The AND gate that was not there&lt;/h2&gt;
+&lt;p&gt;You wrote &lt;code&gt;assign y = a &amp;amp; b;&lt;/code&gt;, ran synthesis, and opened the gate-level netlist
+to check something unrelated. There is no AND gate in it. There is a NAND2
+feeding an inverter.&lt;/p&gt;
+&lt;p&gt;Look up both cells in the library databook and it gets stranger. The NAND2 is
+four transistors. The AND2, which exists, is six, and it is slower. The
+synthesiser did nothing unusual. It used the AND2 cell, and
+the AND2 cell &lt;strong&gt;is&lt;/strong&gt; a NAND2 followed by an inverter, because in static CMOS
+there is no other way to build one.&lt;/p&gt;
+&lt;p&gt;This article is about why. It covers the two transistors as switches, the
+pull-down and pull-up networks made from them, why those networks always
+produce an inverting function, how NAND and NOR fall out of series and parallel
+arrangements, and why the two are not equally good. It targets anyone who has
+been handed a standard cell library and wants to know what the numbers in it
+mean, and anyone learning digital design who wants gates to stop being symbols
+on a page. It follows on from
+&lt;a href="http://lizard-spock.co.uk/digital-design-01-mask-sets-and-how-a-transistor-gets-built.html"&gt;Digital Design 01&lt;/a&gt;,
+which built the transistors these gates are made of and showed how a gate
+voltage forms the channel that makes one conduct.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;A 1 is a voltage&lt;/h2&gt;
+&lt;p&gt;One thing to settle before any of the schematics make sense: a logic value is
+not an abstraction sitting on top of the circuit. It is a voltage on a wire.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;A digital 1 is the supply voltage, VDD.&lt;/strong&gt; &lt;strong&gt;A digital 0 is ground, 0 V.&lt;/strong&gt; In
+these schematics the rail marked VDD and the value 1 are the same thing, and the
+rail marked GND and the value 0 are the same thing. Saying a gate "outputs a 1"
+and saying it "connects its output to VDD" describe one event.&lt;/p&gt;
+&lt;p&gt;VDD is whatever the process runs at, and it has fallen steadily with each node:
+5 V in the 1980s, 3.3 V, 1.8 V, and around 0.7 to 0.9 V on a modern logic
+process. The logic does not care about the number. It cares that there are two
+rails, that every output can be tied to one of them, and that the receiving gate
+can tell which.&lt;/p&gt;
+&lt;p&gt;Real circuits leave margin around both values. Anything above roughly 70 per
+cent of VDD reads as a 1, anything below roughly 30 per cent reads as a 0, and
+the band between is the noise margin. A "weak" or "degraded" level later in this
+article means a voltage that has drifted towards that middle band, where the
+next gate has to work harder to decide.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Two switches, each good at one thing&lt;/h2&gt;
+&lt;p&gt;The metal-oxide-semiconductor field-effect transistor (MOSFET) has three
+terminals that matter here: &lt;strong&gt;gate&lt;/strong&gt;, &lt;strong&gt;source&lt;/strong&gt; and &lt;strong&gt;drain&lt;/strong&gt;. Voltage on the
+gate controls whether current can flow between source and drain. No current
+flows into the gate itself; it is a capacitor plate over an insulator. That is
+the whole reason complementary metal-oxide-semiconductor (CMOS) logic can drive
+thousands of inputs without a power budget for it.&lt;/p&gt;
+&lt;p&gt;There are two flavours, and they are opposites.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;nMOS&lt;/th&gt;
+&lt;th&gt;pMOS&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Conducts when the gate is&lt;/td&gt;
+&lt;td&gt;high&lt;/td&gt;
+&lt;td&gt;low&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Turns on at&lt;/td&gt;
+&lt;td&gt;gate above source by the threshold voltage&lt;/td&gt;
+&lt;td&gt;gate below source by the threshold voltage&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Passes a good&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Passes a poor&lt;/td&gt;
+&lt;td&gt;1, stopping a threshold below the supply&lt;/td&gt;
+&lt;td&gt;0, stopping a threshold above ground&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Carrier&lt;/td&gt;
+&lt;td&gt;electrons&lt;/td&gt;
+&lt;td&gt;holes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Speed for the same width&lt;/td&gt;
+&lt;td&gt;faster&lt;/td&gt;
+&lt;td&gt;slower, by roughly two to three times&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/01-mos-switches-HQ.png"&gt;&lt;img alt="Side by side schematics of an nMOS transistor connected between the output node and ground and a pMOS transistor connected between the supply and the output node, annotated with which logic level each one passes well" src="http://lizard-spock.co.uk/01-mos-switches-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The two rows in the middle of that table are the ones everything else is built
+on.&lt;/p&gt;
+&lt;p&gt;Try to pull an output up to the supply through an nMOS. The output rises, and as
+it rises the gate-to-source voltage falls, because the source is the rising
+node. When the output gets within one threshold voltage of the gate, the
+transistor stops conducting. The output sits at roughly the supply minus a
+threshold: a 1 that is a few hundred millivolts short of VDD, eating into the
+noise margin above and leaking current in the gate it feeds. The pMOS has the mirror-image problem pulling down to ground.&lt;/p&gt;
+&lt;p&gt;So the transistors get used the way they are good:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;nMOS transistors connect the output to ground.&lt;/strong&gt; They form the &lt;strong&gt;pull-down
+  network&lt;/strong&gt;, and their job is producing a solid 0.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;pMOS transistors connect the output to the supply.&lt;/strong&gt; They form the
+  &lt;strong&gt;pull-up network&lt;/strong&gt;, and their job is producing a solid 1.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Every static CMOS gate is those two networks, sharing the same inputs, sharing
+the same output node, and arranged so exactly one of them conducts for any
+combination of inputs. That last property is what "complementary" means, and it
+has a consequence: when the output is settled, there is no path
+from supply to ground, so a settled gate draws no current beyond leakage. CMOS
+burns power when it switches, not when it sits.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The inverter, in full&lt;/h2&gt;
+&lt;p&gt;One nMOS, one pMOS, gates tied together as the input, drains tied together as
+the output.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/02-inverter-HQ.png"&gt;&lt;img alt="A CMOS inverter schematic with a pMOS above and an nMOS below, plus two smaller versions showing which transistor conducts for a low input and for a high input" src="http://lizard-spock.co.uk/02-inverter-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Input low: the pMOS conducts and the nMOS is off, so the output is connected to
+the supply and pulled to a solid 1. Input high: the nMOS conducts and the pMOS
+is off, so the output is connected to ground and pulled to a solid 0. Each
+transistor is used only in the direction it is good at, and in neither state is
+there a path from supply to ground.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;A&lt;/th&gt;
+&lt;th&gt;pMOS&lt;/th&gt;
+&lt;th&gt;nMOS&lt;/th&gt;
+&lt;th&gt;Output&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;on&lt;/td&gt;
+&lt;td&gt;off&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;off&lt;/td&gt;
+&lt;td&gt;on&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Two practical points come straight out of the picture.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The pMOS is drawn wider than the nMOS.&lt;/strong&gt; Holes are slower than electrons by
+about a factor of two to three, so a pMOS of the same width delivers less
+current and pulls up more slowly than the nMOS pulls down. Cell libraries
+compensate by making the pMOS roughly twice the width, which balances rise and
+fall times at the cost of area and input capacitance. Look at any standard cell
+layout and the top row of transistors is visibly fatter than the bottom row.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Drive strength is width.&lt;/strong&gt; An INVX4 is not a different circuit from an INVX1.
+It is the same two transistors, four times as wide, sourcing four times the
+current into whatever it drives, and presenting four times the capacitance to
+whatever drives it. That trade is the entire content of buffer insertion during
+synthesis: pay input capacitance here to gain drive strength there.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Series and parallel are AND and OR&lt;/h2&gt;
+&lt;p&gt;Now build a network out of more than one transistor. Two rules, and they are the
+whole of it, because a transistor is a switch and switches in series and in
+parallel behave the way you would expect.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;In series&lt;/strong&gt;: the path conducts only if &lt;strong&gt;both&lt;/strong&gt; transistors conduct.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;In parallel&lt;/strong&gt;: the path conducts if &lt;strong&gt;either&lt;/strong&gt; transistor conducts.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Take the pull-down network, made of nMOS, so each transistor conducts when its
+input is high. Then:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Pull-down arrangement&lt;/th&gt;
+&lt;th&gt;Conducts when&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;A in series with B&lt;/td&gt;
+&lt;td&gt;A AND B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A in parallel with B&lt;/td&gt;
+&lt;td&gt;A OR B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;And here is the step that decides the shape of every gate that follows. The
+pull-down network pulls the output &lt;strong&gt;low&lt;/strong&gt;. So when the network conducts, the
+output is 0, and when it does not, the pull-up has it at 1:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;NOT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;the&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;pull&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;down&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;network&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;conducts&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The pull-down network computes AND and OR of its inputs, and then the output
+node inverts the answer, because conducting means pulling low. There is no
+arrangement of nMOS transistors between the output and ground that produces a
+non-inverting function. Pulling the output down is the only thing such a network
+can do.&lt;/p&gt;
+&lt;p&gt;The pull-up network has to be the complement, so that exactly one network
+conducts at a time. Since pMOS transistors conduct on a &lt;strong&gt;low&lt;/strong&gt; input, the
+complement comes out as the series-parallel dual: wherever the pull-down has
+transistors in series, the pull-up has them in parallel, and the other way
+round. That is De Morgan's theorem drawn as wiring rather than written as
+algebra.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/04-series-parallel-HQ.png"&gt;&lt;img alt="Two switch networks, one series pair conducting only when both switches are on and one parallel pair conducting when either is on, with the rule that the pull-up network uses the opposite arrangement" src="http://lizard-spock.co.uk/04-series-parallel-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The recipe for any static CMOS gate is now mechanical:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Write the function you want as an inverted expression, &lt;code&gt;y = NOT(f)&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Build &lt;code&gt;f&lt;/code&gt; in nMOS between output and ground: AND becomes series, OR becomes
+   parallel.&lt;/li&gt;
+&lt;li&gt;Build the dual of that network in pMOS between output and supply: series
+   becomes parallel, parallel becomes series.&lt;/li&gt;
+&lt;li&gt;Count the transistors. Two per input, always.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2&gt;NAND2 and NOR2&lt;/h2&gt;
+&lt;p&gt;Apply the recipe to the two simplest cases and the standard cell library appears.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;NAND2&lt;/strong&gt; is &lt;code&gt;y = NOT(A AND B)&lt;/code&gt;. AND becomes two nMOS in series to ground. The
+dual is two pMOS in parallel to the supply.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;NOR2&lt;/strong&gt; is &lt;code&gt;y = NOT(A OR B)&lt;/code&gt;. OR becomes two nMOS in parallel to ground. The
+dual is two pMOS in series to the supply.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/03-nand2-nor2-HQ.png"&gt;&lt;img alt="NAND2 and NOR2 transistor schematics side by side, showing series nMOS with parallel pMOS for the NAND and parallel nMOS with series pMOS for the NOR, with the transistor sizing noted for each" src="http://lizard-spock.co.uk/03-nand2-nor2-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;A&lt;/th&gt;
+&lt;th&gt;B&lt;/th&gt;
+&lt;th&gt;NAND2 pull-down&lt;/th&gt;
+&lt;th&gt;NAND2 out&lt;/th&gt;
+&lt;th&gt;NOR2 pull-down&lt;/th&gt;
+&lt;th&gt;NOR2 out&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;off&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;off&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;off&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;on&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;off&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;on&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;on&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;on&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Four transistors each, symmetric on paper. They are not symmetric in silicon.&lt;/p&gt;
+&lt;p&gt;In NAND2 the &lt;strong&gt;slow&lt;/strong&gt; transistors, the pMOS pair, are in parallel, so either one
+alone can pull the output up, and each can stay near the minimum practical width
+that balances the gate. The nMOS pair is in series, so two channel resistances
+add on the pull-down, and each nMOS is roughly doubled in width to compensate.
+Electrons are cheap to widen.&lt;/p&gt;
+&lt;p&gt;In NOR2 it is the other way round, and the arrangement falls the wrong way. The pMOS pair
+is in &lt;strong&gt;series&lt;/strong&gt;, so two already-slow devices add their resistances, and getting
+a rise time to match the fall time means widening each of them by something like
+four times the nMOS width. That is a bigger cell, more input capacitance
+presented to whatever drives it, and a worse delay for the same logical work.&lt;/p&gt;
+&lt;p&gt;This is why libraries and synthesis are NAND-heavy. Given a choice between two
+logically equivalent structures, the one built from NAND2 and inverters is
+usually smaller and faster than the one built from NOR2. It is also why a
+four-input NOR is rare, and a four-input NAND uncommon: stacking four pMOS in
+series produces a cell whose pull-up is several times slower than its pull-down,
+and stacking any four devices runs into the &lt;strong&gt;body effect&lt;/strong&gt;, where transistors part-way up a
+stack see a raised source voltage, an effectively higher threshold, and less
+current than the one at the bottom. Practical libraries stop at three or four
+inputs and let synthesis build trees from there.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Where the AND gate's extra transistors went&lt;/h2&gt;
+&lt;p&gt;Back to the netlist that started this. The recipe produces &lt;code&gt;y = NOT(f)&lt;/code&gt;, always.
+The output node is pulled low by a conducting network, and there is no way to
+arrange switches so that conducting pulls it high while still using nMOS below
+and pMOS above. &lt;strong&gt;A single-stage static CMOS gate is inverting by construction.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;So AND2 is NAND2 plus an inverter: 4 + 2 = 6 transistors, two stages of delay
+rather than one. OR2 is NOR2 plus an inverter, and inherits the NOR2 pull-up
+problem as well. A buffer is two inverters, for the same reason. Nothing in the
+library is non-inverting for free.&lt;/p&gt;
+&lt;p&gt;NAND and NOR are not
+"universal gates" because of a tidy algebraic fact about being able to express
+everything with them. They are the gates the libraries are built from because
+a pull-down network and its dual produce them naturally, and AND and OR
+are the compound cells, sold at a two-transistor and one-stage premium. The
+Boolean operators you write in a hardware description language are the
+abstraction. The inverting cells are the hardware.&lt;/p&gt;
+&lt;p&gt;Two habits follow from it.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Push the inversions around instead of paying for them.&lt;/strong&gt; De Morgan says a
+NAND with inverted inputs is an OR, and a NOR with inverted inputs is an AND.
+An inverter that cancels another inverter is free once the netlist is optimised,
+and a bubble that moves to a place where something else already inverts costs
+nothing at all. Synthesis does this automatically, which is why the netlist so
+rarely resembles the RTL structurally.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Compound functions can stay in one stage.&lt;/strong&gt; The recipe never said the network
+had to be two transistors. &lt;code&gt;y = NOT((A AND B) OR C)&lt;/code&gt; is an &lt;strong&gt;and-or-invert&lt;/strong&gt;
+gate, AOI21: two nMOS in series for the AND, that pair in parallel with a third
+for the OR, and the dual above it. Six transistors, one stage of delay, and it
+does the work of an AND2 feeding a NOR2, which would have cost ten
+transistors and three stages.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/05-aoi21-HQ.png"&gt;&lt;img alt="An AOI21 gate schematic with two nMOS in series in parallel with a third in the pull-down network, and the dual arrangement of pMOS in the pull-up network, six transistors in one stage" src="http://lizard-spock.co.uk/05-aoi21-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Libraries carry a whole family of these: AOI21, AOI22, OAI21, OAI221 and more.
+Technology mapping during synthesis is largely the business of spotting where
+one of them fits, and it is a large part of why hand-instantiated gate-level
+logic so seldom beats the tool.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The two things static CMOS is bad at&lt;/h2&gt;
+&lt;p&gt;Two functions resist the recipe, and both are common enough that libraries solve
+them another way.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The multiplexer.&lt;/strong&gt; Selecting between two inputs as a static CMOS gate is an
+AOI22 at eight transistors, one inverter to make the complement of the select
+and another to restore the polarity: twelve transistors for a function that only
+has to connect one of two wires to an output. The
+alternative is a &lt;strong&gt;transmission gate&lt;/strong&gt;: an nMOS and a pMOS in parallel, driven
+by complementary select signals, acting as a switch that passes a full-strength
+signal in either direction. The nMOS covers the low end, the pMOS covers the
+high end, and between them the weak-1 and weak-0 problems cancel. Two
+transmission gates and an inverter make a clean two-way multiplexer.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Exclusive-OR.&lt;/strong&gt; In pure static CMOS, XOR needs both inputs and their
+complements and lands at ten to twelve transistors. Built from transmission
+gates it comes down to six or eight. Since XOR is the core of every adder and
+every parity tree, that saving justifies the library carrying special cells for
+it, and it is why an adder's transistor count never quite matches the figure the
+gate count suggests.&lt;/p&gt;
+&lt;p&gt;The catch with transmission gates is that they pass signals rather than drive
+them. A chain of them accumulates resistance quadratically and has no gain to
+restore a degraded edge, so a buffer has to appear every couple of stages.
+Transmission-gate logic is a local optimisation inside a cell, not a style for
+building a whole design.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Reading a cell library like a circuit&lt;/h2&gt;
+&lt;p&gt;The next time a databook is open, the numbers have physical meanings.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Transistor count&lt;/strong&gt;, or the area column standing in for it: two per input for
+  a simple gate, plus two for every inversion the function needs at the output.
+  A six-transistor two-input cell is a compound gate with an inverter on it.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Input capacitance&lt;/strong&gt; differs per pin on the same cell. In a NAND2 the input
+  nearest the output in the nMOS stack switches faster than the one nearest
+  ground, which is why the timing model gives per-pin arcs and why synthesis
+  cares which signal lands on which pin.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;A NOR2 that is larger than the NAND2&lt;/strong&gt; of the same drive strength is the
+  series pMOS stack, sized up. If a design is NOR-heavy, that is showing up in
+  both area and timing.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Drive strength suffixes&lt;/strong&gt; are transistor width. More output current, more
+  input capacitance, no change to the logic.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Rise and fall times that differ&lt;/strong&gt; mean the pull-up and pull-down networks
+  are not balanced, either by design or because the cell was optimised for area.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Every one of those numbers is a pull-up network and a pull-down network, drawn
+as polygons on the masks from the previous article, and the standard cell layout
+is where the two articles meet: the p-type row along the top under a supply
+rail, the n-type row along the bottom over a ground rail, polysilicon stripes
+crossing both to form the gates, and metal 1 stitching the drains together into
+the output.&lt;/p&gt;
+&lt;p&gt;The next article in the series takes these cells and starts combining them:
+Boolean algebra as a tool for restructuring logic before it ever reaches a
+transistor.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/digital-design-01-mask-sets-and-how-a-transistor-gets-built.html"&gt;Digital Design 01: Mask sets, and how a transistor gets built&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="Digital Design"></category><category term="Electronics"></category><category term="CMOS"></category><category term="MOSFET"></category><category term="Logic Gates"></category><category term="NAND"></category><category term="NOR"></category><category term="Standard Cells"></category><category term="Transistors"></category></entry><entry><title>Lashing a tripod</title><link href="http://lizard-spock.co.uk/lashing-a-tripod.html" rel="alternate"></link><published>2026-08-19T00:00:00+01:00</published><updated>2026-08-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-19:/lashing-a-tripod.html</id><summary type="html">&lt;p&gt;How to tie a clove hitch and a tripod lashing, and the wrap and frapping counts that let three poles open into a tripod.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-tripod-hero-HQ.png"&gt;&lt;img alt="Two lashed tripods standing apart, carrying a horizontal spar between their apexes with kit hung from it" src="http://lizard-spock.co.uk/00-tripod-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Camp gadgets stand on tripods. Three points of contact define a plane, so three feet sit solid on whatever ground they are put on. Add a fourth and one leg can end up on a different plane from the other three, which is the rocking you have met on a pub table or a chair on an uneven floor.&lt;/p&gt;
 &lt;p&gt;This post ties three poles into a tripod with one lashing, starting with the clove hitch it begins and ends on.&lt;/p&gt;
 &lt;h2&gt;Tying the clove hitch&lt;/h2&gt;
@@ -11317,9 +11693,4 @@ end
 &lt;img alt="Raised Bed" src="/images/Gardening/morganp-20141012-RaisedBed-IMG_9607.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;A couple of images before it was filled:
 &lt;img alt="Raised Bed" src="/images/Gardening/morganp-20140708-RaisedBed-_MG_9173.jpg"&gt;
-&lt;img alt="Raised Bed" src="/images/Gardening/morganp-20140708-RaisedBed-_MG_9175.jpg"&gt;&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="DIY"></category><category term="Garden"></category><category term="Woodwork"></category></entry><entry><title>"OS X disable back gesture"</title><link href="http://lizard-spock.co.uk/os-x-disable-back-gesture.html" rel="alternate"></link><published>2015-02-18T18:26:07+00:00</published><updated>2015-02-18T18:26:07+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-02-18:/os-x-disable-back-gesture.html</id><summary type="html">&lt;p&gt;After accidentally scrolling back a page when browsing the web in chrome too many times. Figured out how to disable …&lt;/p&gt;</summary><content type="html">&lt;p&gt;After accidentally scrolling back a page when browsing the web in chrome too many times. Figured out how to disable it: from your terminal&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool FALSE
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;a href="http://apple.stackexchange.com/questions/21236/how-do-i-disable-chromes-two-finger-back-forward-navigation"&gt;From 
-http://apple.stackexchange.com&lt;/a&gt;.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="OS X"></category></entry></feed>
+&lt;img alt="Raised Bed" src="/images/Gardening/morganp-20140708-RaisedBed-_MG_9175.jpg"&gt;&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="DIY"></category><category term="Garden"></category><category term="Woodwork"></category></entry></feed>
