@@ -1,6 +1,6 @@
 Title: Scotland Outdoor Routes
 Date: 2026-03-06 12:00
-Category: Home & Garden
+Category: Outdoor
 Tags: Outdoors, Wildlife, Family, Garden, Bike
 Author: morganp
 Status: published
