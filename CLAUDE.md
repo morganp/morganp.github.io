@@ -154,6 +154,18 @@ Web apps appear in the Tools dropdown nav, configured in `pelicanconf.py` as `WE
 | Fretdrom Editor | `content/fretdrom-editor` | `github.com/morganp/fretdrom-editor` | `main` | `copy-webapps` (has `public/`) |
 | Wavedrom Editor | `content/wavedrom-editor` | `github.com/morganp/wavedrom-editor` | `dist` (CI-built standalone) | `STATIC_PATHS` |
 | Drum Rudiments | `content/drum_rudiments` | — | static files, no upstream repo yet | `STATIC_PATHS` |
+| LPI Network Explorer | `content/amba-lpi-network-explorer` | `github.com/morganp/amba-lpi-network-explorer` | `main` | `copy-webapps` (single file, see below) |
+| APB Network Explorer | `content/amba-apb-network-explorer` | `github.com/morganp/amba-apb-network-explorer` | `main` | `copy-webapps` (single file, see below) |
+
+**Single-page externals folded into AMBA Explorer.** `amba-lpi-network-explorer` and
+`amba-apb-network-explorer` each ship one self-contained `public/index.html`. They are
+not separate Tools entries and do not get their own output folder. `copy-webapps`
+rsyncs each file into the AMBA Explorer output as `LPI-Network-Explorer.html` and
+`APB-Network-Explorer.html`. Those two lines must stay **after** the
+`rsync -a --delete .../amba-explorer/public/` line, because that rsync deletes
+anything in `output/amba-explorer/` not present in the AMBA Explorer submodule.
+They are reachable by direct URL only; the AMBA Explorer landing page does not link
+them.
 
 ### Updating a webapp submodule
 

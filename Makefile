@@ -53,6 +53,8 @@ help:
 
 copy-webapps:
 	rsync -a --delete "$(BASEDIR)/content/amba-explorer/public/" "$(OUTPUTDIR)/amba-explorer/"
+	rsync -a "$(BASEDIR)/content/amba-lpi-network-explorer/public/index.html" "$(OUTPUTDIR)/amba-explorer/LPI-Network-Explorer.html"
+	rsync -a "$(BASEDIR)/content/amba-apb-network-explorer/public/index.html" "$(OUTPUTDIR)/amba-explorer/APB-Network-Explorer.html"
 	rsync -a --delete "$(BASEDIR)/content/openscad-gui/public/" "$(OUTPUTDIR)/openscad-gui/"
 	rsync -a --delete "$(BASEDIR)/content/fretdrom-editor/public/" "$(OUTPUTDIR)/fretdrom-editor/"
 	rsync -a --delete "$(BASEDIR)/content/stem-academy/public/" "$(OUTPUTDIR)/stem-academy/"
