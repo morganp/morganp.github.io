@@ -22,6 +22,8 @@ cat_dict = {
     6: "Photography",
     7: "Programming",
     8: "Unix & Tools",
+    9: "Outdoor",
+    10: "Woodwork",
 }
 for k, v in cat_dict.items():
     print(f"  {k}: {v}")
