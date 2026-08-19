@@ -460,4 +460,4 @@ libraries are built from.
 
 ---
 
-*Next in the series: pull-up and pull-down networks, and why a static CMOS gate is always inverting.*
+*Next: [Digital Design 02: Pull-up and pull-down networks]({filename}../2026-08-19_Digital_Design_02_Pull_Up_Pull_Down/2026-08-19_Digital_Design_02_Pull_Up_Pull_Down.md)*
