@@ -13,14 +13,33 @@ Pelican static site generator blog, hosted on GitHub Pages at lizard-spock.co.uk
 ## Commands
 - before python, make commands run `source ./venv/bin/activate`
 - do not use em-dash in posts.
+- do not use cleft sentences: write `the gate oxide blocks the current`, not `the gate oxide is what blocks the current`. Keep one only to correct a misconception, answer the previous sentence, or give a definition.
+- check every mid-sentence `what`. It is usually a cleft to unwind, or a noun that was never named. `what the numbers mean` after a verb of knowing is fine.
+- keep technical terms whole. Never let a modifier stand alone as a noun with its head elided: write `opposite branching`, not `the opposite ones`; `trees with alternate branching`, not `the tree is alternate`. Hyphenate when it modifies a noun: `an opposite-branching tree`.
+- no commentary about the article itself: no `it is worth noting`, `worth seeing once`, `keep hold of`, `as mentioned above`.
+- no commentary about the artwork either. Never narrate how a figure was made or claim it was made correctly (`coloured accurately`, `drawn to scale`). Say only what helps the reader use it. This is working notes leaking into the draft.
 - After creating a new draft post, suggest the user preview it with `make devserver` and visit `http://localhost:8000/drafts/<slug>.html`.
 - When moving an article from draft to published, ask the user if the Date metadata should be updated to today's date before publishing.
 - do not use tabs in post, spaces only.
 
 ## Writing a Post
 
-**Use the `blog-post` skill** (`.claude/skills/blog-post/`) for the full pipeline:
-narrative structure, prose passes, image generation, build verification, deploy.
+**Invoke the `blog-post` skill** (`.claude/skills/blog-post/`) before writing any
+post or generating any image for this blog. Not "keep it in mind": call it with
+the Skill tool, first, every time. It covers narrative structure, prose passes,
+image generation, build verification and deploy.
+
+It carries two blocking gates that have been skipped before:
+
+1. **Outline gate.** Present the heading outline and stop. No body prose until
+   the user approves. This lives in `technical-writer` Pass 1, so invoke that
+   skill rather than working from memory of its four passes.
+2. **Prototype gate.** Generate every image at `--size 512px` first, show it,
+   and stop. No full-size render until the user approves the look. For a set of
+   images, prototype one per visual family before committing to the set.
+   Showing means running `open <path>` so it appears on screen. Reading the
+   image into your own context is not showing it, describing it is not showing
+   it, and neither is quoting a path for the user to open themselves.
 
 House style facts, needed when editing existing posts too:
 
@@ -52,7 +71,19 @@ make clean                  # remove output/
 ```
 Run `make` with no args to see all targets.
 
-> **Deploy time:** `make github` takes ~12 minutes (711s) to process ~437 articles. Always run in background. Inform the user of this wait time before starting a deploy.
+> **Deploy time:** `make github` takes **35 to 40 minutes**, not 12. Always run in
+> background and tell the user the real figure before starting. The breakdown as
+> of 2026-08-19, ~453 articles:
+> - Pelican build: ~15 min
+> - `copy-webapps` rsync: ~20 min, almost all of it `stem-academy`, which is 270
+>   files and 57 MB of 4-5 MB mascot PNGs read off iCloud Drive
+> - `ghp-import` plus push: a few minutes
+>
+> **Never leave a devserver running during a deploy.** `make devserver` writes to
+> the same `output/` that `make github` builds into, and `publishconf.py` sets
+> `DELETE_OUTPUT_DIRECTORY=True`. Dev config uses `RELATIVE_URLS=True`, so
+> devserver pages leaking into the push would break every link on the live site.
+> Check with `pgrep -fl "pelican -lr"` first.
 
 
 ## Rules for Claude
