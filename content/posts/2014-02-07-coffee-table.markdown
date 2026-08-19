@@ -3,7 +3,7 @@ layout: post
 title: "Coffee Table"
 date: 2014-02-07 21:18:14 +0000
 comments: true
-Category: Home & Garden
+Category: Woodwork
 Tags: DIY, Hardwood, Woodwork
 ---
 

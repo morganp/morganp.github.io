@@ -35,8 +35,22 @@
                                 {% endif %}
                                 {% if DISPLAY_CATEGORIES_ON_MENU -%}
                                         {% for cat, null in categories %}
-                                                <li{% if cat == category %} class="active"{% endif %}><a href="{{ SITEURL }}/{{ cat.url }}">{{ cat }}</a></li>
+                                                {% if not (TECH_CATEGORIES and cat.name in TECH_CATEGORIES) %}
+                                                        <li{% if cat == category %} class="active"{% endif %}><a href="{{ SITEURL }}/{{ cat.url }}">{{ cat }}</a></li>
+                                                {% endif %}
                                         {% endfor %}
+                                {% endif %}
+                                {% if TECH_CATEGORIES %}
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                        {% for cat, null in categories %}
+                                                                {% if cat.name in TECH_CATEGORIES %}
+                                                                        <li><a href="{{ SITEURL }}/{{ cat.url }}">{{ cat }}</a></li>
+                                                                {% endif %}
+                                                        {% endfor %}
+                                                </ul>
+                                        </li>
                                 {% endif %}
                                 {% if WEBAPPS %}
                                         <li class="nav-dropdown">

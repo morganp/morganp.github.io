@@ -1,6 +1,6 @@
 Title: 3D Printed Pinch Rods in OpenSCAD
 Date: 2026-04-12
-Category: Home & Garden
+Category: Woodwork
 Tags: OpenSCAD, 3D Printing, BOSL2, Woodworking, CAD, Parametric Design
 Slug: openscad-pinch-rods
 Author: morganp

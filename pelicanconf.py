@@ -90,6 +90,15 @@ FRETBOARD_CACHE_URL  = '/images/fretboard'
 
 THEME_TEMPLATES_OVERRIDES = ['templates']
 
+# Categories grouped behind a single "Tech" dropdown in the nav. Anything not
+# listed here stays as a top-level nav entry.
+TECH_CATEGORIES = [
+    'Engineering',
+    'Hardware & Homelab',
+    'Programming',
+    'Unix & Tools',
+]
+
 WEBAPPS = [
     ('Drum Rudiments', '/drum_rudiments/'),
     ('Wavedrom Editor', '/wavedrom-editor/'),
