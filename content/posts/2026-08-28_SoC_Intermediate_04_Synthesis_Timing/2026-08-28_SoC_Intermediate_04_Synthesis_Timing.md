@@ -91,22 +91,25 @@ launch edge + clock-to-Q + data path delay + setup time
 capture edge + useful skew - uncertainty
 ```
 
-Hold is the same relationship read from the other end. The data must not arrive
-so early that it overwrites the value the capture flip-flop is still reading
-from the previous edge.
+Both terms above assume the launch and capture flip-flops see the same clock
+edge at the same moment, which is what a balanced clock tree is built to
+deliver. [Article 07 covers clock tree
+synthesis]({filename}../2026-04-11_SoC_Article_07_Clocking_Reset_and_Power_Domains/2026-04-11_SoC_Article_07_Clocking_Reset_and_Power_Domains.md)
+and the H-tree that equalises the paths. Real trees land within tens of
+picoseconds rather than at zero, and useful skew unbalances them deliberately,
+which is where the skew term earns its place.
 
-```wavedrom
-{
-  "signal": [
-    {"name": "launch clk",   "wave": "P......."},
-    {"name": "capture clk",  "wave": "P......."},
-    {"name": "data at D",    "wave": "x..2...x", "data": ["new value"]},
-    {"name": "setup window", "wave": "x...3x..", "data": ["stable"]},
-    {"name": "hold window",  "wave": "x.4x....", "data": ["stable"]}
-  ],
-  "head": {"text": "Setup closes the window before the capture edge, hold holds it open after"}
-}
-```
+Assume a balanced tree for the moment, and setup needs only two edges of one
+clock:
+
+[![Setup violation drawn as three waveform traces, CLK, launch flop Q and capture flop D, with the data transition landing inside a shaded setup window immediately before the second clock edge]({attach}/images/SoC/ArticleI04/03-setup-violation-900w.png)]({attach}/images/SoC/ArticleI04/03-setup-violation-HQ.png)
+
+Hold is the same relationship read from the other end, and it is not a
+next-edge check at all. The data must not arrive so early that it overwrites the
+value the capture flip-flop is still reading from the edge that just fired.
+Launch and capture are the same edge:
+
+[![Hold violation drawn as three waveform traces, CLK, launch flop Q and capture flop D, with the new data arriving inside a shaded hold window that starts at the single clock edge]({attach}/images/SoC/ArticleI04/04-hold-violation-900w.png)]({attach}/images/SoC/ArticleI04/04-hold-violation-HQ.png)
 
 The two failures have opposite personalities, and each is worst at the corner
 that is kindest to the other.
