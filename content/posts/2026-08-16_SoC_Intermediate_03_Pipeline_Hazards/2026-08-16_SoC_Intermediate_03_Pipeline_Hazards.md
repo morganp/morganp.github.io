@@ -466,4 +466,4 @@ plan and, judging by errata sheets, several months of somebody's life.
 ---
 
 *Previous: [Article I-02: Cache coherency protocols]({filename}../2026-08-06_SoC_Intermediate_02_Cache_Coherency/2026-08-06_SoC_Intermediate_02_Cache_Coherency.md)*
-*Next: Intermediate Article 04, RTL Synthesis and Timing Closure*
+*Next: [Article I-04: RTL synthesis and timing closure]({filename}../2026-08-28_SoC_Intermediate_04_Synthesis_Timing/2026-08-28_SoC_Intermediate_04_Synthesis_Timing.md)*
