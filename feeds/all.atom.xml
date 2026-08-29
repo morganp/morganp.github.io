@@ -1,5 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-29T00:00:00+01:00</updated><entry><title>Multi-tool or separate tools</title><link href="http://lizard-spock.co.uk/multi-tool-or-separate-tools.html" rel="alternate"></link><published>2026-08-29T00:00:00+01:00</published><updated>2026-08-29T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-29:/multi-tool-or-separate-tools.html</id><summary type="html">&lt;p&gt;A Knipex Cobra XS, an Opinel No 08 and a bit driver measured against a Leatherman Wave+ on weight, price and capability.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/01-hero-HQ.png"&gt;&lt;img alt="Sketch comparison of a Leatherman Wave Plus against a Knipex Cobra XS, an Opinel No 08 and a PB Swiss bit driver" src="http://lizard-spock.co.uk/01-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-08-29T00:00:00+01:00</updated><entry><title>Digital Design 03: Metastability</title><link href="http://lizard-spock.co.uk/digital-design-03-metastability.html" rel="alternate"></link><published>2026-08-29T00:00:00+01:00</published><updated>2026-08-29T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-29:/digital-design-03-metastability.html</id><summary type="html">&lt;p&gt;Why a flip-flop can stop between the rails, why two gates reading that voltage can disagree with each other, and why the bug that follows never reproduces.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-metastability-hero-HQ.png"&gt;&lt;img alt="A D-type flip-flop whose output wire splits at a junction and reaches two inverters, the upper one resolving it as 1 and the lower one as 0" src="http://lizard-spock.co.uk/00-metastability-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Series: Digital Design Fundamentals | Article 3&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;The board runs for six days. On the seventh, the status register reports a state
+the state machine cannot reach, the firmware takes a branch that was never meant
+to execute, and the watchdog resets the part. Simulation has run the same
+sequence ten million times and never produced it. Attaching a scope to the
+suspect net makes the fault stop for a fortnight.&lt;/p&gt;
+&lt;p&gt;This article explains where that state came from. Two routes lead to it: an
+input from another clock domain, and a synchronous path that failed timing
+closure. Both end at the same condition, a setup or hold requirement that was
+not met at the sampling edge. It is for anyone who writes register transfer
+level code and has been told to put two flip-flops on an asynchronous input
+without being told what the second flip-flop is for.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;A decision with no margin&lt;/h2&gt;
+&lt;p&gt;A flip-flop is a decision element with gain. At the sampling edge it captures
+the difference between its input and its own switching threshold, then amplifies
+that difference until the output reaches a rail.&lt;/p&gt;
+&lt;p&gt;The captured difference sets how long the amplification takes. An input that
+settled a nanosecond early presents almost the full supply, and one pass through
+the internal loop is enough. An input that moved a few picoseconds before the
+edge presents a few millivolts, and the same loop needs several passes to build
+those millivolts up to a rail.&lt;/p&gt;
+&lt;p&gt;That difference has no lower limit. Data crossing the threshold close enough to
+the clock edge leaves the flip-flop microvolts to amplify, or less, and the
+amplification then starts from microvolts.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/01-settling-margin-HQ.png"&gt;&lt;img alt="Output voltage against time for several starting margins, showing that a smaller captured margin takes longer to reach a rail and one curve still sitting at the threshold when the next clock edge reads it" src="http://lizard-spock.co.uk/01-settling-margin-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Distance from the threshold grows as &lt;code&gt;V0 e^(t / tau)&lt;/code&gt;, where &lt;code&gt;V0&lt;/code&gt; is the
+captured margin and &lt;code&gt;tau&lt;/code&gt; is the settling time constant. Time to reach a rail
+therefore depends on the logarithm of the margin, so a margin ten times smaller
+costs only about 2.3 more time constants. Waiting buys a great deal and never
+buys certainty.&lt;/p&gt;
+&lt;p&gt;While the output is still climbing it sits between the rails. That is
+metastability. Not a broken circuit, but an amplifier part way through a
+decision.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Where the clock edge lands&lt;/h2&gt;
+&lt;p&gt;Setup time and hold time describe a window around the clock edge in which the
+input has to be stable. An input that changes inside that window is the input
+that leaves almost no margin to amplify.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_d8b224b08549af11c760dc10e7812f03.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Two situations put a real design in that window. The first is a signal with no
+fixed relationship to the sampling clock: another clock domain, a button, a
+sensor. The second is a fully synchronous path that failed timing closure, where
+static timing analysis has already reported a violated setup or hold
+requirement.&lt;/p&gt;
+&lt;p&gt;The two look different in a report and identical at the flip-flop. Both are the
+same condition, a setup or hold requirement not met at the sampling edge.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;One wire, two answers&lt;/h2&gt;
+&lt;p&gt;Settling time is not the only hazard, and the next one does not depend on it at
+all. A flip-flop output is a wire, and a wire goes to more than one place.&lt;/p&gt;
+&lt;p&gt;While the output sits near mid rail, every gate on that net is reading it. Each
+has its own switching threshold, set by the ratio of its pull-up and pull-down
+networks, and those thresholds are not identical. Process variation moves them,
+different cell types have different ones by design, and different loads mean the
+reads do not happen at the same instant.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_2ba665312784b327927f0c147c935239.svg"&gt;&lt;/p&gt;
+&lt;p&gt;One node, one instant, two answers. Neither gate is faulty and neither reading
+is wrong. The wire did not carry a logic value for them to agree about.&lt;/p&gt;
+&lt;p&gt;That is the failure, and metastability by itself is not. A flip-flop sitting at
+mid rail with nothing reading it costs some current and resolves. The damage
+starts when that voltage reaches two places and the two places disagree.&lt;/p&gt;
+&lt;p&gt;Downstream registers then hold values that cannot occur together. A one-hot
+state machine ends a cycle with two bits high, so two decodes match at once. A
+handshake ends with both ends believing the other holds the token. None of those
+states appear in the encoding, in the assertions or in the coverage report. The
+register transfer level model cannot represent a wire that two readers disagree
+about, so simulation never produces them.&lt;/p&gt;
+&lt;p&gt;The bug that results is rare, random, and moves when observed. A scope probe
+adds capacitance and shifts the timing. Temperature and supply voltage move
+switching thresholds. Rebuilding the design changes placement, so the wire
+delays that produced the divergence are gone and a fresh set arrives elsewhere.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Two flip-flops, and why not one&lt;/h2&gt;
+&lt;p&gt;The fix follows from the exponential. Give the metastable node a full clock
+period to settle before anything reads it.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_64f11331eecdb03016bc0300ff1c7e11.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The first flip-flop absorbs the risk, and its output goes nowhere except the
+second flip-flop, so a divergent read has nothing to diverge into. The
+single-load rule matters as much as the second stage. Fanning the first stage
+out to anything else recreates the divergence the structure exists to prevent.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Putting a number on it&lt;/h2&gt;
+&lt;p&gt;Mean time between failures, or MTBF, follows from the settling time constant and
+two frequencies:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;MTBF = e^(t_r / tau) / (T0 x f_clk x f_data)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;t_r&lt;/code&gt; is the settling time allowed, &lt;code&gt;T0&lt;/code&gt; is the width of the aperture, &lt;code&gt;f_clk&lt;/code&gt;
+is the destination clock frequency and &lt;code&gt;f_data&lt;/code&gt; is the rate of input changes.
+Only &lt;code&gt;t_r&lt;/code&gt; sits in the exponent, so it dominates everything else.&lt;/p&gt;
+&lt;p&gt;Liberty timing files do not carry &lt;code&gt;tau&lt;/code&gt; or &lt;code&gt;T0&lt;/code&gt;. They model a cell as a
+deterministic table of setup, hold and clock-to-Q, and metastability is a
+probability distribution with an exponential tail. The parameters have to come
+from transistor-level simulation instead. Measuring them on
+&lt;code&gt;sky130_fd_sc_hd__dfxtp_1&lt;/code&gt;, the real 24-transistor SkyWater cell, gives this:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Corner&lt;/th&gt;
+&lt;th&gt;Setup&lt;/th&gt;
+&lt;th&gt;tau&lt;/th&gt;
+&lt;th&gt;T0&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ss slow&lt;/td&gt;
+&lt;td&gt;45.6 ps&lt;/td&gt;
+&lt;td&gt;116.8 ps&lt;/td&gt;
+&lt;td&gt;67.4 ps&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tt typical&lt;/td&gt;
+&lt;td&gt;28.6 ps&lt;/td&gt;
+&lt;td&gt;43.8 ps&lt;/td&gt;
+&lt;td&gt;492.2 ps&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ff fast&lt;/td&gt;
+&lt;td&gt;20.5 ps&lt;/td&gt;
+&lt;td&gt;21.8 ps&lt;/td&gt;
+&lt;td&gt;1872 ps&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;code&gt;tau&lt;/code&gt; varies by 5.4 times across the corners, and it sits in an exponent.
+Characterise at the slow corner, because that is where the latch resolves most
+slowly.&lt;/p&gt;
+&lt;p&gt;Take the slow corner and put the synchroniser somewhere demanding. The
+destination clock &lt;code&gt;f_clk&lt;/code&gt; is 400 MHz, so its period is 2.5 ns. The asynchronous
+input &lt;code&gt;f_data&lt;/code&gt; changes at 10 MHz. The first stage gets half a period to settle,
+and each stage after it adds a full period.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Stages&lt;/th&gt;
+&lt;th&gt;Settling allowed&lt;/th&gt;
+&lt;th&gt;In time constants&lt;/th&gt;
+&lt;th&gt;MTBF&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;1.25 ns&lt;/td&gt;
+&lt;td&gt;11&lt;/td&gt;
+&lt;td&gt;0.16 seconds&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;3.75 ns&lt;/td&gt;
+&lt;td&gt;32&lt;/td&gt;
+&lt;td&gt;10 years&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;6.25 ns&lt;/td&gt;
+&lt;td&gt;54&lt;/td&gt;
+&lt;td&gt;2.0e10 years&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;A single flip-flop fails six times a minute. The second stage moves that to
+about ten years, which is a product lifetime and not a comfortable margin. The
+third stage moves it to twenty billion years. Each stage is worth roughly nine
+orders of magnitude, because each one adds 2.5 ns of settling and that is 21
+time constants.&lt;/p&gt;
+&lt;p&gt;Slow the clock to 100 MHz and the same two-stage synchroniser reports 2.8e43
+years. That is the number most designers meet, and it is why two flip-flops is
+treated as automatic. The rule is safe at 100 MHz and marginal at 400 MHz, and
+nothing about the flip-flop changed.&lt;/p&gt;
+&lt;p&gt;Two stages is a convention, not a law. It holds only while &lt;code&gt;tau&lt;/code&gt; stays small
+against the clock period. Raise the same cell to 1 GHz and two stages give half
+a second, three give under an hour, and it takes five to reach 2500 years. A
+130 nm cell has no business running at 1 GHz, and a process built for that speed
+has a &lt;code&gt;tau&lt;/code&gt; of a few picoseconds.&lt;/p&gt;
+&lt;p&gt;The measurement and the code behind those tables are at
+&lt;a href="https://github.com/morganp/flipflop-mtbf"&gt;github.com/morganp/flipflop-mtbf&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Closing&lt;/h2&gt;
+&lt;p&gt;For any signal entering a clock domain from outside it, three questions:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Does it pass through two flip-flops before anything else reads it?&lt;/li&gt;
+&lt;li&gt;Does the first of those flip-flops drive exactly one load?&lt;/li&gt;
+&lt;li&gt;Does anything else cross alongside it that has to stay consistent with it?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The second question is the one this article adds. A synchroniser with a fanned
+out first stage looks correct in a schematic review and fails in the same way as
+no synchroniser at all.&lt;/p&gt;
+&lt;p&gt;The third question is a different problem. Two flip-flops protect one bit, and
+they promise nothing about a multi-bit bus, about related control signals
+synchronised separately, or about a synchronous path that failed timing closure.
+Those need handshakes, Gray coding, or a fix in the path itself.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/digital-design-02-pull-up-and-pull-down-networks.html"&gt;Digital Design 02: Pull-up and pull-down networks&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="Digital Design"></category><category term="Electronics"></category><category term="CMOS"></category><category term="Flip-Flops"></category><category term="Metastability"></category><category term="Synchronisers"></category><category term="CDC"></category></entry><entry><title>Multi-tool or separate tools</title><link href="http://lizard-spock.co.uk/multi-tool-or-separate-tools.html" rel="alternate"></link><published>2026-08-29T00:00:00+01:00</published><updated>2026-08-29T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-29:/multi-tool-or-separate-tools.html</id><summary type="html">&lt;p&gt;A Knipex Cobra XS, an Opinel No 08 and a bit driver measured against a Leatherman Wave+ on weight, price and capability.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/01-hero-HQ.png"&gt;&lt;img alt="Sketch comparison of a Leatherman Wave Plus against a Knipex Cobra XS, an Opinel No 08 and a PB Swiss bit driver" src="http://lizard-spock.co.uk/01-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;The nut on the garden tap has seized again. The Leatherman comes out of the
 pocket, the pliers swing open, and the jaws close on air either side of a
 22 mm flat. The tool that has ridden in that pocket every day for a year cannot
@@ -920,11 +1117,16 @@ is where the two articles meet: the p-type row along the top under a supply
 rail, the n-type row along the bottom over a ground rail, polysilicon stripes
 crossing both to form the gates, and metal 1 stitching the drains together into
 the output.&lt;/p&gt;
-&lt;p&gt;The next article in the series takes these cells and starts combining them:
+&lt;p&gt;From here the series splits, and the two branches do not depend on each other.&lt;/p&gt;
+&lt;p&gt;One branch wires these cells into a loop and asks what happens when the loop
+holds neither a 0 nor a 1: metastability, and the unreproducible bugs that
+follow when two gates read the same undecided wire and disagree.&lt;/p&gt;
+&lt;p&gt;The other branch keeps the cells combinational and starts combining them:
 Boolean algebra as a tool for restructuring logic before it ever reaches a
 transistor.&lt;/p&gt;
 &lt;hr&gt;
-&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/digital-design-01-mask-sets-and-how-a-transistor-gets-built.html"&gt;Digital Design 01: Mask sets, and how a transistor gets built&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="Digital Design"></category><category term="Electronics"></category><category term="CMOS"></category><category term="MOSFET"></category><category term="Logic Gates"></category><category term="NAND"></category><category term="NOR"></category><category term="Standard Cells"></category><category term="Transistors"></category></entry><entry><title>Lashing a tripod</title><link href="http://lizard-spock.co.uk/lashing-a-tripod.html" rel="alternate"></link><published>2026-08-19T00:00:00+01:00</published><updated>2026-08-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-19:/lashing-a-tripod.html</id><summary type="html">&lt;p&gt;How to tie a clove hitch and a tripod lashing, and the wrap and frapping counts that let three poles open into a tripod.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-tripod-hero-HQ.png"&gt;&lt;img alt="Two lashed tripods standing apart, carrying a horizontal spar between their apexes with kit hung from it" src="http://lizard-spock.co.uk/00-tripod-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/digital-design-01-mask-sets-and-how-a-transistor-gets-built.html"&gt;Digital Design 01: Mask sets, and how a transistor gets built&lt;/a&gt;&lt;/em&gt;
+&lt;em&gt;Next: &lt;a href="http://lizard-spock.co.uk/digital-design-03-metastability.html"&gt;Digital Design 03: Metastability&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="Digital Design"></category><category term="Electronics"></category><category term="CMOS"></category><category term="MOSFET"></category><category term="Logic Gates"></category><category term="NAND"></category><category term="NOR"></category><category term="Standard Cells"></category><category term="Transistors"></category></entry><entry><title>Lashing a tripod</title><link href="http://lizard-spock.co.uk/lashing-a-tripod.html" rel="alternate"></link><published>2026-08-19T00:00:00+01:00</published><updated>2026-08-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-19:/lashing-a-tripod.html</id><summary type="html">&lt;p&gt;How to tie a clove hitch and a tripod lashing, and the wrap and frapping counts that let three poles open into a tripod.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/00-tripod-hero-HQ.png"&gt;&lt;img alt="Two lashed tripods standing apart, carrying a horizontal spar between their apexes with kit hung from it" src="http://lizard-spock.co.uk/00-tripod-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Camp gadgets stand on tripods. Three points of contact define a plane, so three feet sit solid on whatever ground they are put on. Add a fourth and one leg can end up on a different plane from the other three, which is the rocking you have met on a pub table or a chair on an uneven floor.&lt;/p&gt;
 &lt;p&gt;This post ties three poles into a tripod with one lashing, starting with the clove hitch it begins and ends on.&lt;/p&gt;
 &lt;h2&gt;Tying the clove hitch&lt;/h2&gt;
@@ -12179,26 +12381,4 @@ note the input keyword change to the input arguments &lt;code&gt;varargin&lt;/co
 &lt;p&gt;The command line should override testbench defined options but this has proven unreliable.&lt;/p&gt;
 &lt;p&gt;command line to set value:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;irun -define mode_sel=1 ...
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verilog"></category></entry><entry><title>"Verilog: shm waveforms"</title><link href="http://lizard-spock.co.uk/verilog-shm-waveforms.html" rel="alternate"></link><published>2015-03-26T19:38:29+00:00</published><updated>2015-03-26T19:38:29+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-03-26:/verilog-shm-waveforms.html</id><summary type="html">&lt;p&gt;The best practice is to use a tcl file:&lt;/p&gt;
-&lt;p&gt;shm.tcl &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;database -open waves -shm
-probe -create your_top_level -depth all …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;The best practice is to use a tcl file:&lt;/p&gt;
-&lt;p&gt;shm.tcl &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;database -open waves -shm
-probe -create your_top_level -depth all -all -shm -database waves
-run 
-exit
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;run with :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;irun -access +r testcase.sv -input shm.tcl
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Alternatively the following can be added to the simulation:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;initial begin
-  $shm_open(&amp;quot;waves.shm&amp;quot;); $shm_probe(&amp;quot;AS&amp;quot;);
-end
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;run with &lt;code&gt;irun -access +r testcase.sv&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;NB: I have had trouble getting this last version to work, the tcl file method is more reliable.&lt;/p&gt;</content><category term="Engineering"></category><category term="Verilog"></category></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Engineering"></category><category term="Verilog"></category></entry></feed>

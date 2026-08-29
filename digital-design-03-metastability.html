@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Digital Design 03: Metastability</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Why a flip-flop can stop between the rails, why two gates reading that voltage can disagree with each other, and why the bug that follows never reproduces." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./digital-design-03-metastability.html" rel="bookmark"
+             title="Permalink to Digital Design 03: Metastability">Digital Design 03: Metastability</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-29T00:00:00+01:00">
+                Published: Sat 29 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/digital-design.html">Digital Design</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/cmos.html">CMOS</a> <a href="./tag/flip-flops.html">Flip-Flops</a> <a href="./tag/metastability.html">Metastability</a> <a href="./tag/synchronisers.html">Synchronisers</a> <a href="./tag/cdc.html">CDC</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="./00-metastability-hero-HQ.png"><img alt="A D-type flip-flop whose output wire splits at a junction and reaches two inverters, the upper one resolving it as 1 and the lower one as 0" src="./00-metastability-hero-900w.png"></a></p>
+<p><em>Series: Digital Design Fundamentals | Article 3</em></p>
+<hr>
+<p>The board runs for six days. On the seventh, the status register reports a state
+the state machine cannot reach, the firmware takes a branch that was never meant
+to execute, and the watchdog resets the part. Simulation has run the same
+sequence ten million times and never produced it. Attaching a scope to the
+suspect net makes the fault stop for a fortnight.</p>
+<p>This article explains where that state came from. Two routes lead to it: an
+input from another clock domain, and a synchronous path that failed timing
+closure. Both end at the same condition, a setup or hold requirement that was
+not met at the sampling edge. It is for anyone who writes register transfer
+level code and has been told to put two flip-flops on an asynchronous input
+without being told what the second flip-flop is for.</p>
+<hr>
+<h2>A decision with no margin</h2>
+<p>A flip-flop is a decision element with gain. At the sampling edge it captures
+the difference between its input and its own switching threshold, then amplifies
+that difference until the output reaches a rail.</p>
+<p>The captured difference sets how long the amplification takes. An input that
+settled a nanosecond early presents almost the full supply, and one pass through
+the internal loop is enough. An input that moved a few picoseconds before the
+edge presents a few millivolts, and the same loop needs several passes to build
+those millivolts up to a rail.</p>
+<p>That difference has no lower limit. Data crossing the threshold close enough to
+the clock edge leaves the flip-flop microvolts to amplify, or less, and the
+amplification then starts from microvolts.</p>
+<p><a href="./01-settling-margin-HQ.png"><img alt="Output voltage against time for several starting margins, showing that a smaller captured margin takes longer to reach a rail and one curve still sitting at the threshold when the next clock edge reads it" src="./01-settling-margin-900w.png"></a></p>
+<p>Distance from the threshold grows as <code>V0 e^(t / tau)</code>, where <code>V0</code> is the
+captured margin and <code>tau</code> is the settling time constant. Time to reach a rail
+therefore depends on the logarithm of the margin, so a margin ten times smaller
+costs only about 2.3 more time constants. Waiting buys a great deal and never
+buys certainty.</p>
+<p>While the output is still climbing it sits between the rails. That is
+metastability. Not a broken circuit, but an amplifier part way through a
+decision.</p>
+<hr>
+<h2>Where the clock edge lands</h2>
+<p>Setup time and hold time describe a window around the clock edge in which the
+input has to be stable. An input that changes inside that window is the input
+that leaves almost no margin to amplify.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_d8b224b08549af11c760dc10e7812f03.svg"></p>
+<p>Two situations put a real design in that window. The first is a signal with no
+fixed relationship to the sampling clock: another clock domain, a button, a
+sensor. The second is a fully synchronous path that failed timing closure, where
+static timing analysis has already reported a violated setup or hold
+requirement.</p>
+<p>The two look different in a report and identical at the flip-flop. Both are the
+same condition, a setup or hold requirement not met at the sampling edge.</p>
+<hr>
+<h2>One wire, two answers</h2>
+<p>Settling time is not the only hazard, and the next one does not depend on it at
+all. A flip-flop output is a wire, and a wire goes to more than one place.</p>
+<p>While the output sits near mid rail, every gate on that net is reading it. Each
+has its own switching threshold, set by the ratio of its pull-up and pull-down
+networks, and those thresholds are not identical. Process variation moves them,
+different cell types have different ones by design, and different loads mean the
+reads do not happen at the same instant.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_2ba665312784b327927f0c147c935239.svg"></p>
+<p>One node, one instant, two answers. Neither gate is faulty and neither reading
+is wrong. The wire did not carry a logic value for them to agree about.</p>
+<p>That is the failure, and metastability by itself is not. A flip-flop sitting at
+mid rail with nothing reading it costs some current and resolves. The damage
+starts when that voltage reaches two places and the two places disagree.</p>
+<p>Downstream registers then hold values that cannot occur together. A one-hot
+state machine ends a cycle with two bits high, so two decodes match at once. A
+handshake ends with both ends believing the other holds the token. None of those
+states appear in the encoding, in the assertions or in the coverage report. The
+register transfer level model cannot represent a wire that two readers disagree
+about, so simulation never produces them.</p>
+<p>The bug that results is rare, random, and moves when observed. A scope probe
+adds capacitance and shifts the timing. Temperature and supply voltage move
+switching thresholds. Rebuilding the design changes placement, so the wire
+delays that produced the divergence are gone and a fresh set arrives elsewhere.</p>
+<hr>
+<h2>Two flip-flops, and why not one</h2>
+<p>The fix follows from the exponential. Give the metastable node a full clock
+period to settle before anything reads it.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_64f11331eecdb03016bc0300ff1c7e11.svg"></p>
+<p>The first flip-flop absorbs the risk, and its output goes nowhere except the
+second flip-flop, so a divergent read has nothing to diverge into. The
+single-load rule matters as much as the second stage. Fanning the first stage
+out to anything else recreates the divergence the structure exists to prevent.</p>
+<hr>
+<h2>Putting a number on it</h2>
+<p>Mean time between failures, or MTBF, follows from the settling time constant and
+two frequencies:</p>
+<div class="highlight"><pre><span></span><code>MTBF = e^(t_r / tau) / (T0 x f_clk x f_data)
+</code></pre></div>
+
+<p><code>t_r</code> is the settling time allowed, <code>T0</code> is the width of the aperture, <code>f_clk</code>
+is the destination clock frequency and <code>f_data</code> is the rate of input changes.
+Only <code>t_r</code> sits in the exponent, so it dominates everything else.</p>
+<p>Liberty timing files do not carry <code>tau</code> or <code>T0</code>. They model a cell as a
+deterministic table of setup, hold and clock-to-Q, and metastability is a
+probability distribution with an exponential tail. The parameters have to come
+from transistor-level simulation instead. Measuring them on
+<code>sky130_fd_sc_hd__dfxtp_1</code>, the real 24-transistor SkyWater cell, gives this:</p>
+<table>
+<thead>
+<tr>
+<th>Corner</th>
+<th>Setup</th>
+<th>tau</th>
+<th>T0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ss slow</td>
+<td>45.6 ps</td>
+<td>116.8 ps</td>
+<td>67.4 ps</td>
+</tr>
+<tr>
+<td>tt typical</td>
+<td>28.6 ps</td>
+<td>43.8 ps</td>
+<td>492.2 ps</td>
+</tr>
+<tr>
+<td>ff fast</td>
+<td>20.5 ps</td>
+<td>21.8 ps</td>
+<td>1872 ps</td>
+</tr>
+</tbody>
+</table>
+<p><code>tau</code> varies by 5.4 times across the corners, and it sits in an exponent.
+Characterise at the slow corner, because that is where the latch resolves most
+slowly.</p>
+<p>Take the slow corner and put the synchroniser somewhere demanding. The
+destination clock <code>f_clk</code> is 400 MHz, so its period is 2.5 ns. The asynchronous
+input <code>f_data</code> changes at 10 MHz. The first stage gets half a period to settle,
+and each stage after it adds a full period.</p>
+<table>
+<thead>
+<tr>
+<th>Stages</th>
+<th>Settling allowed</th>
+<th>In time constants</th>
+<th>MTBF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1.25 ns</td>
+<td>11</td>
+<td>0.16 seconds</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3.75 ns</td>
+<td>32</td>
+<td>10 years</td>
+</tr>
+<tr>
+<td>3</td>
+<td>6.25 ns</td>
+<td>54</td>
+<td>2.0e10 years</td>
+</tr>
+</tbody>
+</table>
+<p>A single flip-flop fails six times a minute. The second stage moves that to
+about ten years, which is a product lifetime and not a comfortable margin. The
+third stage moves it to twenty billion years. Each stage is worth roughly nine
+orders of magnitude, because each one adds 2.5 ns of settling and that is 21
+time constants.</p>
+<p>Slow the clock to 100 MHz and the same two-stage synchroniser reports 2.8e43
+years. That is the number most designers meet, and it is why two flip-flops is
+treated as automatic. The rule is safe at 100 MHz and marginal at 400 MHz, and
+nothing about the flip-flop changed.</p>
+<p>Two stages is a convention, not a law. It holds only while <code>tau</code> stays small
+against the clock period. Raise the same cell to 1 GHz and two stages give half
+a second, three give under an hour, and it takes five to reach 2500 years. A
+130 nm cell has no business running at 1 GHz, and a process built for that speed
+has a <code>tau</code> of a few picoseconds.</p>
+<p>The measurement and the code behind those tables are at
+<a href="https://github.com/morganp/flipflop-mtbf">github.com/morganp/flipflop-mtbf</a>.</p>
+<hr>
+<h2>Closing</h2>
+<p>For any signal entering a clock domain from outside it, three questions:</p>
+<ul>
+<li>Does it pass through two flip-flops before anything else reads it?</li>
+<li>Does the first of those flip-flops drive exactly one load?</li>
+<li>Does anything else cross alongside it that has to stay consistent with it?</li>
+</ul>
+<p>The second question is the one this article adds. A synchroniser with a fanned
+out first stage looks correct in a schematic review and fails in the same way as
+no synchroniser at all.</p>
+<p>The third question is a different problem. Two flip-flops protect one bit, and
+they promise nothing about a multi-bit bus, about related control signals
+synchronised separately, or about a synchronous path that failed timing closure.
+Those need handshakes, Gray coding, or a fix in the path itself.</p>
+<hr>
+<p><em>Previous: <a href="./digital-design-02-pull-up-and-pull-down-networks.html">Digital Design 02: Pull-up and pull-down networks</a></em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
