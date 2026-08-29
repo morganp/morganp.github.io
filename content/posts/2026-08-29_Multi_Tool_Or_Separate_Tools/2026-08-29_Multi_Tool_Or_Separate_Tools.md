@@ -7,7 +7,7 @@ Author: morganp
 Summary: A Knipex Cobra XS, an Opinel No 08 and a bit driver measured against a Leatherman Wave+ on weight, price and capability.
 Status: published
 
-[![Sketch comparison of a Leatherman Wave Plus against a Knipex Cobra XS, an Opinel No 08 and a PB Swiss bit driver]({attach}/images/Outdoor/SameWeightBetterTools/01-hero-900w.png)]({attach}/images/Outdoor/SameWeightBetterTools/01-hero-HQ.png)
+[![Sketch comparison of a Leatherman Wave Plus against a Knipex Cobra XS, an Opinel No 08 and a PB Swiss bit driver]({attach}/images/Outdoor/MultiToolOrSeparateTools/01-hero-900w.png)]({attach}/images/Outdoor/MultiToolOrSeparateTools/01-hero-HQ.png)
 
 The nut on the garden tap has seized again. The Leatherman comes out of the
 pocket, the pliers swing open, and the jaws close on air either side of a
@@ -121,7 +121,7 @@ strip.
 The weights land close together. The prices do not, because the driver sets
 them apart.
 
-[![Bar chart comparing the weight and the price of both kits against a Leatherman Wave Plus]({attach}/images/Outdoor/SameWeightBetterTools/02-weight-cost-900w.png)]({attach}/images/Outdoor/SameWeightBetterTools/02-weight-cost-HQ.png)
+[![Bar chart comparing the weight and the price of both kits against a Leatherman Wave Plus]({attach}/images/Outdoor/MultiToolOrSeparateTools/02-weight-cost-900w.png)]({attach}/images/Outdoor/MultiToolOrSeparateTools/02-weight-cost-HQ.png)
 
 | Item | Weight | Price |
 |------|--------|-------|
