@@ -156,39 +156,32 @@ Web apps appear in the Tools dropdown nav, configured in `pelicanconf.py` as `WE
 | Drum Rudiments | `content/drum_rudiments` | — | static files, no upstream repo yet | `STATIC_PATHS` |
 | LPI Network Explorer | `content/amba-lpi-network-explorer` | `github.com/morganp/amba-lpi-network-explorer` | `main` | `copy-webapps` (single file, see below) |
 | APB Network Explorer | `content/amba-apb-network-explorer` | `github.com/morganp/amba-apb-network-explorer` | `main` | `copy-webapps` (single file, see below) |
+| AXI Network Explorer | `content/amba-axi-network-explorer` | `github.com/morganp/amba-axi-network-explorer` | `main` | `copy-webapps` (single file, see below) |
 
-**Single-page externals folded into AMBA Explorer.** `amba-lpi-network-explorer` and
-`amba-apb-network-explorer` each ship one self-contained page. They are not separate
-Tools entries and do not get their own output folder. `copy-webapps` rsyncs each file
-into the AMBA Explorer output as `LPI-Network-Explorer.html` and
-`APB-Network-Explorer.html`, which are the names the AMBA Explorer landing page and the
-per-protocol `.dc.html` pages link to. Those rsync lines must stay **after** the
-`rsync -a --delete .../amba-explorer/public/` line, because that rsync deletes anything
-in `output/amba-explorer/` not present in the AMBA Explorer submodule.
+**Single-page externals folded into AMBA Explorer.** `amba-lpi-network-explorer`,
+`amba-apb-network-explorer` and `amba-axi-network-explorer` each ship one
+self-contained page, named for its destination in the repo itself. They are not
+separate Tools entries and do not get their own output folder. `copy-webapps` copies
+each file into the AMBA Explorer output under the same name it already has:
 
-> **Source filename is changing.** These externals were first published as
-> `public/index.html` and renamed on copy. Upstream is renaming each file in its own
-> repo to the destination name, so after the next push the source becomes
-> `public/LPI-Network-Explorer.html` and `public/APB-Network-Explorer.html`.
->
-> **When a pointer bump brings that rename in, update the source half of the rsync
-> line in `copy-webapps`.** The destination half never changes: the filename in
-> `output/amba-explorer/` is the link target baked into the AMBA Explorer pages, so
-> renaming the destination breaks those links. A bump that lands the rename without
-> the Makefile edit fails loudly, since rsync errors on a missing source path.
->
-> Check after any bump of these submodules:
-> ```bash
-> ls content/amba-lpi-network-explorer/public/ content/amba-apb-network-explorer/public/
-> ```
-> Once both sides match, the copy is a plain same-name copy and the line can drop to
-> `rsync -a .../public/<Name>.html "$(OUTPUTDIR)/amba-explorer/"`.
+```
+content/amba-lpi-network-explorer/public/LPI-Network-Explorer.html
+content/amba-apb-network-explorer/public/APB-Network-Explorer.html
+content/amba-axi-network-explorer/public/AXI-Network-Explorer.html
+```
 
-**Pending: `AXI-Network-Explorer.html`.** The AMBA Explorer pages already link it in two
-places, but `github.com/morganp/amba-axi-network-explorer` holds only a `.gitignore` and
-has no page yet, so that link 404s on the live site. When the repo gets content, wire it
-the same way: `git submodule add`, one rsync line placed after the `--delete` line, and a
-row in the table above.
+Those are the names the AMBA Explorer landing page and the per-protocol `.dc.html`
+pages link to, so a rename on either side breaks those links. The three rsync lines
+must stay **after** the `rsync -a --delete .../amba-explorer/public/` line, because
+that rsync deletes anything in `output/amba-explorer/` not present in the AMBA
+Explorer submodule.
+
+A bump that renames a source file fails loudly, since rsync errors on a missing
+source path. Check after any bump of these submodules:
+
+```bash
+ls content/amba-{lpi,apb,axi}-network-explorer/public/
+```
 
 ### Updating a webapp submodule
 
