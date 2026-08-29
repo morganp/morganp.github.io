@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" width="900" height="480">
+<style>
+  .bg{fill:#F5F2EC}
+  .wave{fill:none;stroke:#2D2D2D;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+  .edge{stroke:#4A4A4A;stroke-width:1.5;stroke-dasharray:5 5}
+  .ttl{font:700 19px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#2D2D2D}
+  .sig{font:700 16px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#2D2D2D}
+  .sub{font:400 12px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#4A4A4A}
+  .lab{font:600 14px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#2D2D2D}
+  .note{font:400 13px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#4A4A4A}
+  .pur{font:700 14px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#7B35C2}
+  .bad{font:700 14px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#E07820}
+  .band{fill:#7B35C2;fill-opacity:.11}
+  .bedge{stroke:#7B35C2;stroke-width:1.5;stroke-dasharray:4 4}
+  .arr{stroke:#7B35C2;stroke-width:2.5;fill:none}
+  .arro{stroke:#E07820;stroke-width:2.5;fill:none}
+</style>
+<rect class="bg" width="900" height="480"/>
+<text x="40" y="34" class="ttl">Setup violation: data arrives too late for the NEXT edge</text>
+
+<rect class="band" x="566" y="70" width="74" height="272"/>
+<line class="bedge" x1="566" y1="70" x2="566" y2="342"/>
+<line class="bedge" x1="640" y1="70" x2="640" y2="342"/>
+<text x="603" y="62" class="pur" text-anchor="middle">setup window</text>
+
+<line class="edge" x1="200" y1="70" x2="200" y2="342"/>
+<line class="edge" x1="640" y1="70" x2="640" y2="342"/>
+
+<text x="40" y="107" class="sig">CLK</text>
+<path class="wave" d="M112,122 H200 V82 H420 V122 H640 V82 H860"/>
+<text x="200" y="146" class="lab" text-anchor="middle">edge N</text>
+<text x="200" y="162" class="sub" text-anchor="middle">launches the data</text>
+<text x="662" y="146" class="lab">edge N+1</text>
+<text x="662" y="162" class="sub">captures it</text>
+
+<text x="40" y="212" class="sig">Q</text>
+<text x="40" y="228" class="sub">launch flop</text>
+<path class="wave" d="M112,232 H232 L248,192 H860"/>
+
+<path class="arr" d="M248,266 H586"/>
+<path class="arr" d="M578,260 l8,6 -8,6"/>
+<text x="415" y="260" class="note" text-anchor="middle">clock-to-Q + logic depth + routing</text>
+
+<text x="40" y="312" class="sig">D</text>
+<text x="40" y="328" class="sub">capture flop</text>
+<path class="wave" d="M112,332 H592 L608,292 H860"/>
+
+<circle cx="600" cy="312" r="6" fill="#E07820"/>
+<path class="arro" d="M600,320 V368"/>
+<path class="arro" d="M594,360 l6,8 6,-8"/>
+<text x="600" y="388" class="bad" text-anchor="middle">the edge arrives while the data is still moving</text>
+<text x="600" y="406" class="note" text-anchor="middle">the flop samples a value that has not settled</text>
+
+<path class="arr" d="M566,440 H640"/>
+<path class="arr" d="M574,434 l-8,6 8,6"/>
+<path class="arr" d="M632,434 l8,6 -8,6"/>
+<text x="603" y="432" class="pur" text-anchor="middle">t_su</text>
+<text x="546" y="445" class="note" text-anchor="end">data must be stable across this whole window</text>
+</svg>

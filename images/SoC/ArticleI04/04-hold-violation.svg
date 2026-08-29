@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" width="900" height="480">
+<style>
+  .bg{fill:#F5F2EC}
+  .wave{fill:none;stroke:#2D2D2D;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+  .edge{stroke:#4A4A4A;stroke-width:1.5;stroke-dasharray:5 5}
+  .ttl{font:700 19px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#2D2D2D}
+  .sig{font:700 16px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#2D2D2D}
+  .sub{font:400 12px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#4A4A4A}
+  .lab{font:600 14px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#2D2D2D}
+  .note{font:400 13px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#4A4A4A}
+  .pur{font:700 14px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#7B35C2}
+  .bad{font:700 14px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#E07820}
+  .band{fill:#7B35C2;fill-opacity:.11}
+  .bedge{stroke:#7B35C2;stroke-width:1.5;stroke-dasharray:4 4}
+  .arr{stroke:#7B35C2;stroke-width:2.5;fill:none}
+  .arro{stroke:#E07820;stroke-width:2.5;fill:none}
+</style>
+<rect class="bg" width="900" height="480"/>
+<text x="40" y="34" class="ttl">Hold violation: new data arrives too early, on the SAME edge</text>
+
+<rect class="band" x="300" y="70" width="90" height="272"/>
+<line class="bedge" x1="390" y1="70" x2="390" y2="342"/>
+<text x="345" y="62" class="pur" text-anchor="middle">hold window</text>
+
+<line class="edge" x1="300" y1="70" x2="300" y2="342"/>
+
+<text x="40" y="107" class="sig">CLK</text>
+<path class="wave" d="M112,122 H300 V82 H620 V122 H860"/>
+<text x="412" y="146" class="lab">edge N</text>
+<text x="412" y="162" class="sub">launches the data AND captures it, one edge doing both</text>
+
+<text x="40" y="212" class="sig">Q</text>
+<text x="40" y="228" class="sub">launch flop</text>
+<path class="wave" d="M112,192 H332 L348,232 H860"/>
+
+<path class="arr" d="M470,266 H356"/>
+<path class="arr" d="M364,260 l-8,6 8,6"/>
+<text x="480" y="270" class="note">short path: clock-to-Q and almost no logic between</text>
+
+<text x="40" y="312" class="sig">D</text>
+<text x="40" y="328" class="sub">capture flop</text>
+<path class="wave" d="M112,292 H344 L360,332 H860"/>
+
+<circle cx="352" cy="312" r="6" fill="#E07820"/>
+<path class="arro" d="M352,320 V368"/>
+<path class="arro" d="M346,360 l6,8 6,-8"/>
+<text x="352" y="388" class="bad" text-anchor="middle">the old value is destroyed before it was sampled</text>
+<text x="352" y="406" class="note" text-anchor="middle">broken at every frequency, including zero</text>
+
+<path class="arr" d="M300,440 H390"/>
+<path class="arr" d="M308,434 l-8,6 8,6"/>
+<path class="arr" d="M382,434 l8,6 -8,6"/>
+<text x="345" y="432" class="pur" text-anchor="middle">t_h</text>
+<text x="410" y="445" class="note">the old value must survive this window after the edge</text>
+</svg>
