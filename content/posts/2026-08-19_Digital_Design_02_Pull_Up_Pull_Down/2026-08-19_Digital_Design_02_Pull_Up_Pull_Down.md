@@ -340,10 +340,17 @@ rail, the n-type row along the bottom over a ground rail, polysilicon stripes
 crossing both to form the gates, and metal 1 stitching the drains together into
 the output.
 
-The next article in the series takes these cells and starts combining them:
+From here the series splits, and the two branches do not depend on each other.
+
+One branch wires these cells into a loop and asks what happens when the loop
+holds neither a 0 nor a 1: metastability, and the unreproducible bugs that
+follow when two gates read the same undecided wire and disagree.
+
+The other branch keeps the cells combinational and starts combining them:
 Boolean algebra as a tool for restructuring logic before it ever reaches a
 transistor.
 
 ---
 
 *Previous: [Digital Design 01: Mask sets, and how a transistor gets built]({filename}../2026-08-18_Digital_Design_01_Mask_Sets/2026-08-18_Digital_Design_01_Mask_Sets.md)*
+*Next: [Digital Design 03: Metastability]({filename}../2026-08-29_Digital_Design_03_Metastability/2026-08-29_Digital_Design_03_Metastability.md)*
