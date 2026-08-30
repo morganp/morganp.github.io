@@ -173,4 +173,4 @@ Both rows play eight notes per bar, but the shuffle "&" notes wait until two-thi
 
 Because the number chart is the only version you have to memorise. Learn the grid at the top of this post once and you now know the 12-bar blues in E, A, G, D, C, and every other key: the table converts numbers to chord names. When a jam leader calls "blues in A, quick change, watch for the stops", every word of that maps onto something in this post except the stops, and those are just bars where the band hits beat one and lets the singer have the rest.
 
-Next in the series: [variations on the open A shape]({filename}/posts/2026-07-01_A_Shape_Open_Chord_Variations.md), plus the D and E shapes, to grow the chord vocabulary used in this progression.
+Next in the series: [variations on the open A shape]({filename}/posts/2026-08-30_A_Shape_Open_Chord_Variations.md), plus the D and E shapes, to grow the chord vocabulary used in this progression.
