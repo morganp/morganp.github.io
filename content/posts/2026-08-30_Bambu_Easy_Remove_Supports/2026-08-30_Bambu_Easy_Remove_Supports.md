@@ -13,7 +13,7 @@ Nothing went wrong. The stock support profile is tuned to hold overhangs up reli
 
 Below is the profile I have settled on in Bambu Studio, printing PLA on an A1 Mini with a 0.4mm nozzle at 0.16mm layer height. The settings map straight across to OrcaSlicer, which shares the same support engine.
 
-## The profile
+## The 0.16mm profile
 
 <div class="support-values">
 <style>
