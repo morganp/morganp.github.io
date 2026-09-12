@@ -62,7 +62,7 @@
                 </address>
         <p>In <a href="./category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/computer-architecture.html">Computer Architecture</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/multicore.html">Multicore</a> <a href="./tag/caches.html">Caches</a> <a href="./tag/mesi.html">MESI</a> <a href="./tag/coherency.html">Coherency</a> <a href="./tag/arm.html">ARM</a> <a href="./tag/verification.html">Verification</a> </p>        
-</footer><!-- /.post-info -->        <p><a href="./00-coherency-hero-HQ.png"><img alt="A multicore cache coherency fabric on a system on chip, with four processor caches around a shared interconnect that carries snoop and ownership traffic to a directory and a memory controller" src="./00-coherency-hero-900w.png"></a></p>
+</footer><!-- /.post-info -->        <p><a href="./images/SoC/ArticleI02/00-coherency-hero-HQ.png"><img alt="A multicore cache coherency fabric on a system on chip, with four processor caches around a shared interconnect that carries snoop and ownership traffic to a directory and a memory controller" src="./images/SoC/ArticleI02/00-coherency-hero-900w.png"></a></p>
 <p><em>Series: Intermediate SoC Design | Article 2 of 10</em></p>
 <hr>
 <h2>Two counters that will not scale</h2>
@@ -109,7 +109,7 @@ protocol becomes predictable.</p>
 <span class="w">  </span><span class="nv">Only</span><span class="w"> </span><span class="nv">one</span><span class="w"> </span><span class="nv">cache</span><span class="w"> </span><span class="nv">may</span><span class="w"> </span><span class="nv">hold</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">dirty</span>,<span class="w"> </span><span class="nv">writable</span><span class="w"> </span><span class="nv">copy</span>.
 </code></pre></div>
 
-<p><a href="./01-single-writer-HQ.png"><img alt="The single writer rule illustrated: three processor caches holding clean readable copies of the same cache line on one side, and a single cache holding the one dirty writable copy on the other" src="./01-single-writer-900w.png"></a></p>
+<p><a href="./images/SoC/ArticleI02/01-single-writer-HQ.png"><img alt="The single writer rule illustrated: three processor caches holding clean readable copies of the same cache line on one side, and a single cache holding the one dirty writable copy on the other" src="./images/SoC/ArticleI02/01-single-writer-900w.png"></a></p>
 <p>Readers are cheap and can be plentiful. Writers are exclusive. When a core
 wants to write a line that other caches hold, it must first take ownership and
 remove every other copy.</p>
@@ -184,7 +184,7 @@ round trip to every sharer before it can proceed.</p>
 <h2>Snooping: every cache hears everything</h2>
 <p>The direct way to keep caches agreeing is to let them all listen to the same
 coherence traffic.</p>
-<p><a href="./02-snooping-HQ.png"><img alt="Snooping coherency: four processor caches all connected to one shared coherent bus, with a single request broadcast reaching every cache simultaneously" src="./02-snooping-900w.png"></a></p>
+<p><a href="./images/SoC/ArticleI02/02-snooping-HQ.png"><img alt="Snooping coherency: four processor caches all connected to one shared coherent bus, with a single request broadcast reaching every cache simultaneously" src="./images/SoC/ArticleI02/02-snooping-900w.png"></a></p>
 <p>Every cache observes every read, invalidate, and ownership request, and each
 one checks whether it holds the line. The model holds few surprises during
 bring-up, and latency is low because there is no lookup step before the
@@ -200,7 +200,7 @@ broadcast.</p>
 <h2>Directories: telling only the caches that care</h2>
 <p>A directory records which caches might hold each line. The fabric consults it
 and sends targeted snoops instead of broadcasting.</p>
-<p><a href="./03-directory-HQ.png"><img alt="Directory based coherency: a central directory holding a sharer list for a cache line, sending targeted snoops to only the two caches that hold copies while two other caches are left undisturbed" src="./03-directory-900w.png"></a></p>
+<p><a href="./images/SoC/ArticleI02/03-directory-HQ.png"><img alt="Directory based coherency: a central directory holding a sharer list for a cache line, sending targeted snoops to only the two caches that hold copies while two other caches are left undisturbed" src="./images/SoC/ArticleI02/03-directory-900w.png"></a></p>
 <div class="highlight"><pre><span></span><code><span class="n">Directory</span><span class="w"> </span><span class="n">entry</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">cache</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="n">A</span>
 
 <span class="w">  </span><span class="nl">Tag</span><span class="p">:</span><span class="w">       </span><span class="n">A</span><span class="p">[</span><span class="n">PA</span><span class="w"> </span><span class="n">tag</span><span class="p">]</span>
@@ -244,7 +244,7 @@ It was also irrelevant.</p>
 <code>stats[1].hits</code> are different objects, because it never sees objects. It tracks
 cache lines, typically 64 bytes, and a line is the smallest thing it can own,
 share, or invalidate.</p>
-<p><a href="./04-false-sharing-HQ.png"><img alt="False sharing: two processor cores writing to two different variables that occupy the same 64 byte cache line, with the line ownership bouncing back and forth between the two caches on every write" src="./04-false-sharing-900w.png"></a></p>
+<p><a href="./images/SoC/ArticleI02/04-false-sharing-HQ.png"><img alt="False sharing: two processor cores writing to two different variables that occupy the same 64 byte cache line, with the line ownership bouncing back and forth between the two caches on every write" src="./images/SoC/ArticleI02/04-false-sharing-900w.png"></a></p>
 <div class="highlight"><pre><span></span><code><span class="n">One</span><span class="w"> </span><span class="mi">64</span><span class="o">-</span><span class="n">byte</span><span class="w"> </span><span class="n">cache</span><span class="w"> </span><span class="n">line</span>
 
 <span class="w">  </span><span class="n">offset</span><span class="o">:</span><span class="w">  </span><span class="o">+</span><span class="mi">0</span><span class="w">            </span><span class="o">+</span><span class="mi">8</span><span class="w">                        </span><span class="o">+</span><span class="mi">63</span>
@@ -271,7 +271,7 @@ wrong. The hardware is honouring the single-writer rule exactly as specified.</p
 <p>Direct memory access engines and accelerators read and write memory without
 executing any of the cache maintenance instructions a core would. Systems
 handle this in one of three ways.</p>
-<p><a href="./05-dma-coherency-HQ.png"><img alt="Three coherency approaches for a direct memory access engine: non-coherent with software cache maintenance, input output coherent participating in snoops for selected transactions, and fully coherent sharing the domain with the processors" src="./05-dma-coherency-900w.png"></a></p>
+<p><a href="./images/SoC/ArticleI02/05-dma-coherency-HQ.png"><img alt="Three coherency approaches for a direct memory access engine: non-coherent with software cache maintenance, input output coherent participating in snoops for selected transactions, and fully coherent sharing the domain with the processors" src="./images/SoC/ArticleI02/05-dma-coherency-900w.png"></a></p>
 <ol>
 <li><strong>Non-coherent:</strong> Software cleans caches before a transfer out and invalidates them after a transfer in. The hardware is cheap, and a single missed maintenance operation corrupts the transfer.</li>
 <li><strong>Input output coherent:</strong> The engine participates in the coherency fabric for selected transactions, so its reads snoop the caches. Software stops needing maintenance for those buffers.</li>

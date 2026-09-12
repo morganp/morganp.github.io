@@ -80,7 +80,7 @@
 <hr>
 <h2>The AMBA Family</h2>
 <p>ARM's <strong>AMBA</strong> specification, first published in 1996 and evolving through multiple generations, defines a family of bus protocols at different performance tiers:</p>
-<p><a href="./06-amba-family-HQ.png"><img alt="AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple" src="./06-amba-family-900w.png"></a></p>
+<p><a href="./images/SoC/Article06/06-amba-family-HQ.png"><img alt="AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple" src="./images/SoC/Article06/06-amba-family-900w.png"></a></p>
 <p>The family spans from simple, low-power APB peripherals on the right through pipelined AHB, high-performance AXI4, all the way to cache-coherent ACE/CHI protocols used in multi-core processor clusters on the left.</p>
 <hr>
 <h2>APB: advanced peripheral bus</h2>
@@ -129,7 +129,7 @@
 <p><strong>AXI4</strong> is the highest-performance AMBA protocol, used to connect CPUs, memory controllers, DMA engines, GPUs, and other high-bandwidth masters and slaves. It is the backbone of most modern SoCs.</p>
 <p>AXI4's key innovation is <strong>independent channels</strong>: read and write transactions are completely separate, and multiple transactions can be in flight simultaneously.</p>
 <h3>The five AXI channels</h3>
-<p><a href="./06-axi-channels-HQ.png"><img alt="AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names" src="./06-axi-channels-900w.png"></a></p>
+<p><a href="./images/SoC/Article06/06-axi-channels-HQ.png"><img alt="AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names" src="./images/SoC/Article06/06-axi-channels-900w.png"></a></p>
 <p>The five channels are:</p>
 <ul>
 <li><strong>AW (Write Address)</strong>: master sends the address and burst parameters for a write</li>
@@ -159,7 +159,7 @@
 <h2>The interconnect: from bus to crossbar</h2>
 <p>A simple shared bus forces all masters to share a single data path -- only one master can use it at a time. This creates a bottleneck in systems with multiple high-bandwidth masters.</p>
 <p>The solution is an <strong>AXI crossbar</strong> (also called a <strong>switch matrix</strong>): it provides dedicated paths between every master-slave pair, allowing multiple simultaneous transfers as long as they target different slaves.</p>
-<p><a href="./06-bus-vs-crossbar-HQ.png"><img alt="Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right" src="./06-bus-vs-crossbar-900w.png"></a></p>
+<p><a href="./images/SoC/Article06/06-bus-vs-crossbar-HQ.png"><img alt="Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right" src="./images/SoC/Article06/06-bus-vs-crossbar-900w.png"></a></p>
 <p>ARM's CoreLink NIC-400 and NIC-450 are examples of AXI mux-style interconnects, where a fixed matrix routes each master to a set of slaves. The CoreLink NI-700 takes a different approach: it is a Network-on-Chip (NoC) switched network that routes transactions independently through the fabric, allowing better scalability for large numbers of endpoints. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.</p>
 <hr>
 <h2>QoS: Quality of Service in Interconnects</h2>
@@ -178,12 +178,12 @@
 <hr>
 <h2>APB bridge: connecting the bus tiers</h2>
 <p>Because APB is simpler and lower power, slow peripherals are typically attached to an <strong>APB bus</strong> rather than directly to the AXI/AHB backbone. An <strong>AXI-to-APB bridge</strong> converts between the protocols:</p>
-<p><a href="./06-soc-bus-hierarchy-HQ.png"><img alt="SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus" src="./06-soc-bus-hierarchy-900w.png"></a></p>
+<p><a href="./images/SoC/Article06/06-soc-bus-hierarchy-HQ.png"><img alt="SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus" src="./images/SoC/Article06/06-soc-bus-hierarchy-900w.png"></a></p>
 <p>The bridge runs the APB at a lower, slower clock (e.g., 100 MHz) while the AXI backbone runs at 500 MHz or more, reducing dynamic power in the peripherals.</p>
 <hr>
 <h2>Network-on-Chip (NoC)</h2>
 <p>In the largest, most complex SoCs -- server processors, AI accelerators -- even an AXI crossbar becomes a bottleneck. The solution is a <strong>Network-on-Chip (NoC)</strong>: a switched packet network embedded on the die, with routers at each node and links between them.</p>
-<p><a href="./06-noc-mesh-HQ.png"><img alt="Network-on-Chip 4x4 mesh topology showing router nodes connected by bidirectional links with CPU, GPU, DRAM, and NPU blocks at the edges" src="./06-noc-mesh-900w.png"></a></p>
+<p><a href="./images/SoC/Article06/06-noc-mesh-HQ.png"><img alt="Network-on-Chip 4x4 mesh topology showing router nodes connected by bidirectional links with CPU, GPU, DRAM, and NPU blocks at the edges" src="./images/SoC/Article06/06-noc-mesh-900w.png"></a></p>
 <p>NoCs provide:</p>
 <ul>
 <li><strong>Scalability</strong> -- adding more processing tiles does not require redesigning the interconnect</li>
