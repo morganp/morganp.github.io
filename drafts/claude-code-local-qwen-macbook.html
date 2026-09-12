@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Running Claude Code with a Local Qwen Model on a 16 GB MacBook</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="How to point Claude Code at a local llama-server on a 16 GB Apple Silicon MacBook. Covers model choice (Qwen3-8B fits well at 7 GB), server flags,..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                        <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="../category/music.html">Music</a></li>
+                                                        <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="../category/photography.html">Photography</a></li>
+                                                        <li><a href="../category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="../category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="../category/programming.html">Programming</a></li>
+                                                                        <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/claude-code-local-qwen-macbook.html" rel="bookmark"
+             title="Permalink to Running Claude Code with a Local Qwen Model on a 16 GB MacBook">Running Claude Code with a Local Qwen Model on a 16 GB MacBook</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-06-25T00:00:00+01:00">
+                Published: Thu 25 June 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/programming.html">Programming</a>.</p>
+<p>tags: <a href="../tag/claude-code.html">claude-code</a> <a href="../tag/llm.html">llm</a> <a href="../tag/local-llm.html">local-llm</a> <a href="../tag/qwen.html">qwen</a> <a href="../tag/llama-cpp.html">llama-cpp</a> <a href="../tag/macos.html">macos</a> </p>        
+</footer><!-- /.post-info -->        <p>Claude Code normally talks to Anthropic's API. With a small config change you can point it at a local <a href="https://github.com/ggml-org/llama.cpp">llama.cpp</a> server instead, keeping everything on-device. This post covers the full setup on a 16 GB Apple Silicon MacBook.</p>
+<h2>Why bother?</h2>
+<ul>
+<li>No API cost for quick throwaway tasks</li>
+<li>No data leaving the machine</li>
+<li>Useful for offline work or testing prompts cheaply</li>
+</ul>
+<p>The tradeoff: a local 7B model is noticeably weaker than Claude Sonnet. Use it for mechanical tasks (small edits, grep, file reads) and fall back to the real API for anything requiring reasoning.</p>
+<h2>Model choice</h2>
+<p>The obvious pick is a large model, but on 16 GB RAM you need to be realistic.</p>
+<p><strong>Too heavy:</strong> <code>unsloth/Qwen3.5-35B-A3B-GGUF:Q4_K_M</code> -- with <code>-ngl 999</code> Metal hit GPU out-of-memory. Without full offload it ran at ~0.15 generation tok/s. Unusable for an interactive coding session.</p>
+<p><strong>Works well:</strong> <code>Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M</code> -- fits comfortably, fast enough once the prompt size is controlled (more on that below). Idle RSS ~4.4 GB.</p>
+<p><strong>Better:</strong> <code>Qwen/Qwen3-8B-GGUF:Q4_K_M</code> -- the newer Qwen3 generation, ~7 GB RSS, fits fine on 16 GB. More capable than the 7B coder model. This is what I'd recommend now.</p>
+<h2>Install llama.cpp</h2>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>llama.cpp
+llama-server<span class="w"> </span>--version
+</code></pre></div>
+
+<p>Tested against version <code>9780 (1191758c5)</code>.</p>
+<h2>Start the server</h2>
+<div class="highlight"><pre><span></span><code>llama-server<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-hf<span class="w"> </span>Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">8131</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-ngl<span class="w"> </span>all<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-t<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-c<span class="w"> </span><span class="m">32768</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-b<span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-ub<span class="w"> </span><span class="m">512</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--parallel<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-fa<span class="w"> </span>on<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--jinja<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--keep<span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cache-type-k<span class="w"> </span>q8_0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cache-type-v<span class="w"> </span>q8_0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--no-context-shift<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--reasoning<span class="w"> </span>off
+</code></pre></div>
+
+<p>A few flag notes:</p>
+<ul>
+<li><code>-ngl all</code> offloads all layers to Metal GPU. Required for usable speed.</li>
+<li><code>--reasoning off</code> disables Qwen3 thinking mode. Without it the server logs show <code>thinking = 1</code> even when you try to disable it via template kwargs.</li>
+<li><code>--jinja</code> enables the Jinja chat template, needed for correct instruction formatting.</li>
+<li><code>--no-context-shift</code> prevents silent context truncation.</li>
+</ul>
+<p>Verify it started:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>http://127.0.0.1:8131/health
+<span class="c1"># {&quot;status&quot;:&quot;ok&quot;}</span>
+</code></pre></div>
+
+<p>Quick smoke test:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>http://127.0.0.1:8131/v1/chat/completions<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;model&quot;:&quot;Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;Reply with OK only.&quot;}],&quot;max_tokens&quot;:8}&#39;</span>
+</code></pre></div>
+
+<p>Direct generation speed: ~102 prompt tok/s, ~67 generation tok/s.</p>
+<h2>Claude Code settings profile</h2>
+<p>Create <code>~/.claude/settings-qwen.json</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;$schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://json.schemastore.org/claude-code-settings.json&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;ANTHROPIC_BASE_URL&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8131&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ANTHROPIC_AUTH_TOKEN&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;local&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ANTHROPIC_MODEL&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ANTHROPIC_DEFAULT_OPUS_MODEL&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ANTHROPIC_DEFAULT_SONNET_MODEL&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ANTHROPIC_DEFAULT_HAIKU_MODEL&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;CLAUDE_CODE_SUBAGENT_MODEL&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;CLAUDE_CODE_MAX_OUTPUT_TOKENS&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;8192&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;DISABLE_AUTOUPDATER&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;DISABLE_TELEMETRY&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;DISABLE_ERROR_REPORTING&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;DISABLE_NON_ESSENTIAL_MODEL_CALLS&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>ANTHROPIC_AUTH_TOKEN=local</code> is a dummy value -- the local server does not check it.</p>
+<p>Note: do <strong>not</strong> set <code>DISABLE_PROMPT_CACHING=1</code>. See the prompt caching section below.</p>
+<h2>The critical flag: <code>--bare</code></h2>
+<p>This is the single most important thing for making a local 7B model viable with Claude Code.</p>
+<p>Regular Claude Code sends a large hidden system prompt plus tool schemas on every request. Measured token counts for a trivial <code>"test"</code> prompt:</p>
+<table>
+<thead>
+<tr>
+<th>Launch mode</th>
+<th>Prompt tokens</th>
+<th>Wall time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Regular Claude Code</td>
+<td>23,808</td>
+<td>~2 min</td>
+</tr>
+<tr>
+<td>Regular, tools disabled</td>
+<td>5,746</td>
+<td>18.7s</td>
+</tr>
+<tr>
+<td><code>--bare</code> + <code>Read,Edit,Write,Bash</code></td>
+<td>~1,099</td>
+<td>sub-second (cache hit)</td>
+</tr>
+<tr>
+<td><code>--bare</code> + no tools</td>
+<td>154</td>
+<td>sub-second</td>
+</tr>
+</tbody>
+</table>
+<p><code>--bare</code> strips hooks, LSP, plugin sync, auto-memory, CLAUDE.md discovery, and the large coding-agent system prompt. The model only sees your message and a minimal tool schema.</p>
+<h2>Shell alias</h2>
+<div class="highlight"><pre><span></span><code><span class="nb">alias</span><span class="w"> </span>claude-qwen<span class="o">=</span><span class="s1">&#39;claude \</span>
+<span class="s1">  --setting-sources local,project \</span>
+<span class="s1">  --settings ~/.claude/settings-qwen.json \</span>
+<span class="s1">  --bare \</span>
+<span class="s1">  --tools &quot;Read,Edit,Write,Bash&quot;&#39;</span>
+</code></pre></div>
+
+<p><code>--setting-sources local,project</code> skips the global <code>~/.claude/settings.json</code>, so your normal Claude settings are unaffected.</p>
+<h2>Prompt caching: leave it on</h2>
+<p>You might expect to disable Anthropic-style prompt caching since the local server does not support it. Don't.</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>First request</th>
+<th>Second request</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DISABLE_PROMPT_CACHING=1</code></td>
+<td>7.4s</td>
+<td>1.0s</td>
+</tr>
+<tr>
+<td>Caching enabled (default)</td>
+<td>1.2s</td>
+<td>1.0s</td>
+</tr>
+</tbody>
+</table>
+<p>With caching disabled, the first request hits a slow path -- likely a retry after the server rejects the cache headers. With it enabled, llama.cpp's own KV cache handles reuse and the first request is already fast.</p>
+<h2>Memory usage</h2>
+<p>The 7B Q4_K_M model uses ~4.4 GB RSS at idle. Under concurrent requests it stays flat at ~4.5 GB -- weights and KV cache are both pre-allocated at startup.</p>
+<h3>Context size vs memory</h3>
+<p>Qwen2.5-Coder-7B has 8 KV heads, 28 layers, head_dim 128. With q8_0 cache:</p>
+<div class="highlight"><pre><span></span><code>KV cache = 2 × 28 × 8 × 128 × n_ctx × 1 byte = 57,344 bytes/token
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th><code>-c</code></th>
+<th>KV cache</th>
+<th>Total RSS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>32768</td>
+<td>~1.75 GB</td>
+<td>~4.4 GB</td>
+</tr>
+<tr>
+<td>65536</td>
+<td>~3.5 GB</td>
+<td>~6.2 GB</td>
+</tr>
+</tbody>
+</table>
+<p>32768 is plenty for <code>--bare</code> sessions -- typical usage stays well under 10k tokens. Only increase if you're loading large files or long sessions.</p>
+<h2>What about MLX?</h2>
+<p>Apple Silicon supports MLX, a native ML framework that can run models without llama.cpp. I tried <code>mlx-community/Qwen3-8B-4bit</code> via <code>mlx_lm.server</code>. It didn't work out for two reasons:</p>
+<ol>
+<li>
+<p><strong>API format mismatch.</strong> <code>mlx_lm.server</code> only speaks OpenAI format (<code>/v1/chat/completions</code>). Claude Code uses the Anthropic Messages API (<code>/v1/messages</code>). A translation proxy is needed. I wrote one, but Claude Code also sends streaming requests which the proxy didn't handle.</p>
+</li>
+<li>
+<p><strong>LiteLLM (the standard proxy solution) fails on Python 3.14.</strong> Homebrew ships Python 3.14 and LiteLLM's proxy dependencies (<code>orjson</code>, <code>backoff</code>, <code>apscheduler</code>, etc.) don't all have wheels for it yet.</p>
+</li>
+</ol>
+<p>GGUF via llama-server avoids all of this -- llama-server has built-in Anthropic Messages API compatibility, so Claude Code talks to it directly with no proxy.</p>
+<h2>Summary</h2>
+<ol>
+<li><code>brew install llama.cpp</code></li>
+<li>Start <code>llama-server -hf Qwen/Qwen3-8B-GGUF:Q4_K_M</code> with <code>-ngl all --reasoning off --jinja</code></li>
+<li>Create <code>~/.claude/settings-qwen3.json</code> pointing at the server</li>
+<li>Use <code>claude --bare --tools "Read,Edit,Write,Bash" --settings ~/.claude/settings-qwen3.json</code></li>
+<li>Leave prompt caching enabled</li>
+<li>Only run one server at a time -- each takes 4-7 GB RAM</li>
+</ol>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
