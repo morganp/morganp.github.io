@@ -7,7 +7,7 @@ Status: published
 Summary: Profiling Zsh startup, then rebuilding the setup around Oh My Zsh, the Git plugin, autosuggestions, syntax highlighting, and Spaceship Prompt. Covers where the milliseconds go, how completion caching changes under a framework, and every tracked file needed to reproduce it.
 Slug: zsh-startup-analysis-and-modern-setup
 
-[![Zsh startup analysis and modern setup]({attach}/images/Unix/zsh/zsh-hero-900w.png)]({attach}/images/Unix/zsh/zsh-hero-HQ.png)
+[![Zsh startup analysis and modern setup]({static}/images/Unix/zsh/zsh-hero-900w.png)]({static}/images/Unix/zsh/zsh-hero-HQ.png)
 
 This post documents the current Zsh setup and the measurements that shaped it.
 It covers startup performance, completion behavior, plugins, and prompt design.
@@ -137,7 +137,7 @@ Oh My Zsh is unavailable. This guard prevents 2 `compinit` calls in one shell.
 
 Pressing Tab twice lists the matches with their descriptions:
 
-![Zsh completion menu listing git subcommands with descriptions]({attach}/images/Unix/zsh/zsh-completion-menu.png)
+![Zsh completion menu listing git subcommands with descriptions]({static}/images/Unix/zsh/zsh-completion-menu.png)
 
 Oh My Zsh also configures completion menus, caching, process completion, and
 Bash completion compatibility. The local matcher style still provides
@@ -185,7 +185,7 @@ default, which makes repeated commands available without a history search. The
 suggested remainder appears in a dimmed colour and is accepted with the right
 arrow key:
 
-![Zsh autosuggestion showing dimmed ghost text after a partial command]({attach}/images/Unix/zsh/zsh-autosuggestion.png)
+![Zsh autosuggestion showing dimmed ghost text after a partial command]({static}/images/Unix/zsh/zsh-autosuggestion.png)
 
 [Zsh Syntax Highlighting](https://github.com/zsh-users/zsh-syntax-highlighting)
 colors command-line tokens before execution. Its main highlighter distinguishes
@@ -196,7 +196,7 @@ The recording below shows all 3 features in one session. An autosuggestion is
 accepted, Tab lists the completion matches, an unknown command turns red, and
 the corrected command turns green:
 
-![Animated demonstration of autosuggestions, tab completion, and syntax highlighting]({attach}/images/Unix/zsh/zsh-completion.gif)
+![Animated demonstration of autosuggestions, tab completion, and syntax highlighting]({static}/images/Unix/zsh/zsh-completion.gif)
 
 Syntax highlighting loads last because it wraps Zsh Line Editor widgets. A
 later plugin could replace those wrappers and prevent highlighting from
@@ -246,7 +246,7 @@ Spaceship never loads it. Its `SPACESHIP_TIME_SHOW` variable also defaults to
 The Git section tracks the working tree. Stashing every change clears the dirty
 indicators, and restoring them brings the indicators back:
 
-![Spaceship prompt showing the Git section change as the working tree changes]({attach}/images/Unix/zsh/zsh-prompt-git-state.png)
+![Spaceship prompt showing the Git section change as the working tree changes]({static}/images/Unix/zsh/zsh-prompt-git-state.png)
 
 Asynchronous rendering prevents Git inspection from blocking command entry.
 Spaceship renders the prompt immediately, then updates asynchronous sections

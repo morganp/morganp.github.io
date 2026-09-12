@@ -7,7 +7,7 @@ Author: morganp
 Summary: Why a static CMOS gate is always inverting, how series and parallel transistor networks turn into NAND and NOR, why NOR2 is the slower of the pair, and where the extra two transistors in an AND gate go.
 Status: published
 
-[![An output wire strung between a supply rail and a ground rail, with a closed switch pulling it up and an open switch below it, and arrows pointing up to the supply and down to ground]({attach}/images/DigitalDesign/Article02/00-pullup-pulldown-hero-900w.png)]({attach}/images/DigitalDesign/Article02/00-pullup-pulldown-hero-HQ.png)
+[![An output wire strung between a supply rail and a ground rail, with a closed switch pulling it up and an open switch below it, and arrows pointing up to the supply and down to ground]({static}/images/DigitalDesign/Article02/00-pullup-pulldown-hero-900w.png)]({static}/images/DigitalDesign/Article02/00-pullup-pulldown-hero-HQ.png)
 
 *Series: Digital Design Fundamentals | Article 2*
 
@@ -82,7 +82,7 @@ There are two flavours, and they are opposites.
 | Carrier | electrons | holes |
 | Speed for the same width | faster | slower, by roughly two to three times |
 
-[![Side by side schematics of an nMOS transistor connected between the output node and ground and a pMOS transistor connected between the supply and the output node, annotated with which logic level each one passes well]({attach}/images/DigitalDesign/Article02/01-mos-switches-900w.png)]({attach}/images/DigitalDesign/Article02/01-mos-switches-HQ.png)
+[![Side by side schematics of an nMOS transistor connected between the output node and ground and a pMOS transistor connected between the supply and the output node, annotated with which logic level each one passes well]({static}/images/DigitalDesign/Article02/01-mos-switches-900w.png)]({static}/images/DigitalDesign/Article02/01-mos-switches-HQ.png)
 
 The two rows in the middle of that table are the ones everything else is built
 on.
@@ -115,7 +115,7 @@ burns power when it switches, not when it sits.
 One nMOS, one pMOS, gates tied together as the input, drains tied together as
 the output.
 
-[![A CMOS inverter schematic with a pMOS above and an nMOS below, plus two smaller versions showing which transistor conducts for a low input and for a high input]({attach}/images/DigitalDesign/Article02/02-inverter-900w.png)]({attach}/images/DigitalDesign/Article02/02-inverter-HQ.png)
+[![A CMOS inverter schematic with a pMOS above and an nMOS below, plus two smaller versions showing which transistor conducts for a low input and for a high input]({static}/images/DigitalDesign/Article02/02-inverter-900w.png)]({static}/images/DigitalDesign/Article02/02-inverter-HQ.png)
 
 Input low: the pMOS conducts and the nMOS is off, so the output is connected to
 the supply and pulled to a solid 1. Input high: the nMOS conducts and the pMOS
@@ -181,7 +181,7 @@ transistors in series, the pull-up has them in parallel, and the other way
 round. That is De Morgan's theorem drawn as wiring rather than written as
 algebra.
 
-[![Two switch networks, one series pair conducting only when both switches are on and one parallel pair conducting when either is on, with the rule that the pull-up network uses the opposite arrangement]({attach}/images/DigitalDesign/Article02/04-series-parallel-900w.png)]({attach}/images/DigitalDesign/Article02/04-series-parallel-HQ.png)
+[![Two switch networks, one series pair conducting only when both switches are on and one parallel pair conducting when either is on, with the rule that the pull-up network uses the opposite arrangement]({static}/images/DigitalDesign/Article02/04-series-parallel-900w.png)]({static}/images/DigitalDesign/Article02/04-series-parallel-HQ.png)
 
 The recipe for any static CMOS gate is now mechanical:
 
@@ -204,7 +204,7 @@ dual is two pMOS in parallel to the supply.
 **NOR2** is `y = NOT(A OR B)`. OR becomes two nMOS in parallel to ground. The
 dual is two pMOS in series to the supply.
 
-[![NAND2 and NOR2 transistor schematics side by side, showing series nMOS with parallel pMOS for the NAND and parallel nMOS with series pMOS for the NOR, with the transistor sizing noted for each]({attach}/images/DigitalDesign/Article02/03-nand2-nor2-900w.png)]({attach}/images/DigitalDesign/Article02/03-nand2-nor2-HQ.png)
+[![NAND2 and NOR2 transistor schematics side by side, showing series nMOS with parallel pMOS for the NAND and parallel nMOS with series pMOS for the NOR, with the transistor sizing noted for each]({static}/images/DigitalDesign/Article02/03-nand2-nor2-900w.png)]({static}/images/DigitalDesign/Article02/03-nand2-nor2-HQ.png)
 
 | A | B | NAND2 pull-down | NAND2 out | NOR2 pull-down | NOR2 out |
 |---|---|---|---|---|---|
@@ -275,7 +275,7 @@ for the OR, and the dual above it. Six transistors, one stage of delay, and it
 does the work of an AND2 feeding a NOR2, which would have cost ten
 transistors and three stages.
 
-[![An AOI21 gate schematic with two nMOS in series in parallel with a third in the pull-down network, and the dual arrangement of pMOS in the pull-up network, six transistors in one stage]({attach}/images/DigitalDesign/Article02/05-aoi21-900w.png)]({attach}/images/DigitalDesign/Article02/05-aoi21-HQ.png)
+[![An AOI21 gate schematic with two nMOS in series in parallel with a third in the pull-down network, and the dual arrangement of pMOS in the pull-up network, six transistors in one stage]({static}/images/DigitalDesign/Article02/05-aoi21-900w.png)]({static}/images/DigitalDesign/Article02/05-aoi21-HQ.png)
 
 Libraries carry a whole family of these: AOI21, AOI22, OAI21, OAI221 and more.
 Technology mapping during synthesis is largely the business of spotting where

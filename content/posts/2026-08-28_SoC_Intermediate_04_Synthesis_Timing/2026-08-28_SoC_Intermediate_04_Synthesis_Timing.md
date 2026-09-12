@@ -7,7 +7,7 @@ Author: morganp
 Summary: Why a design can pass sign-off timing and still fail in silicon, and the machinery that decides it: what synthesis optimises, what static timing analysis actually proves, SDC exceptions and the damage they hide, reading a timing report, RTL versus tool fixes, and multi-corner multi-mode closure.
 Status: published
 
-[![An RTL to silicon workflow drawn as connected engineering stations, moving from source code through synthesis, gates, placement, routing and timing reports, with a feedback loop returning to the start]({attach}/images/SoC/ArticleI04/00-closure-hero-900w.png)]({attach}/images/SoC/ArticleI04/00-closure-hero-HQ.png)
+[![An RTL to silicon workflow drawn as connected engineering stations, moving from source code through synthesis, gates, placement, routing and timing reports, with a feedback loop returning to the start]({static}/images/SoC/ArticleI04/00-closure-hero-900w.png)]({static}/images/SoC/ArticleI04/00-closure-hero-HQ.png)
 
 *Series: Intermediate SoC Design | Article 4 of 10*
 
@@ -102,14 +102,14 @@ which is where the skew term earns its place.
 Assume a balanced tree for the moment, and setup needs only two edges of one
 clock:
 
-[![Setup violation drawn as three waveform traces, CLK, launch flop Q and capture flop D, with the data transition landing inside a shaded setup window immediately before the second clock edge]({attach}/images/SoC/ArticleI04/03-setup-violation-900w.png)]({attach}/images/SoC/ArticleI04/03-setup-violation-HQ.png)
+[![Setup violation drawn as three waveform traces, CLK, launch flop Q and capture flop D, with the data transition landing inside a shaded setup window immediately before the second clock edge]({static}/images/SoC/ArticleI04/03-setup-violation-900w.png)]({static}/images/SoC/ArticleI04/03-setup-violation-HQ.png)
 
 Hold is the same relationship read from the other end, and it is not a
 next-edge check at all. The data must not arrive so early that it overwrites the
 value the capture flip-flop is still reading from the edge that just fired.
 Launch and capture are the same edge:
 
-[![Hold violation drawn as three waveform traces, CLK, launch flop Q and capture flop D, with the new data arriving inside a shaded hold window that starts at the single clock edge]({attach}/images/SoC/ArticleI04/04-hold-violation-900w.png)]({attach}/images/SoC/ArticleI04/04-hold-violation-HQ.png)
+[![Hold violation drawn as three waveform traces, CLK, launch flop Q and capture flop D, with the new data arriving inside a shaded hold window that starts at the single clock edge]({static}/images/SoC/ArticleI04/04-hold-violation-900w.png)]({static}/images/SoC/ArticleI04/04-hold-violation-HQ.png)
 
 The two failures have opposite personalities, and each is worst at the corner
 that is kindest to the other.
@@ -236,7 +236,7 @@ whether the implementation matches the constraints. Those are the same
 statement only to the extent that the constraints are true, and nothing in the
 flow verifies that they are.
 
-[![A constraint file drawn as a simplified map laid over the more complicated terrain of a real chip, with a few places where the map and the terrain disagree marked as gaps]({attach}/images/SoC/ArticleI04/01-map-and-terrain-900w.png)]({attach}/images/SoC/ArticleI04/01-map-and-terrain-HQ.png)
+[![A constraint file drawn as a simplified map laid over the more complicated terrain of a real chip, with a few places where the map and the terrain disagree marked as gaps]({static}/images/SoC/ArticleI04/01-map-and-terrain-900w.png)]({static}/images/SoC/ArticleI04/01-map-and-terrain-HQ.png)
 
 Read the failure at the top of the article again with that in mind. The
 configuration register had a `set_false_path` on it, added early, when the
@@ -364,7 +364,7 @@ and the analysis views multiply with them. The sign-off question is not "does
 the design meet timing", it is "does every mode meet timing at every corner it
 can be in".
 
-[![A grid of process, voltage and temperature corners crossed with operating modes, with the slow hot corner and the fast cold corner marked as the ones that fail first]({attach}/images/SoC/ArticleI04/02-corners-modes-900w.png)]({attach}/images/SoC/ArticleI04/02-corners-modes-HQ.png)
+[![A grid of process, voltage and temperature corners crossed with operating modes, with the slow hot corner and the fast cold corner marked as the ones that fail first]({static}/images/SoC/ArticleI04/02-corners-modes-900w.png)]({static}/images/SoC/ArticleI04/02-corners-modes-HQ.png)
 
 Two practical consequences. First, a corner nobody enabled is a corner nobody
 checked, so the list of analysis views is itself a review item. Second,

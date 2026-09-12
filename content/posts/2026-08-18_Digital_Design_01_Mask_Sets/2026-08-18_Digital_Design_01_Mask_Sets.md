@@ -7,7 +7,7 @@ Author: morganp
 Summary: What a photomask is, the sequence of masks that turns a blank wafer into a MOSFET, why the mask count keeps climbing, the approximate cost of a mask set at each geometry from 250 nm down to 3 nm, and what an A1 metal spin costs against a B0 all-layer respin.
 Status: published
 
-[![Four photomask plates floating in an exploded stack above a silicon wafer, with a single beam of light passing down through them onto the dies below]({attach}/images/DigitalDesign/Article01/00-mask-hero-900w.png)]({attach}/images/DigitalDesign/Article01/00-mask-hero-HQ.png)
+[![Four photomask plates floating in an exploded stack above a silicon wafer, with a single beam of light passing down through them onto the dies below]({static}/images/DigitalDesign/Article01/00-mask-hero-900w.png)]({static}/images/DigitalDesign/Article01/00-mask-hero-HQ.png)
 
 *Series: Digital Design Fundamentals | Article 1*
 
@@ -144,7 +144,7 @@ contacts, and then two per metal level for the rest. A simple two-metal process
 lands around twelve masks. A fifteen-metal modern logic process is already past
 forty before any of the complications below.
 
-[![Cross-section of a CMOS inverter showing the p-type substrate, n-well, shallow trench isolation, n-plus and p-plus source and drain regions, gate oxide, polysilicon gates, contacts and metal 1, with each feature numbered by the mask that creates it]({attach}/images/DigitalDesign/Article01/01-mosfet-cross-section-900w.png)]({attach}/images/DigitalDesign/Article01/01-mosfet-cross-section-HQ.png)
+[![Cross-section of a CMOS inverter showing the p-type substrate, n-well, shallow trench isolation, n-plus and p-plus source and drain regions, gate oxide, polysilicon gates, contacts and metal 1, with each feature numbered by the mask that creates it]({static}/images/DigitalDesign/Article01/01-mosfet-cross-section-900w.png)]({static}/images/DigitalDesign/Article01/01-mosfet-cross-section-HQ.png)
 
 ---
 
@@ -182,7 +182,7 @@ now a film of n-type silicon a few nanometres thick. That film is the
 voltage at which this happens is the **threshold voltage**, and it is one of the
 numbers a process is built around.
 
-![Animated cross-section of an nMOS transistor. The gate voltage rises from zero, first pushing holes away from the surface to leave a depleted layer, then pulling electrons to the surface to form an n-type channel joining source to drain, after which electrons drift along the channel]({attach}/images/DigitalDesign/Article01/02-channel-formation.svg)
+![Animated cross-section of an nMOS transistor. The gate voltage rises from zero, first pushing holes away from the surface to leave a depleted layer, then pulling electrons to the surface to form an n-type channel joining source to drain, after which electrons drift along the channel]({static}/images/DigitalDesign/Article01/02-channel-formation.svg)
 
 Once the channel exists, a voltage between drain and source moves electrons
 along it. More gate voltage pulls in more electrons, which lowers the channel

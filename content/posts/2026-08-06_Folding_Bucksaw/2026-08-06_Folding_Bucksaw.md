@@ -7,7 +7,7 @@ Author: morganp
 Summary: A dimensioned build for a takedown bow saw around a 610 mm blade, and why folding it to blade length quietly caps how thick a log it will cut.
 Status: published
 
-[![A wooden bucksaw shown assembled under cord tension, and folded into a single flat bar with the blade hidden inside]({attach}/images/Outdoor/FoldingBucksaw/00-hero-900w.png)]({attach}/images/Outdoor/FoldingBucksaw/00-hero-HQ.png)
+[![A wooden bucksaw shown assembled under cord tension, and folded into a single flat bar with the blade hidden inside]({static}/images/Outdoor/FoldingBucksaw/00-hero-900w.png)]({static}/images/Outdoor/FoldingBucksaw/00-hero-HQ.png)
 
 A bow saw cuts firewood faster than a folding pruning saw, with less effort, and anyone who has used both in the same afternoon knows it within about three strokes. The frame holds the blade in tension, so the blade can be thin. The thinner the blade, the thinner the kerf, and the less material removed per stroke, which makes for an easier cut. Yet the saw most people actually carry is the folding one, because it is more compact and more convenient to pack.
 
@@ -33,7 +33,7 @@ Which means the blade and the two arms are permanently one assembly. To pack it,
 
 Swing each arm ninety degrees about its own pin and it lies flat along the blade. One arm covers the left half, the other covers the right. The blade ends up sheathed inside the slots in its own arms, which is exactly where you want a set of exposed teeth to be.
 
-[![Folded arrangement: each arm swings ninety degrees about its blade pin and lies along the blade, sheathing it, with the total bundle 637 mm long]({attach}/images/Outdoor/FoldingBucksaw/02-folded-900w.png)]({attach}/images/Outdoor/FoldingBucksaw/02-folded-HQ.png)
+[![Folded arrangement: each arm swings ninety degrees about its blade pin and lies along the blade, sheathing it, with the total bundle 637 mm long]({static}/images/Outdoor/FoldingBucksaw/02-folded-900w.png)]({static}/images/Outdoor/FoldingBucksaw/02-folded-HQ.png)
 
 ## The dimension you do not get to choose
 
@@ -57,7 +57,7 @@ Slide the stretcher up to about sixty per cent of the arm height and the throat 
 
 This build takes the throat.
 
-[![Dimensioned side elevation of the assembled frame showing 315 mm arms, 597 mm blade span, 146 mm throat and the 111 mm and 169 mm lever arms]({attach}/images/Outdoor/FoldingBucksaw/01-elevation-900w.png)]({attach}/images/Outdoor/FoldingBucksaw/01-elevation-HQ.png)
+[![Dimensioned side elevation of the assembled frame showing 315 mm arms, 597 mm blade span, 146 mm throat and the 111 mm and 169 mm lever arms]({static}/images/Outdoor/FoldingBucksaw/01-elevation-900w.png)]({static}/images/Outdoor/FoldingBucksaw/01-elevation-HQ.png)
 
 ## Where the slot and the stretcher fight
 
@@ -67,7 +67,7 @@ The blade slot has to run the full length of the arm, because the folded blade n
 
 The fix is to stop treating it as a mortise. Cut a **pocket** instead: 20 mm along the arm, 10 mm deep, 19 mm across, opening on the inner face. Because the slot is only 1.5 mm wide and the pocket is far wider, the pocket does not cross the slot, it simply widens its mouth for 20 mm. The stretcher end drops in, tension holds it there, and the folded blade passes through the same space with room to spare. Leaving 3 mm of wood on each side of the pocket stops the stretcher wandering sideways.
 
-[![Three arm cross-sections: at the blade pin, mid arm showing the 35 mm deep 1.5 mm kerf, and at the stretcher socket showing the 10 by 19 mm pocket]({attach}/images/Outdoor/FoldingBucksaw/03-sections-900w.png)]({attach}/images/Outdoor/FoldingBucksaw/03-sections-HQ.png)
+[![Three arm cross-sections: at the blade pin, mid arm showing the 35 mm deep 1.5 mm kerf, and at the stretcher socket showing the 10 by 19 mm pocket]({static}/images/Outdoor/FoldingBucksaw/03-sections-900w.png)]({static}/images/Outdoor/FoldingBucksaw/03-sections-HQ.png)
 
 Two things about that slot are worth stating because they look alarming and are not.
 

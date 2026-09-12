@@ -7,7 +7,7 @@ Author: Morgan Prior
 Summary: A practical guide to AMBA Low Power Interface handshake protocols: Q-Channel and P-Channel signal tables, state machines, timing diagrams, and design rules from ARM IHI0068.
 Status: published
 
-[![SoC power domain management with PMU controlling gated and active domains]({attach}/images/Engineering/AMBA_LPI/lpi-hero-900w.png)]({attach}/images/Engineering/AMBA_LPI/lpi-hero-HQ.png)
+[![SoC power domain management with PMU controlling gated and active domains]({static}/images/Engineering/AMBA_LPI/lpi-hero-900w.png)]({static}/images/Engineering/AMBA_LPI/lpi-hero-HQ.png)
 
 Modern System on Chip (SoC) designs contain dozens of independent IP blocks, each drawing power even when inactive. The AMBA (Advanced Microcontroller Bus Architecture) Low Power Interface (LPI) provides every block with a standardized handshake protocol to coordinate safe clock and power removal. This post covers both LPI interface types, Q-Channel and P-Channel, with timing diagrams and state machines drawn from the ARM IHI0068 specification.
 

@@ -25,7 +25,7 @@ In traditional electronics, a "system" was a **circuit board** populated with ma
 
 A **System on Chip** collapses most or all of those components onto a **single piece of silicon**. The processor, memory interfaces, graphics engine, USB controller, cryptographic accelerator, radio interface, and many other functional blocks are fabricated together in one integrated circuit.
 
-[![Side-by-side comparison: a traditional board-level system with many discrete chips connected by slow PCB traces versus a System on Chip with the same blocks integrated onto a single die connected by fast on-chip wires]({attach}/images/SoC/Article02/01-board-vs-soc-900w.png)]({attach}/images/SoC/Article02/01-board-vs-soc-HQ.png)
+[![Side-by-side comparison: a traditional board-level system with many discrete chips connected by slow PCB traces versus a System on Chip with the same blocks integrated onto a single die connected by fast on-chip wires]({static}/images/SoC/Article02/01-board-vs-soc-900w.png)]({static}/images/SoC/Article02/01-board-vs-soc-HQ.png)
 
 The term "SoC" emerged formally in the mid-1990s when transistor densities crossed roughly 100 million per chip, the threshold at which integrating a complete system became both technically practical and economically compelling. Today, modern SoCs routinely contain **tens of billions of transistors**.
 
@@ -35,7 +35,7 @@ The term "SoC" emerged formally in the mid-1990s when transistor densities cross
 
 ![image]({attach}Gemini_Generated_Image_yhyy7hyhyy7hyhyy-2-900w.png)
 
-[![Four benefits of integration shown as a 2x2 grid: Speed (on-chip nanoseconds vs PCB 60-100ns), Power Efficiency (low-voltage on-chip signalling vs high-drive off-chip), Area and Cost (fewer chips, smaller PCB), and Reliability (fewer solder joints)]({attach}/images/SoC/Article02/02-integration-benefits-900w.png)]({attach}/images/SoC/Article02/02-integration-benefits-HQ.png)
+[![Four benefits of integration shown as a 2x2 grid: Speed (on-chip nanoseconds vs PCB 60-100ns), Power Efficiency (low-voltage on-chip signalling vs high-drive off-chip), Area and Cost (fewer chips, smaller PCB), and Reliability (fewer solder joints)]({static}/images/SoC/Article02/02-integration-benefits-900w.png)]({static}/images/SoC/Article02/02-integration-benefits-HQ.png)
 
 Putting everything on one die is not just about convenience. It delivers fundamental advantages across every dimension that matters.
 
@@ -63,7 +63,7 @@ Solder joints and connectors are the most common failure points in electronic as
 
 While no two SoCs are identical, most share a recognisable set of functional blocks:
 
-[![SoC anatomy block diagram showing the processing subsystem (CPU cores, GPU/DSP, hardware accelerators) connected via the AXI high-speed interconnect to on-chip SRAM, DDR memory controller, DMA engine, and peripheral bridge, with clock/reset, power management, and security engine as spanning blocks]({attach}/images/SoC/Article02/03-soc-anatomy-900w.png)]({attach}/images/SoC/Article02/03-soc-anatomy-HQ.png)
+[![SoC anatomy block diagram showing the processing subsystem (CPU cores, GPU/DSP, hardware accelerators) connected via the AXI high-speed interconnect to on-chip SRAM, DDR memory controller, DMA engine, and peripheral bridge, with clock/reset, power management, and security engine as spanning blocks]({static}/images/SoC/Article02/03-soc-anatomy-900w.png)]({static}/images/SoC/Article02/03-soc-anatomy-HQ.png)
 
 Each block has its own dedicated article later in the series. Here is a brief map of what each does:
 
@@ -116,7 +116,7 @@ Dedicated hardware for encryption, secure boot, key storage, and access control.
 
 The range here is important. An SoC is not just a smartphone chip. The same integration principle applies from a $0.50 microcontroller running a light switch to a $200 chip managing an autonomous vehicle.
 
-[![SoC application spectrum arranged left to right by complexity and cost: tiny IoT/MCU chip at far left through embedded controller, smartphone SoC, automotive SoC, to HPC/data-centre SoC at far right, with transistor count and power budget indicated for each]({attach}/images/SoC/Article02/04-soc-spectrum-900w.png)]({attach}/images/SoC/Article02/04-soc-spectrum-HQ.png)
+[![SoC application spectrum arranged left to right by complexity and cost: tiny IoT/MCU chip at far left through embedded controller, smartphone SoC, automotive SoC, to HPC/data-centre SoC at far right, with transistor count and power budget indicated for each]({static}/images/SoC/Article02/04-soc-spectrum-900w.png)]({static}/images/SoC/Article02/04-soc-spectrum-HQ.png)
 
 ---
 
@@ -150,7 +150,7 @@ A crucial insight for SoC design is that **hardware and software are both valid 
 
 Most SoCs exploit this duality deliberately - placing performance-critical, stable functions in hardware, and flexible or complex control logic in software. Understanding where to draw that line is one of the core skills in SoC architecture and is the subject of Article 11.
 
-[![Two-column comparison of hardware vs software implementation: left column shows hardware block icons with labels - parallel execution, fixed function, high efficiency; right column shows software/CPU icons - sequential execution, flexible, patchable; a central dividing line labelled "The HW/SW Boundary" with a spectrum arrow beneath]({attach}/images/SoC/Article02/05-hw-sw-tradeoff-900w.png)]({attach}/images/SoC/Article02/05-hw-sw-tradeoff-HQ.png)
+[![Two-column comparison of hardware vs software implementation: left column shows hardware block icons with labels - parallel execution, fixed function, high efficiency; right column shows software/CPU icons - sequential execution, flexible, patchable; a central dividing line labelled "The HW/SW Boundary" with a spectrum arrow beneath]({static}/images/SoC/Article02/05-hw-sw-tradeoff-900w.png)]({static}/images/SoC/Article02/05-hw-sw-tradeoff-HQ.png)
 
 ---
 

@@ -8,7 +8,7 @@ Summary: How to generate and use ctags for Verilog/SystemVerilog projects, cover
 Slug: ctags-verilog-systemverilog
 
 
-[![Ctags for Verilog navigation]({attach}/images/Unix/ctags/ctags-verilog-hero-900w.png)]({attach}/images/Unix/ctags/ctags-verilog-hero-HQ.png)
+[![Ctags for Verilog navigation]({static}/images/Unix/ctags/ctags-verilog-hero-900w.png)]({static}/images/Unix/ctags/ctags-verilog-hero-HQ.png)
 
 Navigating a large Verilog or SystemVerilog codebase without tag-based Go to Definition is painful. This tutorial shows how to generate and use `ctags` for projects that use a `design.vc` file list — common in simulators like Verilator, VCS, and xrun.
 

@@ -7,7 +7,7 @@ Author: morganp
 Summary: A field key for ten common British trees built on bark and branching rather than leaves, and why the same species can carry two different bark patterns on one trunk.
 Status: published
 
-[![A drift of ten overlapping leaves, one from each tree in this post: oak, ash, beech, sycamore, silver birch, hazel, horse chestnut, holly, a Scots pine shoot and a flat yew spray]({attach}/images/Outdoor/ReadingBarkAndLeaves/00-treeid-hero-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/00-treeid-hero-HQ.png)
+[![A drift of ten overlapping leaves, one from each tree in this post: oak, ash, beech, sycamore, silver birch, hazel, horse chestnut, holly, a Scots pine shoot and a flat yew spray]({static}/images/Outdoor/ReadingBarkAndLeaves/00-treeid-hero-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/00-treeid-hero-HQ.png)
 
 For half the year a British wood has no leaves on it. From the end of October to the middle of April, the field guide in your pocket is mostly photographs of things that are not currently present. The wood stays perfectly identifiable through January, and the people doing it cannot always tell you how.
 
@@ -51,61 +51,61 @@ Each plate has the leaf on the left and the bark on the right.
 
 ### Oak
 
-[![An oak leaf with rounded lobes beside a panel of grey brown oak bark fissured into short blocks]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-01-oak-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-01-oak-HQ.png)
+[![An oak leaf with rounded lobes beside a panel of grey brown oak bark fissured into short blocks]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-01-oak-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-01-oak-HQ.png)
 
 Alternate branching. The leaf is widest above the middle, with four or five rounded lobes a side, almost no stalk, and two small ear shaped lobes where the blade meets the stalk. The bark carries deep vertical fissures cross linked into short blocks. Pedunculate oak has long stalked acorns and near stalkless leaves; sessile oak reverses both.
 
 ### Ash
 
-[![A pinnate ash leaf of paired toothed leaflets beside a panel of pale grey bark in a diamond lattice]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-02-ash-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-02-ash-HQ.png)
+[![A pinnate ash leaf of paired toothed leaflets beside a panel of pale grey bark in a diamond lattice]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-02-ash-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-02-ash-HQ.png)
 
 Opposite branching. One leaf is a slender stalk carrying five or six pairs of toothed leaflets and a terminal one, so a single ash leaf can be 300 mm long. The bark is pale grey with shallow ridges meeting in a lattice of diamonds. In winter the buds are sooty black, and nothing else in Britain has them.
 
 ### Beech
 
-[![An oval beech leaf with a wavy margin beside a panel of smooth silvery grey beech bark]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-03-beech-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-03-beech-HQ.png)
+[![An oval beech leaf with a wavy margin beside a panel of smooth silvery grey beech bark]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-03-beech-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-03-beech-HQ.png)
 
 Alternate branching. The leaf is a plain oval with a pointed tip, the margin gently wavy and never toothed, with straight parallel side veins running out to each wave and a fringe of silky hairs when young. The bark is smooth silvery grey and stays smooth for the life of the tree.
 
 ### Sycamore
 
-[![A five lobed sycamore leaf beside a panel of grey pink bark flaking into irregular plates]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-04-sycamore-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-04-sycamore-HQ.png)
+[![A five lobed sycamore leaf beside a panel of grey pink bark flaking into irregular plates]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-04-sycamore-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-04-sycamore-HQ.png)
 
 Opposite branching. One blade, five lobes cut about halfway to the centre, coarse blunt teeth, on a long stout stalk. The bark is grey with a pink tinge, flaking away in irregular rounded plates that leave paler patches behind. The seeds are the familiar winged pairs.
 
 ### Silver birch
 
-[![A small triangular birch leaf beside a panel of white papery bark with lenticels and black diamonds]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-05-silver-birch-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-05-silver-birch-HQ.png)
+[![A small triangular birch leaf beside a panel of white papery bark with lenticels and black diamonds]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-05-silver-birch-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-05-silver-birch-HQ.png)
 
 Alternate branching. A small triangular leaf with a broad base and doubly toothed margin, large teeth carrying smaller teeth of their own. The bark is white and papery, peeling in horizontal strips, marked with dark lenticel lines and breaking into rough black diamonds near the base. The twigs are warty and hairless, which separates it from downy birch.
 
 ### Hazel
 
-[![A round hazel leaf with an abrupt point beside a panel of smooth coppery bark with pale lenticels]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-06-hazel-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-06-hazel-HQ.png)
+[![A round hazel leaf with an abrupt point beside a panel of smooth coppery bark with pale lenticels]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-06-hazel-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-06-hazel-HQ.png)
 
 Alternate branching. Almost circular, with an abrupt short point, a heart shaped base, and a soft downy surface puckered by impressed veins. The bark is smooth coppery brown with pale horizontal lenticels and no fissures at all. Hazel usually stands multi stemmed from old coppice, and carries catkins from January.
 
 ### Horse chestnut
 
-[![A palmate compound horse chestnut leaf of seven leaflets beside a panel of grey brown scaly bark]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-07-horse-chestnut-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-07-horse-chestnut-HQ.png)
+[![A palmate compound horse chestnut leaf of seven leaflets beside a panel of grey brown scaly bark]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-07-horse-chestnut-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-07-horse-chestnut-HQ.png)
 
 Opposite branching. Five to seven leaflets radiate from one point at the top of a stout stalk, each widest near its tip. The bark is grey brown and breaks into coarse scaly plates that lift at the edges. The buds are large and sticky. It is not native, and arrived here around 1600.
 
 ### Holly
 
-[![A spiny glossy holly leaf with red berries beside a panel of smooth pale grey bark with warty bumps]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-08-holly-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-08-holly-HQ.png)
+[![A spiny glossy holly leaf with red berries beside a panel of smooth pale grey bark with warty bumps]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-08-holly-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-08-holly-HQ.png)
 
 Alternate branching, and evergreen. Stiff, glossy, very dark green, with spines at the crest of each wave in the margin. Those spines are a response to browsing, so above the height a deer can reach the same tree often carries smooth edged leaves with no spines at all. The bark is smooth pale grey with scattered warty bumps. Berries appear on female trees only.
 
 ### Scots pine
 
-[![A Scots pine shoot with needles in pairs beside a bark panel that is orange and papery above and grey and fissured below]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-09-scots-pine-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-09-scots-pine-HQ.png)
+[![A Scots pine shoot with needles in pairs beside a bark panel that is orange and papery above and grey and fissured below]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-09-scots-pine-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-09-scots-pine-HQ.png)
 
 Needles in pairs, 40 to 70 mm, blue green and twisted, each pair joined at the base by a small brown sheath. Counting the needles in a bundle is the test: two means Scots pine, and Britain has no other native pine. The bark runs orange pink and papery high on the trunk and grey brown in deep fissured slabs at the base.
 
 ### Yew
 
-[![A flat yew spray with needles in two ranks and red arils beside a panel of red brown flaking bark]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-10-yew-900w.png)]({attach}/images/Outdoor/ReadingBarkAndLeaves/tree-10-yew-HQ.png)
+[![A flat yew spray with needles in two ranks and red arils beside a panel of red brown flaking bark]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-10-yew-900w.png)]({static}/images/Outdoor/ReadingBarkAndLeaves/tree-10-yew-HQ.png)
 
 Needles single and flat, set in two ranks so the whole spray lies flat, and soft enough to run a hand along. The bark is red brown, peeling in thin flakes, over a trunk that is fluted and often made of several fused stems. Yew carries red arils rather than cones, and every part of the tree except the flesh of the aril is poisonous.
 

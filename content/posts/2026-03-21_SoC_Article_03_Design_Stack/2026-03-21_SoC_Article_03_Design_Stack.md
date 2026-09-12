@@ -23,7 +23,7 @@ This concept of layered abstraction is one of the most powerful ideas in all of 
 
 Think of SoC design as a series of nested boxes. Each layer can be understood and reasoned about independently, so long as it respects the contracts defined by the layers around it.
 
-[![The SoC abstraction stack from physical layout at the bottom to application software at the top, with ISA highlighted as the hardware/software boundary]({attach}/images/SoC/Article03/01-abstraction-stack-900w.png)]({attach}/images/SoC/Article03/01-abstraction-stack-HQ.png)
+[![The SoC abstraction stack from physical layout at the bottom to application software at the top, with ISA highlighted as the hardware/software boundary]({static}/images/SoC/Article03/01-abstraction-stack-900w.png)]({static}/images/SoC/Article03/01-abstraction-stack-HQ.png)
 
 Engineers who work in SoC design typically specialise in one or two adjacent layers. A physical design engineer thinks in terms of polygons and resistance; a firmware engineer thinks in terms of memory-mapped registers and interrupt vectors. The stack is the shared vocabulary that lets them collaborate.
 
@@ -33,7 +33,7 @@ Engineers who work in SoC design typically specialise in one or two adjacent lay
 
 A classic way to visualise the design space is the **Y-chart**, introduced by Daniel Gajski and Robert Kuhn in 1983. It organises design descriptions along three axes (or "domains"), each of which can be examined at multiple levels of abstraction:
 
-[![The Gajski-Kuhn Y-Chart showing three design domains - behavioural, structural, and physical - with abstraction levels along each axis]({attach}/images/SoC/Article03/03-y-chart-900w.png)]({attach}/images/SoC/Article03/03-y-chart-HQ.png)
+[![The Gajski-Kuhn Y-Chart showing three design domains - behavioural, structural, and physical - with abstraction levels along each axis]({static}/images/SoC/Article03/03-y-chart-900w.png)]({static}/images/SoC/Article03/03-y-chart-HQ.png)
 
 The key insight of the Y-chart is that every design activity maps a description from one domain into another at the same level of abstraction. **Synthesis** maps a behavioural RTL description into a structural gate-level netlist. **Place-and-route** maps a structural netlist into a physical layout.
 
@@ -45,7 +45,7 @@ At the very bottom of the stack sits the **transistor** - the fundamental switch
 
 A single CMOS inverter (NOT gate) uses one nMOS and one pMOS transistor. This pairing is elegant: it ensures that when the output is stable, no DC path exists from power to ground, so the circuit draws near-zero static power.
 
-[![CMOS inverter schematic showing pMOS and nMOS transistors in complementary configuration, with IN and OUT signals and Vdd/GND rails]({attach}/images/SoC/Article03/02-cmos-inverter-900w.png)]({attach}/images/SoC/Article03/02-cmos-inverter-HQ.png)
+[![CMOS inverter schematic showing pMOS and nMOS transistors in complementary configuration, with IN and OUT signals and Vdd/GND rails]({static}/images/SoC/Article03/02-cmos-inverter-900w.png)]({static}/images/SoC/Article03/02-cmos-inverter-HQ.png)
 
 The process of manufacturing transistors is described by the **technology node** - a number like 5 nm, 7 nm, or 28 nm. This roughly corresponds to the minimum feature size achievable. Smaller nodes pack more transistors into the same area but require more expensive processes.
 
@@ -55,7 +55,7 @@ The process of manufacturing transistors is described by the **technology node**
 
 Transistors are combined to form **logic gates** - circuits that implement boolean operations. Gates are the building blocks of all digital logic.
 
-[![Six common logic gates: AND, OR, NOT, NAND, NOR, and XOR, drawn as hand-sketched IEEE symbols with Boolean equations. NAND and NOR highlighted in teal as universal gates.]({attach}/images/SoC/Article03/06-logic-gates-900w.png)]({attach}/images/SoC/Article03/06-logic-gates-HQ.png)
+[![Six common logic gates: AND, OR, NOT, NAND, NOR, and XOR, drawn as hand-sketched IEEE symbols with Boolean equations. NAND and NOR highlighted in teal as universal gates.]({static}/images/SoC/Article03/06-logic-gates-900w.png)]({static}/images/SoC/Article03/06-logic-gates-HQ.png)
 
 In practice, **NAND and NOR** gates are the most fundamental - any other gate can be built from them (they are "universal"). Standard cell libraries contain dozens to hundreds of gate variants with different drive strengths, optimised for speed or area.
 
@@ -170,7 +170,7 @@ The microarchitecture is the *implementation* of the ISA - the actual pipeline, 
 
 A simple five-stage pipeline illustrates the key idea:
 
-[![5-stage pipeline grid showing three instructions executing in parallel across clock cycles, with Execute stages in teal and Write Back in orange]({attach}/images/SoC/Article03/04-pipeline-900w.png)]({attach}/images/SoC/Article03/04-pipeline-HQ.png)
+[![5-stage pipeline grid showing three instructions executing in parallel across clock cycles, with Execute stages in teal and Write Back in orange]({static}/images/SoC/Article03/04-pipeline-900w.png)]({static}/images/SoC/Article03/04-pipeline-HQ.png)
 
 Multiple instructions are in-flight simultaneously, improving throughput. The art of microarchitecture is managing the interactions between them - particularly **hazards** where one instruction depends on the result of a previous one that hasn't finished yet.
 
@@ -182,7 +182,7 @@ One of the most important concepts in SoC design is the **Intellectual Property 
 
 IP cores come in three forms:
 
-[![IP core classification spectrum from Soft IP (RTL source, portable) through Firm IP (netlist) to Hard IP (GDSII layout, fully optimised), with opposing arrows showing the portability vs optimisation trade-off]({attach}/images/SoC/Article03/05-ip-core-types-900w.png)]({attach}/images/SoC/Article03/05-ip-core-types-HQ.png)
+[![IP core classification spectrum from Soft IP (RTL source, portable) through Firm IP (netlist) to Hard IP (GDSII layout, fully optimised), with opposing arrows showing the portability vs optimisation trade-off]({static}/images/SoC/Article03/05-ip-core-types-900w.png)]({static}/images/SoC/Article03/05-ip-core-types-HQ.png)
 
 ARM's Cortex-M series are delivered as **soft IP** - you receive the RTL description and synthesise it yourself. ARM's Cortex-A series in advanced processes often comes as **hard IP** - the physical layout is fixed for a particular foundry process.
 
@@ -202,7 +202,7 @@ Common IP blocks found in SoCs:
 
 Taking an SoC from concept to fabricated silicon follows a structured sequence of steps, each with its own tools and verification checkpoints:
 
-[![SoC design flow from Specification through Architecture, RTL Design, Synthesis, Place and Route, Sign-off to Tape-out, with RTL Simulation feeding into Synthesis and a feedback arrow showing iteration back to RTL Design.]({attach}/images/SoC/Article03/07-design-flow-900w.png)]({attach}/images/SoC/Article03/07-design-flow-HQ.png)
+[![SoC design flow from Specification through Architecture, RTL Design, Synthesis, Place and Route, Sign-off to Tape-out, with RTL Simulation feeding into Synthesis and a feedback arrow showing iteration back to RTL Design.]({static}/images/SoC/Article03/07-design-flow-900w.png)]({static}/images/SoC/Article03/07-design-flow-HQ.png)
 
 Article 10 in this series covers the design flow in detail. For now, the important point is that design is not a linear process - it is iterative. Problems discovered during synthesis or place-and-route often require revisiting the RTL, and sometimes the architecture.
 

@@ -46,7 +46,7 @@ Vim does not use the system clipboard by default. Add the following to `.vimrc` 
 
 For every application except Exceed, map the Linux-style shortcuts to their macOS equivalents. This means pressing `Ctrl-Shift-C` in any native macOS app triggers `Cmd-C`, so the Linux muscle memory works everywhere.
 
-[![Karabiner-Elements: Ctrl-Shift rules applied to all apps except Exceed]({attach}/images/Unix/CopyPaste/karabiner-non-exceed-900w.png)]({attach}/images/Unix/CopyPaste/karabiner-non-exceed-HQ.png)
+[![Karabiner-Elements: Ctrl-Shift rules applied to all apps except Exceed]({static}/images/Unix/CopyPaste/karabiner-non-exceed-900w.png)]({static}/images/Unix/CopyPaste/karabiner-non-exceed-HQ.png)
 
 The four rules (copy, paste, cut, undo):
 
@@ -150,7 +150,7 @@ The four rules (copy, paste, cut, undo):
 
 When Exceed is the active application, the reverse mapping applies: `Cmd-C/V/X/Z` are translated into `Ctrl-Shift-C/V/X/Z` so they reach gVim and other Linux applications with the shortcuts they expect.
 
-[![Karabiner-Elements: Cmd rules applied when Exceed is active]({attach}/images/Unix/CopyPaste/karabiner-exceed-900w.png)]({attach}/images/Unix/CopyPaste/karabiner-exceed-HQ.png)
+[![Karabiner-Elements: Cmd rules applied when Exceed is active]({static}/images/Unix/CopyPaste/karabiner-exceed-900w.png)]({static}/images/Unix/CopyPaste/karabiner-exceed-HQ.png)
 
 ```json
 {

@@ -7,7 +7,7 @@ Author: morganp
 Summary: Why two threads with separate counters can run slower than one thread, and the coherency machinery that explains it: the single-writer rule, MESI states, read-for-ownership, snooping, directories, snoop filters, and the cache line granularity that no amount of reading the source code reveals.
 Status: published
 
-[![A multicore cache coherency fabric on a system on chip, with four processor caches around a shared interconnect that carries snoop and ownership traffic to a directory and a memory controller]({attach}/images/SoC/ArticleI02/00-coherency-hero-900w.png)]({attach}/images/SoC/ArticleI02/00-coherency-hero-HQ.png)
+[![A multicore cache coherency fabric on a system on chip, with four processor caches around a shared interconnect that carries snoop and ownership traffic to a directory and a memory controller]({static}/images/SoC/ArticleI02/00-coherency-hero-900w.png)]({static}/images/SoC/ArticleI02/00-coherency-hero-HQ.png)
 
 *Series: Intermediate SoC Design | Article 2 of 10*
 
@@ -73,7 +73,7 @@ For any cache line:
   Only one cache may hold a dirty, writable copy.
 ```
 
-[![The single writer rule illustrated: three processor caches holding clean readable copies of the same cache line on one side, and a single cache holding the one dirty writable copy on the other]({attach}/images/SoC/ArticleI02/01-single-writer-900w.png)]({attach}/images/SoC/ArticleI02/01-single-writer-HQ.png)
+[![The single writer rule illustrated: three processor caches holding clean readable copies of the same cache line on one side, and a single cache holding the one dirty writable copy on the other]({static}/images/SoC/ArticleI02/01-single-writer-900w.png)]({static}/images/SoC/ArticleI02/01-single-writer-HQ.png)
 
 Readers are cheap and can be plentiful. Writers are exclusive. When a core
 wants to write a line that other caches hold, it must first take ownership and
@@ -204,7 +204,7 @@ round trip to every sharer before it can proceed.
 The direct way to keep caches agreeing is to let them all listen to the same
 coherence traffic.
 
-[![Snooping coherency: four processor caches all connected to one shared coherent bus, with a single request broadcast reaching every cache simultaneously]({attach}/images/SoC/ArticleI02/02-snooping-900w.png)]({attach}/images/SoC/ArticleI02/02-snooping-HQ.png)
+[![Snooping coherency: four processor caches all connected to one shared coherent bus, with a single request broadcast reaching every cache simultaneously]({static}/images/SoC/ArticleI02/02-snooping-900w.png)]({static}/images/SoC/ArticleI02/02-snooping-HQ.png)
 
 Every cache observes every read, invalidate, and ownership request, and each
 one checks whether it holds the line. The model holds few surprises during
@@ -226,7 +226,7 @@ Snooping suits four cores. It does not suit thirty-two.
 A directory records which caches might hold each line. The fabric consults it
 and sends targeted snoops instead of broadcasting.
 
-[![Directory based coherency: a central directory holding a sharer list for a cache line, sending targeted snoops to only the two caches that hold copies while two other caches are left undisturbed]({attach}/images/SoC/ArticleI02/03-directory-900w.png)]({attach}/images/SoC/ArticleI02/03-directory-HQ.png)
+[![Directory based coherency: a central directory holding a sharer list for a cache line, sending targeted snoops to only the two caches that hold copies while two other caches are left undisturbed]({static}/images/SoC/ArticleI02/03-directory-900w.png)]({static}/images/SoC/ArticleI02/03-directory-HQ.png)
 
 ```
 Directory entry for cache line A
@@ -286,7 +286,7 @@ Coherency does not track variables. It has no idea that `stats[0].hits` and
 cache lines, typically 64 bytes, and a line is the smallest thing it can own,
 share, or invalidate.
 
-[![False sharing: two processor cores writing to two different variables that occupy the same 64 byte cache line, with the line ownership bouncing back and forth between the two caches on every write]({attach}/images/SoC/ArticleI02/04-false-sharing-900w.png)]({attach}/images/SoC/ArticleI02/04-false-sharing-HQ.png)
+[![False sharing: two processor cores writing to two different variables that occupy the same 64 byte cache line, with the line ownership bouncing back and forth between the two caches on every write]({static}/images/SoC/ArticleI02/04-false-sharing-900w.png)]({static}/images/SoC/ArticleI02/04-false-sharing-HQ.png)
 
 ```
 One 64-byte cache line
@@ -321,7 +321,7 @@ Direct memory access engines and accelerators read and write memory without
 executing any of the cache maintenance instructions a core would. Systems
 handle this in one of three ways.
 
-[![Three coherency approaches for a direct memory access engine: non-coherent with software cache maintenance, input output coherent participating in snoops for selected transactions, and fully coherent sharing the domain with the processors]({attach}/images/SoC/ArticleI02/05-dma-coherency-900w.png)]({attach}/images/SoC/ArticleI02/05-dma-coherency-HQ.png)
+[![Three coherency approaches for a direct memory access engine: non-coherent with software cache maintenance, input output coherent participating in snoops for selected transactions, and fully coherent sharing the domain with the processors]({static}/images/SoC/ArticleI02/05-dma-coherency-900w.png)]({static}/images/SoC/ArticleI02/05-dma-coherency-HQ.png)
 
 1. **Non-coherent:** Software cleans caches before a transfer out and invalidates them after a transfer in. The hardware is cheap, and a single missed maintenance operation corrupts the transfer.
 2. **Input output coherent:** The engine participates in the coherency fabric for selected transactions, so its reads snoop the caches. Software stops needing maintenance for those buffers.

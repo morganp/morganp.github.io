@@ -23,7 +23,7 @@ This article surveys the main classes of processor used in SoCs, explains what m
 
 Different computational tasks have different shapes. Some are sequential and unpredictable (parsing a web page). Others are massively parallel and regular (multiplying a matrix). Still others require precisely timed, low-latency responses (handling a radio frame). These different "shapes" of computation call for different processor architectures.
 
-[![Computational Task Taxonomy showing the spectrum from sequential irregular control-heavy tasks handled by CPUs through DSPs and GPUs to parallel regular data-heavy tasks handled by neural engines]({attach}/images/SoC/Article04/04-task-taxonomy-900w.png)]({attach}/images/SoC/Article04/04-task-taxonomy-HQ.png)
+[![Computational Task Taxonomy showing the spectrum from sequential irregular control-heavy tasks handled by CPUs through DSPs and GPUs to parallel regular data-heavy tasks handled by neural engines]({static}/images/SoC/Article04/04-task-taxonomy-900w.png)]({static}/images/SoC/Article04/04-task-taxonomy-HQ.png)
 
 ---
 
@@ -37,7 +37,7 @@ Modern CPU cores in SoCs are overwhelmingly **RISC** (Reduced Instruction Set Co
 
 The key subsystems inside a CPU core are:
 
-[![CPU core internal architecture showing the instruction fetch, decode and dispatch, execute units (ALU, FPU, multiplier), register file, load/store unit, and branch predictor]({attach}/images/SoC/Article04/04-cpu-core-internals-900w.png)]({attach}/images/SoC/Article04/04-cpu-core-internals-HQ.png)
+[![CPU core internal architecture showing the instruction fetch, decode and dispatch, execute units (ALU, FPU, multiplier), register file, load/store unit, and branch predictor]({static}/images/SoC/Article04/04-cpu-core-internals-900w.png)]({static}/images/SoC/Article04/04-cpu-core-internals-HQ.png)
 
 ### Pipeline Stages
 
@@ -65,7 +65,7 @@ A five-stage pipeline is the canonical teaching model:
 
 For power-sensitive SoCs (smartphones, wearables), ARM developed the **big.LITTLE** architecture, which pairs high-performance "big" cores with energy-efficient "little" cores on the same die:
 
-[![ARM big.LITTLE DynamIQ cluster configuration showing the performance cluster with Cortex-A78 cores and the efficiency cluster with Cortex-A55 cores, sharing an L3 cache and system interconnect]({attach}/images/SoC/Article04/04-big-little-cluster-900w.png)]({attach}/images/SoC/Article04/04-big-little-cluster-HQ.png)
+[![ARM big.LITTLE DynamIQ cluster configuration showing the performance cluster with Cortex-A78 cores and the efficiency cluster with Cortex-A55 cores, sharing an L3 cache and system interconnect]({static}/images/SoC/Article04/04-big-little-cluster-900w.png)]({static}/images/SoC/Article04/04-big-little-cluster-HQ.png)
 
 The OS scheduler assigns heavy tasks (video decoding, gaming) to the big cores, and lightweight tasks (receiving notifications, idle polling) to the little cores. This can reduce energy consumption by 10x or more compared to running everything on the big cores.
 
@@ -109,7 +109,7 @@ The core of almost all digital signal processing is the **dot product**: multipl
 
 A MAC operation computes: **Accumulator += A x B** in a single cycle.
 
-[![DSP MAC Unit showing the single-cycle multiply-accumulate pipeline: A and B input registers feeding a multiplier, then an adder, then a 40-bit accumulator with feedback]({attach}/images/SoC/Article04/04-dsp-mac-unit-900w.png)]({attach}/images/SoC/Article04/04-dsp-mac-unit-HQ.png)
+[![DSP MAC Unit showing the single-cycle multiply-accumulate pipeline: A and B input registers feeding a multiplier, then an adder, then a 40-bit accumulator with feedback]({static}/images/SoC/Article04/04-dsp-mac-unit-900w.png)]({static}/images/SoC/Article04/04-dsp-mac-unit-HQ.png)
 
 ### DSP architecture features
 
@@ -131,7 +131,7 @@ A GPU is architected around **massive parallelism**. Instead of a few powerful, 
 
 The programming model is based on the observation that rendering a 3D scene, applying a filter to an image, or training a neural network involves applying the **same operation** to **many different data points** independently.
 
-[![GPU vs CPU core organisation: the CPU has 4 large complex cores with large caches, while the GPU has 2048 simple shader cores - showing how CPUs are optimised for serial branchy tasks while GPUs excel at regular parallel tasks]({attach}/images/SoC/Article04/04-gpu-vs-cpu-900w.png)]({attach}/images/SoC/Article04/04-gpu-vs-cpu-HQ.png)
+[![GPU vs CPU core organisation: the CPU has 4 large complex cores with large caches, while the GPU has 2048 simple shader cores - showing how CPUs are optimised for serial branchy tasks while GPUs excel at regular parallel tasks]({static}/images/SoC/Article04/04-gpu-vs-cpu-900w.png)]({static}/images/SoC/Article04/04-gpu-vs-cpu-HQ.png)
 
 In mobile SoCs, GPUs are used for:
 - 3D gaming and UI rendering
@@ -151,7 +151,7 @@ As compute-intensive AI workloads have become dominant, SoC vendors have added *
 
 An NPU accelerates neural network inference - the process of running a trained model on new input data. The core operation is matrix-vector multiplication (essentially a large MAC array).
 
-[![Systolic array architecture used in NPU designs: a grid of Processing Elements (PEs) where weights flow downward and activations flow rightward, each PE computing one MAC per clock cycle, with partial sums accumulating downward]({attach}/images/SoC/Article04/04-systolic-array-900w.png)]({attach}/images/SoC/Article04/04-systolic-array-HQ.png)
+[![Systolic array architecture used in NPU designs: a grid of Processing Elements (PEs) where weights flow downward and activations flow rightward, each PE computing one MAC per clock cycle, with partial sums accumulating downward]({static}/images/SoC/Article04/04-systolic-array-900w.png)]({static}/images/SoC/Article04/04-systolic-array-HQ.png)
 
 In a systolic array, data flows through the processing elements rhythmically. Weights are pre-loaded; activations and partial sums flow through, with each PE performing one MAC per cycle. This achieves very high utilisation of the multiplication hardware.
 
@@ -173,7 +173,7 @@ The camera pipeline - demosaicing, noise reduction, white balance, tone mapping,
 
 A high-end mobile SoC might contain the following processing elements:
 
-[![Modern mobile SoC processor subsystem showing the CPU cluster (prime, big and little cores), GPU, DSP, NPU, ISP and modem as distinct blocks on the die]({attach}/images/SoC/Article04/04-soc-processor-subsystem-900w.png)]({attach}/images/SoC/Article04/04-soc-processor-subsystem-HQ.png)
+[![Modern mobile SoC processor subsystem showing the CPU cluster (prime, big and little cores), GPU, DSP, NPU, ISP and modem as distinct blocks on the die]({static}/images/SoC/Article04/04-soc-processor-subsystem-900w.png)]({static}/images/SoC/Article04/04-soc-processor-subsystem-HQ.png)
 
 ---
 

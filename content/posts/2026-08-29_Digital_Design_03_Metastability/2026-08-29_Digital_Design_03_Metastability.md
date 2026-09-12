@@ -7,7 +7,7 @@ Author: morganp
 Summary: Why a flip-flop can stop between the rails, why two gates reading that voltage can disagree with each other, and why the bug that follows never reproduces.
 Status: published
 
-[![A D-type flip-flop whose output wire splits at a junction and reaches two inverters, the upper one resolving it as 1 and the lower one as 0]({attach}/images/DigitalDesign/Article03/00-metastability-hero-900w.png)]({attach}/images/DigitalDesign/Article03/00-metastability-hero-HQ.png)
+[![A D-type flip-flop whose output wire splits at a junction and reaches two inverters, the upper one resolving it as 1 and the lower one as 0]({static}/images/DigitalDesign/Article03/00-metastability-hero-900w.png)]({static}/images/DigitalDesign/Article03/00-metastability-hero-HQ.png)
 
 *Series: Digital Design Fundamentals | Article 3*
 
@@ -44,7 +44,7 @@ That difference has no lower limit. Data crossing the threshold close enough to
 the clock edge leaves the flip-flop microvolts to amplify, or less, and the
 amplification then starts from microvolts.
 
-[![Output voltage against time for several starting margins, showing that a smaller captured margin takes longer to reach a rail and one curve still sitting at the threshold when the next clock edge reads it]({attach}/images/DigitalDesign/Article03/01-settling-margin-900w.png)]({attach}/images/DigitalDesign/Article03/01-settling-margin-HQ.png)
+[![Output voltage against time for several starting margins, showing that a smaller captured margin takes longer to reach a rail and one curve still sitting at the threshold when the next clock edge reads it]({static}/images/DigitalDesign/Article03/01-settling-margin-900w.png)]({static}/images/DigitalDesign/Article03/01-settling-margin-HQ.png)
 
 Distance from the threshold grows as `V0 e^(t / tau)`, where `V0` is the
 captured margin and `tau` is the settling time constant. Time to reach a rail

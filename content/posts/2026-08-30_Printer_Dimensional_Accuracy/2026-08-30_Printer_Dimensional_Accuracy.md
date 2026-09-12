@@ -9,7 +9,7 @@ Status: draft
 
 The M3 bolt will not go through the 3mm clearance hole. The bracket rocks on the bench. The CAD measures 3.000mm and the bench is flat, so both faults belong to the printer, and both have a setting.
 
-[![Cross section of a first layer spreading wider than the layers above it, and a hole whose toolpath chords fall inside the nominal circle]({attach}/images/Engineering/PrinterDimensionalAccuracy/01-two-errors-900w.png)]({attach}/images/Engineering/PrinterDimensionalAccuracy/01-two-errors-HQ.png)
+[![Cross section of a first layer spreading wider than the layers above it, and a hole whose toolpath chords fall inside the nominal circle]({static}/images/Engineering/PrinterDimensionalAccuracy/01-two-errors-900w.png)]({static}/images/Engineering/PrinterDimensionalAccuracy/01-two-errors-HQ.png)
 
 ## The base spreads
 

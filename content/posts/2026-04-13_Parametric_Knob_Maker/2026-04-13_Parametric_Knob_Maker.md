@@ -51,7 +51,7 @@ include <parametric-knob-maker/parametric_knob.scad>
 knob();
 ```
 
-![Default knob -- 30mm diameter, 15mm tall, 15 grip cutouts]({attach}/images/OpenSCAD/ParametricKnob/knob_default.png)
+![Default knob -- 30mm diameter, 15mm tall, 15 grip cutouts]({static}/images/OpenSCAD/ParametricKnob/knob_default.png)
 
 ### Small thumbscrew knob
 
@@ -62,7 +62,7 @@ include <parametric-knob-maker/parametric_knob.scad>
 knob(knob_height=8, knob_diam=20, offset_height=2);
 ```
 
-![Small knob -- 20mm diameter, 8mm tall]({attach}/images/OpenSCAD/ParametricKnob/knob_small.png)
+![Small knob -- 20mm diameter, 8mm tall]({static}/images/OpenSCAD/ParametricKnob/knob_small.png)
 
 ### Large adjustment knob
 
@@ -79,7 +79,7 @@ knob(
 );
 ```
 
-![Large knob -- 50mm diameter, 20mm tall, 20 grip cutouts]({attach}/images/OpenSCAD/ParametricKnob/knob_large.png)
+![Large knob -- 50mm diameter, 20mm tall, 20 grip cutouts]({static}/images/OpenSCAD/ParametricKnob/knob_large.png)
 
 ### Slim base
 
@@ -96,7 +96,7 @@ knob(
 );
 ```
 
-![Slim base knob -- 35mm diameter with narrow 10mm base]({attach}/images/OpenSCAD/ParametricKnob/knob_slim_base.png)
+![Slim base knob -- 35mm diameter with narrow 10mm base]({static}/images/OpenSCAD/ParametricKnob/knob_slim_base.png)
 
 ### Combining with a BOSL2 screw
 
@@ -116,7 +116,7 @@ union() {
 }
 ```
 
-![Thumbscrew assembly -- knob with M5 threaded shaft below]({attach}/images/OpenSCAD/ParametricKnob/knob_thumbscrew.png)
+![Thumbscrew assembly -- knob with M5 threaded shaft below]({static}/images/OpenSCAD/ParametricKnob/knob_thumbscrew.png)
 
 ## The `hex_knob()` Module
 
@@ -141,11 +141,11 @@ hex_knob(
 
 The `screwhead_facetoface` parameter corresponds to the face-to-face dimension `s` in DIN 933. The knob is designed to capture the bolt head in the base recess with the shaft passing through -- the hex recess feature is still under development.
 
-![Hex knob underside with M8 hex bolt ready to insert]({attach}/images/OpenSCAD/ParametricKnob/hex_knob_with_bolt.png)
+![Hex knob underside with M8 hex bolt ready to insert]({static}/images/OpenSCAD/ParametricKnob/hex_knob_with_bolt.png)
 
 | Default hex knob | Large hex knob |
 |---|---|
-| ![Default hex knob -- 30mm diameter, 15mm tall]({attach}/images/OpenSCAD/ParametricKnob/hex_knob_default.png) | ![Large hex knob -- 45mm diameter, 20mm tall]({attach}/images/OpenSCAD/ParametricKnob/hex_knob_large.png) |
+| ![Default hex knob -- 30mm diameter, 15mm tall]({static}/images/OpenSCAD/ParametricKnob/hex_knob_default.png) | ![Large hex knob -- 45mm diameter, 20mm tall]({static}/images/OpenSCAD/ParametricKnob/hex_knob_large.png) |
 
 ## Implementation Notes
 

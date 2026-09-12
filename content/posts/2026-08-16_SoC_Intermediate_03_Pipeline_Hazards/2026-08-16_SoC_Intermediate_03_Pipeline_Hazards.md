@@ -7,7 +7,7 @@ Author: morganp
 Summary: Why adding a pipeline stage can make a processor slower, and the hazard machinery that decides the outcome: forwarding paths, load-use stalls, branch prediction and flush, structural conflicts, multi-cycle units, and the valid bits that keep exceptions precise.
 Status: published
 
-[![A processor pipeline drawn as a transparent assembly line, with several instructions in flight at once moving through fetch, decode, execute, memory and writeback stages]({attach}/images/SoC/ArticleI03/00-pipeline-hero-900w.png)]({attach}/images/SoC/ArticleI03/00-pipeline-hero-HQ.png)
+[![A processor pipeline drawn as a transparent assembly line, with several instructions in flight at once moving through fetch, decode, execute, memory and writeback stages]({static}/images/SoC/ArticleI03/00-pipeline-hero-900w.png)]({static}/images/SoC/ArticleI03/00-pipeline-hero-HQ.png)
 
 *Series: Intermediate SoC Design | Article 3 of 10*
 
@@ -327,7 +327,7 @@ right, and costs the entire pipeline when it is wrong. You are not buying
 throughput with depth. You are buying frequency, and paying for it with the
 penalty on every event that discards work.
 
-[![Two pipelines drawn side by side, a short one and a long one, each flushing after a mispredicted branch, with the long pipeline discarding many more instructions than the short one]({attach}/images/SoC/ArticleI03/01-depth-penalty-900w.png)]({attach}/images/SoC/ArticleI03/01-depth-penalty-HQ.png)
+[![Two pipelines drawn side by side, a short one and a long one, each flushing after a mispredicted branch, with the long pipeline discarding many more instructions than the short one]({static}/images/SoC/ArticleI03/01-depth-penalty-900w.png)]({static}/images/SoC/ArticleI03/01-depth-penalty-HQ.png)
 
 That explains the split in the results. The three benchmarks that gained were
 predictable ones, where the pipeline is right almost all the time and depth is
@@ -346,7 +346,7 @@ The third class is the most mundane and the easiest to design out, if you find
 it before tape-out. A structural hazard is hardware oversubscription: two
 stages wanting one resource in one cycle.
 
-[![A single memory port with two arrows arriving at once, one from instruction fetch and one from a data load, with only one able to proceed]({attach}/images/SoC/ArticleI03/02-structural-hazard-900w.png)]({attach}/images/SoC/ArticleI03/02-structural-hazard-HQ.png)
+[![A single memory port with two arrows arriving at once, one from instruction fetch and one from a data load, with only one able to proceed]({static}/images/SoC/ArticleI03/02-structural-hazard-900w.png)]({static}/images/SoC/ArticleI03/02-structural-hazard-HQ.png)
 
 The classic examples:
 
@@ -407,7 +407,7 @@ complete, no younger instruction having changed any architectural state, and a
 program counter that says exactly where to resume. The hardware, meanwhile, has
 five instructions in flight and has been speculating for the last three cycles.
 
-[![A pipeline with a single commit point marked, where instructions before it have changed architectural state and instructions after it are still speculative and can be discarded]({attach}/images/SoC/ArticleI03/03-commit-point-900w.png)]({attach}/images/SoC/ArticleI03/03-commit-point-HQ.png)
+[![A pipeline with a single commit point marked, where instructions before it have changed architectural state and instructions after it are still speculative and can be discarded]({static}/images/SoC/ArticleI03/03-commit-point-900w.png)]({static}/images/SoC/ArticleI03/03-commit-point-HQ.png)
 
 Even an in-order pipeline has to work at this:
 

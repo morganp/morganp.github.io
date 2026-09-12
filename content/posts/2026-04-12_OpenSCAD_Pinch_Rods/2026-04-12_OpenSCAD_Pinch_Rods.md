@@ -7,7 +7,7 @@ Author: morganp
 Summary: Designing a parametric set of pinch rods in OpenSCAD using the BOSL2 library. Pinch rods are a traditional woodworking tool for checking carcases for square and transferring interior dimensions without measuring.
 Status: published
 
-[![Assembled pinch rods]({attach}/images/OpenSCAD/PinchRods/assembled-900w.png)]({attach}/images/OpenSCAD/PinchRods/assembled-HQ.png)
+[![Assembled pinch rods]({static}/images/OpenSCAD/PinchRods/assembled-900w.png)]({static}/images/OpenSCAD/PinchRods/assembled-HQ.png)
 
 ## What are Pinch Rods?
 
@@ -17,7 +17,7 @@ The beauty of pinch rods over a tape measure is that you never read a number. Th
 
 They have a second use too: transferring interior dimensions. Set the rods to fit snugly inside a space, lock them, carry the tool to your workpiece, and mark directly. No arithmetic, no misread ruler.
 
-[![Side profile showing both guides and the two overlapping rods]({attach}/images/OpenSCAD/PinchRods/assembled_side-900w.png)]({attach}/images/OpenSCAD/PinchRods/assembled_side-HQ.png)
+[![Side profile showing both guides and the two overlapping rods]({static}/images/OpenSCAD/PinchRods/assembled_side-900w.png)]({static}/images/OpenSCAD/PinchRods/assembled_side-HQ.png)
 
 Lost Art Press have documented pinch rods across several articles spanning 2013 to 2025, from a home-centre build using steel tube sleeves and heart pine, through to the machined brass Crucible Tool hardware and a new all-metal prototype using 1/4" keystock. The design has been remarkably stable across all those years -- two rods, two guides, one thumbscrew.
 
@@ -55,13 +55,13 @@ The guides are intentionally different. Each one locks a different rod, so you c
 
 | Guide 1 -- inverted, screw hole on top | Guide 2 -- M5 thumbscrew knob |
 |---|---|
-| [![Guide 1]({attach}/images/OpenSCAD/PinchRods/guide1_detail-900w.png)]({attach}/images/OpenSCAD/PinchRods/guide1_detail-HQ.png) | [![Guide 2]({attach}/images/OpenSCAD/PinchRods/guide2_detail-900w.png)]({attach}/images/OpenSCAD/PinchRods/guide2_detail-HQ.png) |
+| [![Guide 1]({static}/images/OpenSCAD/PinchRods/guide1_detail-900w.png)]({static}/images/OpenSCAD/PinchRods/guide1_detail-HQ.png) | [![Guide 2]({static}/images/OpenSCAD/PinchRods/guide2_detail-900w.png)]({static}/images/OpenSCAD/PinchRods/guide2_detail-HQ.png) |
 
 ## Tapered Tips
 
 Each rod has a 45-degree chisel taper at one end. Both tapers point toward the shared centreline between the two stacked rods, so from the side the two tips form a symmetric arrowhead shape pointing at the Z midpoint.
 
-[![Tapered rod tips exiting guide 1]({attach}/images/OpenSCAD/PinchRods/tips_detail-900w.png)]({attach}/images/OpenSCAD/PinchRods/tips_detail-HQ.png)
+[![Tapered rod tips exiting guide 1]({static}/images/OpenSCAD/PinchRods/tips_detail-900w.png)]({static}/images/OpenSCAD/PinchRods/tips_detail-HQ.png)
 
 The taper is generated using `hull()` between a knife-edge line at the tip and a full rectangular cross-section a little further along. At 45 degrees the horizontal run equals the vertical rise, so the taper length is exactly `STOCK_THICKNESS` (9.5mm). The two rods have their tapers on opposite ends of the assembly so each tip engages a different corner of the workpiece.
 
@@ -71,7 +71,7 @@ Four parts are printed separately. For 3mf export, set `MODE = "print"` and sele
 
 | Guide 1 | Guide 2 | Thumbscrew | Rod (print x2) |
 |---|---|---|---|
-| [![Guide 1 part]({attach}/images/OpenSCAD/PinchRods/part_guide1-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide1-HQ.png) | [![Guide 2 part]({attach}/images/OpenSCAD/PinchRods/part_guide2-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_guide2-HQ.png) | [![Fastener part]({attach}/images/OpenSCAD/PinchRods/part_fastener-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_fastener-HQ.png) | [![Rod part]({attach}/images/OpenSCAD/PinchRods/part_rod-900w.png)]({attach}/images/OpenSCAD/PinchRods/part_rod-HQ.png) |
+| [![Guide 1 part]({static}/images/OpenSCAD/PinchRods/part_guide1-900w.png)]({static}/images/OpenSCAD/PinchRods/part_guide1-HQ.png) | [![Guide 2 part]({static}/images/OpenSCAD/PinchRods/part_guide2-900w.png)]({static}/images/OpenSCAD/PinchRods/part_guide2-HQ.png) | [![Fastener part]({static}/images/OpenSCAD/PinchRods/part_fastener-900w.png)]({static}/images/OpenSCAD/PinchRods/part_fastener-HQ.png) | [![Rod part]({static}/images/OpenSCAD/PinchRods/part_rod-900w.png)]({static}/images/OpenSCAD/PinchRods/part_rod-HQ.png) |
 
 ## Dependencies
 

@@ -7,7 +7,7 @@ Author: morganp
 Summary: The mechanisms behind AXI4 throughput and the bugs each one creates: burst encoding, transaction identifiers, out-of-order completion, outstanding transaction tracking, quality of service signalling, and the handshake rules that hand-written bridges break most often.
 Status: published
 
-[![An AXI4 interconnect at the centre of a system on chip, with a processor, a direct memory access engine, a graphics processor and a memory controller exchanging tagged read and write transactions along coloured channel paths]({attach}/images/SoC/ArticleI01/00-axi4-hero-900w.png)]({attach}/images/SoC/ArticleI01/00-axi4-hero-HQ.png)
+[![An AXI4 interconnect at the centre of a system on chip, with a processor, a direct memory access engine, a graphics processor and a memory controller exchanging tagged read and write transactions along coloured channel paths]({static}/images/SoC/ArticleI01/00-axi4-hero-900w.png)]({static}/images/SoC/ArticleI01/00-axi4-hero-HQ.png)
 
 *Series: Intermediate SoC Design | Article 1 of 10*
 
@@ -44,7 +44,7 @@ signal names are identical in both.
 AXI4 separates read traffic and write traffic into five independent channels.
 Each channel carries its own handshake and makes progress on its own schedule.
 
-[![The five AXI4 channels drawn between a manager and a subordinate: write address, write data and write response on the write path, read address and read data on the read path, each channel labelled with its direction and valid and ready signal pair]({attach}/images/SoC/ArticleI01/01-five-channels-900w.png)]({attach}/images/SoC/ArticleI01/01-five-channels-HQ.png)
+[![The five AXI4 channels drawn between a manager and a subordinate: write address, write data and write response on the write path, read address and read data on the read path, each channel labelled with its direction and valid and ready signal pair]({static}/images/SoC/ArticleI01/01-five-channels-900w.png)]({static}/images/SoC/ArticleI01/01-five-channels-HQ.png)
 
 | Channel | Name | Direction |
 |---|---|---|
@@ -107,7 +107,7 @@ moment the source changes its data.
 A burst moves several data beats from one address phase. AXI4 supports three
 burst types, selected by the `AxBURST` field.
 
-[![Three AXI4 burst types compared on a memory address grid: FIXED repeatedly accessing one address, INCR stepping forward through consecutive addresses, and WRAP stepping forward then wrapping back to the start of an aligned region]({attach}/images/SoC/ArticleI01/02-burst-types-900w.png)]({attach}/images/SoC/ArticleI01/02-burst-types-HQ.png)
+[![Three AXI4 burst types compared on a memory address grid: FIXED repeatedly accessing one address, INCR stepping forward through consecutive addresses, and WRAP stepping forward then wrapping back to the start of an aligned region]({static}/images/SoC/ArticleI01/02-burst-types-900w.png)]({static}/images/SoC/ArticleI01/02-burst-types-HQ.png)
 
 | Burst | Behaviour | Typical use |
 |---|---|---|
@@ -237,7 +237,7 @@ Transaction identifiers let a manager keep several requests in flight at once.
 The `AWID` and `ARID` fields tag requests, and the `BID` and `RID` fields tag
 the matching responses.
 
-[![Two tagged read requests entering an interconnect scoreboard and leaving in a different order: a request tagged ID 4 to slow memory issued first but returning second, and a request tagged ID 7 to fast memory issued second but returning first]({attach}/images/SoC/ArticleI01/03-out-of-order-900w.png)]({attach}/images/SoC/ArticleI01/03-out-of-order-HQ.png)
+[![Two tagged read requests entering an interconnect scoreboard and leaving in a different order: a request tagged ID 4 to slow memory issued first but returning second, and a request tagged ID 7 to fast memory issued second but returning first]({static}/images/SoC/ArticleI01/03-out-of-order-900w.png)]({static}/images/SoC/ArticleI01/03-out-of-order-HQ.png)
 
 Two ordering rules follow from the identifiers:
 
@@ -332,7 +332,7 @@ The `AxQOS` field lets a manager mark the relative urgency of a transaction.
 Quality of service, abbreviated QoS, is a 4-bit value carried on both AXI4
 address channels.
 
-[![Three traffic classes arriving at an AXI arbiter with different quality of service values: a display scanout read at the highest value, a processor cache refill in the middle, and a background copy at the lowest, with the arbiter also weighing a starvation counter and outstanding transaction limits]({attach}/images/SoC/ArticleI01/04-qos-arbitration-900w.png)]({attach}/images/SoC/ArticleI01/04-qos-arbitration-HQ.png)
+[![Three traffic classes arriving at an AXI arbiter with different quality of service values: a display scanout read at the highest value, a processor cache refill in the middle, and a background copy at the lowest, with the arbiter also weighing a starvation counter and outstanding transaction limits]({static}/images/SoC/ArticleI01/04-qos-arbitration-900w.png)]({static}/images/SoC/ArticleI01/04-qos-arbitration-HQ.png)
 
 A display controller fetching pixels for the next scanline needs low latency,
 because late pixels tear the image. A background copy engine can wait. The
@@ -384,7 +384,7 @@ costs verification effort, unless system integration forces the choice.
 AXI failures usually appear as a hang rather than an error. A stalled
 handshake produces no exception, no trap, and no log entry.
 
-[![A debug decision path for a stalled AXI interface: capture all five channels, identify which channel shows valid high with ready low, then determine whether the source or the destination owes progress]({attach}/images/SoC/ArticleI01/05-debug-flow-900w.png)]({attach}/images/SoC/ArticleI01/05-debug-flow-HQ.png)
+[![A debug decision path for a stalled AXI interface: capture all five channels, identify which channel shows valid high with ready low, then determine whether the source or the destination owes progress]({static}/images/SoC/ArticleI01/05-debug-flow-900w.png)]({static}/images/SoC/ArticleI01/05-debug-flow-HQ.png)
 
 The common root causes are:
 

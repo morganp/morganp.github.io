@@ -36,7 +36,7 @@ IP vendors design their blocks to be **plug-compatible** with the standard, so a
 
 ARM's **AMBA** specification, first published in 1996 and evolving through multiple generations, defines a family of bus protocols at different performance tiers:
 
-[![AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple]({attach}/images/SoC/Article06/06-amba-family-900w.png)]({attach}/images/SoC/Article06/06-amba-family-HQ.png)
+[![AMBA protocol family spectrum showing ACE/CHI, AXI4, AHB, and APB from high-performance to simple]({static}/images/SoC/Article06/06-amba-family-900w.png)]({static}/images/SoC/Article06/06-amba-family-HQ.png)
 
 The family spans from simple, low-power APB peripherals on the right through pipelined AHB, high-performance AXI4, all the way to cache-coherent ACE/CHI protocols used in multi-core processor clusters on the left.
 
@@ -140,7 +140,7 @@ AXI4's key innovation is **independent channels**: read and write transactions a
 
 ### The five AXI channels
 
-[![AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names]({attach}/images/SoC/Article06/06-axi-channels-900w.png)]({attach}/images/SoC/Article06/06-axi-channels-HQ.png)
+[![AXI4 five-channel architecture diagram showing master and slave blocks connected by AW, W, B, AR, and R channels with signal names]({static}/images/SoC/Article06/06-axi-channels-900w.png)]({static}/images/SoC/Article06/06-axi-channels-HQ.png)
 
 The five channels are:
 
@@ -196,7 +196,7 @@ A simple shared bus forces all masters to share a single data path -- only one m
 
 The solution is an **AXI crossbar** (also called a **switch matrix**): it provides dedicated paths between every master-slave pair, allowing multiple simultaneous transfers as long as they target different slaves.
 
-[![Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right]({attach}/images/SoC/Article06/06-bus-vs-crossbar-900w.png)]({attach}/images/SoC/Article06/06-bus-vs-crossbar-HQ.png)
+[![Shared bus versus AXI crossbar comparison showing bottleneck on left and simultaneous transfers on right]({static}/images/SoC/Article06/06-bus-vs-crossbar-900w.png)]({static}/images/SoC/Article06/06-bus-vs-crossbar-HQ.png)
 
 ARM's CoreLink NIC-400 and NIC-450 are examples of AXI mux-style interconnects, where a fixed matrix routes each master to a set of slaves. The CoreLink NI-700 takes a different approach: it is a Network-on-Chip (NoC) switched network that routes transactions independently through the fabric, allowing better scalability for large numbers of endpoints. RISC-V SoCs commonly use TileLink or AXI crossbars built with open-source IP.
 
@@ -227,7 +227,7 @@ AXI4-Lite is extremely common for connecting peripheral IP blocks to the system 
 
 Because APB is simpler and lower power, slow peripherals are typically attached to an **APB bus** rather than directly to the AXI/AHB backbone. An **AXI-to-APB bridge** converts between the protocols:
 
-[![SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus]({attach}/images/SoC/Article06/06-soc-bus-hierarchy-900w.png)]({attach}/images/SoC/Article06/06-soc-bus-hierarchy-HQ.png)
+[![SoC bus hierarchy showing CPU core, L2 cache, AXI crossbar connecting to DRAM, GPU, DMA, and APB bridge leading to peripheral bus]({static}/images/SoC/Article06/06-soc-bus-hierarchy-900w.png)]({static}/images/SoC/Article06/06-soc-bus-hierarchy-HQ.png)
 
 The bridge runs the APB at a lower, slower clock (e.g., 100 MHz) while the AXI backbone runs at 500 MHz or more, reducing dynamic power in the peripherals.
 
@@ -237,7 +237,7 @@ The bridge runs the APB at a lower, slower clock (e.g., 100 MHz) while the AXI b
 
 In the largest, most complex SoCs -- server processors, AI accelerators -- even an AXI crossbar becomes a bottleneck. The solution is a **Network-on-Chip (NoC)**: a switched packet network embedded on the die, with routers at each node and links between them.
 
-[![Network-on-Chip 4x4 mesh topology showing router nodes connected by bidirectional links with CPU, GPU, DRAM, and NPU blocks at the edges]({attach}/images/SoC/Article06/06-noc-mesh-900w.png)]({attach}/images/SoC/Article06/06-noc-mesh-HQ.png)
+[![Network-on-Chip 4x4 mesh topology showing router nodes connected by bidirectional links with CPU, GPU, DRAM, and NPU blocks at the edges]({static}/images/SoC/Article06/06-noc-mesh-900w.png)]({static}/images/SoC/Article06/06-noc-mesh-HQ.png)
 
 NoCs provide:
 

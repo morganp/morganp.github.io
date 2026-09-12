@@ -7,7 +7,7 @@ Author: morganp
 Summary: How to tie a clove hitch and a tripod lashing, and the wrap and frapping counts that let three poles open into a tripod.
 Status: published
 
-[![Two lashed tripods standing apart, carrying a horizontal spar between their apexes with kit hung from it]({attach}/images/Outdoor/LashingATripod/00-tripod-hero-900w.png)]({attach}/images/Outdoor/LashingATripod/00-tripod-hero-HQ.png)
+[![Two lashed tripods standing apart, carrying a horizontal spar between their apexes with kit hung from it]({static}/images/Outdoor/LashingATripod/00-tripod-hero-900w.png)]({static}/images/Outdoor/LashingATripod/00-tripod-hero-HQ.png)
 
 Camp gadgets stand on tripods. Three points of contact define a plane, so three feet sit solid on whatever ground they are put on. Add a fourth and one leg can end up on a different plane from the other three, which is the rocking you have met on a pub table or a chair on an uneven floor.
 
@@ -23,7 +23,7 @@ Both ends of the lashing are clove hitches, so that knot comes first. It is two 
 4. Feed the working end under that diagonal.
 5. Pull both ends until the turns bed down against the pole.
 
-[![Five panels showing a clove hitch tied in place on a horizontal pole: the end taken up the front and round the back, brought out underneath, crossed over and round a second time to form a diagonal, fed under that diagonal, and pulled tight]({attach}/images/Outdoor/LashingATripod/01-clove-hitch-900w.png)]({attach}/images/Outdoor/LashingATripod/01-clove-hitch-HQ.png)
+[![Five panels showing a clove hitch tied in place on a horizontal pole: the end taken up the front and round the back, brought out underneath, crossed over and round a second time to form a diagonal, fed under that diagonal, and pulled tight]({static}/images/Outdoor/LashingATripod/01-clove-hitch-900w.png)]({static}/images/Outdoor/LashingATripod/01-clove-hitch-HQ.png)
 
 Step 4 is the whole knot. The two turns trap each other against the pole, so the harder the lashing pulls, the harder the hitch grips. Miss the tuck and you have a round turn, which shakes loose as soon as you let go.
 
@@ -45,4 +45,4 @@ So lay the three poles side by side on the ground, with the middle one reversed 
 4. **Clove hitch** on the right-hand pole to finish, tied exactly as the first one, and dress the tail back under the frapping so nothing hangs loose.
 5. **Stand the bundle up** and walk the two outer legs out. Each pole turns a quarter turn inside the wraps, every wrapping turn shortens as it takes up that rotation, and the lashing pulls itself tight.
 
-[![Five-panel sequence: clove hitch on the left pole, four woven figure-of-eight wrapping turns, two frapping turns in each gap, the finishing clove hitch on the right pole, and the legs walked open]({attach}/images/Outdoor/LashingATripod/02-lashing-sequence-900w.png)]({attach}/images/Outdoor/LashingATripod/02-lashing-sequence-HQ.png)
+[![Five-panel sequence: clove hitch on the left pole, four woven figure-of-eight wrapping turns, two frapping turns in each gap, the finishing clove hitch on the right pole, and the legs walked open]({static}/images/Outdoor/LashingATripod/02-lashing-sequence-900w.png)]({static}/images/Outdoor/LashingATripod/02-lashing-sequence-HQ.png)

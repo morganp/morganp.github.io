@@ -7,7 +7,7 @@ Status: published
 Summary: Five changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile that you can still escape from, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, a two-row status line with a keybinding hint row, and mouse selection that copies to the system clipboard on X11.
 Slug: tmux-always-on-setup
 
-[![An always-on tmux setup]({attach}/images/Unix/tmux/tmux-hero-900w.png)]({attach}/images/Unix/tmux/tmux-hero-HQ.png)
+[![An always-on tmux setup]({static}/images/Unix/tmux/tmux-hero-900w.png)]({static}/images/Unix/tmux/tmux-hero-HQ.png)
 
 If you have not met it yet, tmux is a terminal multiplexer. It lets one
 terminal window hold many sessions, split into panes, and it keeps those

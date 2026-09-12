@@ -23,7 +23,7 @@ The art of SoC memory architecture is bridging the massive speed gap between the
 
 The problem starts with a fundamental mismatch in technology:
 
-[![Memory technology comparison table showing capacity, latency, bandwidth and power from CPU registers through DRAM to flash storage]({attach}/images/SoC/Article05/05-memory-technology-comparison-900w.png)]({attach}/images/SoC/Article05/05-memory-technology-comparison-HQ.png)
+[![Memory technology comparison table showing capacity, latency, bandwidth and power from CPU registers through DRAM to flash storage]({static}/images/SoC/Article05/05-memory-technology-comparison-900w.png)]({static}/images/SoC/Article05/05-memory-technology-comparison-HQ.png)
 
 Notice the gap: a CPU register delivers data in under a nanosecond, while external DRAM takes 50-70 ns - roughly 100x slower. Without a caching strategy, the CPU would spend most of its time waiting for memory.
 
@@ -33,7 +33,7 @@ Notice the gap: a CPU register delivers data in under a nanosecond, while extern
 
 The solution is a **hierarchy** of storage technologies, organised by speed, cost, and distance from the processor:
 
-[![Memory hierarchy pyramid showing registers, L1 cache, L2 cache, L3 cache, DRAM and flash storage with latency and capacity annotations]({attach}/images/SoC/Article05/05-memory-hierarchy-900w.png)]({attach}/images/SoC/Article05/05-memory-hierarchy-HQ.png)
+[![Memory hierarchy pyramid showing registers, L1 cache, L2 cache, L3 cache, DRAM and flash storage with latency and capacity annotations]({static}/images/SoC/Article05/05-memory-hierarchy-900w.png)]({static}/images/SoC/Article05/05-memory-hierarchy-HQ.png)
 
 The hierarchy works because of **locality** - the observation that most programs access the same data repeatedly over a short period (*temporal locality*) and access data at adjacent addresses in sequence (*spatial locality*). Caches exploit both properties.
 
@@ -71,7 +71,7 @@ Three important cache parameters:
 
 **Associativity** - how many possible cache locations a given memory address can map to. A *direct-mapped* cache is simplest: each address maps to exactly one line. A *fully-associative* cache can hold any address in any line. A *4-way set-associative* cache is a compromise: each address maps to a set of 4 lines.
 
-[![Cache associativity comparison showing direct-mapped cache versus 4-way set-associative cache organisation]({attach}/images/SoC/Article05/05-cache-organisation-900w.png)]({attach}/images/SoC/Article05/05-cache-organisation-HQ.png)
+[![Cache associativity comparison showing direct-mapped cache versus 4-way set-associative cache organisation]({static}/images/SoC/Article05/05-cache-organisation-900w.png)]({static}/images/SoC/Article05/05-cache-organisation-HQ.png)
 
 **Write policy** - what happens when the CPU writes to a cached address:
 
@@ -92,7 +92,7 @@ SRAM retains data as long as power is applied (it is *volatile*). It is fast (su
 
 External DRAM uses a **one-transistor, one-capacitor** (1T1C) cell. The charge on a capacitor represents the bit value.
 
-[![SRAM 6T cell versus DRAM 1T1C cell comparison showing transistor and capacitor layout with wordline and bitline connections]({attach}/images/SoC/Article05/05-sram-dram-cells-900w.png)]({attach}/images/SoC/Article05/05-sram-dram-cells-HQ.png)
+[![SRAM 6T cell versus DRAM 1T1C cell comparison showing transistor and capacitor layout with wordline and bitline connections]({static}/images/SoC/Article05/05-sram-dram-cells-900w.png)]({static}/images/SoC/Article05/05-sram-dram-cells-HQ.png)
 
 The 1T1C cell is much smaller than a 6T SRAM cell, enabling much higher density - today's DRAM stores tens of gigabits per die. However, the capacitor leaks charge over time, so each cell must be **refreshed** (read and rewritten) thousands of times per second. This refresh activity consumes power and introduces brief periods where the memory cannot be accessed.
 
@@ -149,7 +149,7 @@ Between the SoC's system bus and the DRAM package sits the **DRAM controller** -
 - Manages multiple banks and ranks for parallel access
 - Implements **QoS (Quality of Service)** to ensure latency-sensitive initiators (for example, display engines) get priority
 
-[![DRAM controller architecture block diagram showing AXI slave interface, command scheduler, refresh engine, and PHY interface connecting to LPDDR5 DRAM]({attach}/images/SoC/Article05/05-dram-controller-900w.png)]({attach}/images/SoC/Article05/05-dram-controller-HQ.png)
+[![DRAM controller architecture block diagram showing AXI slave interface, command scheduler, refresh engine, and PHY interface connecting to LPDDR5 DRAM]({static}/images/SoC/Article05/05-dram-controller-900w.png)]({static}/images/SoC/Article05/05-dram-controller-HQ.png)
 
 ---
 
@@ -173,7 +173,7 @@ The SoC connects to these through dedicated controller IP blocks: eMMC controlle
 
 From software's perspective, all memory - SRAM, DRAM, memory-mapped registers, flash - appears as a flat **address space**. The processor simply reads and writes to 32-bit or 64-bit addresses; the hardware decides which memory or peripheral handles each range.
 
-[![32-bit SoC address space layout showing peripheral registers, private CPU peripherals, external DRAM, on-chip SRAM, and flash ROM regions]({attach}/images/SoC/Article05/05-address-map-900w.png)]({attach}/images/SoC/Article05/05-address-map-HQ.png)
+[![32-bit SoC address space layout showing peripheral registers, private CPU peripherals, external DRAM, on-chip SRAM, and flash ROM regions]({static}/images/SoC/Article05/05-address-map-900w.png)]({static}/images/SoC/Article05/05-address-map-HQ.png)
 
 The **memory map** is one of the first things a firmware developer consults when writing code for a new SoC. It is typically documented in the SoC's **Technical Reference Manual (TRM)**.
 
@@ -224,7 +224,7 @@ The **MMU** translates **virtual addresses** (used by software) into **physical 
 
 Translation is performed via a **page table** hierarchy stored in DRAM. To avoid the latency of a full table walk for every access, the CPU caches recent translations in the **TLB (Translation Lookaside Buffer)**:
 
-[![MMU virtual to physical address translation diagram showing VPN fields, TLB lookup path, page table walk on miss, and physical frame number output]({attach}/images/SoC/Article05/05-mmu-translation-900w.png)]({attach}/images/SoC/Article05/05-mmu-translation-HQ.png)
+[![MMU virtual to physical address translation diagram showing VPN fields, TLB lookup path, page table walk on miss, and physical frame number output]({static}/images/SoC/Article05/05-mmu-translation-900w.png)]({static}/images/SoC/Article05/05-mmu-translation-HQ.png)
 
 The ARM SMMU (System Memory Management Unit) extends this concept to non-CPU masters (DMA engines, GPU), ensuring that peripheral DMA transfers are also constrained to authorised memory regions.
 

@@ -36,7 +36,7 @@ This collection of problems is called **clock skew** (spatial variation) and **c
 
 The solution is a carefully engineered **clock tree**: a hierarchical network of buffers that distributes the clock signal from a single source to all destinations. Engineers size each branch so that all paths have approximately equal delay.
 
-[![H-tree clock distribution showing equal-length paths from PLL output through hierarchical buffers to leaf flip-flops]({attach}/images/SoC/Article07/07-clock-tree-900w.png)]({attach}/images/SoC/Article07/07-clock-tree-HQ.png)
+[![H-tree clock distribution showing equal-length paths from PLL output through hierarchical buffers to leaf flip-flops]({static}/images/SoC/Article07/07-clock-tree-900w.png)]({static}/images/SoC/Article07/07-clock-tree-HQ.png)
 
 All paths from source to leaf flip-flops are equal length, giving equal delay and low skew.
 
@@ -48,7 +48,7 @@ All paths from source to leaf flip-flops are equal length, giving equal delay an
 
 SoCs do not use their raw crystal oscillator frequency (typically 24--100 MHz from an external crystal) directly. Instead, a **phase-locked loop (PLL)** multiplies and divides this reference to generate the precise frequencies needed by each subsystem.
 
-[![PLL block diagram showing reference clock into phase/frequency detector, loop filter, VCO producing output, with feedback divider closing the loop]({attach}/images/SoC/Article07/07-pll-block-900w.png)]({attach}/images/SoC/Article07/07-pll-block-HQ.png)
+[![PLL block diagram showing reference clock into phase/frequency detector, loop filter, VCO producing output, with feedback divider closing the loop]({static}/images/SoC/Article07/07-pll-block-900w.png)]({static}/images/SoC/Article07/07-pll-block-HQ.png)
 
 Output frequency = Ref × (N/M) where N and M are programmable dividers.
 
@@ -67,7 +67,7 @@ A typical large SoC has 4--12 PLLs:
 
 Different parts of a SoC operate at different frequencies, and often from different clocks. A **clock domain** is a group of flip-flops all clocked by the same source.
 
-[![Clock domain tree showing crystal oscillator feeding multiple PLLs that fan out to CPU, GPU, DDR, AXI bus, APB peripherals, and always-on RTC domains at different frequencies]({attach}/images/SoC/Article07/07-clock-domains-900w.png)]({attach}/images/SoC/Article07/07-clock-domains-HQ.png)
+[![Clock domain tree showing crystal oscillator feeding multiple PLLs that fan out to CPU, GPU, DDR, AXI bus, APB peripherals, and always-on RTC domains at different frequencies]({static}/images/SoC/Article07/07-clock-domains-900w.png)]({static}/images/SoC/Article07/07-clock-domains-HQ.png)
 
 When data must cross from one clock domain to another, a **Clock Domain Crossing (CDC)** circuit is required. For example, the CPU domain and the peripheral Advanced Peripheral Bus (APB) domain run at different frequencies. Failure to handle CDCs correctly is one of the most common sources of functional bugs in SoC designs.
 
@@ -94,7 +94,7 @@ The probability of metastability resolving correctly increases with time. A **tw
 
 The two-stage synchroniser adds **two destination-clock cycles of latency** but reduces the probability of a metastability-induced failure to negligible levels. More complex CDCs (for multi-bit signals or first-in first-out (FIFO) buffers) use more sophisticated structures.
 
-![1-bit two-stage synchroniser schematic: D_in feeds FF1 (teal, may be metastable), FF1 Q feeds FF2, both clocked by DST_CLK, output is SYNC_OUT]({attach}/images/SoC/Article07/07-sync-2stage-900w.png)
+![1-bit two-stage synchroniser schematic: D_in feeds FF1 (teal, may be metastable), FF1 Q feeds FF2, both clocked by DST_CLK, output is SYNC_OUT]({static}/images/SoC/Article07/07-sync-2stage-900w.png)
 
 ---
 
@@ -197,7 +197,7 @@ digraph PowerStates {
 
 **Power gating** uses header or footer switches (large p-type (PMOS) or n-type (NMOS) transistors) to physically disconnect a domain from its supply rail, reducing leakage current to near zero:
 
-[![Power gating diagram showing VDD connected through a PMOS header switch to a virtual VDD rail supplying a logic block, with an NMOS footer switch to GND, both controlled by the PMU]({attach}/images/SoC/Article07/07-power-gating-900w.png)]({attach}/images/SoC/Article07/07-power-gating-HQ.png)
+[![Power gating diagram showing VDD connected through a PMOS header switch to a virtual VDD rail supplying a logic block, with an NMOS footer switch to GND, both controlled by the PMU]({static}/images/SoC/Article07/07-power-gating-900w.png)]({static}/images/SoC/Article07/07-power-gating-HQ.png)
 
 When the block is gated off, its internal state is lost. If the state must be preserved (for example, cache contents or CPU registers), **retention registers**: special flip-flops with a separate, always-powered supply, save critical state before power-down.
 
@@ -217,13 +217,13 @@ Where:
 
 Since power scales with V², halving the voltage reduces dynamic power by 4×. Modern SoC CPUs support many operating points, and the operating system (OS) uses a **DVFS governor** to select the appropriate operating point based on workload.
 
-[![DVFS operating points table showing five performance levels from Ultra Low at 600 MHz / 0.65 V up to Ultra High at 3.0 GHz / 1.05 V]({attach}/images/SoC/Article07/07-dvfs-900w.png)]({attach}/images/SoC/Article07/07-dvfs-HQ.png)
+[![DVFS operating points table showing five performance levels from Ultra Low at 600 MHz / 0.65 V up to Ultra High at 3.0 GHz / 1.05 V]({static}/images/SoC/Article07/07-dvfs-900w.png)]({static}/images/SoC/Article07/07-dvfs-HQ.png)
 
 ### Clock gating
 
 A lighter-weight alternative to power gating is **clock gating**: stopping the clock to a region of logic. With the clock stopped, flip-flops no longer switch, and dynamic power drops to near zero (though leakage continues). Clock gating is implemented with an **integrated clock gating cell (ICG)**:
 
-[![Integrated clock gating cell schematic showing EN input into a latch clocked by CLK, with the latch output ANDed with CLK to produce GATED_CLK, preventing glitches on enable transitions]({attach}/images/SoC/Article07/07-clock-gating-900w.png)]({attach}/images/SoC/Article07/07-clock-gating-HQ.png)
+[![Integrated clock gating cell schematic showing EN input into a latch clocked by CLK, with the latch output ANDed with CLK to produce GATED_CLK, preventing glitches on enable transitions]({static}/images/SoC/Article07/07-clock-gating-900w.png)]({static}/images/SoC/Article07/07-clock-gating-HQ.png)
 
 When EN = 0, GATED_CLK is held low (no switching). When EN = 1, GATED_CLK follows CLK normally. The internal latch captures EN during the CLK=low phase, ensuring GATED_CLK transitions only at clock boundaries and never produces a glitch:
 

@@ -29,7 +29,7 @@ The design flow exists to make bugs cheap to find early and impossible to reach 
 
 ## Overview of the flow
 
-[![SoC design flow overview]({attach}/images/SoC/Article10/10-design-flow-900w.png)]({attach}/images/SoC/Article10/10-design-flow-HQ.png)
+[![SoC design flow overview]({static}/images/SoC/Article10/10-design-flow-900w.png)]({static}/images/SoC/Article10/10-design-flow-HQ.png)
 
 ---
 
@@ -95,7 +95,7 @@ Verification is the process of proving (to sufficient confidence) that the RTL c
 
 Engineers simulate the RTL against a **testbench** that models the SoC's environment. Most modern SoC testbenches use the Universal Verification Methodology (UVM), a standardised framework for building reusable verification components:
 
-[![UVM verification environment]({attach}/images/SoC/Article10/10-verification-uvm-900w.png)]({attach}/images/SoC/Article10/10-verification-uvm-HQ.png)
+[![UVM verification environment]({static}/images/SoC/Article10/10-verification-uvm-900w.png)]({static}/images/SoC/Article10/10-verification-uvm-HQ.png)
 
 ### Coverage-Driven Verification
 
@@ -180,7 +180,7 @@ Physical design transforms the logical netlist into a physical layout: geometric
 
 The die is partitioned into regions, and major blocks are placed at approximate locations. Phase-locked loops (PLLs), physical layer interfaces (PHYs), static RAM (SRAM), and IP hard macros are placed at fixed locations first.
 
-[![Physical design floorplan]({attach}/images/SoC/Article10/10-physical-design-900w.png)]({attach}/images/SoC/Article10/10-physical-design-HQ.png)
+[![Physical design floorplan]({static}/images/SoC/Article10/10-physical-design-900w.png)]({static}/images/SoC/Article10/10-physical-design-HQ.png)
 
 ### Placement
 
