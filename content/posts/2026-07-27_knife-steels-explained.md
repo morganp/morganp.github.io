@@ -7,7 +7,7 @@ Status: published
 Summary: Why stainless resists rust, why carbon steel earned its reputation for strength, and how modern powder steels like Elmax and MagnaCut collapsed the old trade-off, with a look at the steels Leatherman, Opinel, Victorinox, and Fallkniven actually use.
 Slug: knife-steels-explained
 
-[![Bushcraft knife in profile with a magnifier over the edge showing carbide particles in the steel]({attach}/images/Outdoor/KnifeSteels/01-hero-900w.png)]({attach}/images/Outdoor/KnifeSteels/01-hero-HQ.png)
+[![Bushcraft knife in profile with a magnifier over the edge showing carbide particles in the steel]({static}/images/Outdoor/KnifeSteels/01-hero-900w.png)]({static}/images/Outdoor/KnifeSteels/01-hero-HQ.png)
 
 Choosing a grind shapes how a blade cuts, but the steel it's made from decides how long that edge lasts, how it fails under stress, and how much upkeep it needs. This is a follow-up to the piece on knife grinds, looking at steel instead of geometry, and at how the two choices work together for bushcraft and general outdoor use.
 
@@ -33,7 +33,7 @@ Chromium does not protect steel by being tough. It protects by oxidising first. 
 
 The threshold is around 10.5 to 11% chromium **in solution**, and that qualifier does the real work. Chromium locked into chromium carbides is not available to form the passive layer. A traditional stainless like 440C carries 17% chromium on the datasheet, but a large share of it is tied up in coarse chromium carbides, so the steel behaves as though it has considerably less. Worse, those carbide particles create local chemistry differences at their boundaries, which is exactly where pitting corrosion starts. High chromium on paper does not automatically mean high corrosion resistance in the hand.
 
-[![Cross-section comparing chromium in solution building an intact oxide film against chromium locked in a carbide leaving a gap and a depleted zone]({attach}/images/Outdoor/KnifeSteels/03-passive-layer-900w.png)]({attach}/images/Outdoor/KnifeSteels/03-passive-layer-HQ.png)
+[![Cross-section comparing chromium in solution building an intact oxide film against chromium locked in a carbide leaving a gap and a depleted zone]({static}/images/Outdoor/KnifeSteels/03-passive-layer-900w.png)]({static}/images/Outdoor/KnifeSteels/03-passive-layer-HQ.png)
 
 ### Why carbon steel got its reputation for strength
 
@@ -57,7 +57,7 @@ Three developments closed the gap from the other direction.
 
 **Powder metallurgy.** Conventional ingot steel solidifies slowly, and chromium carbides grow coarse as it does, sometimes tens of microns across. In PM production the molten alloy is gas-atomised into fine powder, each droplet freezing almost instantly, then consolidated under heat and pressure. The carbides never get the chance to grow. The same alloy with carbides an order of magnitude smaller is markedly tougher, takes a finer edge, and is easier to sharpen.
 
-[![Two panels at the same magnification, coarse chromium carbides in conventional ingot steel against fine powder metallurgy carbides]({attach}/images/Outdoor/KnifeSteels/02-carbides-900w.png)]({attach}/images/Outdoor/KnifeSteels/02-carbides-HQ.png)
+[![Two panels at the same magnification, coarse chromium carbides in conventional ingot steel against fine powder metallurgy carbides]({static}/images/Outdoor/KnifeSteels/02-carbides-900w.png)]({static}/images/Outdoor/KnifeSteels/02-carbides-HQ.png)
 
 **Better carbide chemistry.** Vanadium and niobium carbides are harder than chromium carbides and naturally form much smaller particles. Building wear resistance from vanadium and niobium instead of chromium gives better edge retention *and* leaves the chromium free in solution to do corrosion work.
 
