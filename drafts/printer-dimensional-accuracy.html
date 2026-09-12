@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Printer dimensional accuracy: the hole is small and the base is wide</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Why a printed hole finishes under its nominal diameter, the Bambu Studio settings that correct it, and the curve Bambu already fitted for you and..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                        <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="../category/music.html">Music</a></li>
+                                                        <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="../category/photography.html">Photography</a></li>
+                                                        <li><a href="../category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="../category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="../category/programming.html">Programming</a></li>
+                                                                        <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/printer-dimensional-accuracy.html" rel="bookmark"
+             title="Permalink to Printer dimensional accuracy: the hole is small and the base is wide">Printer dimensional accuracy: the hole is small and the base is wide</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-08-30T00:00:00+01:00">
+                Published: Sun 30 August 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/3d-print.html">3D Print</a> <a href="../tag/bambu-lab.html">Bambu Lab</a> <a href="../tag/slicer.html">Slicer</a> <a href="../tag/tolerances.html">Tolerances</a> <a href="../tag/orcaslicer.html">OrcaSlicer</a> </p>        
+</footer><!-- /.post-info -->        <p>The M3 bolt will not go through the 3mm clearance hole. The bracket rocks on the bench. The CAD measures 3.000mm and the bench is flat, so both faults belong to the printer, and both have a setting.</p>
+<p><a href="../drafts/01-two-errors-HQ.png"><img alt="Cross section of a first layer spreading wider than the layers above it, and a hole whose toolpath chords fall inside the nominal circle" src="../drafts/01-two-errors-900w.png"></a></p>
+<h2>The base spreads</h2>
+<p>Nozzle pressure against a hot plate pushes the first layer sideways, so the
+base finishes 0.1 to 0.3mm wider than the wall above it. The same displacement
+runs inward at a hole, which is why a pin slides down a hole and stops on the
+bottom layer.</p>
+<p><code>Elefant foot compensation</code> fixes both directions at once. It shrinks the solid
+area of the first layer, so the outside comes in and every hole wall goes out,
+and it touches no other layer. Every stock A1 Mini profile ships it at <strong>zero</strong>,
+while P1 and X1 profiles inherit 0.15mm.</p>
+<p>If the bulge runs up five layers rather than one, that is bed heat rather than
+squash, and no compensation reaches it. Drop the plate to 60C after the first
+layer.</p>
+<h2>Holes come out small</h2>
+<p>Three effects stack on the inside of a curve: the toolpath chords fall inside
+the true arc, extrusion on a concave path crowds toward the centre, and flow
+lags where the head slows. Each contributes a roughly fixed error in
+millimetres, so a 10mm hole loses a percent and a 3mm hole loses the bolt.</p>
+<p><code>X-Y hole compensation</code> offsets hole walls outward, <code>X-Y contour compensation</code>
+does the same for outside walls and takes a negative value. Both ship at zero.</p>
+<h2>Bambu already measured this</h2>
+<p><code>Auto circle contour-hole compensation</code> does the same job per filament and per
+diameter. Every Bambu filament profile carries a fitted curve. Bambu PLA Basic
+on an A1 Mini compensates a hole by 0.21mm at 3mm diameter, 0.20 at 4mm, 0.15
+at 10mm, and a 0.088 floor beyond about 18mm. That is the error above, measured
+and fitted.</p>
+<p>It is off by default, and no shipped process profile turns it on. The curve
+only exists for Bambu's own filaments, it only corrects circles the slicer
+recognises, up to 50mm, and switching it on would change the fit of every model
+already tuned against uncompensated printers. Do not run it alongside the
+manual settings: they stack, and on a 4mm hole the pair opens the hole by a
+quarter of a millimetre.</p>
+<h2>Measuring your own</h2>
+<p><a href="../models/hole-ladder-gauge.3mf">Download the ladder gauge (3mf)</a>, or the
+<a href="../models/hole-ladder-gauge.scad">OpenSCAD source</a>. One card of thirteen
+holes, 3.70 to 4.30 in 0.05mm steps, and a 4.00mm pin. Both the pin and the
+holes have the squashed layer kept clear of the fit, the pin by a foot and the
+holes by a lead-in cone.</p>
+<p>A 4.00 pin never enters a 4.00 hole, since two equal diameters interfere. The
+target is the pin entering at 4.05.</p>
+<ol>
+<li>Print card and pin with every compensation at zero.</li>
+<li>Measure the pin across the outside jaws. Anything over 4.00 is contour
+   error, so contour compensation is minus half of it.</li>
+<li>Find the smallest hole the pin enters. Subtract the pin diameter, then the
+   0.05 a sliding fit needs. Half of what remains is your hole compensation.</li>
+<li>Reprint and confirm the pin enters at 4.05 and passes all the way through.</li>
+</ol>
+<p>Do elephant foot first. A narrowed bottom layer stops the pin whatever the rest
+of the hole measures, and correcting the wrong fault twice is how an afternoon
+disappears.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
