@@ -64,14 +64,14 @@
 <p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/computer-architecture.html">Computer Architecture</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/embedded-systems.html">Embedded Systems</a> <a href="./tag/linux.html">Linux</a> <a href="./tag/firmware.html">Firmware</a> <a href="./tag/boot.html">Boot</a> <a href="./tag/device-drivers.html">Device Drivers</a> <a href="./tag/rtos.html">RTOS</a> </p>        
 </footer><!-- /.post-info -->        <p><em>Series: Introduction to SoC Design | Article 11 of 11</em></p>
 <hr>
-<p><a href="./hw-sw-co-design-HQ.png"><img alt="HW/SW Co-Design header illustration" src="./hw-sw-co-design-900w.png"></a></p>
+<p><a href="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hw-sw-co-design-HQ.png"><img alt="HW/SW Co-Design header illustration" src="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hw-sw-co-design-900w.png"></a></p>
 <h2>Introduction</h2>
 <p>Throughout this series, we have focused primarily on the hardware side of SoC design: the processors, memory, buses, and physical implementation. But a SoC without software is inert. The firmware that boots it, the operating system that manages its resources, the drivers that talk to its peripherals, and the applications that use it are just as important as the hardware itself.</p>
 <p><strong>HW/SW Co-Design</strong> is the discipline of designing hardware and software together, recognising that they are inseparable aspects of the same system. This article brings together the software side of the SoC story, covering the boot process, device drivers, the OS interface, and the co-design trade-offs that shape every product decision.</p>
 <hr>
 <h2>The HW/SW interface: where they meet</h2>
 <p>Hardware and software communicate through a small number of well-defined mechanisms:</p>
-<p><a href="./hwsw-interface-HQ.png"><img alt="HW/SW Interface Mechanisms diagram" src="./hwsw-interface-900w.png"></a></p>
+<p><a href="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hwsw-interface-HQ.png"><img alt="HW/SW Interface Mechanisms diagram" src="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hwsw-interface-900w.png"></a></p>
 <h3>Memory-Mapped Registers</h3>
 <p>The primary interface between software and hardware on a SoC is <strong>memory-mapped I/O</strong>: every hardware block exposes a set of control and status registers (CSRs) at fixed addresses in the physical address space.</p>
 <div class="highlight"><pre><span></span><code><span class="nx">Typical</span><span class="w"> </span><span class="nx">UART</span><span class="w"> </span><span class="nx">Register</span><span class="w"> </span><span class="nx">Map</span><span class="w"> </span><span class="p">(</span><span class="kd">base</span><span class="w"> </span><span class="nx">address</span><span class="p">:</span><span class="w"> </span><span class="mh">0x4000</span><span class="nx">_0000</span><span class="p">):</span>
@@ -97,7 +97,7 @@
 <hr>
 <h2>The Software Stack</h2>
 <p>The software on a SoC is organised in layers, each depending on the layer below it:</p>
-<p><a href="./software-stack-HQ.png"><img alt="Software stack layers diagram" src="./software-stack-900w.png"></a></p>
+<p><a href="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/software-stack-HQ.png"><img alt="Software stack layers diagram" src="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/software-stack-900w.png"></a></p>
 <hr>
 <h2>The Boot Process</h2>
 <p>Bringing a SoC from cold power-up to a running operating system is a multi-stage process, each stage loading and executing the next:</p>
@@ -159,7 +159,7 @@
 <hr>
 <h2>HW/SW Partitioning</h2>
 <p>The most important architectural decision in co-design is <strong>which functions to implement in hardware and which in software</strong>. This partitioning determines performance, power, flexibility, and development cost.</p>
-<p><a href="./hwsw-partitioning-HQ.png"><img alt="HW/SW partitioning decision matrix" src="./hwsw-partitioning-900w.png"></a></p>
+<p><a href="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hwsw-partitioning-HQ.png"><img alt="HW/SW partitioning decision matrix" src="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hwsw-partitioning-900w.png"></a></p>
 <h3>Real trade-off examples</h3>
 <p><strong>AES Encryption:</strong>
 - Software (Cortex-A, 1 core): ~300 MB/s, ~200 mW
@@ -177,7 +177,7 @@
 <h2>Co-Simulation and Co-Verification</h2>
 <p>HW/SW co-design requires testing both halves together before silicon exists. There are several approaches:</p>
 <p><strong>Virtual platform and virtual prototype</strong>: a software model of the SoC, typically written in SystemC/Transaction-Level Modelling (TLM), that runs on a host workstation. The firmware binary is compiled for the target ISA and runs on an instruction-set simulator (ISS). This allows firmware development to begin before RTL is complete.</p>
-<p><a href="./virtual-platform-HQ.png"><img alt="Virtual platform architecture diagram" src="./virtual-platform-900w.png"></a></p>
+<p><a href="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/virtual-platform-HQ.png"><img alt="Virtual platform architecture diagram" src="./posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/virtual-platform-900w.png"></a></p>
 <p><strong>FPGA prototyping</strong>: the RTL is synthesised onto one or more large FPGAs, running at 5-50 MHz. Real firmware and software run on the FPGA, providing a cycle-accurate model that can run full Linux. FPGA prototyping boards (Xilinx VCU118, Intel Stratix 10) are essential tools for pre-silicon software development.</p>
 <p><strong>Hardware emulation</strong>: as discussed in Article 10, emulators compile the RTL into custom FPGAs that run at MHz speeds, supporting real-time testing with actual peripherals.</p>
 <hr>
