@@ -31,7 +31,14 @@ READERS = {'html': None}
 # inside the directory content/
 # The contents of img/ will be available at 
 # {{ SITEURL }}/img
-STATIC_PATHS = ['images', 'pdf', 'models', 'extra', 'drum_rudiments', 'wavedrom-editor']
+# 'posts' is a static path as well as ARTICLE_PATHS so that folder-style posts
+# can keep their images beside the markdown and still serve from a folder URL.
+# Article sources are skipped by STATIC_EXCLUDE_SOURCES, which defaults to True.
+STATIC_PATHS = ['images', 'pdf', 'models', 'extra', 'drum_rudiments', 'wavedrom-editor', 'posts']
+
+# Defaults plus macOS clutter and the extensionless Jekyll leftover at
+# content/posts/_, none of which should be copied into the built site.
+IGNORE_FILES = ['**/.*', '.DS_Store', '_']
 EXTRA_PATH_METADATA = {'extra/custom.css': {'path': 'static/custom.css'}}
 STYLESHEET_URL = '/static/custom.css'
 

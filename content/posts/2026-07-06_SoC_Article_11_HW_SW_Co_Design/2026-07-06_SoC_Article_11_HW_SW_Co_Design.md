@@ -11,7 +11,7 @@ Status: published
 
 ---
 
-[![HW/SW Co-Design header illustration]({attach}hw-sw-co-design-900w.png)]({attach}hw-sw-co-design-HQ.png)
+[![HW/SW Co-Design header illustration]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hw-sw-co-design-900w.png)]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hw-sw-co-design-HQ.png)
 
 ## Introduction
 
@@ -25,7 +25,7 @@ Throughout this series, we have focused primarily on the hardware side of SoC de
 
 Hardware and software communicate through a small number of well-defined mechanisms:
 
-[![HW/SW Interface Mechanisms diagram]({attach}hwsw-interface-900w.png)]({attach}hwsw-interface-HQ.png)
+[![HW/SW Interface Mechanisms diagram]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hwsw-interface-900w.png)]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hwsw-interface-HQ.png)
 
 ### Memory-Mapped Registers
 
@@ -60,7 +60,7 @@ This read-modify-write register interface is the universal pattern for SoC firmw
 
 The software on a SoC is organised in layers, each depending on the layer below it:
 
-[![Software stack layers diagram]({attach}software-stack-900w.png)]({attach}software-stack-HQ.png)
+[![Software stack layers diagram]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/software-stack-900w.png)]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/software-stack-HQ.png)
 
 ---
 
@@ -173,7 +173,7 @@ When Linux boots, it reads the Device Tree, matches `compatible` strings to regi
 
 The most important architectural decision in co-design is **which functions to implement in hardware and which in software**. This partitioning determines performance, power, flexibility, and development cost.
 
-[![HW/SW partitioning decision matrix]({attach}hwsw-partitioning-900w.png)]({attach}hwsw-partitioning-HQ.png)
+[![HW/SW partitioning decision matrix]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hwsw-partitioning-900w.png)]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/hwsw-partitioning-HQ.png)
 
 ### Real trade-off examples
 
@@ -200,7 +200,7 @@ HW/SW co-design requires testing both halves together before silicon exists. The
 
 **Virtual platform and virtual prototype**: a software model of the SoC, typically written in SystemC/Transaction-Level Modelling (TLM), that runs on a host workstation. The firmware binary is compiled for the target ISA and runs on an instruction-set simulator (ISS). This allows firmware development to begin before RTL is complete.
 
-[![Virtual platform architecture diagram]({attach}virtual-platform-900w.png)]({attach}virtual-platform-HQ.png)
+[![Virtual platform architecture diagram]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/virtual-platform-900w.png)]({static}/posts/2026-07-06_SoC_Article_11_HW_SW_Co_Design/virtual-platform-HQ.png)
 
 **FPGA prototyping**: the RTL is synthesised onto one or more large FPGAs, running at 5-50 MHz. Real firmware and software run on the FPGA, providing a cycle-accurate model that can run full Linux. FPGA prototyping boards (Xilinx VCU118, Intel Stratix 10) are essential tools for pre-silicon software development.
 

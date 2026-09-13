@@ -19,7 +19,7 @@ In the previous article we traced the seventy-year journey from room-sized mainf
 
 ## The Board-to-Silicon Transition
 
-![image]({attach}Gemini_Generated_Image_yhyy7hyhyy7hyhyy-901w.png)
+![image]({static}/posts/2026-03-15_SoC_Article_02_Anatomy_and_Motivation/Gemini_Generated_Image_yhyy7hyhyy7hyhyy-901w.png)
 
 In traditional electronics, a "system" was a **circuit board** populated with many separate chips, each performing one role: a CPU chip, a separate memory controller, a graphics processor, communication peripheral chips, and a power management IC, all connected by copper traces on the PCB.
 
@@ -33,7 +33,7 @@ The term "SoC" emerged formally in the mid-1990s when transistor densities cross
 
 ## Why Does Integration Matter?
 
-![image]({attach}Gemini_Generated_Image_yhyy7hyhyy7hyhyy-2-900w.png)
+![image]({static}/posts/2026-03-15_SoC_Article_02_Anatomy_and_Motivation/Gemini_Generated_Image_yhyy7hyhyy7hyhyy-2-900w.png)
 
 [![Four benefits of integration shown as a 2x2 grid: Speed (on-chip nanoseconds vs PCB 60-100ns), Power Efficiency (low-voltage on-chip signalling vs high-drive off-chip), Area and Cost (fewer chips, smaller PCB), and Reliability (fewer solder joints)]({static}/images/SoC/Article02/02-integration-benefits-900w.png)]({static}/images/SoC/Article02/02-integration-benefits-HQ.png)
 
@@ -59,7 +59,7 @@ Solder joints and connectors are the most common failure points in electronic as
 
 ## The Anatomy of a Generic SoC
 
-![image]({attach}Gemini_Generated_Image_yhyy7hyhyy7hyhyy-3-900w.png)
+![image]({static}/posts/2026-03-15_SoC_Article_02_Anatomy_and_Motivation/Gemini_Generated_Image_yhyy7hyhyy7hyhyy-3-900w.png)
 
 While no two SoCs are identical, most share a recognisable set of functional blocks:
 
@@ -103,7 +103,7 @@ Dedicated hardware for encryption, secure boot, key storage, and access control.
 
 ## SoC Examples in the Real World
 
-![image]({attach}Gemini_Generated_Image_yhyy7hyhyy7hyhyy-4-900w.png)
+![image]({static}/posts/2026-03-15_SoC_Article_02_Anatomy_and_Motivation/Gemini_Generated_Image_yhyy7hyhyy7hyhyy-4-900w.png)
 
 | SoC | Application | Notable Features |
 |-----|-------------|-----------------|
@@ -120,7 +120,7 @@ The range here is important. An SoC is not just a smartphone chip. The same inte
 
 ---
 
-![image]({attach}Gemini_Generated_Image_yhyy7hyhyy7hyhyy-5-900w.png)
+![image]({static}/posts/2026-03-15_SoC_Article_02_Anatomy_and_Motivation/Gemini_Generated_Image_yhyy7hyhyy7hyhyy-5-900w.png)
 
 ## The Complexity Challenge
 

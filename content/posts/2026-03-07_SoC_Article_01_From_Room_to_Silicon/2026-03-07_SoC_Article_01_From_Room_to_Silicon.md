@@ -10,7 +10,7 @@ Summary: How computing evolved from room-filling mainframes to a sliver of silic
 
 ---
 
-![image]({attach}e94c024c96e0d5c9d4abd4ff88d2b54b0c6220e6da4821532a97d5e0972e0297-901w.jpg)
+![image]({static}/posts/2026-03-07_SoC_Article_01_From_Room_to_Silicon/e94c024c96e0d5c9d4abd4ff88d2b54b0c6220e6da4821532a97d5e0972e0297-901w.jpg)
 
 ## Introduction
 
@@ -80,7 +80,7 @@ The economics were equally extreme: only universities, large corporations, gover
 
 ---
 
-![image]({attach}75c93b948fd4c7e4d5d2bd57310eae25d63ba86933920bd1896ee562c266c3a4-900w.jpg)
+![image]({static}/posts/2026-03-07_SoC_Article_01_From_Room_to_Silicon/75c93b948fd4c7e4d5d2bd57310eae25d63ba86933920bd1896ee562c266c3a4-900w.jpg)
 
 ## Era 2: The Minicomputer (1965–1975)
 
