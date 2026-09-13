@@ -143,15 +143,22 @@ Do not use `{attach}` for these. It relocates the file beside the rendered
 article, which for a root-level article means the root of the site, losing the
 folder and risking a filename collision with another post.
 
-To check for a regression after a build, count the images that landed at the
-root:
+Folder-style posts under `content/posts/<Post>/` may keep their images beside
+the markdown. `posts` is in `STATIC_PATHS` for that reason, so reference those
+with the folder in the path:
 
-```bash
-ls output/*.png | wc -l
+```markdown
+![description]({static}/posts/2026-07-06_My_Post/diagram-900w.png)
 ```
 
-Only the folder-style posts under `content/posts/<Post>/` that keep images
-beside their markdown should appear there.
+They serve from `/posts/<Post>/diagram-900w.png`.
+
+To check for a regression after a build, count the images that landed at the
+root. It should be zero:
+
+```bash
+ls output/*.png output/*.jpg 2>/dev/null | wc -l
+```
 
 ## Deployment Flow
 
