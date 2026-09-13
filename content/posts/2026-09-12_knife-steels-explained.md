@@ -1,5 +1,5 @@
 Title: Knife Steels Explained: Hardness, Toughness, and Edge Retention
-Date: 2026-07-27
+Date: 2026-09-12
 Category: Outdoor
 Tags: knives, steel, bushcraft, outdoor, gear, metallurgy
 Author: morganp
