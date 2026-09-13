@@ -95,8 +95,9 @@ Run `make` with no args to see all targets.
 5. **Images**: Store images in `content/images/` and reference them correctly.
    - Display images must be no wider than 900px and optimised for fast loading.
    - For generated images: produce a full-res version (suffix `-HQ.png`) and a 900px display version (suffix `-900w.png`) using `sips -Z 900 HQ.png --out 900w.png`.
-   - When embedding in posts, display the 900px version. If a high-res version exists, link to it so clicking opens the full resolution: `[![alt]({attach}/images/Sub/img-900w.png)]({attach}/images/Sub/img-HQ.png)`
-   - If no HQ version, use a plain image embed: `![alt]({attach}/images/Sub/img-900w.png)`
+   - When embedding in posts, display the 900px version. If a high-res version exists, link to it so clicking opens the full resolution: `[![alt]({static}/images/Sub/img-900w.png)]({static}/images/Sub/img-HQ.png)`
+   - If no HQ version, use a plain image embed: `![alt]({static}/images/Sub/img-900w.png)`
+   - **Use `{static}`, never `{attach}`.** `{attach}` copies the file next to the rendered article, and articles render at the site root, so every attached image is published to the root of the site rather than under `/images/`. That flattening also collides: two posts that each attach their own `01-hero-900w.png` overwrite each other, and whichever builds last wins the URL. `{static}` leaves the file under `content/images/`, so the URL keeps the folder, `/images/Outdoor/KnifeSteels/01-hero-900w.png`.
 6. **Themes**: Do not modify files inside `themes/` unless explicitly told to.
 7. **Configuration**: When updating settings, prefer modifying `pelicanconf.py` over `publishconf.py`.
 8. **Art / Image Generation**: Always apply the lizard-spock site aesthetic when using the `/art` skill or generating any image for this blog. The style guide is at `~/.claude/skills/art/aesthetics/lizard-spock.md` — read it before constructing any image prompt.
@@ -132,10 +133,25 @@ Categories: Engineering, Home & Garden, Hardware & Homelab, Music, Photography, 
 ## Image References in Posts
 
 ```markdown
-![description]({attach}/images/SubFolder/photo.jpg)
+![description]({static}/images/SubFolder/photo.jpg)
 ```
 
-Images go in `content/images/` and are configured as a static path.
+Images go in `content/images/` and are configured as a static path, so
+`{static}` resolves to `/images/SubFolder/photo.jpg` on the built site.
+
+Do not use `{attach}` for these. It relocates the file beside the rendered
+article, which for a root-level article means the root of the site, losing the
+folder and risking a filename collision with another post.
+
+To check for a regression after a build, count the images that landed at the
+root:
+
+```bash
+ls output/*.png | wc -l
+```
+
+Only the folder-style posts under `content/posts/<Post>/` that keep images
+beside their markdown should appear there.
 
 ## Deployment Flow
 
