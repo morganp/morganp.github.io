@@ -2,6 +2,8 @@
 
 Pelican static site generator blog, hosted on GitHub Pages at lizard-spock.co.uk. Source lives on `main` branch; built HTML is deployed to `gh-pages` branch.
 
+Renderer versions and the diagram cache policy live in `AGENTS.md`.
+
 ## Core Structure
 - `content/`: Contains all Markdown/reStructuredText articles and pages.
 - `content/pages/`: Static pages (About, Contact, etc.).
