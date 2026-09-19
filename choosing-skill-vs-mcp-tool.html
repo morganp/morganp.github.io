@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Skill or MCP tool? A rule of thumb for Claude integrations</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="A practical rule for deciding whether a new Claude capability should be a skill (prompted procedure) or an MCP tool (deterministic lookup/action),..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./choosing-skill-vs-mcp-tool.html" rel="bookmark"
+             title="Permalink to Skill or MCP tool? A rule of thumb for Claude integrations">Skill or MCP tool? A rule of thumb for Claude integrations</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-09-13T00:00:00+01:00">
+                Published: Sun 13 September 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/programming.html">Programming</a>.</p>
+<p>tags: <a href="./tag/claude.html">claude</a> <a href="./tag/mcp.html">mcp</a> <a href="./tag/skills.html">skills</a> <a href="./tag/architecture.html">architecture</a> <a href="./tag/secondbrain.html">secondbrain</a> </p>        
+</footer><!-- /.post-info -->        <h2>The question</h2>
+<p>While extending my SecondBrain <code>/morning</code> briefing, I wanted to add a couple of small daily extras: a "Daily Stoic" quote, and a "daily knot" tip. Both are just: look up today's entry from a fixed, pre-compiled dataset. The question was whether these belonged in the skillbook (as <code>SKILL.md</code> procedures) or as tools on the SecondBrain MCP server.</p>
+<p>It turned out I'd already answered this once without noticing — <code>get_daily_stoic</code> already exists as an MCP tool, not a skill. That accident turned out to be the right call, and thinking through <em>why</em> gave a rule of thumb worth writing down.</p>
+<h2>The distinction: lookup vs. reasoning</h2>
+<p>The deciding factor isn't whether the feature calls an external API. It's whether the work being done is <strong>lookup</strong> or <strong>reasoning</strong>.</p>
+<ul>
+<li><strong>MCP tool</strong> — a fixed dataset (say, a JSON or markdown table keyed by date) behind a thin function that does a deterministic lookup. No model judgment is involved in producing the content itself; the same input always returns the same output.</li>
+<li><strong>Skill</strong> — a procedure the model follows using judgment: formatting rules, what to prioritize, how to phrase things, what to omit. My existing <code>daily-summary</code> skill is a good example — it reasons over goals, actions, and due dates fresh each time, and that reasoning <em>is</em> the value it adds.</li>
+</ul>
+<p>A "daily knot" or "daily quote" is a lookup, not a procedure. Building it as a skill would mean stuffing a reference file into context every time the briefing runs and asking the model to "pick today's entry" — non-deterministic, token-heavy, and re-deriving the same answer every session for no benefit.</p>
+<h2>The practical shape this takes</h2>
+<ol>
+<li><strong>Curate the data once.</strong> For something like knots, that's a one-time content pass — pull entries from reference books into a small structured file (<code>knots.json</code> or similar), living wherever the Stoic dataset already lives on the MCP server. This is content curation, not a recurring skill invocation.</li>
+<li><strong>Add a matching tool.</strong> A <code>get_daily_knot</code> tool mirroring <code>get_daily_stoic</code>'s signature — optional date param in, name/use-case/steps/source out.</li>
+<li><strong>Let the skill stay thin.</strong> The <code>/morning</code> skill just calls both tools and renders the results under a small section, alongside calendar, actions, and reminders. The skill layer keeps doing what it's good at (formatting, prioritization); the MCP layer keeps doing what it's good at (deterministic data serving).</li>
+</ol>
+<h2>Why this matters beyond one feature</h2>
+<p>Keeping lookups out of skills has a few compounding benefits:</p>
+<ul>
+<li><strong>Determinism.</strong> A tool call returns the same thing for the same date, every time, regardless of which client or model is asking.</li>
+<li><strong>Reusability.</strong> An MCP tool is available to <em>any</em> MCP client, not just a Claude session with the skillbook loaded.</li>
+<li><strong>Cheaper composition.</strong> No need to re-read a big reference file into context on every invocation — the skill only pays for the small rendered result.</li>
+</ul>
+<p>The one design question this doesn't answer on its own: should a lookup like this rotate by calendar date (fixed 365-entry cycle, like the Stoic quote) or independently (random-but-non-repeating, needing far fewer entries plus a rotation pointer)? That's a smaller decision, but worth making explicitly before building the dataset — it changes how much content curation is actually required up front.</p>
+<p><strong>Rule of thumb:</strong> if adding the feature means writing a <code>SKILL.md</code> that just tells the model "here's a list, pick today's one" — it's not a skill. Put the list behind a tool, and let the skill call the tool.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

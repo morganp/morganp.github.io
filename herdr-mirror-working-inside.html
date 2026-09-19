@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Working inside a herdr mirror</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="A mirror workspace is a real local workspace, so every native command inside it acts on the local machine, including the plus button in the tab..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./herdr-mirror-working-inside.html" rel="bookmark"
+             title="Permalink to Working inside a herdr mirror">Working inside a herdr mirror</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-09-19T00:00:00+01:00">
+                Published: Sat 19 September 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="./tag/herdr.html">herdr</a> <a href="./tag/terminal.html">terminal</a> <a href="./tag/keybindings.html">keybindings</a> <a href="./tag/ssh.html">ssh</a> <a href="./tag/dotfiles.html">dotfiles</a> </p>        
+</footer><!-- /.post-info -->        <p>The sidebar carries <code>homelab: ~</code> next to the local spaces, the panes stream,
+and the agent on the other machine reports its state where you can see it.
+Then you press the key for a new tab, and a shell opens on the laptop.</p>
+<p><a href="./images/Unix/HerdrMirror/02-hero-HQ.png"><img alt="A blank keycap with two arrows leaving it: an amber arrow to a window with a purple title bar for the remote host, and a charcoal arrow to a plain window for the local machine" src="./images/Unix/HerdrMirror/02-hero-900w.png"></a></p>
+<p>This post is for anyone already running the <code>herdr-mirror</code> plugin and working
+in a mirror day to day. It covers creating tabs and whole spaces on the remote
+host, getting scrolling to work, and the limits of the setup. Setting the link
+up in the first place is part one:
+<a href="./herdr-mirror-remote-sidebar.html">Mirroring a remote herdr server</a>.</p>
+<p>This post calls herdr's modifier key the leader, following vim. The
+configuration file spells it <code>prefix</code>, so the key bindings read <code>prefix+c</code>
+while the prose says leader and <code>c</code>.</p>
+<h2>Keeping new tabs and spaces on the remote</h2>
+<p>A mirror workspace is a genuine local workspace, and herdr has no concept of
+mirroring. Every native command inside that workspace therefore acts locally,
+which produces the most common surprise in this setup.</p>
+<p>Open a mirror, press leader and <code>c</code> for a new tab, and you get a local tab.
+It runs a shell on your own machine, inside a workspace whose other panes live
+on the remote. The plugin never created that tab, so it never syncs it. The tab
+counts give the mismatch away:</p>
+<div class="highlight"><pre><span></span><code>local  homelab: ~   2 tabs, 2 panes
+remote w2           1 tab,  1 pane
+</code></pre></div>
+
+<p>The plus button in the tab bar behaves the same way. It calls herdr's native
+new tab action directly rather than passing through a key binding, so it
+always creates a local tab. No configuration changes that. Treat the plus
+button as the local option and use a key for the remote one.</p>
+<p>The fix is to bind the plugin's remote actions. Each one falls back to the
+plain local action when you invoke it outside a mirror, so the native keys can
+point at them and cover both cases:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[keys]</span>
+<span class="n">new_tab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+shift+c&quot;</span>
+<span class="n">split_vertical</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+shift+v&quot;</span>
+<span class="n">split_horizontal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+shift+minus&quot;</span>
+
+<span class="k">[[keys.command]]</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+c&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;plugin_action&quot;</span>
+<span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mirror.remote-new-tab&quot;</span>
+
+<span class="k">[[keys.command]]</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+v&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;plugin_action&quot;</span>
+<span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mirror.remote-split-right&quot;</span>
+
+<span class="k">[[keys.command]]</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+minus&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;plugin_action&quot;</span>
+<span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mirror.remote-split-down&quot;</span>
+</code></pre></div>
+
+<p>Declare the <code>[keys]</code> table before the <code>[[keys.command]]</code> blocks. Placing it
+after them risks a table redefinition error, because the array entries create
+the <code>keys</code> table implicitly.</p>
+<p>After a <code>herdr server reload-config</code>, leader and <code>c</code> creates a tab on the
+mirrored host, and the plus button still creates a local one. The natives
+remain available on their shift variants.</p>
+<p>This scheme has one cost. The remapped keys now depend on the plugin staying
+installed and enabled, because no native binding sits behind them any more.
+The shift variants remain as the escape hatch.</p>
+<p>Splits carry an extra rule. On a non-mirrored pane inside a mirror workspace,
+<code>remote-split-right</code> and <code>remote-split-down</code> report an error rather than
+splitting locally. A local split there would desync the mirrored layout, so
+the plugin refuses instead of making the mismatch worse.</p>
+<h3>A whole space on the remote</h3>
+<p>The same rule extends one level up. <code>mirror.remote-new-workspace</code> creates a
+workspace on the mirrored host, and the daemon brings it back within seconds as
+a new <code>homelab: &lt;name&gt;</code> space in the local sidebar. It inherits the host and
+the working directory from the mirror you invoke it from.</p>
+<p>Native <code>new_workspace</code> already sits on <code>prefix+shift+n</code>, so the remote version
+takes the same key with alt added:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[[keys.command]]</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prefix+alt+n&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;plugin_action&quot;</span>
+<span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mirror.remote-new-workspace&quot;</span>
+</code></pre></div>
+
+<p>Pressed outside a mirror it creates a plain local workspace, so the binding is
+safe anywhere. This is the shortest route into the remote machine: one key, and
+a space appears in the sidebar with its shell already on the other end.</p>
+<h2>Getting scrolling to work</h2>
+<p>Start an agent in a pane, then reach for the wheel. Nothing moves, or the
+agent's own prompt history cycles under your fingers. The pane holds thousands
+of lines and none of them come back.</p>
+<p>The cause is mouse reporting. An agent command line interface (CLI) grabs the
+mouse so it can handle clicks and drags itself, and a grabbed mouse owns the
+wheel too. The event
+never reaches herdr's pane scrollback.</p>
+<p>Two routes avoid the grab, and they reach different buffers.</p>
+<p>Ghostty handles the first. Setting <code>mouse-shift-capture = false</code> reserves shift
+for the terminal:</p>
+<div class="highlight"><pre><span></span><code># Shift+scroll always scrolls terminal scrollback, even when a TUI app
+# captures the mouse
+mouse-shift-capture = false
+</code></pre></div>
+
+<p>Hold shift and scroll, and the wheel bypasses whatever grabbed the mouse. That
+wheel reaches Ghostty's own scrollback, the window as Ghostty painted it, rather
+than herdr's pane scrollback. Output from before the current layout is not in
+it, and the sidebar and the neighbouring panes scroll as part of the same
+rectangle. This route gives a quick look backwards, not a pane-scoped view.</p>
+<p>herdr's copy mode is the second route and the precise one. <code>prefix+[</code> enters
+it, the arrow and page keys move through that pane's own scrollback, and <code>q</code>
+leaves. A keyboard route never touches the mouse grab, so the foreground
+application stops mattering. Spell the binding <code>prefix+[</code>, because the config
+parser rejects <code>prefix+bracketleft</code>.</p>
+<h3>Mirror panes are still unsolved</h3>
+<p>Neither route reaches a mirror pane's history, and the reason is a trade you
+have probably already made.</p>
+<p>Copying text out of a mirror pane fails by default. The plugin forwards raw
+mouse events to the remote whenever the pane's foreground process is not a
+known shell, and an agent CLI does not appear on that list, so every drag goes
+to the remote and no local selection happens. The fix is per host:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[hosts.homelab]</span>
+<span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;herdr-homelab&quot;</span>
+<span class="n">forward_mouse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</code></pre></div>
+
+<p>That releases the mouse grab, and the wheel goes with it. An ungrabbed pane in
+the alternate screen falls back to alternate scroll, where herdr turns each
+notch into an Up or Down key that the remote reads as history recall. The
+plugin therefore sends <code>?1007l</code> to switch alternate scroll off, which leaves
+the wheel inert rather than wrong.</p>
+<p>Holding shift and scrolling still reads Ghostty's buffer, and the remote
+application's own keys still work. Nothing reaches remote pane scrollback from
+inside a mirror, and turning <code>forward_mouse</code> back on to recover the wheel costs
+local selection again.</p>
+<h2>Limitations</h2>
+<p>Five constraints apply once the mirror is running.</p>
+<ul>
+<li>The plugin tracks the streaming protocol, so both ends need matching builds.</li>
+<li>Keystroke echo costs a frame round trip, which adds a small constant delay
+  compared with raw ssh.</li>
+<li>Mirror workspaces show no git information, because herdr derives the sidebar
+  branch from a local working directory.</li>
+<li>A mirror is only as reachable as its host, and the daemon reports a
+  readable status when a host goes away.</li>
+<li>Wheel scrollback does not work in a mirror pane while <code>forward_mouse = false</code>,
+  the setting that makes local selection work.</li>
+</ul>
+<p>None of these change the reason to run it. The value is the sidebar: one
+window, every machine, and every agent reporting its state where you are
+already looking.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
