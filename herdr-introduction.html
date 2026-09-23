@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>herdr, a terminal for coding agents</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="herdr is a terminal multiplexer built around coding agents. It marks every pane working, blocked or idle, so a stopped agent announces itself, it..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./herdr-introduction.html" rel="bookmark"
+             title="Permalink to herdr, a terminal for coding agents">herdr, a terminal for coding agents</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-09-23T00:00:00+01:00">
+                Published: Wed 23 September 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/unix-tools.html">Unix & Tools</a>.</p>
+<p>tags: <a href="./tag/herdr.html">herdr</a> <a href="./tag/terminal.html">terminal</a> <a href="./tag/tmux.html">tmux</a> <a href="./tag/agents.html">agents</a> <a href="./tag/workflow.html">workflow</a> </p>        
+</footer><!-- /.post-info -->        <p>Five agents are running across four tabs. One of them stopped two minutes ago
+to ask a yes or no question, and the other four are still working. Finding the
+one that is waiting means visiting all four tabs.</p>
+<p><a href="./images/Unix/HerdrMirror/01-hero-HQ.png"><img alt="A terminal workspace window: the sidebar lists a local space and a purple remote space, and an amber line carries the remote session from that entry into the main pane" src="./images/Unix/HerdrMirror/01-hero-900w.png"></a></p>
+<p>This post introduces herdr, a terminal multiplexer built for running coding
+agents, and is for anyone who currently runs those agents in tmux or in a pile
+of terminal tabs. herdr does not wrap or replace the agents. It owns their
+terminals, the way tmux owns a shell, and it tracks the state of each one.</p>
+<h2>What herdr is</h2>
+<p>herdr is one Rust binary that runs as a background server with a thin client
+in front of it. The server owns the terminals. The client draws them, and you
+can close it without stopping the work.</p>
+<p>The layout has three levels. A space holds tabs, a tab holds panes, and a pane
+holds one process. A sidebar down the left lists the spaces and every agent
+running inside them.</p>
+<p>Anyone coming from tmux will recognise the shape. A space is close to a tmux
+session, a tab to a window, and a pane to a pane. The prefix key works the same
+way, and defaults to <code>ctrl+b</code>.</p>
+<h2>The sidebar knows which agent is stuck</h2>
+<p>Every pane carries a state, and herdr marks it working, blocked or idle. An
+agent that stops to ask a question shows as blocked in the sidebar, next to the
+name of the tab it lives in.</p>
+<p>This solves the problem in the opening paragraph. Instead of walking four tabs
+to find the one waiting on an answer, you read the sidebar and go straight
+there. On a busy machine with several agents, this is the difference between
+noticing in two seconds and noticing in ten minutes.</p>
+<p>tmux has no equivalent, because tmux has no idea what runs inside a pane. It
+can show you a window name and a process name. It cannot tell you that Claude
+Code is sitting at a confirmation prompt.</p>
+<h2>What survives a restart</h2>
+<p>Detaching leaves everything running. Press the prefix and <code>q</code>, and the client
+exits while the server keeps every pane alive. Run <code>herdr</code> again to reattach.
+An ssh connection that drops takes the client with it and leaves the work
+untouched.</p>
+<p>tmux does this too, and has done for twenty years. The difference appears at
+the next restart. After the server or the machine restarts, herdr brings back
+the saved layout: the spaces, the tabs and the panes return in place.</p>
+<p>The limit matters, because a restored layout looks more complete than it is.
+The original processes do not survive a restart. herdr can resume a supported
+agent session natively, using the agent's own resume command, but a shell
+command that was running is gone. The layout returns, and the work inside
+it needs restarting.</p>
+<h2>Mouse and keyboard, both first class</h2>
+<p>Click a pane to focus it. Drag a border to resize it. Drag across text to
+select it. None of that needs configuration, and the prefix key bindings work
+at the same time, so the choice is per moment rather than per tool.</p>
+<p>tmux ships with the mouse off. Until <code>set -g mouse on</code> reaches <code>.tmux.conf</code>,
+clicking a pane does nothing and dragging a border does nothing. The setting is
+one line, and every new tmux user has to learn about that line first.</p>
+<h2>Scrolling that works before you configure it</h2>
+<p>The difference shows most clearly in scrollback. In herdr, the wheel scrolls
+the focused pane's history immediately, three lines per notch, which
+<code>ui.mouse_scroll_lines</code> changes. PageUp and PageDown reach the same history in
+an ordinary shell pane, and herdr forwards them to full-screen applications
+that want them instead.</p>
+<p>Two more routes reach the same history. <code>prefix+[</code> enters copy mode for
+keyboard selection, and <code>prefix+e</code> opens the current pane's scrollback in
+<code>$EDITOR</code> inside a temporary zoomed pane, which beats scrolling when the
+interesting output is a screen or two back.</p>
+<p>The tmux trap here is specific and catches people for months. With the mouse
+off, the terminal turns the wheel into Up and Down key presses, and the
+application in the pane receives them as key presses. Scrolling a shell then
+walks your command history, and scrolling an agent command line interface
+(CLI) cycles its prompt history. The wheel appears to do something random
+rather than nothing.</p>
+<p>One honest caveat about herdr. An application that grabs the mouse for its own
+purposes takes the wheel with it, and most agent CLIs do exactly that. In
+those panes, copy mode still scrolls, and a terminal level route such as
+Ghostty's shift and scroll still reads the window buffer.</p>
+<h2>Starting it</h2>
+<p>Install it and start it in the directory where the work lives:</p>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>herdr
+herdr
+</code></pre></div>
+
+<p>Three commands cover the first week:</p>
+<ul>
+<li><code>herdr</code> attaches to the session, or creates it.</li>
+<li><code>herdr status server</code> reports the running server, its protocol number and its
+  socket path.</li>
+<li><code>herdr session list</code> names the sessions and shows which are running.</li>
+</ul>
+<p>After that, the sidebar does the work. Start an agent in a pane, start another
+in a second pane, and watch which one goes blocked first.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

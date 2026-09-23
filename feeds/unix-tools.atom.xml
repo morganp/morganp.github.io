@@ -1,380 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-19T00:00:00+01:00</updated><entry><title>Mirroring a remote herdr server</title><link href="http://lizard-spock.co.uk/herdr-mirror-remote-sidebar.html" rel="alternate"></link><published>2026-09-19T00:00:00+01:00</published><updated>2026-09-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-19:/herdr-mirror-remote-sidebar.html</id><summary type="html">&lt;p&gt;The herdr-mirror plugin turns workspaces on a remote herdr server into real local workspaces with live panes, so one window shows every agent on every machine. This post separates the local requirements from the remote ones, sets up key-based access and a systemd user unit, and explains how the connection starts.&lt;/p&gt;</summary><content type="html">&lt;p&gt;The agent on the homelab box finished eleven minutes ago. Nothing told you,
-because its terminal lives behind an ssh session in a window you are not
-looking at. Meanwhile the sidebar in front of you shows four local agents and
-reports their state perfectly.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Unix &amp; Tools</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/unix-tools.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-23T00:00:00+01:00</updated><entry><title>herdr, a terminal for coding agents</title><link href="http://lizard-spock.co.uk/herdr-introduction.html" rel="alternate"></link><published>2026-09-23T00:00:00+01:00</published><updated>2026-09-23T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-23:/herdr-introduction.html</id><summary type="html">&lt;p&gt;herdr is a terminal multiplexer built around coding agents. It marks every pane working, blocked or idle, so a stopped agent announces itself, it restores the layout after a restart, and the mouse and the scroll wheel work before you configure anything. This post introduces the tool and compares it with tmux.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Five agents are running across four tabs. One of them stopped two minutes ago
+to ask a yes or no question, and the other four are still working. Finding the
+one that is waiting means visiting all four tabs.&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Unix/HerdrMirror/01-hero-HQ.png"&gt;&lt;img alt="A terminal workspace window: the sidebar lists a local space and a purple remote space, and an amber line carries the remote session from that entry into the main pane" src="http://lizard-spock.co.uk/images/Unix/HerdrMirror/01-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;This post is for anyone who runs coding agents on more than one machine and
-wants a single window that shows all of them. It covers the &lt;code&gt;herdr-mirror&lt;/code&gt;
-plugin: what each end of the link needs, how to set up the access it depends
-on, and how the connection starts. This setup uses a laptop as the local
-machine and a homelab server called &lt;code&gt;homelab&lt;/code&gt; as the remote.&lt;/p&gt;
-&lt;p&gt;The plugin makes each remote workspace a real local workspace named
-&lt;code&gt;&amp;lt;host&amp;gt;: &amp;lt;name&amp;gt;&lt;/code&gt;. Its panes stream the remote terminal live, and its agents
-report their true state in the sidebar. Mirroring is one way, but you can type
-into any mirror pane to drive the remote session.&lt;/p&gt;
-&lt;h2&gt;What you need on each machine&lt;/h2&gt;
-&lt;p&gt;The requirements are lopsided. Almost everything happens on the local
-machine, and the remote runs stock herdr and nothing else.&lt;/p&gt;
-&lt;h3&gt;Requirements on the local machine&lt;/h3&gt;
-&lt;p&gt;The local machine carries the plugin, the configuration, and the daemon that
-holds the connection open.&lt;/p&gt;
+&lt;p&gt;This post introduces herdr, a terminal multiplexer built for running coding
+agents, and is for anyone who currently runs those agents in tmux or in a pile
+of terminal tabs. herdr does not wrap or replace the agents. It owns their
+terminals, the way tmux owns a shell, and it tracks the state of each one.&lt;/p&gt;
+&lt;h2&gt;What herdr is&lt;/h2&gt;
+&lt;p&gt;herdr is one Rust binary that runs as a background server with a thin client
+in front of it. The server owns the terminals. The client draws them, and you
+can close it without stopping the work.&lt;/p&gt;
+&lt;p&gt;The layout has three levels. A space holds tabs, a tab holds panes, and a pane
+holds one process. A sidebar down the left lists the spaces and every agent
+running inside them.&lt;/p&gt;
+&lt;p&gt;Anyone coming from tmux will recognise the shape. A space is close to a tmux
+session, a tab to a window, and a pane to a pane. The prefix key works the same
+way, and defaults to &lt;code&gt;ctrl+b&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;The sidebar knows which agent is stuck&lt;/h2&gt;
+&lt;p&gt;Every pane carries a state, and herdr marks it working, blocked or idle. An
+agent that stops to ask a question shows as blocked in the sidebar, next to the
+name of the tab it lives in.&lt;/p&gt;
+&lt;p&gt;This solves the problem in the opening paragraph. Instead of walking four tabs
+to find the one waiting on an answer, you read the sidebar and go straight
+there. On a busy machine with several agents, this is the difference between
+noticing in two seconds and noticing in ten minutes.&lt;/p&gt;
+&lt;p&gt;tmux has no equivalent, because tmux has no idea what runs inside a pane. It
+can show you a window name and a process name. It cannot tell you that Claude
+Code is sitting at a confirmation prompt.&lt;/p&gt;
+&lt;h2&gt;What survives a restart&lt;/h2&gt;
+&lt;p&gt;Detaching leaves everything running. Press the prefix and &lt;code&gt;q&lt;/code&gt;, and the client
+exits while the server keeps every pane alive. Run &lt;code&gt;herdr&lt;/code&gt; again to reattach.
+An ssh connection that drops takes the client with it and leaves the work
+untouched.&lt;/p&gt;
+&lt;p&gt;tmux does this too, and has done for twenty years. The difference appears at
+the next restart. After the server or the machine restarts, herdr brings back
+the saved layout: the spaces, the tabs and the panes return in place.&lt;/p&gt;
+&lt;p&gt;The limit matters, because a restored layout looks more complete than it is.
+The original processes do not survive a restart. herdr can resume a supported
+agent session natively, using the agent's own resume command, but a shell
+command that was running is gone. The layout returns, and the work inside
+it needs restarting.&lt;/p&gt;
+&lt;h2&gt;Mouse and keyboard, both first class&lt;/h2&gt;
+&lt;p&gt;Click a pane to focus it. Drag a border to resize it. Drag across text to
+select it. None of that needs configuration, and the prefix key bindings work
+at the same time, so the choice is per moment rather than per tool.&lt;/p&gt;
+&lt;p&gt;tmux ships with the mouse off. Until &lt;code&gt;set -g mouse on&lt;/code&gt; reaches &lt;code&gt;.tmux.conf&lt;/code&gt;,
+clicking a pane does nothing and dragging a border does nothing. The setting is
+one line, and every new tmux user has to learn about that line first.&lt;/p&gt;
+&lt;h2&gt;Scrolling that works before you configure it&lt;/h2&gt;
+&lt;p&gt;The difference shows most clearly in scrollback. In herdr, the wheel scrolls
+the focused pane's history immediately, three lines per notch, which
+&lt;code&gt;ui.mouse_scroll_lines&lt;/code&gt; changes. PageUp and PageDown reach the same history in
+an ordinary shell pane, and herdr forwards them to full-screen applications
+that want them instead.&lt;/p&gt;
+&lt;p&gt;Two more routes reach the same history. &lt;code&gt;prefix+[&lt;/code&gt; enters copy mode for
+keyboard selection, and &lt;code&gt;prefix+e&lt;/code&gt; opens the current pane's scrollback in
+&lt;code&gt;$EDITOR&lt;/code&gt; inside a temporary zoomed pane, which beats scrolling when the
+interesting output is a screen or two back.&lt;/p&gt;
+&lt;p&gt;The tmux trap here is specific and catches people for months. With the mouse
+off, the terminal turns the wheel into Up and Down key presses, and the
+application in the pane receives them as key presses. Scrolling a shell then
+walks your command history, and scrolling an agent command line interface
+(CLI) cycles its prompt history. The wheel appears to do something random
+rather than nothing.&lt;/p&gt;
+&lt;p&gt;One honest caveat about herdr. An application that grabs the mouse for its own
+purposes takes the wheel with it, and most agent CLIs do exactly that. In
+those panes, copy mode still scrolls, and a terminal level route such as
+Ghostty's shift and scroll still reads the window buffer.&lt;/p&gt;
+&lt;h2&gt;Starting it&lt;/h2&gt;
+&lt;p&gt;Install it and start it in the directory where the work lives:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;brew&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;herdr
+herdr
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Three commands cover the first week:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;herdr, on a build whose command line offers &lt;code&gt;herdr terminal session&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;macOS or Linux on x86_64 or aarch64, because the installer fetches a
-  prebuilt binary.&lt;/li&gt;
-&lt;li&gt;The &lt;code&gt;herdr-mirror&lt;/code&gt; plugin, installed and enabled.&lt;/li&gt;
-&lt;li&gt;A &lt;code&gt;hosts.toml&lt;/code&gt; file listing each remote you want to mirror.&lt;/li&gt;
-&lt;li&gt;Non-interactive ssh key access outbound to every host in that file.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;herdr&lt;/code&gt; attaches to the session, or creates it.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;herdr status server&lt;/code&gt; reports the running server, its protocol number and its
+  socket path.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;herdr session list&lt;/code&gt; names the sessions and shows which are running.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Check the stream support first, because a version number does not answer
-this requirement clearly:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;herdr&lt;span class="w"&gt; &lt;/span&gt;terminal&lt;span class="w"&gt; &lt;/span&gt;--help
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;The output must list a &lt;code&gt;session&lt;/code&gt; subcommand. If it does not, the build is too
-old and no amount of configuration helps.&lt;/p&gt;
-&lt;h3&gt;Requirements on the remote machine&lt;/h3&gt;
-&lt;p&gt;The remote needs herdr and a way in. It does not need the plugin, a
-configuration file, an open port, or any knowledge that mirroring exists.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;herdr installed, on a build that also offers &lt;code&gt;herdr terminal session&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;A herdr server running, which is the requirement people miss.&lt;/li&gt;
-&lt;li&gt;Your public key in &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;socat&lt;/code&gt; or &lt;code&gt;python3&lt;/code&gt;, but only if the ssh daemon refuses socket forwards.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The last item covers a transport fallback. The plugin reaches the remote
-application programming interface (API) socket through an &lt;code&gt;ssh -L&lt;/code&gt; forward by
-default. Some ssh daemons accept the forward
-and then never move a byte, so the plugin falls back to a relay over &lt;code&gt;ssh&lt;/code&gt;
-exec, which needs &lt;code&gt;socat&lt;/code&gt; or &lt;code&gt;python3&lt;/code&gt; on the remote. Almost every system has
-one of them.&lt;/p&gt;
-&lt;p&gt;Keep both ends on the same herdr build. The streaming protocol is the moving
-part, and a mismatch shows up as a version complaint from the daemon rather
-than a broken pane.&lt;/p&gt;
-&lt;h2&gt;Setting up key-based access&lt;/h2&gt;
-&lt;p&gt;The plugin runs unattended, so it cannot answer a password prompt. Its access
-test is exact:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ssh&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;BatchMode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;yes&lt;span class="w"&gt; &lt;/span&gt;homelab&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;That command must exit zero and print nothing. A dedicated key keeps this
-access separate from your general ssh identity, which means you can revoke it
-by deleting one line on the remote.&lt;/p&gt;
-&lt;p&gt;Generate the key on the local machine:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ssh-keygen&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;ed25519&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;~/.ssh/id_ed25519_herdr&lt;span class="w"&gt; &lt;/span&gt;-N&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-C&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;herdr-mirror&amp;quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;The empty passphrase is a real trade-off, not an oversight. A daemon that
-reconnects on its own cannot prompt you, so the choice is an unencrypted key
-or a passphrase held by an agent that must stay loaded. On macOS the agent
-route works well with &lt;code&gt;UseKeychain yes&lt;/code&gt; and &lt;code&gt;AddKeysToAgent yes&lt;/code&gt;. The
-unencrypted key is simpler and survives agent problems, at the cost that
-anyone who reads the file gains shell access to the remote.&lt;/p&gt;
-&lt;p&gt;Copy the public half to the remote. This step prompts for the remote account
-password, so run it yourself in a terminal:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ssh-copy-id&lt;span class="w"&gt; &lt;/span&gt;-i&lt;span class="w"&gt; &lt;/span&gt;~/.ssh/id_ed25519_herdr.pub&lt;span class="w"&gt; &lt;/span&gt;user@homelab
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Then name the target in &lt;code&gt;~/.ssh/config&lt;/code&gt; so the dedicated key is always the one
-offered:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Host herdr-homelab homelab
-    HostName homelab.lan
-    User user
-    IdentityFile ~/.ssh/id_ed25519_herdr
-    IdentitiesOnly yes
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;code&gt;IdentitiesOnly yes&lt;/code&gt; prevents a confusing authentication failure. Without it,
-ssh offers every identity the agent holds, and a server with a low
-&lt;code&gt;MaxAuthTries&lt;/code&gt; can reject you before it reaches the right key.&lt;/p&gt;
-&lt;p&gt;Now run the access test again. Nothing later works until it passes silently.&lt;/p&gt;
-&lt;h2&gt;Keeping the remote server alive&lt;/h2&gt;
-&lt;p&gt;A herdr server on the remote is a requirement, not a detail, and a server
-started by hand disappears at the next reboot. A systemd user unit fixes both
-problems.&lt;/p&gt;
-&lt;p&gt;Write &lt;code&gt;~/.config/systemd/user/herdr.service&lt;/code&gt; on the remote:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[Unit]&lt;/span&gt;
-&lt;span class="na"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;herdr server&lt;/span&gt;
-&lt;span class="na"&gt;After&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;network.target&lt;/span&gt;
-
-&lt;span class="k"&gt;[Service]&lt;/span&gt;
-&lt;span class="na"&gt;Type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;simple&lt;/span&gt;
-&lt;span class="na"&gt;ExecStart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;/home/user/.local/bin/herdr server&lt;/span&gt;
-&lt;span class="na"&gt;Restart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;on-failure&lt;/span&gt;
-&lt;span class="na"&gt;RestartSec&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;5&lt;/span&gt;
-
-&lt;span class="k"&gt;[Install]&lt;/span&gt;
-&lt;span class="na"&gt;WantedBy&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;default.target&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Use an absolute path in &lt;code&gt;ExecStart&lt;/code&gt;. Systemd does not read your shell profile,
-so a bare &lt;code&gt;herdr&lt;/code&gt; fails when the binary lives in &lt;code&gt;~/.local/bin&lt;/code&gt;. Find the real
-path with &lt;code&gt;command -v herdr&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Enable and start it:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;systemctl&lt;span class="w"&gt; &lt;/span&gt;--user&lt;span class="w"&gt; &lt;/span&gt;daemon-reload
-systemctl&lt;span class="w"&gt; &lt;/span&gt;--user&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--now&lt;span class="w"&gt; &lt;/span&gt;herdr.service
-herdr&lt;span class="w"&gt; &lt;/span&gt;status&lt;span class="w"&gt; &lt;/span&gt;server
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;The status output should report &lt;code&gt;status: running&lt;/code&gt; along with a protocol
-number and a socket path.&lt;/p&gt;
-&lt;p&gt;One step remains, and it needs root:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;loginctl&lt;span class="w"&gt; &lt;/span&gt;enable-linger&lt;span class="w"&gt; &lt;/span&gt;user
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Lingering keeps the systemd user manager running when you have no login
-session on the machine. Without it, the user manager exits after your last
-session closes and takes the herdr server with it. The setup appears to work
-for a while, because the mirror daemon keeps connecting over ssh and creating
-sessions, then fails after a reboot. Enable lingering and the problem never
-appears.&lt;/p&gt;
-&lt;h2&gt;Installing and configuring the plugin&lt;/h2&gt;
-&lt;p&gt;Everything in this section happens on the local machine.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;herdr&lt;span class="w"&gt; &lt;/span&gt;plugin&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;nikok6/herdr-mirror
-herdr&lt;span class="w"&gt; &lt;/span&gt;server&lt;span class="w"&gt; &lt;/span&gt;reload-config
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;The install prints a preview of the actions and event hooks the plugin
-registers, then builds the binary. It also links a command
-at &lt;code&gt;~/.local/bin/herdr-mirror&lt;/code&gt;, which gives shell use and key bindings one
-stable path that survives updates.&lt;/p&gt;
-&lt;p&gt;Next, list your hosts:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[hosts.homelab]&lt;/span&gt;
-&lt;span class="n"&gt;target&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;herdr-homelab&amp;quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;The key on the left, &lt;code&gt;homelab&lt;/code&gt;, becomes the sidebar prefix, so mirrored
-workspaces appear as &lt;code&gt;homelab: &amp;lt;name&amp;gt;&lt;/code&gt;. The &lt;code&gt;target&lt;/code&gt; value accepts anything
-ssh accepts, which includes an alias from &lt;code&gt;~/.ssh/config&lt;/code&gt;. Pointing it at the
-alias rather than at &lt;code&gt;user@host&lt;/code&gt; guarantees the dedicated key applies.&lt;/p&gt;
-&lt;p&gt;The file belongs at &lt;code&gt;~/.config/herdr-mirror/hosts.toml&lt;/code&gt;, and that path is
-literal. The plugin does not honour &lt;code&gt;XDG_CONFIG_HOME&lt;/code&gt;, so a configuration
-directory relocated by that variable is not searched. This matters if you keep
-your configuration in a repository and point &lt;code&gt;XDG_CONFIG_HOME&lt;/code&gt; at it, which is
-a common dotfiles pattern. Run &lt;code&gt;herdr-mirror status&lt;/code&gt; to see the exact paths it
-searches and the file it loaded.&lt;/p&gt;
-&lt;h2&gt;Starting the connection&lt;/h2&gt;
-&lt;p&gt;There is no connect command, which surprises most people. Three layers stack
-up, and each one only needs the layer under it:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;The remote server&lt;/strong&gt;: a running herdr server publishes an API socket. The
-   plugin reads workspace and pane state from it.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;The transport&lt;/strong&gt;: the local daemon opens an ssh master connection, then
-   forwards that API socket over it. The &lt;code&gt;api_transport&lt;/code&gt; setting selects the
-   method, and its default of &lt;code&gt;auto&lt;/code&gt; tries the socket forward first and falls
-   back to the exec relay.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;The daemon&lt;/strong&gt;: one local process reconciles remote workspaces into local
-   mirrors and pushes agent status into the sidebar.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Only the third layer needs starting, and it starts itself. The default
-&lt;code&gt;autostart = true&lt;/code&gt; means that focusing any workspace starts the daemon. To
-start or resume it by hand:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;herdr-mirror&lt;span class="w"&gt; &lt;/span&gt;start
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Reconnection is automatic. The daemon retries on a ladder rather than giving
-up, so a remote that reboots comes back on its own. A manual &lt;code&gt;herdr-mirror
-pause&lt;/code&gt; is sticky until you run &lt;code&gt;start&lt;/code&gt; again, while a crash recovers at the
-next workspace focus.&lt;/p&gt;
-&lt;h2&gt;Verifying the setup&lt;/h2&gt;
-&lt;p&gt;Work through these checks in order. Each one isolates a different layer, so
-the first failure tells you where the problem lives.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Confirm silent key access with &lt;code&gt;ssh -o BatchMode=yes homelab true&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Confirm the remote server with &lt;code&gt;ssh homelab 'herdr status server'&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Confirm the local server with &lt;code&gt;herdr status server&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Confirm the plugin loaded with &lt;code&gt;herdr-mirror status&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Create a workspace on the remote and watch it appear locally.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;The fourth check is the informative one. A healthy daemon reports the host as
-connected and prints the recent log:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nl"&gt;daemon&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;running&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;45137&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="nl"&gt;config&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Users&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;user&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;herdr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;mirror&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;hosts&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;toml&lt;/span&gt;
-&lt;span class="k"&gt;host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;homelab&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;herdr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;homelab&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mirror&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;workspaces&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mirror&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;panes&lt;/span&gt;
-&lt;span class="n"&gt;recent&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;log&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mi"&gt;2026&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;08&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="nl"&gt;T11&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;35&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;&lt;span class="mf"&gt;25.997&lt;/span&gt;&lt;span class="n"&gt;Z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;homelab&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;connected&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;synced&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Zero mirror workspaces is correct on a fresh remote server, not a fault. The
-plugin mirrors the workspaces that exist, and a new server holds none. Create
-something for it to mirror:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ssh&lt;span class="w"&gt; &lt;/span&gt;homelab&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;herdr workspace create --label mirror-test --no-focus&amp;#39;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Within a few seconds the daemon log records the result, and &lt;code&gt;homelab:
-mirror-test&lt;/code&gt; appears in the local sidebar:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;2026&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;08&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;14&lt;/span&gt;&lt;span class="n"&gt;T11&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mf"&gt;38&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mf"&gt;41.106&lt;/span&gt;&lt;span class="n"&gt;Z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;creating&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mirror&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;workspace&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;homelab&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mirror&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;
-&lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;homelab&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;herdr&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;homelab&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mirror&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;workspaces&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mirror&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;panes&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h2&gt;Reading the daemon log when it fails&lt;/h2&gt;
-&lt;p&gt;The daemon log names the layer that failed, which makes it faster than
-guessing. Three messages cover most first-time setups.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;ssh master to user@host failed: Permission denied (publickey,password)&lt;/code&gt;&lt;/strong&gt;
-tells you the transport layer cannot authenticate. The key is missing from the
-remote, or ssh offers the wrong identity. Reproduce it outside the plugin with
-&lt;code&gt;ssh -o BatchMode=yes homelab true&lt;/code&gt;, which fails the same way and reports more
-detail with &lt;code&gt;-v&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;remote herdr server is not running&lt;/code&gt;&lt;/strong&gt; tells you the transport works and the
-remote server does not. Authentication has already succeeded at this point, so
-this message is progress. Check the systemd unit with
-&lt;code&gt;systemctl --user status herdr.service&lt;/code&gt; on the remote.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;connected and synced&lt;/code&gt;&lt;/strong&gt; with zero mirrors tells you everything works and
-the remote has no workspaces yet. Create one and watch the count change.&lt;/p&gt;
-&lt;p&gt;A renamed host key needs a daemon restart, because the running daemon holds
-the loaded configuration. Run &lt;code&gt;herdr-mirror pause&lt;/code&gt; followed by
-&lt;code&gt;herdr-mirror start&lt;/code&gt;, then check that the log lines carry the new prefix.&lt;/p&gt;
-&lt;h2&gt;After the first connection&lt;/h2&gt;
-&lt;p&gt;Nothing on the local machine needs starting a second time. The daemon owns
-reconnection, so a remote that reboots returns on its own with the same
-workspace and pane counts. Reach for &lt;code&gt;herdr-mirror start&lt;/code&gt; only when
-&lt;code&gt;herdr-mirror status&lt;/code&gt; reports the daemon stopped or paused.&lt;/p&gt;
-&lt;p&gt;Working inside a mirror has its own rules, and they are the subject of the
-second part: &lt;a href="http://lizard-spock.co.uk/herdr-mirror-working-inside.html"&gt;Working inside a herdr mirror&lt;/a&gt;.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="herdr"></category><category term="ssh"></category><category term="systemd"></category><category term="homelab"></category><category term="terminal"></category><category term="dotfiles"></category></entry><entry><title>Working inside a herdr mirror</title><link href="http://lizard-spock.co.uk/herdr-mirror-working-inside.html" rel="alternate"></link><published>2026-09-19T00:00:00+01:00</published><updated>2026-09-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-19:/herdr-mirror-working-inside.html</id><summary type="html">&lt;p&gt;A mirror workspace is a real local workspace, so every native command inside it acts on the local machine, including the plus button in the tab bar. This post binds the plugin's remote actions for tabs, splits and whole spaces, then covers scrolling, which needs a terminal level fix locally and has no fix inside a mirror.&lt;/p&gt;</summary><content type="html">&lt;p&gt;The sidebar carries &lt;code&gt;homelab: ~&lt;/code&gt; next to the local spaces, the panes stream,
-and the agent on the other machine reports its state where you can see it.
-Then you press the key for a new tab, and a shell opens on the laptop.&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Unix/HerdrMirror/02-hero-HQ.png"&gt;&lt;img alt="A blank keycap with two arrows leaving it: an amber arrow to a window with a purple title bar for the remote host, and a charcoal arrow to a plain window for the local machine" src="http://lizard-spock.co.uk/images/Unix/HerdrMirror/02-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;This post is for anyone already running the &lt;code&gt;herdr-mirror&lt;/code&gt; plugin and working
-in a mirror day to day. It covers creating tabs and whole spaces on the remote
-host, getting scrolling to work, and the limits of the setup. Setting the link
-up in the first place is part one:
-&lt;a href="http://lizard-spock.co.uk/herdr-mirror-remote-sidebar.html"&gt;Mirroring a remote herdr server&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;This post calls herdr's modifier key the leader, following vim. The
-configuration file spells it &lt;code&gt;prefix&lt;/code&gt;, so the key bindings read &lt;code&gt;prefix+c&lt;/code&gt;
-while the prose says leader and &lt;code&gt;c&lt;/code&gt;.&lt;/p&gt;
-&lt;h2&gt;Keeping new tabs and spaces on the remote&lt;/h2&gt;
-&lt;p&gt;A mirror workspace is a genuine local workspace, and herdr has no concept of
-mirroring. Every native command inside that workspace therefore acts locally,
-which produces the most common surprise in this setup.&lt;/p&gt;
-&lt;p&gt;Open a mirror, press leader and &lt;code&gt;c&lt;/code&gt; for a new tab, and you get a local tab.
-It runs a shell on your own machine, inside a workspace whose other panes live
-on the remote. The plugin never created that tab, so it never syncs it. The tab
-counts give the mismatch away:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;local  homelab: ~   2 tabs, 2 panes
-remote w2           1 tab,  1 pane
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;The plus button in the tab bar behaves the same way. It calls herdr's native
-new tab action directly rather than passing through a key binding, so it
-always creates a local tab. No configuration changes that. Treat the plus
-button as the local option and use a key for the remote one.&lt;/p&gt;
-&lt;p&gt;The fix is to bind the plugin's remote actions. Each one falls back to the
-plain local action when you invoke it outside a mirror, so the native keys can
-point at them and cover both cases:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[keys]&lt;/span&gt;
-&lt;span class="n"&gt;new_tab&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prefix+shift+c&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;split_vertical&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prefix+shift+v&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;split_horizontal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prefix+shift+minus&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;[[keys.command]]&lt;/span&gt;
-&lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prefix+c&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;plugin_action&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mirror.remote-new-tab&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;[[keys.command]]&lt;/span&gt;
-&lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prefix+v&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;plugin_action&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mirror.remote-split-right&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;[[keys.command]]&lt;/span&gt;
-&lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prefix+minus&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;plugin_action&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mirror.remote-split-down&amp;quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Declare the &lt;code&gt;[keys]&lt;/code&gt; table before the &lt;code&gt;[[keys.command]]&lt;/code&gt; blocks. Placing it
-after them risks a table redefinition error, because the array entries create
-the &lt;code&gt;keys&lt;/code&gt; table implicitly.&lt;/p&gt;
-&lt;p&gt;After a &lt;code&gt;herdr server reload-config&lt;/code&gt;, leader and &lt;code&gt;c&lt;/code&gt; creates a tab on the
-mirrored host, and the plus button still creates a local one. The natives
-remain available on their shift variants.&lt;/p&gt;
-&lt;p&gt;This scheme has one cost. The remapped keys now depend on the plugin staying
-installed and enabled, because no native binding sits behind them any more.
-The shift variants remain as the escape hatch.&lt;/p&gt;
-&lt;p&gt;Splits carry an extra rule. On a non-mirrored pane inside a mirror workspace,
-&lt;code&gt;remote-split-right&lt;/code&gt; and &lt;code&gt;remote-split-down&lt;/code&gt; report an error rather than
-splitting locally. A local split there would desync the mirrored layout, so
-the plugin refuses instead of making the mismatch worse.&lt;/p&gt;
-&lt;h3&gt;A whole space on the remote&lt;/h3&gt;
-&lt;p&gt;The same rule extends one level up. &lt;code&gt;mirror.remote-new-workspace&lt;/code&gt; creates a
-workspace on the mirrored host, and the daemon brings it back within seconds as
-a new &lt;code&gt;homelab: &amp;lt;name&amp;gt;&lt;/code&gt; space in the local sidebar. It inherits the host and
-the working directory from the mirror you invoke it from.&lt;/p&gt;
-&lt;p&gt;Native &lt;code&gt;new_workspace&lt;/code&gt; already sits on &lt;code&gt;prefix+shift+n&lt;/code&gt;, so the remote version
-takes the same key with alt added:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[[keys.command]]&lt;/span&gt;
-&lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prefix+alt+n&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;plugin_action&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mirror.remote-new-workspace&amp;quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Pressed outside a mirror it creates a plain local workspace, so the binding is
-safe anywhere. This is the shortest route into the remote machine: one key, and
-a space appears in the sidebar with its shell already on the other end.&lt;/p&gt;
-&lt;h2&gt;Getting scrolling to work&lt;/h2&gt;
-&lt;p&gt;Start an agent in a pane, then reach for the wheel. Nothing moves, or the
-agent's own prompt history cycles under your fingers. The pane holds thousands
-of lines and none of them come back.&lt;/p&gt;
-&lt;p&gt;The cause is mouse reporting. An agent command line interface (CLI) grabs the
-mouse so it can handle clicks and drags itself, and a grabbed mouse owns the
-wheel too. The event
-never reaches herdr's pane scrollback.&lt;/p&gt;
-&lt;p&gt;Two routes avoid the grab, and they reach different buffers.&lt;/p&gt;
-&lt;p&gt;Ghostty handles the first. Setting &lt;code&gt;mouse-shift-capture = false&lt;/code&gt; reserves shift
-for the terminal:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;# Shift+scroll always scrolls terminal scrollback, even when a TUI app
-# captures the mouse
-mouse-shift-capture = false
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Hold shift and scroll, and the wheel bypasses whatever grabbed the mouse. That
-wheel reaches Ghostty's own scrollback, the window as Ghostty painted it, rather
-than herdr's pane scrollback. Output from before the current layout is not in
-it, and the sidebar and the neighbouring panes scroll as part of the same
-rectangle. This route gives a quick look backwards, not a pane-scoped view.&lt;/p&gt;
-&lt;p&gt;herdr's copy mode is the second route and the precise one. &lt;code&gt;prefix+[&lt;/code&gt; enters
-it, the arrow and page keys move through that pane's own scrollback, and &lt;code&gt;q&lt;/code&gt;
-leaves. A keyboard route never touches the mouse grab, so the foreground
-application stops mattering. Spell the binding &lt;code&gt;prefix+[&lt;/code&gt;, because the config
-parser rejects &lt;code&gt;prefix+bracketleft&lt;/code&gt;.&lt;/p&gt;
-&lt;h3&gt;Mirror panes are still unsolved&lt;/h3&gt;
-&lt;p&gt;Neither route reaches a mirror pane's history, and the reason is a trade you
-have probably already made.&lt;/p&gt;
-&lt;p&gt;Copying text out of a mirror pane fails by default. The plugin forwards raw
-mouse events to the remote whenever the pane's foreground process is not a
-known shell, and an agent CLI does not appear on that list, so every drag goes
-to the remote and no local selection happens. The fix is per host:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[hosts.homelab]&lt;/span&gt;
-&lt;span class="n"&gt;target&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;herdr-homelab&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;forward_mouse&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;That releases the mouse grab, and the wheel goes with it. An ungrabbed pane in
-the alternate screen falls back to alternate scroll, where herdr turns each
-notch into an Up or Down key that the remote reads as history recall. The
-plugin therefore sends &lt;code&gt;?1007l&lt;/code&gt; to switch alternate scroll off, which leaves
-the wheel inert rather than wrong.&lt;/p&gt;
-&lt;p&gt;Holding shift and scrolling still reads Ghostty's buffer, and the remote
-application's own keys still work. Nothing reaches remote pane scrollback from
-inside a mirror, and turning &lt;code&gt;forward_mouse&lt;/code&gt; back on to recover the wheel costs
-local selection again.&lt;/p&gt;
-&lt;h2&gt;Limitations&lt;/h2&gt;
-&lt;p&gt;Five constraints apply once the mirror is running.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;The plugin tracks the streaming protocol, so both ends need matching builds.&lt;/li&gt;
-&lt;li&gt;Keystroke echo costs a frame round trip, which adds a small constant delay
-  compared with raw ssh.&lt;/li&gt;
-&lt;li&gt;Mirror workspaces show no git information, because herdr derives the sidebar
-  branch from a local working directory.&lt;/li&gt;
-&lt;li&gt;A mirror is only as reachable as its host, and the daemon reports a
-  readable status when a host goes away.&lt;/li&gt;
-&lt;li&gt;Wheel scrollback does not work in a mirror pane while &lt;code&gt;forward_mouse = false&lt;/code&gt;,
-  the setting that makes local selection work.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;None of these change the reason to run it. The value is the sidebar: one
-window, every machine, and every agent reporting its state where you are
-already looking.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="herdr"></category><category term="terminal"></category><category term="keybindings"></category><category term="ssh"></category><category term="dotfiles"></category></entry><entry><title>An always-on tmux setup</title><link href="http://lizard-spock.co.uk/tmux-always-on-setup.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/tmux-always-on-setup.html</id><summary type="html">&lt;p&gt;Five changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile that you can still escape from, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, a two-row status line with a keybinding hint row, and mouse selection that copies to the system clipboard on X11.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Unix/tmux/tmux-hero-HQ.png"&gt;&lt;img alt="An always-on tmux setup" src="http://lizard-spock.co.uk/images/Unix/tmux/tmux-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;After that, the sidebar does the work. Start an agent in a pane, start another
+in a second pane, and watch which one goes blocked first.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="herdr"></category><category term="terminal"></category><category term="tmux"></category><category term="agents"></category><category term="workflow"></category></entry><entry><title>An always-on tmux setup</title><link href="http://lizard-spock.co.uk/tmux-always-on-setup.html" rel="alternate"></link><published>2026-08-02T00:00:00+01:00</published><updated>2026-08-02T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-02:/tmux-always-on-setup.html</id><summary type="html">&lt;p&gt;Five changes that make tmux disappear into the background: shell-native autostart from bashrc and zprofile that you can still escape from, session persistence with resurrect and continuum, extended key reporting so Shift+Enter survives the tmux layer, a two-row status line with a keybinding hint row, and mouse selection that copies to the system clipboard on X11.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Unix/tmux/tmux-hero-HQ.png"&gt;&lt;img alt="An always-on tmux setup" src="http://lizard-spock.co.uk/images/Unix/tmux/tmux-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;If you have not met it yet, tmux is a terminal multiplexer. It lets one
 terminal window hold many sessions, split into panes, and it keeps those
 sessions alive after you disconnect. I wrote up the day-to-day mechanics
@@ -4327,4 +4035,17 @@ $&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;chm
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;push&lt;span class="w"&gt; &lt;/span&gt;--tags
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;A very good book covering topics like this and many others &lt;a href="https://www.amazon.co.uk/dp/1934356727?tag=morgue-21&amp;amp;camp=2902&amp;amp;creative=19466&amp;amp;linkCode=as4&amp;amp;creativeASIN=1934356727&amp;amp;adid=0C6PBKZXSP31YKZF8BFS&amp;amp;"&gt;Pragmatic Guide to Git &lt;/a&gt;.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="Git"></category></entry></feed>
+&lt;p&gt;A very good book covering topics like this and many others &lt;a href="https://www.amazon.co.uk/dp/1934356727?tag=morgue-21&amp;amp;camp=2902&amp;amp;creative=19466&amp;amp;linkCode=as4&amp;amp;creativeASIN=1934356727&amp;amp;adid=0C6PBKZXSP31YKZF8BFS&amp;amp;"&gt;Pragmatic Guide to Git &lt;/a&gt;.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="Command Line"></category><category term="Git"></category></entry><entry><title>"Fixing Ncursers on OS X 10.6.3+"</title><link href="http://lizard-spock.co.uk/fixing-ncursers-on-os-x-1063.html" rel="alternate"></link><published>2010-12-13T13:59:47+00:00</published><updated>2010-12-13T13:59:47+00:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2010-12-13:/fixing-ncursers-on-os-x-1063.html</id><summary type="html">&lt;p&gt;Currently OS X 10.6.3 - 10.6.5 the ncursers library is broken. A hacky fix is to copy …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Currently OS X 10.6.3 - 10.6.5 the ncursers library is broken. A hacky fix is to copy the libraries from 10.6.2. I have put my working copies in a public drop box.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;/usr/lib/libncurses.5.dylib&lt;span class="w"&gt; &lt;/span&gt;/usr/lib/libncurses.5.dylib.backup
+$&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;/usr/lib/libncurses.5.4.dylib&lt;span class="w"&gt; &lt;/span&gt;/usr/lib/libncurses.5.4.dylib.backup
+
+$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/usr/lib/
+$&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;wget&lt;span class="w"&gt; &lt;/span&gt;http://dl.dropbox.com/u/8462176/osx-10-6-working-ncurse/libncurses.5.dylib
+$&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;wget&lt;span class="w"&gt; &lt;/span&gt;http://dl.dropbox.com/u/8462176/osx-10-6-working-ncurse/libncurses.5.4.dylib
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Wget can be installed with &lt;a href="https://github.com/mxcl/homebrew"&gt;homebrew&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;brew&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;wget
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The Ideas for the fix came from &lt;a href="http://www.uponmyshoulder.com/blog/2010/os-x-10-6-3-broke-ncurses/"&gt;source&lt;/a&gt;.&lt;/p&gt;</content><category term="Unix &amp; Tools"></category><category term="Apple"></category><category term="Command Line"></category><category term="OS X"></category><category term="Homebrew"></category></entry></feed>
