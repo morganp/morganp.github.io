@@ -3,7 +3,7 @@ Date: 2026-09-19
 Category: Unix & Tools
 Tags: herdr, ssh, systemd, homelab, terminal, dotfiles
 Author: morganp
-Status: published
+Status: draft
 Summary: The herdr-mirror plugin turns workspaces on a remote herdr server into real local workspaces with live panes, so one window shows every agent on every machine. This post separates the local requirements from the remote ones, sets up key-based access and a systemd user unit, and explains how the connection starts.
 Slug: herdr-mirror-remote-sidebar
 

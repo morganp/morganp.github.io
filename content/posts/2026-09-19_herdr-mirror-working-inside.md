@@ -3,7 +3,7 @@ Date: 2026-09-19
 Category: Unix & Tools
 Tags: herdr, terminal, keybindings, ssh, dotfiles
 Author: morganp
-Status: published
+Status: draft
 Summary: A mirror workspace is a real local workspace, so every native command inside it acts on the local machine, including the plus button in the tab bar. This post binds the plugin's remote actions for tabs, splits and whole spaces, then covers scrolling, which needs a terminal level fix locally and has no fix inside a mirror.
 Slug: herdr-mirror-working-inside
 
