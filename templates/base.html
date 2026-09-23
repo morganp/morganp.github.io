@@ -16,6 +16,11 @@
                         {% if FEED_ALL_RSS %}
                                 <link href="{{ FEED_DOMAIN }}/{% if FEED_ALL_RSS_URL %}{{ FEED_ALL_RSS_URL }}{% else %}{{ FEED_ALL_RSS }}{% endif %}" type="application/rss+xml" rel="alternate" title="{{ SITENAME|striptags }} RSS Feed" />
                         {% endif %}
+                        {% if article is defined and article.robots %}
+                                <meta name="robots" content="{{ article.robots }}" />
+                        {% elif page is defined and page.robots %}
+                                <meta name="robots" content="{{ page.robots }}" />
+                        {% endif %}
                         {% block extra_head %}{% endblock extra_head %}
                 {% endblock head %}
         </head>
