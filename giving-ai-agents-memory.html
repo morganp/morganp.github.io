@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Giving AI agents memory</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Part 1 of 3. A markdown vault and a small MCP server that give any AI agent persistent memory, an action list with derived priority, and a..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./giving-ai-agents-memory.html" rel="bookmark"
+             title="Permalink to Giving AI agents memory">Giving AI agents memory</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-09-25T00:00:00+01:00">
+                Published: Fri 25 September 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="./tag/mcp.html">MCP</a> <a href="./tag/claude.html">Claude</a> <a href="./tag/secondbrain.html">SecondBrain</a> <a href="./tag/gtd.html">GTD</a> <a href="./tag/homelab.html">homelab</a> </p>        
+</footer><!-- /.post-info -->        <p>Every new chat with an AI agent starts empty. You explain the project again,
+list the open tasks again, and remind it that the school holidays start on
+Friday. The agent is capable, but it has nowhere to keep anything between
+conversations.</p>
+<p><a href="./images/Homelab/SecondBrain/p1-01-hero-HQ.png"><img alt="A friendly robot head facing forward, with a cable running from its ear socket to an open card-index drawer holding three highlighted cards" src="./images/Homelab/SecondBrain/p1-01-hero-900w.png"></a></p>
+<p>This post builds that place: a markdown vault under git, served to the agent by
+a small MCP (Model Context Protocol) server. Claude Code, the Claude apps and
+Codex all connect to the same vault. Memory, tasks and dates carry over from one
+conversation to the next, and from one client to another. It is part
+1 of 3: part 2 turns the vault into a daily brief on a reMarkable tablet, and
+part 3 reads handwriting on that brief back into the vault. Each part links its
+own repository. The MCP server built here is at
+<a href="https://github.com/morganp/secondbrain-mcp">github.com/morganp/secondbrain-mcp</a>.</p>
+<h2>What an agent should remember</h2>
+<p>The vault holds five kinds of knowledge, and each has its own folder:</p>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>Holds</th>
+<th>Loaded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>memory/</code></td>
+<td>A short brief about you: names, paths, preferences</td>
+<td>Every session</td>
+</tr>
+<tr>
+<td><code>projects/</code></td>
+<td>Active work, each with a <code>next_action</code></td>
+<td>Summary line on request</td>
+</tr>
+<tr>
+<td><code>actions/</code></td>
+<td>Single tasks and ideas</td>
+<td>Summary line on request</td>
+</tr>
+<tr>
+<td><code>areas/</code></td>
+<td>Ongoing duties and long-term goals, plus the calendar</td>
+<td>Summary line on request</td>
+</tr>
+<tr>
+<td><code>reference/</code></td>
+<td>Lookup knowledge: specs, notes, how-tos</td>
+<td>Matching lines only</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_f0b5c2c1bed5b86207629fad173103d3.svg"></p>
+<p>The layout follows <a href="https://fortelabs.com/blog/para/">PARA</a> (Projects, Areas,
+Resources, Archive), with one addition.
+<code>memory/</code> sits outside PARA because it describes the owner rather than any piece
+of work. One question sorts a new note: facts about you that every session needs
+go to memory, ongoing duties go to areas, and lookup knowledge goes to reference.
+Importance plays no part in the choice.</p>
+<p>The rule that keeps the context small is progressive disclosure. A session
+starts by reading <code>memory/INDEX.md</code> and a one-line summary of each project.
+The agent opens a full file only when the conversation needs it, and it searches
+reference material with <code>grep</code> rather than reading it whole.</p>
+<h2>One markdown file per item</h2>
+<p>Each project, action and area is one markdown file. The frontmatter at the top
+of the file is the index, so there is no separate index file to keep in step.
+An action looks like this:</p>
+<div class="highlight"><pre><span></span><code>---
+id: service-the-lawnmower
+stage: next
+tags: [home, garden]
+due: 2026-10-04
+<span class="gu">created: 2026-09-25</span>
+<span class="gu">---</span>
+
+<span class="gh"># Service the lawnmower</span>
+
+Blade sharpening and an oil change before it goes away for winter.
+</code></pre></div>
+
+<p>The vault is a git repository. Every write through the server commits and pushes
+the changed file. The history records each change the agent makes, and a second
+machine holds a copy. A systemd timer also commits anything left behind
+every 10 minutes.</p>
+<h2>An action list the agent manages</h2>
+<p>Actions follow the GTD (Getting Things Done) stages. <code>next</code> is committed work,
+<code>soon</code> is committed but not urgent, <code>waiting</code> is blocked on someone else, and
+<code>sometime</code> holds ideas with no commitment. The first tag is always the area of
+life: <code>work</code>, <code>home</code> or <code>personal</code>. Later tags are free topics.</p>
+<p>The file never stores a priority. The daily brief derives one from <code>stage</code> and
+<code>due</code> each time it reads the action, so the priority cannot go stale as the
+dates pass. The rules apply in order, and the first match wins:</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Condition</th>
+<th>Shown as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Stage is <code>waiting</code></td>
+<td><code>waiting</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Due date has passed</td>
+<td><code>overdue</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Due today</td>
+<td><code>today</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Stage is <code>next</code></td>
+<td><code>next</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Due within 7 days</td>
+<td><code>next</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Stage is <code>sometime</code></td>
+<td><code>sometime</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Anything else</td>
+<td><code>soon</code></td>
+</tr>
+</tbody>
+</table>
+<p>Rule 4 makes the stage a commitment: a <code>next</code> action stays at <code>next</code> whatever
+its date, and an undated one has no date to limit it. Rule 5 works the other
+way, pulling a <code>soon</code> or <code>sometime</code> action forward as its due date approaches.
+A blocked task stays <code>waiting</code> even when overdue, because nothing on your side
+can move it.</p>
+<p>Page 1 of the brief shows <code>overdue</code>, <code>today</code> and <code>next</code>: the work you can act
+on today. <code>waiting</code>, <code>soon</code> and <code>sometime</code> follow on page 2.</p>
+<p>Two flows complete the list. Capture writes a new file from
+<code>actions/_template.md</code>. Completion calls <code>archive_action</code>, which stamps the
+file with an <code>archived:</code> date and moves it under <code>archive/actions/</code>. The list
+and search tools skip <code>archive/</code> by default, so finished work never fills a
+search result.</p>
+<h2>Events and annual dates</h2>
+<p>The calendar lives in <code>areas/calendar/</code> as three markdown tables:</p>
+<ul>
+<li><code>events.md</code> holds one-off events, keyed by <code>YYYY-MM-DD</code>, with an optional end date for ranges.</li>
+<li><code>recurring_events.md</code> holds annual events, keyed by <code>MM-DD</code>: birthdays, anniversaries and fixed holidays.</li>
+<li><code>archived_events.md</code> holds past one-off events.</li>
+</ul>
+<p>The date format decides the file. <code>add_event</code> with <code>2026-10-17</code> inserts a
+one-off row, and <code>add_event</code> with <code>10-17</code> inserts an annual row. The server
+inserts each row in date order, so the agent never reads the table first.</p>
+<p><code>list_events</code> returns a window, today plus 7 days by default. It expands each
+annual row into the window, including across a year end. A quarterly reminder
+becomes four annual rows. Holidays that move each year, such as Easter, go in
+as one-off rows.</p>
+<p>The server can also merge Google Calendar into the same list. The adapter is
+read-only, uses the <code>calendar.readonly</code> scope, and takes all-day events from
+shared calendars and timed meetings from your own. When the two sources hold
+the same event, the vault row wins. If Google fails, <code>list_events</code> returns the
+vault events with a warning line rather than an error. Publish the Google Cloud
+consent screen to Production: in Testing mode Google expires refresh tokens
+after 7 days.</p>
+<h2>The tool set</h2>
+<p>The server exposes the vault as 19 tools in three tiers of cost:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Tools</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Index</td>
+<td><code>list_projects</code>, <code>list_actions</code>, <code>list_areas</code>, <code>list_events</code>, <code>list</code></td>
+<td>One line per item, from frontmatter</td>
+</tr>
+<tr>
+<td>Read</td>
+<td><code>read_text</code>, <code>grep</code>, <code>get_skill</code>, <code>get_daily_stoic</code></td>
+<td>One file, or matching lines</td>
+</tr>
+<tr>
+<td>Write</td>
+<td><code>write_text</code>, <code>append</code>, <code>edit</code>, <code>delete</code>, <code>add_event</code>, <code>add_term</code>, <code>archive_project</code>, <code>archive_action</code>, <code>archive_area</code>, <code>archive_events</code></td>
+<td>A status line, after commit and push</td>
+</tr>
+</tbody>
+</table>
+<p>Each tool schema costs context in every session, so the set stays small and each
+tool does one job. <code>list_actions</code> shows the shape of an index tool. It reads
+only frontmatter, filters, and sorts undated actions last:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">fm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parseFrontmatter</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;utf8&quot;</span><span class="p">));</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">fm</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">stage</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">fm</span><span class="p">.</span><span class="nx">stage</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="nx">stage</span><span class="p">)</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">domain</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="nx">tags</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">domain</span><span class="p">))</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">due_before</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">fm</span><span class="p">.</span><span class="nx">due</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">fm</span><span class="p">.</span><span class="nx">due</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">due_before</span><span class="p">))</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="nx">rows</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">due</span><span class="o">:</span><span class="w"> </span><span class="nx">fm</span><span class="p">.</span><span class="nx">due</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;~&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// &quot;~&quot; sorts after any ISO date, so undated lands last</span>
+<span class="w">  </span><span class="nx">line</span><span class="o">:</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">fm</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> | </span><span class="si">${</span><span class="nx">fm</span><span class="p">.</span><span class="nx">stage</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="si">}</span><span class="sb"> | due </span><span class="si">${</span><span class="nx">fm</span><span class="p">.</span><span class="nx">due</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;-&quot;</span><span class="si">}</span><span class="sb"> | tags </span><span class="si">${</span><span class="nx">fm</span><span class="p">.</span><span class="nx">tags</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;-&quot;</span><span class="si">}</span><span class="sb"> | </span><span class="si">${</span><span class="nx">rel</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>Every path passes through <code>resolveInRoot()</code>, which refuses anything outside the
+vault root.</p>
+<h2>Teaching the agent the rules</h2>
+<p>The tools give the agent access. A <code>CLAUDE.md</code> at the vault root tells it how
+to behave:</p>
+<ul>
+<li>Start each session with <code>list_projects</code> and <code>memory/INDEX.md</code>, and nothing else.</li>
+<li>Open one file at a time with <code>read_text</code>, and search reference material with <code>grep</code>.</li>
+<li>Capture a new task as an action file from the template, with the area tag first.</li>
+<li>Archive finished items with the archive tools, never by moving files.</li>
+<li>Never read or edit the calendar files directly: the event tools do the date arithmetic.</li>
+</ul>
+<p>The same rules sit in <code>README.md</code> for clients that do not read <code>CLAUDE.md</code>.
+Longer procedures live in a separate skills repository, and <code>get_skill</code> fetches
+one on demand. A <code>close</code> skill ends a session by writing its decisions, new
+tasks and project progress back into the right notes.</p>
+<h2>Deploying it</h2>
+<p>The server is a single Node.js file that speaks MCP over standard input and
+output. The deployment runs it in a Proxmox container:</p>
+<ol>
+<li>Clone the vault and the server, and copy <code>mcp/.env.example</code> to <code>mcp/.env</code>.</li>
+<li>Set <code>BRAIN_ROOT</code> to the vault path, and add the Google values if you want the calendar merge.</li>
+<li>Install the systemd unit from <code>deploy/vault-mcp.service</code>, which runs the server behind supergateway on port 3002.</li>
+<li>Put nginx in front to check the bearer token, with the OAuth server handling sign-in.</li>
+<li>Expose nginx through a Cloudflare tunnel.</li>
+<li>Connect each client to the public <code>/mcp</code> URL.</li>
+</ol>
+<p>Run supergateway in stateless mode, and start the server through <code>exec</code> so
+supergateway can stop each child process after its request:</p>
+<div class="highlight"><pre><span></span><code><span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/bin/supergateway --stdio &#39;exec node /opt/brain/mcp/server.js&#39; --port 3002 --outputTransport streamableHttp</span>
+</code></pre></div>
+
+<p>Connect Claude Code with one command:</p>
+<div class="highlight"><pre><span></span><code>claude<span class="w"> </span>mcp<span class="w"> </span>add<span class="w"> </span>--transport<span class="w"> </span>http<span class="w"> </span>secondbrain<span class="w"> </span>https://brain.example.com/mcp
+</code></pre></div>
+
+<p>Two earlier posts cover the details.
+<a href="./building-a-personal-mcp-server.html">Building a personal MCP server</a>
+walks through the tunnel, the systemd unit and the git credentials, and
+<a href="./mcp-server-oauth-authentication.html">MCP server OAuth authentication</a>
+covers the sign-in flow.
+Part 2 uses this vault as the data source for a daily brief on the reMarkable.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

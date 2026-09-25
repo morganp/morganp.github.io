@@ -1,5 +1,258 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-23T00:00:00+01:00</updated><entry><title>herdr, a terminal for coding agents</title><link href="http://lizard-spock.co.uk/herdr-introduction.html" rel="alternate"></link><published>2026-09-23T00:00:00+01:00</published><updated>2026-09-23T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-23:/herdr-introduction.html</id><summary type="html">&lt;p&gt;herdr is a terminal multiplexer built around coding agents. It marks every pane working, blocked or idle, so a stopped agent announces itself, it restores the layout after a restart, and the mouse and the scroll wheel work before you configure anything. This post introduces the tool and compares it with tmux.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Five agents are running across four tabs. One of them stopped two minutes ago
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/all.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-25T00:00:00+01:00</updated><entry><title>Giving AI agents memory</title><link href="http://lizard-spock.co.uk/giving-ai-agents-memory.html" rel="alternate"></link><published>2026-09-25T00:00:00+01:00</published><updated>2026-09-25T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-25:/giving-ai-agents-memory.html</id><summary type="html">&lt;p&gt;Part 1 of 3. A markdown vault and a small MCP server that give any AI agent persistent memory, an action list with derived priority, and a calendar of one-off and annual events.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Every new chat with an AI agent starts empty. You explain the project again,
+list the open tasks again, and remind it that the school holidays start on
+Friday. The agent is capable, but it has nowhere to keep anything between
+conversations.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p1-01-hero-HQ.png"&gt;&lt;img alt="A friendly robot head facing forward, with a cable running from its ear socket to an open card-index drawer holding three highlighted cards" src="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p1-01-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This post builds that place: a markdown vault under git, served to the agent by
+a small MCP (Model Context Protocol) server. Claude Code, the Claude apps and
+Codex all connect to the same vault. Memory, tasks and dates carry over from one
+conversation to the next, and from one client to another. It is part
+1 of 3: part 2 turns the vault into a daily brief on a reMarkable tablet, and
+part 3 reads handwriting on that brief back into the vault. Each part links its
+own repository. The MCP server built here is at
+&lt;a href="https://github.com/morganp/secondbrain-mcp"&gt;github.com/morganp/secondbrain-mcp&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;What an agent should remember&lt;/h2&gt;
+&lt;p&gt;The vault holds five kinds of knowledge, and each has its own folder:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Folder&lt;/th&gt;
+&lt;th&gt;Holds&lt;/th&gt;
+&lt;th&gt;Loaded&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;memory/&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A short brief about you: names, paths, preferences&lt;/td&gt;
+&lt;td&gt;Every session&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;projects/&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Active work, each with a &lt;code&gt;next_action&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Summary line on request&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;actions/&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Single tasks and ideas&lt;/td&gt;
+&lt;td&gt;Summary line on request&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;areas/&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Ongoing duties and long-term goals, plus the calendar&lt;/td&gt;
+&lt;td&gt;Summary line on request&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;reference/&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Lookup knowledge: specs, notes, how-tos&lt;/td&gt;
+&lt;td&gt;Matching lines only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_f0b5c2c1bed5b86207629fad173103d3.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The layout follows &lt;a href="https://fortelabs.com/blog/para/"&gt;PARA&lt;/a&gt; (Projects, Areas,
+Resources, Archive), with one addition.
+&lt;code&gt;memory/&lt;/code&gt; sits outside PARA because it describes the owner rather than any piece
+of work. One question sorts a new note: facts about you that every session needs
+go to memory, ongoing duties go to areas, and lookup knowledge goes to reference.
+Importance plays no part in the choice.&lt;/p&gt;
+&lt;p&gt;The rule that keeps the context small is progressive disclosure. A session
+starts by reading &lt;code&gt;memory/INDEX.md&lt;/code&gt; and a one-line summary of each project.
+The agent opens a full file only when the conversation needs it, and it searches
+reference material with &lt;code&gt;grep&lt;/code&gt; rather than reading it whole.&lt;/p&gt;
+&lt;h2&gt;One markdown file per item&lt;/h2&gt;
+&lt;p&gt;Each project, action and area is one markdown file. The frontmatter at the top
+of the file is the index, so there is no separate index file to keep in step.
+An action looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;---
+id: service-the-lawnmower
+stage: next
+tags: [home, garden]
+due: 2026-10-04
+&lt;span class="gu"&gt;created: 2026-09-25&lt;/span&gt;
+&lt;span class="gu"&gt;---&lt;/span&gt;
+
+&lt;span class="gh"&gt;# Service the lawnmower&lt;/span&gt;
+
+Blade sharpening and an oil change before it goes away for winter.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The vault is a git repository. Every write through the server commits and pushes
+the changed file. The history records each change the agent makes, and a second
+machine holds a copy. A systemd timer also commits anything left behind
+every 10 minutes.&lt;/p&gt;
+&lt;h2&gt;An action list the agent manages&lt;/h2&gt;
+&lt;p&gt;Actions follow the GTD (Getting Things Done) stages. &lt;code&gt;next&lt;/code&gt; is committed work,
+&lt;code&gt;soon&lt;/code&gt; is committed but not urgent, &lt;code&gt;waiting&lt;/code&gt; is blocked on someone else, and
+&lt;code&gt;sometime&lt;/code&gt; holds ideas with no commitment. The first tag is always the area of
+life: &lt;code&gt;work&lt;/code&gt;, &lt;code&gt;home&lt;/code&gt; or &lt;code&gt;personal&lt;/code&gt;. Later tags are free topics.&lt;/p&gt;
+&lt;p&gt;The file never stores a priority. The daily brief derives one from &lt;code&gt;stage&lt;/code&gt; and
+&lt;code&gt;due&lt;/code&gt; each time it reads the action, so the priority cannot go stale as the
+dates pass. The rules apply in order, and the first match wins:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Rule&lt;/th&gt;
+&lt;th&gt;Condition&lt;/th&gt;
+&lt;th&gt;Shown as&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Stage is &lt;code&gt;waiting&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;waiting&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Due date has passed&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;overdue&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;Due today&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;today&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;Stage is &lt;code&gt;next&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;next&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;Due within 7 days&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;next&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;Stage is &lt;code&gt;sometime&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;sometime&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;Anything else&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;soon&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Rule 4 makes the stage a commitment: a &lt;code&gt;next&lt;/code&gt; action stays at &lt;code&gt;next&lt;/code&gt; whatever
+its date, and an undated one has no date to limit it. Rule 5 works the other
+way, pulling a &lt;code&gt;soon&lt;/code&gt; or &lt;code&gt;sometime&lt;/code&gt; action forward as its due date approaches.
+A blocked task stays &lt;code&gt;waiting&lt;/code&gt; even when overdue, because nothing on your side
+can move it.&lt;/p&gt;
+&lt;p&gt;Page 1 of the brief shows &lt;code&gt;overdue&lt;/code&gt;, &lt;code&gt;today&lt;/code&gt; and &lt;code&gt;next&lt;/code&gt;: the work you can act
+on today. &lt;code&gt;waiting&lt;/code&gt;, &lt;code&gt;soon&lt;/code&gt; and &lt;code&gt;sometime&lt;/code&gt; follow on page 2.&lt;/p&gt;
+&lt;p&gt;Two flows complete the list. Capture writes a new file from
+&lt;code&gt;actions/_template.md&lt;/code&gt;. Completion calls &lt;code&gt;archive_action&lt;/code&gt;, which stamps the
+file with an &lt;code&gt;archived:&lt;/code&gt; date and moves it under &lt;code&gt;archive/actions/&lt;/code&gt;. The list
+and search tools skip &lt;code&gt;archive/&lt;/code&gt; by default, so finished work never fills a
+search result.&lt;/p&gt;
+&lt;h2&gt;Events and annual dates&lt;/h2&gt;
+&lt;p&gt;The calendar lives in &lt;code&gt;areas/calendar/&lt;/code&gt; as three markdown tables:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;events.md&lt;/code&gt; holds one-off events, keyed by &lt;code&gt;YYYY-MM-DD&lt;/code&gt;, with an optional end date for ranges.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;recurring_events.md&lt;/code&gt; holds annual events, keyed by &lt;code&gt;MM-DD&lt;/code&gt;: birthdays, anniversaries and fixed holidays.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;archived_events.md&lt;/code&gt; holds past one-off events.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The date format decides the file. &lt;code&gt;add_event&lt;/code&gt; with &lt;code&gt;2026-10-17&lt;/code&gt; inserts a
+one-off row, and &lt;code&gt;add_event&lt;/code&gt; with &lt;code&gt;10-17&lt;/code&gt; inserts an annual row. The server
+inserts each row in date order, so the agent never reads the table first.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;list_events&lt;/code&gt; returns a window, today plus 7 days by default. It expands each
+annual row into the window, including across a year end. A quarterly reminder
+becomes four annual rows. Holidays that move each year, such as Easter, go in
+as one-off rows.&lt;/p&gt;
+&lt;p&gt;The server can also merge Google Calendar into the same list. The adapter is
+read-only, uses the &lt;code&gt;calendar.readonly&lt;/code&gt; scope, and takes all-day events from
+shared calendars and timed meetings from your own. When the two sources hold
+the same event, the vault row wins. If Google fails, &lt;code&gt;list_events&lt;/code&gt; returns the
+vault events with a warning line rather than an error. Publish the Google Cloud
+consent screen to Production: in Testing mode Google expires refresh tokens
+after 7 days.&lt;/p&gt;
+&lt;h2&gt;The tool set&lt;/h2&gt;
+&lt;p&gt;The server exposes the vault as 19 tools in three tiers of cost:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Tier&lt;/th&gt;
+&lt;th&gt;Tools&lt;/th&gt;
+&lt;th&gt;Returns&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Index&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;list_projects&lt;/code&gt;, &lt;code&gt;list_actions&lt;/code&gt;, &lt;code&gt;list_areas&lt;/code&gt;, &lt;code&gt;list_events&lt;/code&gt;, &lt;code&gt;list&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;One line per item, from frontmatter&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Read&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;read_text&lt;/code&gt;, &lt;code&gt;grep&lt;/code&gt;, &lt;code&gt;get_skill&lt;/code&gt;, &lt;code&gt;get_daily_stoic&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;One file, or matching lines&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Write&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;write_text&lt;/code&gt;, &lt;code&gt;append&lt;/code&gt;, &lt;code&gt;edit&lt;/code&gt;, &lt;code&gt;delete&lt;/code&gt;, &lt;code&gt;add_event&lt;/code&gt;, &lt;code&gt;add_term&lt;/code&gt;, &lt;code&gt;archive_project&lt;/code&gt;, &lt;code&gt;archive_action&lt;/code&gt;, &lt;code&gt;archive_area&lt;/code&gt;, &lt;code&gt;archive_events&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A status line, after commit and push&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Each tool schema costs context in every session, so the set stays small and each
+tool does one job. &lt;code&gt;list_actions&lt;/code&gt; shows the shape of an index tool. It reads
+only frontmatter, filters, and sorts undated actions last:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;parseFrontmatter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;await&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;fs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;readFile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;file&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;utf8&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;continue&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;stage&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stage&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;!==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;stage&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;continue&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;domain&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;tags&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;includes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;domain&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;continue&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;due_before&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;due&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;due&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;due_before&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;continue&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nx"&gt;rows&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;push&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;due&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;due&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;~&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;~&amp;quot; sorts after any ISO date, so undated lands last&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;line&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;id&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt; | &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stage&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;?&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt; | due &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;due&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt; | tags &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;fm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;tags&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt; | &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nx"&gt;rel&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Every path passes through &lt;code&gt;resolveInRoot()&lt;/code&gt;, which refuses anything outside the
+vault root.&lt;/p&gt;
+&lt;h2&gt;Teaching the agent the rules&lt;/h2&gt;
+&lt;p&gt;The tools give the agent access. A &lt;code&gt;CLAUDE.md&lt;/code&gt; at the vault root tells it how
+to behave:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Start each session with &lt;code&gt;list_projects&lt;/code&gt; and &lt;code&gt;memory/INDEX.md&lt;/code&gt;, and nothing else.&lt;/li&gt;
+&lt;li&gt;Open one file at a time with &lt;code&gt;read_text&lt;/code&gt;, and search reference material with &lt;code&gt;grep&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Capture a new task as an action file from the template, with the area tag first.&lt;/li&gt;
+&lt;li&gt;Archive finished items with the archive tools, never by moving files.&lt;/li&gt;
+&lt;li&gt;Never read or edit the calendar files directly: the event tools do the date arithmetic.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The same rules sit in &lt;code&gt;README.md&lt;/code&gt; for clients that do not read &lt;code&gt;CLAUDE.md&lt;/code&gt;.
+Longer procedures live in a separate skills repository, and &lt;code&gt;get_skill&lt;/code&gt; fetches
+one on demand. A &lt;code&gt;close&lt;/code&gt; skill ends a session by writing its decisions, new
+tasks and project progress back into the right notes.&lt;/p&gt;
+&lt;h2&gt;Deploying it&lt;/h2&gt;
+&lt;p&gt;The server is a single Node.js file that speaks MCP over standard input and
+output. The deployment runs it in a Proxmox container:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Clone the vault and the server, and copy &lt;code&gt;mcp/.env.example&lt;/code&gt; to &lt;code&gt;mcp/.env&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Set &lt;code&gt;BRAIN_ROOT&lt;/code&gt; to the vault path, and add the Google values if you want the calendar merge.&lt;/li&gt;
+&lt;li&gt;Install the systemd unit from &lt;code&gt;deploy/vault-mcp.service&lt;/code&gt;, which runs the server behind supergateway on port 3002.&lt;/li&gt;
+&lt;li&gt;Put nginx in front to check the bearer token, with the OAuth server handling sign-in.&lt;/li&gt;
+&lt;li&gt;Expose nginx through a Cloudflare tunnel.&lt;/li&gt;
+&lt;li&gt;Connect each client to the public &lt;code&gt;/mcp&lt;/code&gt; URL.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Run supergateway in stateless mode, and start the server through &lt;code&gt;exec&lt;/code&gt; so
+supergateway can stop each child process after its request:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="na"&gt;ExecStart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;/usr/bin/supergateway --stdio &amp;#39;exec node /opt/brain/mcp/server.js&amp;#39; --port 3002 --outputTransport streamableHttp&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Connect Claude Code with one command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;claude&lt;span class="w"&gt; &lt;/span&gt;mcp&lt;span class="w"&gt; &lt;/span&gt;add&lt;span class="w"&gt; &lt;/span&gt;--transport&lt;span class="w"&gt; &lt;/span&gt;http&lt;span class="w"&gt; &lt;/span&gt;secondbrain&lt;span class="w"&gt; &lt;/span&gt;https://brain.example.com/mcp
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Two earlier posts cover the details.
+&lt;a href="http://lizard-spock.co.uk/building-a-personal-mcp-server.html"&gt;Building a personal MCP server&lt;/a&gt;
+walks through the tunnel, the systemd unit and the git credentials, and
+&lt;a href="http://lizard-spock.co.uk/mcp-server-oauth-authentication.html"&gt;MCP server OAuth authentication&lt;/a&gt;
+covers the sign-in flow.
+Part 2 uses this vault as the data source for a daily brief on the reMarkable.&lt;/p&gt;</content><category term="Hardware &amp; Homelab"></category><category term="MCP"></category><category term="Claude"></category><category term="SecondBrain"></category><category term="GTD"></category><category term="homelab"></category></entry><entry><title>herdr, a terminal for coding agents</title><link href="http://lizard-spock.co.uk/herdr-introduction.html" rel="alternate"></link><published>2026-09-23T00:00:00+01:00</published><updated>2026-09-23T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-23:/herdr-introduction.html</id><summary type="html">&lt;p&gt;herdr is a terminal multiplexer built around coding agents. It marks every pane working, blocked or idle, so a stopped agent announces itself, it restores the layout after a restart, and the mouse and the scroll wheel work before you configure anything. This post introduces the tool and compares it with tmux.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Five agents are running across four tabs. One of them stopped two minutes ago
 to ask a yes or no question, and the other four are still working. Finding the
 one that is waiting means visiting all four tabs.&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Unix/HerdrMirror/01-hero-HQ.png"&gt;&lt;img alt="A terminal workspace window: the sidebar lists a local space and a purple remote space, and an amber line carries the remote session from that entry into the main pane" src="http://lizard-spock.co.uk/images/Unix/HerdrMirror/01-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
@@ -13007,10 +13260,4 @@ ReadyNAS: Remote access to larger volume drives (Movies and TV Collections)
 &lt;img alt="Japanese garden, March 2015" src="/images/Gardening/JapaneseGarden/morganp-20150309--IMG_0158.jpg"&gt;
 &lt;img alt="Japanese garden, April 2015" src="/images/Gardening/JapaneseGarden/morganp-20150420--IMG_0417.jpg"&gt;
 &lt;img alt="Japanese garden, April 2015" src="/images/Gardening/JapaneseGarden/morganp-20150420--IMG_0418.jpg"&gt;
-&lt;img alt="Japanese garden, April 2015" src="/images/Gardening/JapaneseGarden/morganp-20150420--IMG_0419.jpg"&gt;&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="DIY"></category><category term="Garden"></category></entry><entry><title>"Potting Bench"</title><link href="http://lizard-spock.co.uk/potting-bench.html" rel="alternate"></link><published>2015-10-10T12:23:15+01:00</published><updated>2015-10-10T12:23:15+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2015-10-10:/potting-bench.html</id><summary type="html">&lt;p&gt;Homemade potting bench, using 15 2.4M Fence boards (£45).&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Homemade potting bench" src="/images/Gardening/PottingBench/morganp-20150414--IMG_0330.jpg"&gt;
-&lt;img alt="Homemade potting bench" src="/images/Gardening/PottingBench/morganp-20150414--IMG_0332.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;Note for ease of building the height was 1.2M …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Homemade potting bench, using 15 2.4M Fence boards (£45).&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Homemade potting bench" src="/images/Gardening/PottingBench/morganp-20150414--IMG_0330.jpg"&gt;
-&lt;img alt="Homemade potting bench" src="/images/Gardening/PottingBench/morganp-20150414--IMG_0332.jpg"&gt;&lt;/p&gt;
-&lt;p&gt;Note for ease of building the height was 1.2M, half a 2.4 meter board, this is too high.&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="DIY"></category><category term="Garden"></category></entry></feed>
+&lt;img alt="Japanese garden, April 2015" src="/images/Gardening/JapaneseGarden/morganp-20150420--IMG_0419.jpg"&gt;&lt;/p&gt;</content><category term="Home &amp; Garden"></category><category term="DIY"></category><category term="Garden"></category></entry></feed>
