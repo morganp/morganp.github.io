@@ -1,5 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Hardware &amp; Homelab</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/hardware-homelab.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-25T00:00:00+01:00</updated><entry><title>Giving AI agents memory</title><link href="http://lizard-spock.co.uk/giving-ai-agents-memory.html" rel="alternate"></link><published>2026-09-25T00:00:00+01:00</published><updated>2026-09-25T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-25:/giving-ai-agents-memory.html</id><summary type="html">&lt;p&gt;Part 1 of 3. A markdown vault and a small MCP server that give any AI agent persistent memory, an action list with derived priority, and a calendar of one-off and annual events.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Every new chat with an AI agent starts empty. You explain the project again,
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Hardware &amp; Homelab</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/hardware-homelab.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-26T00:00:00+01:00</updated><entry><title>A daily brief on the reMarkable</title><link href="http://lizard-spock.co.uk/a-daily-brief-on-the-remarkable.html" rel="alternate"></link><published>2026-09-26T00:00:00+01:00</published><updated>2026-09-26T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-26:/a-daily-brief-on-the-remarkable.html</id><summary type="html">&lt;p&gt;Part 2 of 3. Render the second brain vault as a printed daily brief each morning at 05:00 and deliver it to a reMarkable Paper Pro through a self-hosted rmfakecloud, with no reMarkable cloud involved.&lt;/p&gt;</summary><content type="html">&lt;p&gt;At five in the morning a small container renders one PDF and sends it to the
+tablet. When the tablet wakes, the brief is already in its &lt;code&gt;Daily&lt;/code&gt; folder. It
+holds today's meetings, the tasks that need doing, the next four weeks, and ten
+pages of squared paper for notes.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p2-01-hero-HQ.png"&gt;&lt;img alt="An e-ink tablet on a desk at sunrise beside a cup of coffee, showing a brief with a mini calendar and five checklist rows" src="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p2-01-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This post builds that pipeline on top of the vault and MCP (Model Context
+Protocol) server from
+&lt;a href="http://lizard-spock.co.uk/giving-ai-agents-memory.html"&gt;part 1&lt;/a&gt;.
+It targets a reMarkable Paper Pro and a Linux container on a home server. The
+generator is at
+&lt;a href="https://github.com/morganp/rmbriefing"&gt;github.com/morganp/rmbriefing&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;What the brief contains&lt;/h2&gt;
+&lt;p&gt;The brief is a PDF drawn at the Paper Pro page size of 509 by 679 points. Every
+page after the first is optional, and the generator leaves out any page with
+nothing to show:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Page&lt;/th&gt;
+&lt;th&gt;Contents&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Date, weather, a four-week mini calendar, today's meetings and events, the task checklist, and the next 27 days&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;The one task that matters most, the quote, tasks that did not fit, the &lt;code&gt;waiting&lt;/code&gt;, &lt;code&gt;soon&lt;/code&gt; and &lt;code&gt;sometime&lt;/code&gt; tasks, finance figures, and long-term goals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;The full Daily Stoic reflection behind the quote&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;A legend for the areas and priority labels&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;Edits applied from yesterday's handwriting (part 3)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;6 to 15&lt;/td&gt;
+&lt;td&gt;Squared note paper at 5 mm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The task checklist groups actions under WORK, HOME and PERSONAL, using the first
+tag of each action. Each row carries a checkbox, the action title and a priority
+label. Page 1 holds &lt;code&gt;overdue&lt;/code&gt;, &lt;code&gt;today&lt;/code&gt; and &lt;code&gt;next&lt;/code&gt;; the rest follow on page 2.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p2-02-brief-page1-HQ.png"&gt;&lt;img alt="Page 1 of a sample brief: the date and weather, a mini calendar with holidays shaded, today's meetings, a task checklist grouped by work, home and personal, and cards for the next 27 days" src="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p2-02-brief-page1-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Gathering the day&lt;/h2&gt;
+&lt;p&gt;A single shell script, &lt;code&gt;generate_daily_brief.sh&lt;/code&gt;, collects the inputs into an
+&lt;code&gt;out/&lt;/code&gt; folder and then renders. Most inputs come through the MCP server. The
+script calls Claude Code in print mode, restricted to one tool, and writes the
+raw tool result to a file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;claude&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Call list_events with from=&lt;/span&gt;&lt;span class="nv"&gt;$RANGE_START&lt;/span&gt;&lt;span class="s2"&gt; and to=&lt;/span&gt;&lt;span class="nv"&gt;$RANGE_END&lt;/span&gt;&lt;span class="s2"&gt;. Output ONLY the raw tool result text verbatim, nothing else - no commentary, no markdown formatting.&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;--mcp-config&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;{&amp;quot;mcpServers&amp;quot;:{&amp;quot;secondbrain&amp;quot;:{&amp;quot;type&amp;quot;:&amp;quot;http&amp;quot;,&amp;quot;url&amp;quot;:&amp;quot;http://127.0.0.1:3002/mcp&amp;quot;}}}&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;--allowedTools&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mcp__secondbrain__list_events&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$OUT_DIR&lt;/span&gt;&lt;span class="s2"&gt;/calendar_events.txt&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The MCP server runs in the same container, so the script reaches it on the
+local port without the public sign-in. The inputs are:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Source&lt;/th&gt;
+&lt;th&gt;Tool or service&lt;/th&gt;
+&lt;th&gt;Used for&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Calendar&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;list_events&lt;/code&gt;, Monday to Monday plus 34 days&lt;/td&gt;
+&lt;td&gt;Meetings, all-day events, holiday shading&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Quote&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;get_daily_stoic&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Footer box and reflection page&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Area notes&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;read_text&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Finance figures, holiday balance&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Summary&lt;/td&gt;
+&lt;td&gt;the &lt;code&gt;daily-summary&lt;/code&gt; skill&lt;/td&gt;
+&lt;td&gt;Today notes, the next 27 days, goals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Weather&lt;/td&gt;
+&lt;td&gt;Open-Meteo, no key needed&lt;/td&gt;
+&lt;td&gt;Header line and rain alert&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Actions&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;actions/*.md&lt;/code&gt;, read from disk&lt;/td&gt;
+&lt;td&gt;The task checklist&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_a15d2aee840d5fb81795a4be4cbbf14d.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The checklist reads the action files directly instead of asking the model. The
+files give the exact &lt;code&gt;stage&lt;/code&gt; and &lt;code&gt;due&lt;/code&gt; of every action, so each action gets
+exactly one checkbox on each brief. The renderer derives the priority with the
+rules from part 1, using the brief's own date, so a re-render of an old brief
+reproduces that day's list.&lt;/p&gt;
+&lt;h2&gt;Drawing the PDF&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;render_brief.py&lt;/code&gt; draws every element with ReportLab canvas calls rather than a
+layout engine. Direct drawing gives exact control over positions, which part 3
+depends on. The fonts are the PDF base fonts, Helvetica and Times, plus the
+monochrome Noto Emoji font for weather and section icons, which renders cleanly
+on e-ink.&lt;/p&gt;
+&lt;p&gt;The palette is black, white and grey with one orange-red accent, &lt;code&gt;#d9401e&lt;/code&gt;.
+Only overdue and due-today items use the accent, so it always means "act now".
+The mini calendar adds two fills: a yellow lower half for school holidays and a
+blue upper half for work holidays, so one day can show both.&lt;/p&gt;
+&lt;p&gt;The checkbox is a 7 by 7 point stroked rectangle, and nothing else in the
+brief draws one:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;draw_checkbox&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setStrokeColor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;INK&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLineWidth&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;0.9&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;stroke&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fill&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Part 3 finds the checkboxes by searching the PDF for rectangles of exactly this
+size, so the legend page shows its priority labels without checkboxes. The
+first 2 mm of each page stays clear of the reMarkable tool menu. The note pages
+leave a 54 point band at the top for the same reason.&lt;/p&gt;
+&lt;h2&gt;A private cloud for the tablet&lt;/h2&gt;
+&lt;p&gt;The tablet syncs with rmfakecloud, a self-hosted replacement for the reMarkable
+cloud, instead of the official service. The tablet keeps its normal sync
+behaviour, and the documents stay on your own server.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Component&lt;/th&gt;
+&lt;th&gt;Version&lt;/th&gt;
+&lt;th&gt;Runs on&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;reMarkable Paper Pro firmware&lt;/td&gt;
+&lt;td&gt;3.27.3.0&lt;/td&gt;
+&lt;td&gt;Tablet&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Vellum &lt;code&gt;tun&lt;/code&gt; kernel module&lt;/td&gt;
+&lt;td&gt;1.0.2-r0&lt;/td&gt;
+&lt;td&gt;Tablet&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Tailscale, with &lt;code&gt;tailscale-tun&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;1.102.2-r0&lt;/td&gt;
+&lt;td&gt;Tablet&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;rmfakecloud-proxy&lt;/td&gt;
+&lt;td&gt;0.0.10-r2&lt;/td&gt;
+&lt;td&gt;Tablet&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;rmfakecloud&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;ddvk/rmfakecloud:latest&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Server container&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;rmapi&lt;/td&gt;
+&lt;td&gt;0.0.35&lt;/td&gt;
+&lt;td&gt;Generator container&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Vellum packages are built against a firmware range, so match &lt;code&gt;tun&lt;/code&gt; to your
+firmware: 1.0.2 covers 3.27, and 1.0.3 needs 3.28. Turn off automatic updates
+on the tablet before it joins Wi-Fi, so the firmware stays inside that range.&lt;/p&gt;
+&lt;p&gt;Set up the server first:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create an unprivileged Debian container with nesting enabled, and install Docker.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;ddvk/rmfakecloud&lt;/code&gt; with a &lt;code&gt;JWT_SECRET_KEY&lt;/code&gt; from &lt;code&gt;openssl rand -hex 32&lt;/code&gt;, listening on port 3000. Leave &lt;code&gt;STORAGE_URL&lt;/code&gt; unset, so the server answers on whichever address a client uses.&lt;/li&gt;
+&lt;li&gt;Pass &lt;code&gt;/dev/net/tun&lt;/code&gt; into the container, install Tailscale, and run &lt;code&gt;tailscale serve --bg http://localhost:3000&lt;/code&gt;. This gives the server an HTTPS name, &lt;code&gt;rmcloud.&amp;lt;tailnet&amp;gt;.ts.net&lt;/code&gt;, with a real certificate.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Then set up the tablet:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Back up the tablet. Enabling developer mode factory-resets it.&lt;/li&gt;
+&lt;li&gt;Enable developer mode, then log in over SSH with a key.&lt;/li&gt;
+&lt;li&gt;Install Vellum, then run &lt;code&gt;vellum add tun=1.0.2-r0&lt;/code&gt; and &lt;code&gt;vellum add tailscale tailscale-tun&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;tailscale up&lt;/code&gt; and join the same tailnet as the server.&lt;/li&gt;
+&lt;li&gt;Install the proxy with &lt;code&gt;install.sh install https://rmcloud.&amp;lt;tailnet&amp;gt;.ts.net&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;&amp;lt;server tailnet IP&amp;gt; rmcloud.&amp;lt;tailnet&amp;gt;.ts.net&lt;/code&gt; to &lt;code&gt;/etc/hosts&lt;/code&gt;, because the proxy installer resets the tablet's DNS settings.&lt;/li&gt;
+&lt;li&gt;Pair the tablet from its own settings screen, using a code from the rmfakecloud web page.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The proxy redirects the reMarkable cloud names to itself and forwards them to
+rmfakecloud over the tailnet. The generator container stays off the tailnet and
+talks to rmfakecloud on the home network.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_597173ffa44bf3e0a02fc9be39e182a7.svg"&gt;&lt;/p&gt;
+&lt;h2&gt;Delivery and the 05:00 run&lt;/h2&gt;
+&lt;p&gt;rmapi uploads the finished PDF. Register it once against rmfakecloud with a
+one-time code from the server's Connect page, then always set &lt;code&gt;RMAPI_HOST&lt;/code&gt;. The
+rmapi configuration is not tied to a host, so a run without the variable talks
+to the official cloud and replaces the saved token.&lt;/p&gt;
+&lt;p&gt;The script names each brief with the date and weekday, &lt;code&gt;20260925 Fri brief.pdf&lt;/code&gt;,
+and exits early if that file already exists. The upload has a fallback for a
+document that is already on the tablet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;rmapi&lt;span class="w"&gt; &lt;/span&gt;put&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$PDF&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;Daily&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;rmapi&lt;span class="w"&gt; &lt;/span&gt;put&lt;span class="w"&gt; &lt;/span&gt;--content-only&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$PDF&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;Daily
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Cron runs the script as root in the generator container:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;5&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;opt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;rmbriefing&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;generate_daily_brief&lt;/span&gt;&lt;span class="mf"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sh&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;rmbrief&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;daily&lt;/span&gt;&lt;span class="mf"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="err"&gt;&amp;amp;&lt;/span&gt;&lt;span class="mf"&gt;1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Cron starts with a minimal environment, so the script sets its own:
+&lt;code&gt;HOME&lt;/code&gt;, a &lt;code&gt;PATH&lt;/code&gt; that includes &lt;code&gt;/usr/local/bin&lt;/code&gt;, the rmapi configuration folder,
+and the Claude Code token from &lt;code&gt;claude setup-token&lt;/code&gt;, stored in &lt;code&gt;claude.env&lt;/code&gt;
+with mode 600.&lt;/p&gt;
+&lt;h2&gt;Build your own&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Run the part 1 vault and MCP server, and check &lt;code&gt;list_actions&lt;/code&gt; from Claude Code.&lt;/li&gt;
+&lt;li&gt;Clone &lt;code&gt;rmbriefing&lt;/code&gt; into the same container, and run &lt;code&gt;pip install -r requirements.txt&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Install the &lt;a href="https://github.com/morganp/skillbook/tree/main/daily-summary"&gt;&lt;code&gt;daily-summary&lt;/code&gt; skill&lt;/a&gt; in &lt;code&gt;~/.claude/skills/&lt;/code&gt; for the user that runs cron.&lt;/li&gt;
+&lt;li&gt;Copy &lt;code&gt;.env.example&lt;/code&gt; to &lt;code&gt;.env&lt;/code&gt; and set the vault path, the MCP address, &lt;code&gt;RMAPI_HOST&lt;/code&gt; and your latitude and longitude.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;examples/render-sample.sh&lt;/code&gt;, which renders the sample vault, and open the PDF on your computer.&lt;/li&gt;
+&lt;li&gt;Set up rmfakecloud and the tablet, and push one PDF by hand with &lt;code&gt;rmapi put&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;generate_daily_brief.sh&lt;/code&gt; once by hand, then add the cron line.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Start with steps 1 to 5. The PDF is useful on any tablet or printer, and the
+reMarkable delivery can follow later. Part 3 adds the return path, reading ticks
+and handwritten notes on the brief back into the vault.&lt;/p&gt;</content><category term="Hardware &amp; Homelab"></category><category term="reMarkable"></category><category term="MCP"></category><category term="Claude"></category><category term="ReportLab"></category><category term="rmfakecloud"></category><category term="homelab"></category></entry><entry><title>Giving AI agents memory</title><link href="http://lizard-spock.co.uk/giving-ai-agents-memory.html" rel="alternate"></link><published>2026-09-25T00:00:00+01:00</published><updated>2026-09-25T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-25:/giving-ai-agents-memory.html</id><summary type="html">&lt;p&gt;Part 1 of 3. A markdown vault and a small MCP server that give any AI agent persistent memory, an action list with derived priority, and a calendar of one-off and annual events.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Every new chat with an AI agent starts empty. You explain the project again,
 list the open tasks again, and remind it that the school holidays start on
 Friday. The agent is capable, but it has nowhere to keep anything between
 conversations.&lt;/p&gt;
@@ -252,7 +486,7 @@ supergateway can stop each child process after its request:&lt;/p&gt;
 walks through the tunnel, the systemd unit and the git credentials, and
 &lt;a href="http://lizard-spock.co.uk/mcp-server-oauth-authentication.html"&gt;MCP server OAuth authentication&lt;/a&gt;
 covers the sign-in flow.
-Part 2 uses this vault as the data source for a daily brief on the reMarkable.&lt;/p&gt;</content><category term="Hardware &amp; Homelab"></category><category term="MCP"></category><category term="Claude"></category><category term="SecondBrain"></category><category term="GTD"></category><category term="homelab"></category></entry><entry><title>A Second MCP Server: Managing a Pelican Blog from Claude</title><link href="http://lizard-spock.co.uk/a-second-mcp-server-managing-a-pelican-blog-from-claude.html" rel="alternate"></link><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/a-second-mcp-server-managing-a-pelican-blog-from-claude.html</id><summary type="html">&lt;p&gt;How to add a second self-hosted MCP server alongside an existing one — a blog-management MCP that lets Claude create posts, add images, and publish a Pelican site without leaving the conversation.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same host as an existing MCP server — so the OAuth service, nginx, and firewall rules carry over, and the new server is a matter of writing the tools and adding a new location block to nginx.&lt;/p&gt;
+&lt;a href="http://lizard-spock.co.uk/a-daily-brief-on-the-remarkable.html"&gt;Part 2&lt;/a&gt; uses this vault as the data source for a daily brief on the reMarkable.&lt;/p&gt;</content><category term="Hardware &amp; Homelab"></category><category term="MCP"></category><category term="Claude"></category><category term="SecondBrain"></category><category term="GTD"></category><category term="homelab"></category></entry><entry><title>A Second MCP Server: Managing a Pelican Blog from Claude</title><link href="http://lizard-spock.co.uk/a-second-mcp-server-managing-a-pelican-blog-from-claude.html" rel="alternate"></link><published>2026-06-03T00:00:00+01:00</published><updated>2026-06-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-06-03:/a-second-mcp-server-managing-a-pelican-blog-from-claude.html</id><summary type="html">&lt;p&gt;How to add a second self-hosted MCP server alongside an existing one — a blog-management MCP that lets Claude create posts, add images, and publish a Pelican site without leaving the conversation.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Once you've set up one self-hosted MCP server, adding a second is mostly a case of reusing the infrastructure you've already built. This post covers adding a blog-management MCP to the same host as an existing MCP server — so the OAuth service, nginx, and firewall rules carry over, and the new server is a matter of writing the tools and adding a new location block to nginx.&lt;/p&gt;
 &lt;p&gt;The target: a &lt;code&gt;blog-mcp&lt;/code&gt; server that lets Claude pull the repo, create and edit posts, add images, run &lt;code&gt;make github&lt;/code&gt; to build and publish, and push the source — all without leaving the conversation.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;What's Already in Place&lt;/h2&gt;

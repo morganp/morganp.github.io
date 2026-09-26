@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>A daily brief on the reMarkable</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Part 2 of 3. Render the second brain vault as a printed daily brief each morning at 05:00 and deliver it to a reMarkable Paper Pro through a..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./a-daily-brief-on-the-remarkable.html" rel="bookmark"
+             title="Permalink to A daily brief on the reMarkable">A daily brief on the reMarkable</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-09-26T00:00:00+01:00">
+                Published: Sat 26 September 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="./tag/remarkable.html">reMarkable</a> <a href="./tag/mcp.html">MCP</a> <a href="./tag/claude.html">Claude</a> <a href="./tag/reportlab.html">ReportLab</a> <a href="./tag/rmfakecloud.html">rmfakecloud</a> <a href="./tag/homelab.html">homelab</a> </p>        
+</footer><!-- /.post-info -->        <p>At five in the morning a small container renders one PDF and sends it to the
+tablet. When the tablet wakes, the brief is already in its <code>Daily</code> folder. It
+holds today's meetings, the tasks that need doing, the next four weeks, and ten
+pages of squared paper for notes.</p>
+<p><a href="./images/Homelab/SecondBrain/p2-01-hero-HQ.png"><img alt="An e-ink tablet on a desk at sunrise beside a cup of coffee, showing a brief with a mini calendar and five checklist rows" src="./images/Homelab/SecondBrain/p2-01-hero-900w.png"></a></p>
+<p>This post builds that pipeline on top of the vault and MCP (Model Context
+Protocol) server from
+<a href="./giving-ai-agents-memory.html">part 1</a>.
+It targets a reMarkable Paper Pro and a Linux container on a home server. The
+generator is at
+<a href="https://github.com/morganp/rmbriefing">github.com/morganp/rmbriefing</a>.</p>
+<h2>What the brief contains</h2>
+<p>The brief is a PDF drawn at the Paper Pro page size of 509 by 679 points. Every
+page after the first is optional, and the generator leaves out any page with
+nothing to show:</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Date, weather, a four-week mini calendar, today's meetings and events, the task checklist, and the next 27 days</td>
+</tr>
+<tr>
+<td>2</td>
+<td>The one task that matters most, the quote, tasks that did not fit, the <code>waiting</code>, <code>soon</code> and <code>sometime</code> tasks, finance figures, and long-term goals</td>
+</tr>
+<tr>
+<td>3</td>
+<td>The full Daily Stoic reflection behind the quote</td>
+</tr>
+<tr>
+<td>4</td>
+<td>A legend for the areas and priority labels</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Edits applied from yesterday's handwriting (part 3)</td>
+</tr>
+<tr>
+<td>6 to 15</td>
+<td>Squared note paper at 5 mm</td>
+</tr>
+</tbody>
+</table>
+<p>The task checklist groups actions under WORK, HOME and PERSONAL, using the first
+tag of each action. Each row carries a checkbox, the action title and a priority
+label. Page 1 holds <code>overdue</code>, <code>today</code> and <code>next</code>; the rest follow on page 2.</p>
+<p><a href="./images/Homelab/SecondBrain/p2-02-brief-page1-HQ.png"><img alt="Page 1 of a sample brief: the date and weather, a mini calendar with holidays shaded, today's meetings, a task checklist grouped by work, home and personal, and cards for the next 27 days" src="./images/Homelab/SecondBrain/p2-02-brief-page1-900w.png"></a></p>
+<h2>Gathering the day</h2>
+<p>A single shell script, <code>generate_daily_brief.sh</code>, collects the inputs into an
+<code>out/</code> folder and then renders. Most inputs come through the MCP server. The
+script calls Claude Code in print mode, restricted to one tool, and writes the
+raw tool result to a file:</p>
+<div class="highlight"><pre><span></span><code>claude<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Call list_events with from=</span><span class="nv">$RANGE_START</span><span class="s2"> and to=</span><span class="nv">$RANGE_END</span><span class="s2">. Output ONLY the raw tool result text verbatim, nothing else - no commentary, no markdown formatting.&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--mcp-config<span class="w"> </span><span class="s1">&#39;{&quot;mcpServers&quot;:{&quot;secondbrain&quot;:{&quot;type&quot;:&quot;http&quot;,&quot;url&quot;:&quot;http://127.0.0.1:3002/mcp&quot;}}}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allowedTools<span class="w"> </span><span class="s2">&quot;mcp__secondbrain__list_events&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$OUT_DIR</span><span class="s2">/calendar_events.txt&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+
+<p>The MCP server runs in the same container, so the script reaches it on the
+local port without the public sign-in. The inputs are:</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Tool or service</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Calendar</td>
+<td><code>list_events</code>, Monday to Monday plus 34 days</td>
+<td>Meetings, all-day events, holiday shading</td>
+</tr>
+<tr>
+<td>Quote</td>
+<td><code>get_daily_stoic</code></td>
+<td>Footer box and reflection page</td>
+</tr>
+<tr>
+<td>Area notes</td>
+<td><code>read_text</code></td>
+<td>Finance figures, holiday balance</td>
+</tr>
+<tr>
+<td>Summary</td>
+<td>the <code>daily-summary</code> skill</td>
+<td>Today notes, the next 27 days, goals</td>
+</tr>
+<tr>
+<td>Weather</td>
+<td>Open-Meteo, no key needed</td>
+<td>Header line and rain alert</td>
+</tr>
+<tr>
+<td>Actions</td>
+<td><code>actions/*.md</code>, read from disk</td>
+<td>The task checklist</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_a15d2aee840d5fb81795a4be4cbbf14d.svg"></p>
+<p>The checklist reads the action files directly instead of asking the model. The
+files give the exact <code>stage</code> and <code>due</code> of every action, so each action gets
+exactly one checkbox on each brief. The renderer derives the priority with the
+rules from part 1, using the brief's own date, so a re-render of an old brief
+reproduces that day's list.</p>
+<h2>Drawing the PDF</h2>
+<p><code>render_brief.py</code> draws every element with ReportLab canvas calls rather than a
+layout engine. Direct drawing gives exact control over positions, which part 3
+depends on. The fonts are the PDF base fonts, Helvetica and Times, plus the
+monochrome Noto Emoji font for weather and section icons, which renders cleanly
+on e-ink.</p>
+<p>The palette is black, white and grey with one orange-red accent, <code>#d9401e</code>.
+Only overdue and due-today items use the accent, so it always means "act now".
+The mini calendar adds two fills: a yellow lower half for school holidays and a
+blue upper half for work holidays, so one day can show both.</p>
+<p>The checkbox is a 7 by 7 point stroked rectangle, and nothing else in the
+brief draws one:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">draw_checkbox</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">setStrokeColor</span><span class="p">(</span><span class="n">INK</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">setLineWidth</span><span class="p">(</span><span class="mf">0.9</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">stroke</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Part 3 finds the checkboxes by searching the PDF for rectangles of exactly this
+size, so the legend page shows its priority labels without checkboxes. The
+first 2 mm of each page stays clear of the reMarkable tool menu. The note pages
+leave a 54 point band at the top for the same reason.</p>
+<h2>A private cloud for the tablet</h2>
+<p>The tablet syncs with rmfakecloud, a self-hosted replacement for the reMarkable
+cloud, instead of the official service. The tablet keeps its normal sync
+behaviour, and the documents stay on your own server.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Version</th>
+<th>Runs on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reMarkable Paper Pro firmware</td>
+<td>3.27.3.0</td>
+<td>Tablet</td>
+</tr>
+<tr>
+<td>Vellum <code>tun</code> kernel module</td>
+<td>1.0.2-r0</td>
+<td>Tablet</td>
+</tr>
+<tr>
+<td>Tailscale, with <code>tailscale-tun</code></td>
+<td>1.102.2-r0</td>
+<td>Tablet</td>
+</tr>
+<tr>
+<td>rmfakecloud-proxy</td>
+<td>0.0.10-r2</td>
+<td>Tablet</td>
+</tr>
+<tr>
+<td>rmfakecloud</td>
+<td><code>ddvk/rmfakecloud:latest</code></td>
+<td>Server container</td>
+</tr>
+<tr>
+<td>rmapi</td>
+<td>0.0.35</td>
+<td>Generator container</td>
+</tr>
+</tbody>
+</table>
+<p>Vellum packages are built against a firmware range, so match <code>tun</code> to your
+firmware: 1.0.2 covers 3.27, and 1.0.3 needs 3.28. Turn off automatic updates
+on the tablet before it joins Wi-Fi, so the firmware stays inside that range.</p>
+<p>Set up the server first:</p>
+<ol>
+<li>Create an unprivileged Debian container with nesting enabled, and install Docker.</li>
+<li>Run <code>ddvk/rmfakecloud</code> with a <code>JWT_SECRET_KEY</code> from <code>openssl rand -hex 32</code>, listening on port 3000. Leave <code>STORAGE_URL</code> unset, so the server answers on whichever address a client uses.</li>
+<li>Pass <code>/dev/net/tun</code> into the container, install Tailscale, and run <code>tailscale serve --bg http://localhost:3000</code>. This gives the server an HTTPS name, <code>rmcloud.&lt;tailnet&gt;.ts.net</code>, with a real certificate.</li>
+</ol>
+<p>Then set up the tablet:</p>
+<ol>
+<li>Back up the tablet. Enabling developer mode factory-resets it.</li>
+<li>Enable developer mode, then log in over SSH with a key.</li>
+<li>Install Vellum, then run <code>vellum add tun=1.0.2-r0</code> and <code>vellum add tailscale tailscale-tun</code>.</li>
+<li>Run <code>tailscale up</code> and join the same tailnet as the server.</li>
+<li>Install the proxy with <code>install.sh install https://rmcloud.&lt;tailnet&gt;.ts.net</code>.</li>
+<li>Add <code>&lt;server tailnet IP&gt; rmcloud.&lt;tailnet&gt;.ts.net</code> to <code>/etc/hosts</code>, because the proxy installer resets the tablet's DNS settings.</li>
+<li>Pair the tablet from its own settings screen, using a code from the rmfakecloud web page.</li>
+</ol>
+<p>The proxy redirects the reMarkable cloud names to itself and forwards them to
+rmfakecloud over the tailnet. The generator container stays off the tailnet and
+talks to rmfakecloud on the home network.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_597173ffa44bf3e0a02fc9be39e182a7.svg"></p>
+<h2>Delivery and the 05:00 run</h2>
+<p>rmapi uploads the finished PDF. Register it once against rmfakecloud with a
+one-time code from the server's Connect page, then always set <code>RMAPI_HOST</code>. The
+rmapi configuration is not tied to a host, so a run without the variable talks
+to the official cloud and replaces the saved token.</p>
+<p>The script names each brief with the date and weekday, <code>20260925 Fri brief.pdf</code>,
+and exits early if that file already exists. The upload has a fallback for a
+document that is already on the tablet:</p>
+<div class="highlight"><pre><span></span><code>rmapi<span class="w"> </span>put<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PDF</span><span class="s2">&quot;</span><span class="w"> </span>Daily<span class="w"> </span><span class="o">||</span><span class="w"> </span>rmapi<span class="w"> </span>put<span class="w"> </span>--content-only<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PDF</span><span class="s2">&quot;</span><span class="w"> </span>Daily
+</code></pre></div>
+
+<p>Cron runs the script as root in the generator container:</p>
+<div class="highlight"><pre><span></span><code><span class="mf">0</span><span class="w"> </span><span class="mf">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">rmbriefing</span><span class="o">/</span><span class="n">generate_daily_brief</span><span class="mf">.</span><span class="n">sh</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">rmbrief</span><span class="o">-</span><span class="n">daily</span><span class="mf">.</span><span class="nb">log</span><span class="w"> </span><span class="mf">2</span><span class="o">&gt;</span><span class="err">&amp;</span><span class="mf">1</span>
+</code></pre></div>
+
+<p>Cron starts with a minimal environment, so the script sets its own:
+<code>HOME</code>, a <code>PATH</code> that includes <code>/usr/local/bin</code>, the rmapi configuration folder,
+and the Claude Code token from <code>claude setup-token</code>, stored in <code>claude.env</code>
+with mode 600.</p>
+<h2>Build your own</h2>
+<ol>
+<li>Run the part 1 vault and MCP server, and check <code>list_actions</code> from Claude Code.</li>
+<li>Clone <code>rmbriefing</code> into the same container, and run <code>pip install -r requirements.txt</code>.</li>
+<li>Install the <a href="https://github.com/morganp/skillbook/tree/main/daily-summary"><code>daily-summary</code> skill</a> in <code>~/.claude/skills/</code> for the user that runs cron.</li>
+<li>Copy <code>.env.example</code> to <code>.env</code> and set the vault path, the MCP address, <code>RMAPI_HOST</code> and your latitude and longitude.</li>
+<li>Run <code>examples/render-sample.sh</code>, which renders the sample vault, and open the PDF on your computer.</li>
+<li>Set up rmfakecloud and the tablet, and push one PDF by hand with <code>rmapi put</code>.</li>
+<li>Run <code>generate_daily_brief.sh</code> once by hand, then add the cron line.</li>
+</ol>
+<p>Start with steps 1 to 5. The PDF is useful on any tablet or printer, and the
+reMarkable delivery can follow later. Part 3 adds the return path, reading ticks
+and handwritten notes on the brief back into the vault.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
