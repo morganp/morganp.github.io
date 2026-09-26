@@ -9,6 +9,8 @@ Status: published
 
 Thin steel rod arrives in 300 mm lengths and rolls off the bench at the first knock. The 0.5, 0.8 and 1.0 mm diameters look the same from a metre away. The short offcuts disappear first, usually at the moment a single hinge pin is needed. I cut this rod into pins for hinges made with my [OpenSCAD hinge library](https://github.com/morganp/OpenSCAD_hinge). This post describes a wall-mounted pot that keeps each diameter in its own compartment, for anyone storing small rod, wire or drill bits on an openGrid board.
 
+**Download the model:** the parametric OpenSCAD source is on GitHub at [morganp/Openscad_rod_holder](https://github.com/morganp/Openscad_rod_holder), MIT licence.
+
 ![Tall square openGrid rod holder with a lattice of diamond windows running up the front and side walls, and four compartments visible at the top]({static}/images/Engineering/OpenGridRodHolder/01-rod_holder.png)
 
 ## One cell wide, six tall

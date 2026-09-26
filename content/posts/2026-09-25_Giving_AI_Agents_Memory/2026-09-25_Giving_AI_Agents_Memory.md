@@ -244,4 +244,4 @@ Two earlier posts cover the details.
 walks through the tunnel, the systemd unit and the git credentials, and
 [MCP server OAuth authentication]({filename}/posts/2026-06-03_mcp-server-oauth-authentication.md)
 covers the sign-in flow.
-Part 2 uses this vault as the data source for a daily brief on the reMarkable.
+[Part 2]({filename}/posts/2026-09-25_A_Daily_Brief_on_the_reMarkable/2026-09-25_A_Daily_Brief_on_the_reMarkable.md) uses this vault as the data source for a daily brief on the reMarkable.
