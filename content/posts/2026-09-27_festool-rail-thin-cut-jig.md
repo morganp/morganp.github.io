@@ -11,7 +11,7 @@ Cutting a stack of strips the same width with a guide rail means measuring and m
 
 ![Jig, three quarter view]({attach}/images/festool-thincut/view_iso.png)
 
-Looking along the rail, the key sits in the top slot and the C wraps the back edge. The leg under the rail is 6mm thick, so it suits stock from about 6.5mm up.
+Looking along the rail, the key sits in the top slot and the C wraps the back edge. The leg under the rail should match the thickness of the board being cut, so it stands on the bench and holds up the back of the rail instead of letting it tip. The model makes the leg 0.3mm thinner than the material so it never lifts the rail. The one I printed has a 6mm leg, for 6.3mm stock.
 
 ![End view along the rail, jig in blue]({attach}/images/festool-thincut/view_end.png)
 
@@ -25,6 +25,12 @@ I could not find a published drawing of the rail profile, so the first print use
 
 Use two, one near each end of the rail, so the strip stays parallel.
 
-It prints on its side with no supports. The source is on GitHub at [morganp/openscad-festool-thincut](https://github.com/morganp/openscad-festool-thincut): set `cut_offset` for a different width, and `offset_trim` to fine tune after a test cut.
+It prints on its side with no supports. The source is on GitHub at [morganp/openscad-festool-thincut](https://github.com/morganp/openscad-festool-thincut). The Customizer shows three parameters:
 
-It is also on [MakerWorld](https://makerworld.com/en/models/3363697-festool-guide-rail-thin-cut-stop-customizable) with the 165mm print profile, and the Customize button there changes the width in the browser.
+- `cut_offset`: the strip width, 10 to 168mm. The embossed label follows it.
+- `material_t`: the thickness of the stock being cut, which sets the leg under the rail.
+- `jig_len`: the length of the jig along the rail.
+
+The rail fitting dimensions are hidden in the source, along with `offset_trim` to fine tune the width after a test cut.
+
+It is also on [MakerWorld](https://makerworld.com/en/models/3363697-festool-guide-rail-thin-cut-stop-customizable) with the 165mm print profile, and the Customize button there sets the same three parameters in the browser.
