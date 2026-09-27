@@ -26,3 +26,5 @@ I could not find a published drawing of the rail profile, so the first print use
 Use two, one near each end of the rail, so the strip stays parallel.
 
 It prints on its side with no supports. The source is on GitHub at [morganp/openscad-festool-thincut](https://github.com/morganp/openscad-festool-thincut): set `cut_offset` for a different width, and `offset_trim` to fine tune after a test cut.
+
+It is also on [MakerWorld](https://makerworld.com/en/models/3363697-festool-guide-rail-thin-cut-stop-customizable) with the 165mm print profile, and the Customize button there changes the width in the browser.
