@@ -1,5 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Hardware &amp; Homelab</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/hardware-homelab.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-26T00:00:00+01:00</updated><entry><title>A daily brief on the reMarkable</title><link href="http://lizard-spock.co.uk/a-daily-brief-on-the-remarkable.html" rel="alternate"></link><published>2026-09-26T00:00:00+01:00</published><updated>2026-09-26T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-26:/a-daily-brief-on-the-remarkable.html</id><summary type="html">&lt;p&gt;Part 2 of 3. Render the second brain vault as a printed daily brief each morning at 05:00 and deliver it to a reMarkable Paper Pro through a self-hosted rmfakecloud, with no reMarkable cloud involved.&lt;/p&gt;</summary><content type="html">&lt;p&gt;At five in the morning a small container renders one PDF and sends it to the
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Hardware &amp; Homelab</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/hardware-homelab.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-27T00:00:00+01:00</updated><entry><title>Handwriting back into the second brain</title><link href="http://lizard-spock.co.uk/handwriting-back-into-the-second-brain.html" rel="alternate"></link><published>2026-09-27T00:00:00+01:00</published><updated>2026-09-27T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-27:/handwriting-back-into-the-second-brain.html</id><summary type="html">&lt;p&gt;Part 3 of 3. Read ticks, arrows and handwritten notes off the reMarkable daily brief and apply them to the second brain vault as archived tasks, new due dates and appended notes.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Tick a checkbox on the morning brief, and by the next morning the task has moved
+to the archive. Draw an arrow after a task and write &lt;code&gt;soon&lt;/code&gt;, and it drops off
+page 1. Write a sentence beside a task, and the sentence appears in the task's
+file under a dated heading.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p3-01-hero-HQ.png"&gt;&lt;img alt="A stylus ticks the second checkbox on a tablet, and a dotted arrow carries the tick to one card lifted out of a card-index drawer" src="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p3-01-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This post builds that return path, from pen strokes on the reMarkable to edits
+in the vault from
+&lt;a href="http://lizard-spock.co.uk/giving-ai-agents-memory.html"&gt;part 1&lt;/a&gt;.
+It reads the briefs that
+&lt;a href="http://lizard-spock.co.uk/a-daily-brief-on-the-remarkable.html"&gt;part 2&lt;/a&gt;
+delivers, and it runs at the start of the same 05:00 job. The code is at
+&lt;a href="https://github.com/morganp/rmocr"&gt;github.com/morganp/rmocr&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;What comes back from the tablet&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;rmapi get&lt;/code&gt; downloads a document from rmfakecloud as an &lt;code&gt;.rmdoc&lt;/code&gt; file, which is
+a zip archive:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&amp;lt;doc-id&amp;gt;.pdf              the original brief, byte for byte
+&amp;lt;doc-id&amp;gt;.content          page order and document settings
+&amp;lt;doc-id&amp;gt;/&amp;lt;page-id&amp;gt;.rm     the ink for one page, version 6 format
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A PDF-backed document stores the pen strokes in a separate layer from the PDF.
+Each &lt;code&gt;.rm&lt;/code&gt; file holds only the ink, and only pages with ink have one, so there
+is no need to compare the page against the original render. The rmscene library
+parses the version 6 format into strokes, and each stroke is a list of points:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;rm_strokes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;out&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+    &lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;rb&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;read_blocks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SceneLineItemBlock&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+                &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;item&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;value&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;points&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+                    &lt;span class="n"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;([(&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;points&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;out&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;PyMuPDF reads the PDF side: the page size, the text lines with their positions,
+and the drawing commands.&lt;/p&gt;
+&lt;h2&gt;A vocabulary of ink&lt;/h2&gt;
+&lt;p&gt;Four marks carry meaning on a task row. Everything else is a note:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Ink&lt;/th&gt;
+&lt;th&gt;Effect on the action&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Tick in the checkbox&lt;/td&gt;
+&lt;td&gt;Archive it, after appending any attached note&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Arrow, then a word&lt;/td&gt;
+&lt;td&gt;Set &lt;code&gt;stage&lt;/code&gt;, the area tag, or &lt;code&gt;due&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Words beside the row, no arrow&lt;/td&gt;
+&lt;td&gt;Append them under &lt;code&gt;## Note from brief &amp;lt;date&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Line through the title&lt;/td&gt;
+&lt;td&gt;Report on the next brief, change nothing&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The arrow turns a word into an instruction. &lt;code&gt;work&lt;/code&gt; written beside a row without
+an arrow is a note; &lt;code&gt;→ work&lt;/code&gt; moves the action to the work area. The instruction
+words form a fixed list:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Kind&lt;/th&gt;
+&lt;th&gt;Words&lt;/th&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Priority&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;next&lt;/code&gt;, &lt;code&gt;soon&lt;/code&gt;, &lt;code&gt;sometime&lt;/code&gt;, &lt;code&gt;waiting&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;stage&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Area&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;work&lt;/code&gt;, &lt;code&gt;home&lt;/code&gt;, &lt;code&gt;personal&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;first tag&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Date&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;2026-10-05&lt;/code&gt;, &lt;code&gt;today&lt;/code&gt;, &lt;code&gt;tomorrow&lt;/code&gt;, &lt;code&gt;Friday&lt;/code&gt;, &lt;code&gt;next Friday&lt;/code&gt;, &lt;code&gt;5 Oct&lt;/code&gt;, &lt;code&gt;October 5&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;due&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;A bare weekday means its next occurrence, never today, and &lt;code&gt;next Friday&lt;/code&gt; means
+the Friday after that. A few aliases map to the list, such as &lt;code&gt;someday&lt;/code&gt; to
+&lt;code&gt;sometime&lt;/code&gt; and &lt;code&gt;blocked&lt;/code&gt; to &lt;code&gt;waiting&lt;/code&gt;. Any other word is reported and never
+applied, so a misread instruction cannot demote a task.&lt;/p&gt;
+&lt;h2&gt;Calibrating pen to page&lt;/h2&gt;
+&lt;p&gt;The strokes and the PDF use different coordinate systems. A calibration sheet
+maps one to the other. The sheet is a blank page at the brief's size, 509 by
+679 points, with five crosshairs at known positions. &lt;code&gt;calibration_sheet.py&lt;/code&gt;
+draws it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;reportlab.pdfgen&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;canvas&lt;/span&gt;
+
+&lt;span class="n"&gt;W&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;509&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;679&lt;/span&gt;
+&lt;span class="n"&gt;TARGETS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;CIRCLE&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;TRIANGLE&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;409&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+           &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SQUARE&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;579&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;HEXAGON&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;409&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;579&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+           &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;CROSS&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;254.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;339.5&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+
+&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;canvas&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Canvas&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;calibration.pdf&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pagesize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;W&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;TARGETS&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;                     &lt;span class="c1"&gt;# targets are top-left origin&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;drawString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To calibrate a tablet:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Run &lt;code&gt;calibration_sheet.py --out calibration.pdf&lt;/code&gt;, and push the sheet to the tablet with &lt;code&gt;rmapi put calibration.pdf&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Draw the named shape centred on each crosshair, with the pen you use for the brief.&lt;/li&gt;
+&lt;li&gt;Fetch the document with &lt;code&gt;rmapi get&lt;/code&gt;, and unzip it.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;fit.py &amp;lt;folder&amp;gt; --json-out transform.json&lt;/code&gt;, and set &lt;code&gt;RM_TRANSFORM&lt;/code&gt; to that file.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;fit.py&lt;/code&gt; groups the strokes into five shapes and takes the centre of each. It
+then solves a least-squares fit for a full affine transform, one equation per
+axis:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;x_pdf = 0.31456127 x + 0.00032105 y + 253.1235
+y_pdf = 0.00028972 x + 0.31615912 y +   1.3471
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A full affine fit allows for a different scale on each axis, a small rotation
+and an offset. On a Paper Pro the two scales differ by about 0.5%, and the
+corner residuals come out below 0.5 points. Put the six coefficients in
+&lt;code&gt;transform.py&lt;/code&gt;, or leave them in the JSON file named by &lt;code&gt;RM_TRANSFORM&lt;/code&gt;. Every later step
+passes each stroke point through &lt;code&gt;to_pdf()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;overlay.py&lt;/code&gt; draws the transformed strokes in blue over the page, with the
+checkboxes outlined in red. Run it on the calibration sheet and on the first
+real brief: each tick should sit inside its box.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p3-02-overlay-HQ.png"&gt;&lt;img alt="The task column of a brief with checkboxes outlined in red and the handwriting in blue: ticks inside the boxes for two tasks, and an arrow followed by the word soon beside a third" src="http://lizard-spock.co.uk/images/Homelab/SecondBrain/p3-02-overlay-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Assigning ink to rows&lt;/h2&gt;
+&lt;p&gt;The brief draws each checkbox as a 7 by 7 point stroked rectangle, as described
+in part 2. rmocr finds them in the page's drawing commands, not in the image:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;checkbox_rects&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;page&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;7x7 stroked squares from the content stream, in top-left origin space.&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;rx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;compile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;rb&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+re&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;H&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;page&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rect&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;height&lt;/span&gt;
+    &lt;span class="n"&gt;out&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;rx&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;finditer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;page&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_contents&lt;/span&gt;&lt;span class="p"&gt;()):&lt;/span&gt;
+        &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;h&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;groups&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;abs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;BOX_SIZE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;BOX_TOL&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="nb"&gt;abs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;h&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;BOX_SIZE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;BOX_TOL&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;   &lt;span class="c1"&gt;# -&amp;gt; top-left origin&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;sorted&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;out&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Each checkbox defines a row band, from the top of its box to the top of the
+next box. The strokes then pass through three tests, in order:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Tick&lt;/strong&gt;: at least 4 points of ink length inside the box, padded by 2.5 points. The test measures ink length rather than a single hit, so a stroke that only crosses the box does not count.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Strike&lt;/strong&gt;: a stroke at least 25 points wide and at least four times wider than it is tall, lying across a line of printed text.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Note&lt;/strong&gt;: everything else. Strokes group into clusters within one row band when they are less than 26 points apart.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A note cluster attaches to a row when at least a quarter of its height overlaps
+the row band, and when it spans no more than two rows. Vertical overlap
+decides, not distance, so a note in the far margin still reaches its task. A
+note that spans more rows is a free note, and it is reported rather than
+written anywhere.&lt;/p&gt;
+&lt;p&gt;The row title is the printed text beside the box, including the second line of
+a wrapped title. It must match the &lt;code&gt;#&lt;/code&gt; heading of exactly one action file. A
+title with no match, or with two, is reported and skipped, because a wrong
+match would archive the wrong task.&lt;/p&gt;
+&lt;h2&gt;Reading the words&lt;/h2&gt;
+&lt;p&gt;Each note cluster becomes a small image of black strokes on white. The crop
+follows the cluster with a 12 point margin. The strokes render at 4 pixels per
+point with the pen width of the Fineliner, and the printed page stays out of the
+image.&lt;/p&gt;
+&lt;p&gt;The Claude Code CLI transcribes the image. The prompt gives the image path and
+the printed row as context, and the only tool allowed is &lt;code&gt;Read&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;CLAUDE_BIN&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-p&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;prompt&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;--allowedTools&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Read&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;subprocess&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;capture_output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;timeout&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;timeout&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                   &lt;span class="n"&gt;env&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;env&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cwd&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dirname&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;img_path&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For a note beside a task row, the prompt asks for one JSON object:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;gesture&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;arrow&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;text&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;soon&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The model decides whether an arrow is present, because a small, fast arrowhead
+is easier to name than to measure. The prompt tells it to answer &lt;code&gt;none&lt;/code&gt; unless
+it can see an arrowhead. The &lt;code&gt;text&lt;/code&gt; then goes through the instruction parser
+when &lt;code&gt;gesture&lt;/code&gt; is &lt;code&gt;arrow&lt;/code&gt;, and becomes a note otherwise.&lt;/p&gt;
+&lt;h2&gt;Applying edits&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;writeback.py&lt;/code&gt; turns the results into an edit plan and prints it. By default it
+changes nothing. For the page above, the plan reads:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;PLANNED EDITS (3)
+  p1  archive renew-car-insurance (checkbox ticked)
+  p1  set stage = soon on service-the-lawnmower (arrow + priority, raw &amp;#39;soon&amp;#39;)
+  p1  archive submit-expenses-q3 (checkbox ticked)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;With &lt;code&gt;--apply&lt;/code&gt; it edits the action files, moves archived
+actions into &lt;code&gt;archive/actions/&lt;/code&gt;, and commits the result to the vault. It refuses
+to run on a vault with uncommitted changes, so a writeback commit only ever
+holds writeback edits.&lt;/p&gt;
+&lt;p&gt;A ledger in &lt;code&gt;state/applied.json&lt;/code&gt; records each applied edit. The key is a hash of
+the document, page, action, operation and content:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;key&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;doc_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;edit&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;edit&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;action&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;|&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;doc_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;edit&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;page&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt; &lt;span class="n"&gt;edit&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;op&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+                    &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;_payload&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;edit&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;hashlib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sha256&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;utf-8&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;hexdigest&lt;/span&gt;&lt;span class="p"&gt;()[:&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Reading the same ink twice finds the key and skips the edit. A different note
+beside the same row on a later brief has a new key and applies. The next brief
+then lists the applied edits, and anything that needs attention, on its
+"Written back from paper" page.&lt;/p&gt;
+&lt;h2&gt;Wiring it into the 05:00 run&lt;/h2&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_8c2a414a6f88c5cc3c143a1cb5edf5be.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The writeback runs at the top of &lt;code&gt;generate_daily_brief.sh&lt;/code&gt;, before the brief
+renders, so today's brief already reflects yesterday's ink. It processes the
+last four briefs, because the tablet may not have synced overnight; the ledger
+makes each repeat free. For each brief, the script:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Fetches &lt;code&gt;Daily/&amp;lt;date&amp;gt; brief&lt;/code&gt; with &lt;code&gt;rmapi -ni get&lt;/code&gt;, and skips the day if there is none.&lt;/li&gt;
+&lt;li&gt;Unzips it, and skips it if there are no &lt;code&gt;.rm&lt;/code&gt; files.&lt;/li&gt;
+&lt;li&gt;Runs &lt;code&gt;writeback.py --apply&lt;/code&gt;, and continues to the next brief if it fails.&lt;/li&gt;
+&lt;li&gt;Pushes the vault once, if any brief produced a commit.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;No failure in this stage stops the brief. A missing rmocr install, a vault with
+uncommitted changes, or a failed transcription each log a line and move on.&lt;/p&gt;
+&lt;p&gt;To set it up, clone the repository to &lt;code&gt;/opt/rmocr&lt;/code&gt; and create its virtual
+environment:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;python3&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt;venv&lt;span class="w"&gt; &lt;/span&gt;.venv
+./.venv/bin/pip&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-r&lt;span class="w"&gt; &lt;/span&gt;requirements.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then calibrate your tablet, and run &lt;code&gt;writeback.py&lt;/code&gt; without &lt;code&gt;--apply&lt;/code&gt; on a brief
+you have written on. When the plan matches your ink, the 05:00 job applies the
+next one.&lt;/p&gt;</content><category term="Hardware &amp; Homelab"></category><category term="reMarkable"></category><category term="OCR"></category><category term="Claude"></category><category term="rmscene"></category><category term="PyMuPDF"></category><category term="homelab"></category></entry><entry><title>A daily brief on the reMarkable</title><link href="http://lizard-spock.co.uk/a-daily-brief-on-the-remarkable.html" rel="alternate"></link><published>2026-09-26T00:00:00+01:00</published><updated>2026-09-26T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-26:/a-daily-brief-on-the-remarkable.html</id><summary type="html">&lt;p&gt;Part 2 of 3. Render the second brain vault as a printed daily brief each morning at 05:00 and deliver it to a reMarkable Paper Pro through a self-hosted rmfakecloud, with no reMarkable cloud involved.&lt;/p&gt;</summary><content type="html">&lt;p&gt;At five in the morning a small container renders one PDF and sends it to the
 tablet. When the tablet wakes, the brief is already in its &lt;code&gt;Daily&lt;/code&gt; folder. It
 holds today's meetings, the tasks that need doing, the next four weeks, and ten
 pages of squared paper for notes.&lt;/p&gt;
@@ -232,7 +473,7 @@ with mode 600.&lt;/p&gt;
 &lt;li&gt;Run &lt;code&gt;generate_daily_brief.sh&lt;/code&gt; once by hand, then add the cron line.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Start with steps 1 to 5. The PDF is useful on any tablet or printer, and the
-reMarkable delivery can follow later. Part 3 adds the return path, reading ticks
+reMarkable delivery can follow later. &lt;a href="http://lizard-spock.co.uk/handwriting-back-into-the-second-brain.html"&gt;Part 3&lt;/a&gt; adds the return path, reading ticks
 and handwritten notes on the brief back into the vault.&lt;/p&gt;</content><category term="Hardware &amp; Homelab"></category><category term="reMarkable"></category><category term="MCP"></category><category term="Claude"></category><category term="ReportLab"></category><category term="rmfakecloud"></category><category term="homelab"></category></entry><entry><title>Giving AI agents memory</title><link href="http://lizard-spock.co.uk/giving-ai-agents-memory.html" rel="alternate"></link><published>2026-09-25T00:00:00+01:00</published><updated>2026-09-25T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-25:/giving-ai-agents-memory.html</id><summary type="html">&lt;p&gt;Part 1 of 3. A markdown vault and a small MCP server that give any AI agent persistent memory, an action list with derived priority, and a calendar of one-off and annual events.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Every new chat with an AI agent starts empty. You explain the project again,
 list the open tasks again, and remind it that the school holidays start on
 Friday. The agent is capable, but it has nowhere to keep anything between
@@ -243,7 +484,7 @@ a small MCP (Model Context Protocol) server. Claude Code, the Claude apps and
 Codex all connect to the same vault. Memory, tasks and dates carry over from one
 conversation to the next, and from one client to another. It is part
 1 of 3: part 2 turns the vault into a daily brief on a reMarkable tablet, and
-part 3 reads handwriting on that brief back into the vault. Each part links its
+&lt;a href="http://lizard-spock.co.uk/handwriting-back-into-the-second-brain.html"&gt;part 3&lt;/a&gt; reads handwriting on that brief back into the vault. Each part links its
 own repository. The MCP server built here is at
 &lt;a href="https://github.com/morganp/secondbrain-mcp"&gt;github.com/morganp/secondbrain-mcp&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;What an agent should remember&lt;/h2&gt;

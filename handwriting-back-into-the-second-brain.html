@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Handwriting back into the second brain</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+    <meta name="description" content="Part 3 of 3. Read ticks, arrows and handwritten notes off the reMarkable daily brief and apply them to the second brain vault as archived tasks,..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./handwriting-back-into-the-second-brain.html" rel="bookmark"
+             title="Permalink to Handwriting back into the second brain">Handwriting back into the second brain</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-09-27T00:00:00+01:00">
+                Published: Sun 27 September 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/hardware-homelab.html">Hardware & Homelab</a>.</p>
+<p>tags: <a href="./tag/remarkable.html">reMarkable</a> <a href="./tag/ocr.html">OCR</a> <a href="./tag/claude.html">Claude</a> <a href="./tag/rmscene.html">rmscene</a> <a href="./tag/pymupdf.html">PyMuPDF</a> <a href="./tag/homelab.html">homelab</a> </p>        
+</footer><!-- /.post-info -->        <p>Tick a checkbox on the morning brief, and by the next morning the task has moved
+to the archive. Draw an arrow after a task and write <code>soon</code>, and it drops off
+page 1. Write a sentence beside a task, and the sentence appears in the task's
+file under a dated heading.</p>
+<p><a href="./images/Homelab/SecondBrain/p3-01-hero-HQ.png"><img alt="A stylus ticks the second checkbox on a tablet, and a dotted arrow carries the tick to one card lifted out of a card-index drawer" src="./images/Homelab/SecondBrain/p3-01-hero-900w.png"></a></p>
+<p>This post builds that return path, from pen strokes on the reMarkable to edits
+in the vault from
+<a href="./giving-ai-agents-memory.html">part 1</a>.
+It reads the briefs that
+<a href="./a-daily-brief-on-the-remarkable.html">part 2</a>
+delivers, and it runs at the start of the same 05:00 job. The code is at
+<a href="https://github.com/morganp/rmocr">github.com/morganp/rmocr</a>.</p>
+<h2>What comes back from the tablet</h2>
+<p><code>rmapi get</code> downloads a document from rmfakecloud as an <code>.rmdoc</code> file, which is
+a zip archive:</p>
+<div class="highlight"><pre><span></span><code>&lt;doc-id&gt;.pdf              the original brief, byte for byte
+&lt;doc-id&gt;.content          page order and document settings
+&lt;doc-id&gt;/&lt;page-id&gt;.rm     the ink for one page, version 6 format
+</code></pre></div>
+
+<p>A PDF-backed document stores the pen strokes in a separate layer from the PDF.
+Each <code>.rm</code> file holds only the ink, and only pages with ink have one, so there
+is no need to compare the page against the original render. The rmscene library
+parses the version 6 format into strokes, and each stroke is a list of points:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">rm_strokes</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">read_blocks</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">SceneLineItemBlock</span><span class="p">):</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;points&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">([(</span><span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">points</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">out</span>
+</code></pre></div>
+
+<p>PyMuPDF reads the PDF side: the page size, the text lines with their positions,
+and the drawing commands.</p>
+<h2>A vocabulary of ink</h2>
+<p>Four marks carry meaning on a task row. Everything else is a note:</p>
+<table>
+<thead>
+<tr>
+<th>Ink</th>
+<th>Effect on the action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tick in the checkbox</td>
+<td>Archive it, after appending any attached note</td>
+</tr>
+<tr>
+<td>Arrow, then a word</td>
+<td>Set <code>stage</code>, the area tag, or <code>due</code></td>
+</tr>
+<tr>
+<td>Words beside the row, no arrow</td>
+<td>Append them under <code>## Note from brief &lt;date&gt;</code></td>
+</tr>
+<tr>
+<td>Line through the title</td>
+<td>Report on the next brief, change nothing</td>
+</tr>
+</tbody>
+</table>
+<p>The arrow turns a word into an instruction. <code>work</code> written beside a row without
+an arrow is a note; <code>→ work</code> moves the action to the work area. The instruction
+words form a fixed list:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Words</th>
+<th>Field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Priority</td>
+<td><code>next</code>, <code>soon</code>, <code>sometime</code>, <code>waiting</code></td>
+<td><code>stage</code></td>
+</tr>
+<tr>
+<td>Area</td>
+<td><code>work</code>, <code>home</code>, <code>personal</code></td>
+<td>first tag</td>
+</tr>
+<tr>
+<td>Date</td>
+<td><code>2026-10-05</code>, <code>today</code>, <code>tomorrow</code>, <code>Friday</code>, <code>next Friday</code>, <code>5 Oct</code>, <code>October 5</code></td>
+<td><code>due</code></td>
+</tr>
+</tbody>
+</table>
+<p>A bare weekday means its next occurrence, never today, and <code>next Friday</code> means
+the Friday after that. A few aliases map to the list, such as <code>someday</code> to
+<code>sometime</code> and <code>blocked</code> to <code>waiting</code>. Any other word is reported and never
+applied, so a misread instruction cannot demote a task.</p>
+<h2>Calibrating pen to page</h2>
+<p>The strokes and the PDF use different coordinate systems. A calibration sheet
+maps one to the other. The sheet is a blank page at the brief's size, 509 by
+679 points, with five crosshairs at known positions. <code>calibration_sheet.py</code>
+draws it:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">reportlab.pdfgen</span> <span class="kn">import</span> <span class="n">canvas</span>
+
+<span class="n">W</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="mi">509</span><span class="p">,</span> <span class="mi">679</span>
+<span class="n">TARGETS</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;CIRCLE&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TRIANGLE&quot;</span><span class="p">,</span> <span class="mi">409</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+           <span class="p">(</span><span class="s2">&quot;SQUARE&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">579</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;HEXAGON&quot;</span><span class="p">,</span> <span class="mi">409</span><span class="p">,</span> <span class="mi">579</span><span class="p">),</span>
+           <span class="p">(</span><span class="s2">&quot;CROSS&quot;</span><span class="p">,</span> <span class="mf">254.5</span><span class="p">,</span> <span class="mf">339.5</span><span class="p">)]</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="s2">&quot;calibration.pdf&quot;</span><span class="p">,</span> <span class="n">pagesize</span><span class="o">=</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">TARGETS</span><span class="p">:</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">H</span> <span class="o">-</span> <span class="n">y</span>                     <span class="c1"># targets are top-left origin</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="mi">10</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">drawString</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">14</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+
+<p>To calibrate a tablet:</p>
+<ol>
+<li>Run <code>calibration_sheet.py --out calibration.pdf</code>, and push the sheet to the tablet with <code>rmapi put calibration.pdf</code>.</li>
+<li>Draw the named shape centred on each crosshair, with the pen you use for the brief.</li>
+<li>Fetch the document with <code>rmapi get</code>, and unzip it.</li>
+<li>Run <code>fit.py &lt;folder&gt; --json-out transform.json</code>, and set <code>RM_TRANSFORM</code> to that file.</li>
+</ol>
+<p><code>fit.py</code> groups the strokes into five shapes and takes the centre of each. It
+then solves a least-squares fit for a full affine transform, one equation per
+axis:</p>
+<div class="highlight"><pre><span></span><code>x_pdf = 0.31456127 x + 0.00032105 y + 253.1235
+y_pdf = 0.00028972 x + 0.31615912 y +   1.3471
+</code></pre></div>
+
+<p>A full affine fit allows for a different scale on each axis, a small rotation
+and an offset. On a Paper Pro the two scales differ by about 0.5%, and the
+corner residuals come out below 0.5 points. Put the six coefficients in
+<code>transform.py</code>, or leave them in the JSON file named by <code>RM_TRANSFORM</code>. Every later step
+passes each stroke point through <code>to_pdf()</code>.</p>
+<p><code>overlay.py</code> draws the transformed strokes in blue over the page, with the
+checkboxes outlined in red. Run it on the calibration sheet and on the first
+real brief: each tick should sit inside its box.</p>
+<p><a href="./images/Homelab/SecondBrain/p3-02-overlay-HQ.png"><img alt="The task column of a brief with checkboxes outlined in red and the handwriting in blue: ticks inside the boxes for two tasks, and an arrow followed by the word soon beside a third" src="./images/Homelab/SecondBrain/p3-02-overlay-900w.png"></a></p>
+<h2>Assigning ink to rows</h2>
+<p>The brief draws each checkbox as a 7 by 7 point stroked rectangle, as described
+in part 2. rmocr finds them in the page's drawing commands, not in the image:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">checkbox_rects</span><span class="p">(</span><span class="n">page</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;7x7 stroked squares from the content stream, in top-left origin space.&quot;&quot;&quot;</span>
+    <span class="n">rx</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">rb</span><span class="s2">&quot;(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+re&quot;</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">height</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">rx</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">read_contents</span><span class="p">()):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">BOX_SIZE</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">BOX_TOL</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">BOX_SIZE</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">BOX_TOL</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">H</span> <span class="o">-</span> <span class="n">y</span> <span class="o">-</span> <span class="n">h</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">H</span> <span class="o">-</span> <span class="n">y</span><span class="p">])</span>   <span class="c1"># -&gt; top-left origin</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</code></pre></div>
+
+<p>Each checkbox defines a row band, from the top of its box to the top of the
+next box. The strokes then pass through three tests, in order:</p>
+<ul>
+<li><strong>Tick</strong>: at least 4 points of ink length inside the box, padded by 2.5 points. The test measures ink length rather than a single hit, so a stroke that only crosses the box does not count.</li>
+<li><strong>Strike</strong>: a stroke at least 25 points wide and at least four times wider than it is tall, lying across a line of printed text.</li>
+<li><strong>Note</strong>: everything else. Strokes group into clusters within one row band when they are less than 26 points apart.</li>
+</ul>
+<p>A note cluster attaches to a row when at least a quarter of its height overlaps
+the row band, and when it spans no more than two rows. Vertical overlap
+decides, not distance, so a note in the far margin still reaches its task. A
+note that spans more rows is a free note, and it is reported rather than
+written anywhere.</p>
+<p>The row title is the printed text beside the box, including the second line of
+a wrapped title. It must match the <code>#</code> heading of exactly one action file. A
+title with no match, or with two, is reported and skipped, because a wrong
+match would archive the wrong task.</p>
+<h2>Reading the words</h2>
+<p>Each note cluster becomes a small image of black strokes on white. The crop
+follows the cluster with a 12 point margin. The strokes render at 4 pixels per
+point with the pen width of the Fineliner, and the printed page stays out of the
+image.</p>
+<p>The Claude Code CLI transcribes the image. The prompt gives the image path and
+the printed row as context, and the only tool allowed is <code>Read</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">CLAUDE_BIN</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;--allowedTools&quot;</span><span class="p">,</span> <span class="s2">&quot;Read&quot;</span><span class="p">]</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                   <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">img_path</span><span class="p">))</span>
+</code></pre></div>
+
+<p>For a note beside a task row, the prompt asks for one JSON object:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;gesture&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arrow&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;soon&quot;</span><span class="p">}</span>
+</code></pre></div>
+
+<p>The model decides whether an arrow is present, because a small, fast arrowhead
+is easier to name than to measure. The prompt tells it to answer <code>none</code> unless
+it can see an arrowhead. The <code>text</code> then goes through the instruction parser
+when <code>gesture</code> is <code>arrow</code>, and becomes a note otherwise.</p>
+<h2>Applying edits</h2>
+<p><code>writeback.py</code> turns the results into an edit plan and prints it. By default it
+changes nothing. For the page above, the plan reads:</p>
+<div class="highlight"><pre><span></span><code>PLANNED EDITS (3)
+  p1  archive renew-car-insurance (checkbox ticked)
+  p1  set stage = soon on service-the-lawnmower (arrow + priority, raw &#39;soon&#39;)
+  p1  archive submit-expenses-q3 (checkbox ticked)
+</code></pre></div>
+
+<p>With <code>--apply</code> it edits the action files, moves archived
+actions into <code>archive/actions/</code>, and commits the result to the vault. It refuses
+to run on a vault with uncommitted changes, so a writeback commit only ever
+holds writeback edits.</p>
+<p>A ledger in <code>state/applied.json</code> records each applied edit. The key is a hash of
+the document, page, action, operation and content:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">key</span><span class="p">(</span><span class="n">doc_id</span><span class="p">,</span> <span class="n">edit</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">edit</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">]</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">doc_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">edit</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span> <span class="n">edit</span><span class="p">[</span><span class="s2">&quot;op&quot;</span><span class="p">],</span>
+                    <span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">_payload</span><span class="p">(</span><span class="n">edit</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">20</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Reading the same ink twice finds the key and skips the edit. A different note
+beside the same row on a later brief has a new key and applies. The next brief
+then lists the applied edits, and anything that needs attention, on its
+"Written back from paper" page.</p>
+<h2>Wiring it into the 05:00 run</h2>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_8c2a414a6f88c5cc3c143a1cb5edf5be.svg"></p>
+<p>The writeback runs at the top of <code>generate_daily_brief.sh</code>, before the brief
+renders, so today's brief already reflects yesterday's ink. It processes the
+last four briefs, because the tablet may not have synced overnight; the ledger
+makes each repeat free. For each brief, the script:</p>
+<ol>
+<li>Fetches <code>Daily/&lt;date&gt; brief</code> with <code>rmapi -ni get</code>, and skips the day if there is none.</li>
+<li>Unzips it, and skips it if there are no <code>.rm</code> files.</li>
+<li>Runs <code>writeback.py --apply</code>, and continues to the next brief if it fails.</li>
+<li>Pushes the vault once, if any brief produced a commit.</li>
+</ol>
+<p>No failure in this stage stops the brief. A missing rmocr install, a vault with
+uncommitted changes, or a failed transcription each log a line and move on.</p>
+<p>To set it up, clone the repository to <code>/opt/rmocr</code> and create its virtual
+environment:</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+./.venv/bin/pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</code></pre></div>
+
+<p>Then calibrate your tablet, and run <code>writeback.py</code> without <code>--apply</code> on a brief
+you have written on. When the plan matches your ink, the 05:00 job applies the
+next one.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
