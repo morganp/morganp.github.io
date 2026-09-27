@@ -19,7 +19,7 @@ a small MCP (Model Context Protocol) server. Claude Code, the Claude apps and
 Codex all connect to the same vault. Memory, tasks and dates carry over from one
 conversation to the next, and from one client to another. It is part
 1 of 3: part 2 turns the vault into a daily brief on a reMarkable tablet, and
-part 3 reads handwriting on that brief back into the vault. Each part links its
+[part 3]({filename}/posts/2026-09-25_Handwriting_Back_into_the_Second_Brain/2026-09-25_Handwriting_Back_into_the_Second_Brain.md) reads handwriting on that brief back into the vault. Each part links its
 own repository. The MCP server built here is at
 [github.com/morganp/secondbrain-mcp](https://github.com/morganp/secondbrain-mcp).
 

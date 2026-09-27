@@ -235,5 +235,5 @@ with mode 600.
 7. Run `generate_daily_brief.sh` once by hand, then add the cron line.
 
 Start with steps 1 to 5. The PDF is useful on any tablet or printer, and the
-reMarkable delivery can follow later. Part 3 adds the return path, reading ticks
+reMarkable delivery can follow later. [Part 3]({filename}/posts/2026-09-25_Handwriting_Back_into_the_Second_Brain/2026-09-25_Handwriting_Back_into_the_Second_Brain.md) adds the return path, reading ticks
 and handwritten notes on the brief back into the vault.
