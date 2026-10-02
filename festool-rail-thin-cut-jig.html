@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>A 3D printed thin-cut stop for the Festool rail</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+                        <meta name="google-adsense-account" content="ca-pub-3722123143991195">
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3722123143991195"
+                             crossorigin="anonymous"></script>
+    <meta name="description" content="A small printed clip that hooks into the T-slot on the back of a Festool guide rail and gives a repeatable 165mm strip, with the width embossed on top." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./festool-rail-thin-cut-jig.html" rel="bookmark"
+             title="Permalink to A 3D printed thin-cut stop for the Festool rail">A 3D printed thin-cut stop for the Festool rail</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-09-27T00:00:00+01:00">
+                Published: Sun 27 September 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/3d-print.html">3D Print</a> <a href="./tag/openscad.html">OpenSCAD</a> <a href="./tag/festool.html">Festool</a> <a href="./tag/woodworking.html">Woodworking</a> <a href="./tag/jig.html">Jig</a> </p>        
+</footer><!-- /.post-info -->        <p>Cutting a stack of strips the same width with a guide rail means measuring and marking every one. This clip removes the measuring. It hooks into the T-slot along the back edge of a Festool FS rail, wraps around that edge, and returns under the rail as a thin leg. The end of the leg is a stop: push the edge of the board against it and the rail's cutting edge sits 165mm in.</p>
+<p><img alt="Jig, three quarter view" src="./view_iso.png"></p>
+<p>Looking along the rail, the key sits in the top slot and the C wraps the back edge. The leg under the rail should match the thickness of the board being cut, so it stands on the bench and holds up the back of the rail instead of letting it tip. The model makes the leg 0.3mm thinner than the material so it never lifts the rail. The one I printed has a 6mm leg, for 6.3mm stock.</p>
+<p><img alt="End view along the rail, jig in blue" src="./view_end.png"></p>
+<p>The strip width is embossed on the top of the jig. It is generated from the same parameter that places the stop, so change the width and the label follows.</p>
+<p><img alt="Cut width embossed on top" src="./view_label.png"></p>
+<h2>Calibrating it</h2>
+<p>I could not find a published drawing of the rail profile, so the first print used estimated dimensions. Set to 160mm, it cut 165mm. Rather than move anything, I corrected the rail width in the model by 5mm and set the cut to 165, which leaves the printed geometry identical and makes the label honest. The key neck also went up by 1mm. There is still over 1mm of play in the slot, but pushing the board against the stop takes it up the same way every time, so the cut repeats.</p>
+<p>Use two, one near each end of the rail, so the strip stays parallel.</p>
+<p>It prints on its side with no supports. The source is on GitHub at <a href="https://github.com/morganp/openscad-festool-thincut">morganp/openscad-festool-thincut</a>. The Customizer shows three parameters:</p>
+<ul>
+<li><code>cut_offset</code>: the strip width, 10 to 168mm. The embossed label follows it.</li>
+<li><code>material_t</code>: the thickness of the stock being cut, which sets the leg under the rail.</li>
+<li><code>jig_len</code>: the length of the jig along the rail.</li>
+</ul>
+<p>The rail fitting dimensions are hidden in the source, along with <code>offset_trim</code> to fine tune the width after a test cut.</p>
+<p>It is also on <a href="https://makerworld.com/en/models/3363697-festool-guide-rail-thin-cut-stop-customizable">MakerWorld</a> with the 165mm print profile, and the Customize button there sets the same three parameters in the browser.</p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
