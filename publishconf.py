@@ -16,6 +16,13 @@ CATEGORY_FEED_ATOM = "feeds/{slug}.atom.xml"
 
 DELETE_OUTPUT_DIRECTORY = True
 
+# Drafts stay local: an empty save path stops Pelican rendering them to
+# /drafts/<slug>.html, which ghp-import would otherwise push to gh-pages.
+DRAFT_SAVE_AS = ""
+DRAFT_URL = ""
+DRAFT_LANG_SAVE_AS = ""
+DRAFT_LANG_URL = ""
+
 # Following items are often useful when publishing
 
 # DISQUS_SITENAME = ""
