@@ -1,6 +1,6 @@
 Title: Hikoki NR1890DCA framing nailer
 Date: 2026-10-03
-Category: Home & Garden
+Category: Woodwork
 Tags: Hikoki, Nail Gun, Workshop, Tools
 Slug: hikoki-nr1890dca-framing-nailer
 Author: morganp
