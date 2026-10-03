@@ -1,5 +1,307 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Engineering</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-09-27T00:00:00+01:00</updated><entry><title>A 3D printed thin-cut stop for the Festool rail</title><link href="http://lizard-spock.co.uk/festool-rail-thin-cut-jig.html" rel="alternate"></link><published>2026-09-27T00:00:00+01:00</published><updated>2026-09-27T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-27:/festool-rail-thin-cut-jig.html</id><summary type="html">&lt;p&gt;A small printed clip that hooks into the T-slot on the back of a Festool guide rail and gives a repeatable 165mm strip, with the width embossed on top.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Cutting a stack of strips the same width with a guide rail means measuring and marking every one. This clip removes the measuring. It hooks into the T-slot along the back edge of a Festool FS rail, wraps around that edge, and returns under the rail as a thin leg. The end of the leg is a stop: push the edge of the board against it and the rail's cutting edge sits 165mm in.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Lizard-Spock - Engineering</title><link href="http://lizard-spock.co.uk/" rel="alternate"></link><link href="http://lizard-spock.co.uk/feeds/engineering.atom.xml" rel="self"></link><id>http://lizard-spock.co.uk/</id><updated>2026-10-03T00:00:00+01:00</updated><entry><title>SoC Intermediate 05: Clock domain crossing techniques</title><link href="http://lizard-spock.co.uk/soc-intermediate-05-clock-domain-crossing-techniques.html" rel="alternate"></link><published>2026-10-03T00:00:00+01:00</published><updated>2026-10-03T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-10-03:/soc-intermediate-05-clock-domain-crossing-techniques.html</id><summary type="html">&lt;p&gt;Why a bus can cross a clock domain through correct synchronisers and still deliver a value that never existed, and the structures that prevent it: metastability and the two-flop MTBF, toggle synchronisers, handshakes, Gray-coded pointers, asynchronous FIFOs, reset crossings, and reconvergence.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/SoC/ArticleI05/00-two-domains-hero-HQ.png"&gt;&lt;img alt="Two clock domains on a system on chip beating at different rhythms, joined by a bridge carrying synchroniser, handshake and FIFO structures between them" src="http://lizard-spock.co.uk/images/SoC/ArticleI05/00-two-domains-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Series: Intermediate SoC Design | Article 5 of 10&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The value that never existed&lt;/h2&gt;
+&lt;p&gt;The failure happened about once every eleven hours. A timestamp counter,
+maintained in a 300 MHz domain and read by software running at 100 MHz, would
+very occasionally return a number that was wrong by a large power of two.
+Wrong, then correct again on the next read, then correct for another eleven
+hours.&lt;/p&gt;
+&lt;p&gt;The crossing had been reviewed. Every bit of that counter went through a proper
+two-flop synchroniser in the destination domain. The clock domain crossing
+(CDC) tool reported no unsynchronised crossings anywhere in the block.&lt;/p&gt;
+&lt;p&gt;This article covers the protection those two flops give, the protection they do
+not give, and how to pick the right structure for each kind of crossing. It targets
+engineers writing register transfer level (RTL) code that spans more than one
+clock, and anybody who has been handed a CDC report and a list of waivers and
+asked whether the design is safe.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Why a flip-flop can hesitate&lt;/h2&gt;
+&lt;p&gt;A flip-flop is specified to capture its input reliably provided the input is
+stable for a setup time before the clock edge and a hold time after it. A
+signal arriving from another clock domain has no relationship to that edge and
+will eventually violate the window.&lt;/p&gt;
+&lt;p&gt;When it does, the flop can enter metastability: an internal balanced state
+where the output sits between valid logic levels and takes an unbounded time to
+resolve one way or the other.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/SoC/ArticleI05/01-metastability-HQ.png"&gt;&lt;img alt="A coin landing on its edge and slowly toppling, shown as the balanced state a flip-flop enters when data arrives too close to a clock edge" src="http://lizard-spock.co.uk/images/SoC/ArticleI05/01-metastability-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;It does resolve. The balance is unstable, and the internal feedback amplifies
+whichever way it tips, exponentially. That exponential is the entire basis of
+synchroniser design, because it means the probability of still being undecided
+falls off exponentially with the time you allow. The mean time between failures
+(MTBF) follows from that probability.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;              e^(t_r / tau)
+MTBF  =  ---------------------------
+          T0 &lt;span class="gs"&gt;* f_clock *&lt;/span&gt; f_data
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;t_r&lt;/code&gt; is the time the design gives the flop to resolve before anything reads
+it. &lt;code&gt;tau&lt;/code&gt; and &lt;code&gt;T0&lt;/code&gt; characterise the flop and come from the library. The two
+frequencies set how often the opportunity to fail arises.&lt;/p&gt;
+&lt;p&gt;Put illustrative numbers in. With &lt;code&gt;tau&lt;/code&gt; of 20 ps, &lt;code&gt;T0&lt;/code&gt; of 20 ps, a destination
+clock of 500 MHz, data changing at 10 MHz, and a single flop leaving 0.3 ns of
+slack for resolution, the exponent is 15 and the MTBF is about half a minute. That is not a design, it is a fault generator.&lt;/p&gt;
+&lt;p&gt;Add a second flop and the resolution time gains a full clock period, 2 ns at
+500 MHz. The exponent moves from 15 to 115, and since &lt;code&gt;e&lt;/code&gt; to the 100 is
+roughly ten to the 43, the MTBF leaves the domain of engineering entirely.&lt;/p&gt;
+&lt;p&gt;Two things follow, and both matter. The failure rate can be made arbitrarily
+small, and it can never be made zero. Metastability is managed, not eliminated,
+and the number of stages is a calculation against your library and your
+frequencies, not a convention. Above roughly a gigahertz, or with a fast data
+rate, three stages start to earn their place.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;The structure everyone knows&lt;/h2&gt;
+&lt;p&gt;The two-flop synchroniser is two flip-flops in the destination domain, back to
+back, with nothing combinational between them.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_ee9025e575475e524edfec589b943cde.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The amber edge is a rule, not a drawing convenience. Any combinational logic
+between FF1 and FF2 consumes the resolution time the second flop exists to
+provide, and a synthesis tool that is not told otherwise will happily place
+some there. Real flows mark the structure explicitly, through a synchroniser
+cell from the library, a naming convention the CDC tool recognises, or a
+constraint that keeps the pair together.&lt;/p&gt;
+&lt;p&gt;The cost is latency: the output follows the input by one to two destination
+cycles.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_7382fba9856c42f6cd3ffc6330788461.svg"&gt;&lt;/p&gt;
+&lt;p&gt;That is the correct structure for a single bit that changes slowly relative to
+the destination clock: a status level, an enable, a mode bit that settles long
+before anybody acts on it.&lt;/p&gt;
+&lt;p&gt;It is the wrong structure for everything else, and the rest of this article is
+the everything else.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Pulses that are not there long enough&lt;/h2&gt;
+&lt;p&gt;A one-cycle pulse in a 300 MHz domain lasts about 3.3 ns. A destination clock
+at 100 MHz looks every 10 ns. The pulse can arrive and leave between two
+destination edges, and no amount of synchronisation recovers a signal that was
+never present when anybody sampled.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="WaveDrom timing diagram" src="http://lizard-spock.co.uk/images/wavedrom/wavedrom_ff7f110ee68de1e2fc933fb242e3d7a8.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The fix is to stop crossing a pulse and start crossing a level. A toggle
+synchroniser converts each event into a permanent change of state, which the
+destination cannot miss, then converts it back into a pulse locally.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// Source domain: each event flips the level&lt;/span&gt;
+&lt;span class="k"&gt;always_ff&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;@(&lt;/span&gt;&lt;span class="k"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;src_clk&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;or&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;negedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;src_reset_n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;src_reset_n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;req_toggle&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="mb"&gt;&amp;#39;b0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;src_pulse&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;req_toggle&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="n"&gt;req_toggle&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Destination domain: synchronise, then edge detect&lt;/span&gt;
+&lt;span class="k"&gt;always_ff&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;@(&lt;/span&gt;&lt;span class="k"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dst_clk&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;or&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;negedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dst_reset_n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;dst_reset_n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;sync1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="mb"&gt;&amp;#39;b0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;sync2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="mb"&gt;&amp;#39;b0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;sync3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="mb"&gt;&amp;#39;b0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;sync1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;req_toggle&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;sync2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sync1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;sync3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sync2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dst_pulse&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sync2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sync3&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The third flop is not a third synchroniser stage. It is a delayed copy so the
+exclusive OR can spot the edge. Two stages resolve metastability, the third
+recovers the event.&lt;/p&gt;
+&lt;p&gt;This structure carries events, not data, and it has a rate limit. Events must
+arrive no faster than the destination can observe separate toggles, which means
+at least two or three destination clock periods apart. Push events in faster
+than that and toggles cancel silently, which looks exactly like an interrupt
+that occasionally does not fire.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Buses, and the failure at the top&lt;/h2&gt;
+&lt;p&gt;Now the counter. Each bit went through a correct two-flop synchroniser, and
+each of those synchronisers did its job perfectly.&lt;/p&gt;
+&lt;p&gt;Consider the counter stepping from 0x0FFF to 0x1000. Twelve bits fall and one
+bit rises, all in the same source cycle, but not at exactly the same instant:
+different flops, different clock arrival, different routing, tens of
+picoseconds apart. In the destination domain each synchroniser makes its own
+independent decision about which side of the edge its bit landed on.&lt;/p&gt;
+&lt;p&gt;If the new value of bit 12 is captured and the old values of bits 0 to 11 are
+also captured, the destination reads 0x1FFF. Not the old value, not the new
+value. A number the source counter never held, and never will.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/SoC/ArticleI05/02-multibit-incoherence-HQ.png"&gt;&lt;img alt="A multi-bit bus crossing between two clock domains where individual bits land in different destination cycles, producing a captured value that matches neither the old nor the new source value" src="http://lizard-spock.co.uk/images/SoC/ArticleI05/02-multibit-incoherence-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;A synchroniser does not transfer data. It protects one bit
+against one flop's uncertainty, and that is its entire scope.
+Nothing about it coordinates one bit with another, so the moment two bits are
+supposed to mean something together, the two-flop structure has no opinion and
+provides no protection.&lt;/p&gt;
+&lt;p&gt;Metastability is the part of CDC that has a standard answer. Coherency is the
+part that has to be designed, crossing by crossing, and the bugs that survive
+to silicon come from there. That is also why the CDC tool was quiet: it
+was asked whether the crossings were synchronised, and they were.&lt;/p&gt;
+&lt;p&gt;It explains the eleven hours too. The bad read needs a carry across many bits
+to line up with a read in the other domain, inside a window tens of
+picoseconds wide. Rare, and completely inevitable given enough time. Every CDC
+bug has that signature: it does not happen in simulation, it does not happen on
+the bench, and it happens in the field on a schedule.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Structures that preserve meaning&lt;/h2&gt;
+&lt;p&gt;Once the problem is stated as coherency, the choice of structure follows from
+the combined meaning of the signals.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;What is crossing&lt;/th&gt;
+&lt;th&gt;Structure&lt;/th&gt;
+&lt;th&gt;Why&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;One slow-changing level&lt;/td&gt;
+&lt;td&gt;Two-flop synchroniser&lt;/td&gt;
+&lt;td&gt;Only metastability is at stake&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;An event or pulse&lt;/td&gt;
+&lt;td&gt;Toggle synchroniser&lt;/td&gt;
+&lt;td&gt;Turns a moment into a state&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A register-like value, written occasionally&lt;/td&gt;
+&lt;td&gt;Request and acknowledge handshake&lt;/td&gt;
+&lt;td&gt;Data held stable while it is read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A counter or pointer&lt;/td&gt;
+&lt;td&gt;Gray code plus synchronisers&lt;/td&gt;
+&lt;td&gt;Only one bit changes per step&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A stream of data&lt;/td&gt;
+&lt;td&gt;Asynchronous first in, first out buffer (FIFO)&lt;/td&gt;
+&lt;td&gt;Decouples rates as well as clocks&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A value that is cheap to derive&lt;/td&gt;
+&lt;td&gt;Recompute in the destination&lt;/td&gt;
+&lt;td&gt;The best crossing is no crossing&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;Handshake.&lt;/strong&gt; The source presents the data and asserts request. The data does
+not move until acknowledge comes back, which means the bus is stable through
+every destination sample, so no synchroniser sees a changing input at all.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_ad2f97ae8114007662ae8f2053df5e62.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The round trip costs roughly two synchroniser delays in each direction, so
+throughput is low. For a configuration register written once at boot that is
+irrelevant, and the simplicity is worth more than the cycles.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Gray code.&lt;/strong&gt; Only one bit changes between consecutive values, so the worst
+case at the destination is capturing the old value or the new one. Both are
+values that existed.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;gray&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;binary&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;binary&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The property holds only for values that step by one. A counter that can jump,
+be loaded, or be cleared to zero from an arbitrary value breaks it immediately,
+and that is a real bug pattern rather than a theoretical one.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Asynchronous FIFO.&lt;/strong&gt; For streaming data, the standard structure combines both
+ideas: the data sits in dual-port memory and never crosses a domain at all,
+while the pointers cross as Gray-coded values.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_25af9c0f9e05cca264ee36cd6dee21f3.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Note which way each pointer travels. The write pointer is synchronised into the
+read domain to compute empty, and the read pointer into the write domain to
+compute full. Both are late by a synchroniser delay, and the direction of that
+staleness keeps the design safe: full is computed from a read pointer
+that may be older than reality, so the FIFO can only declare itself full early,
+never late. Empty is conservative in the same direction. Getting either
+comparison backwards produces a FIFO that overruns once a week.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Reset is a crossing too&lt;/h2&gt;
+&lt;p&gt;Reset gets forgotten because it does not look like data. It is a signal that
+one domain drives and another domain's flops obey, which is the definition.&lt;/p&gt;
+&lt;p&gt;Assertion is usually asynchronous on purpose, because reset must work with no
+clock running. Release is the dangerous edge: if reset deasserts near a clock
+edge, some flops in a domain leave reset one cycle before others, and a state
+machine can start in a state its encoding does not allow.&lt;/p&gt;
+&lt;p&gt;The standard answer is to assert asynchronously and deassert synchronously, per
+domain:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;always_ff&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;@(&lt;/span&gt;&lt;span class="k"&gt;posedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;clk&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;or&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;negedge&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;arst_n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;arst_n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;rst_sync1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="mb"&gt;&amp;#39;b0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;rst_sync2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="mb"&gt;&amp;#39;b0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;begin&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;rst_sync1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mh"&gt;1&lt;/span&gt;&lt;span class="mb"&gt;&amp;#39;b1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;rst_sync2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;rst_sync1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="k"&gt;assign&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;reset_n&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;rst_sync2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Every clock domain needs its own instance. Sharing one reset synchroniser
+across domains reintroduces exactly the crossing it was built to remove.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Reconvergence&lt;/h2&gt;
+&lt;p&gt;The last structural trap is two signals that are synchronised correctly and
+separately, then combined in destination logic.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FSM diagram" src="http://lizard-spock.co.uk/images/fsm/fsm_52f740af577b4d7ded9d81ca5a8bd20c.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Each synchroniser independently decides which destination cycle its signal
+arrived in. If the two source signals are related, and a one-cycle skew between
+them describes a state the source never occupied, the destination logic acts on
+a combination that does not exist. It is the multi-bit problem again, wearing
+control-signal clothing, and it is harder to spot because the signals are
+declared separately and often synchronised in different modules.&lt;/p&gt;
+&lt;p&gt;The rule is that anything which must be interpreted together must cross
+together, through one handshake or one FIFO.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Tools, and what a waiver means&lt;/h2&gt;
+&lt;p&gt;CDC tools are structural analysers. They find crossings, classify them, and
+flag the unsafe shapes: unsynchronised multi-bit buses, combinational logic
+inside synchronisers, reconvergent paths, clock multiplexers, generated clocks,
+and reset crossings. On a large SoC they will find thousands, most benign.&lt;/p&gt;
+&lt;p&gt;That volume makes waivers dangerous. A waiver reading "known crossing"
+records only that somebody looked. A waiver should carry the argument: why the
+crossing is safe, what property makes it safe, and what change would break it.&lt;/p&gt;
+&lt;p&gt;The parallel with the previous article in this series is exact. A timing
+exception hides a real path from static timing analysis; a CDC waiver hides a
+real crossing from CDC analysis. Both are written once, by someone who
+understood the design at that moment, and both stay in the file long after the
+RTL around them has changed.&lt;/p&gt;
+&lt;p&gt;Simulation will not cover the gap. Standard simulation samples on ideal edges
+and shows none of this. Randomising clock ratios and injecting synchroniser
+delay in the model finds a useful fraction, and formal CDC analysis finds more,
+but the structural argument for each crossing makes the design safe.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;CDC checklist&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Enumerate every clock, including generated, divided, gated, and
+   multiplexed ones, before enumerating crossings.&lt;/li&gt;
+&lt;li&gt;Match each crossing to its semantics: level, event, register value, pointer,
+   stream, or reset. Write the choice down next to the code.&lt;/li&gt;
+&lt;li&gt;Reserve the two-flop synchroniser for single-bit levels, and calculate the
+   stage count against library &lt;code&gt;tau&lt;/code&gt; and the real frequencies rather than
+   assuming two is always enough.&lt;/li&gt;
+&lt;li&gt;Do not synchronise the bits of a bus independently, and treat any bus
+   arriving at more than one synchroniser as a bug until proven otherwise.&lt;/li&gt;
+&lt;li&gt;Give every clock domain its own reset synchroniser and check the deassertion
+   edge specifically.&lt;/li&gt;
+&lt;li&gt;Bundle related control signals into one crossing so reconvergence cannot
+   invent states.&lt;/li&gt;
+&lt;li&gt;Confirm the FIFO full and empty comparisons use the pointer that makes each
+   one conservative.&lt;/li&gt;
+&lt;li&gt;Require a written argument on every waiver, with an owner, and re-derive it
+   whenever the surrounding RTL changes.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2&gt;Ask what each crossing means&lt;/h2&gt;
+&lt;p&gt;The useful question at a CDC review is not "is this crossing synchronised". It
+is "what do these signals mean together, and what structure preserves that".&lt;/p&gt;
+&lt;p&gt;The counter needed a handshake or a Gray code, and it got two flops per bit
+because most people picture CDC as two flops per bit. The
+review asked the wrong question, the tool answered the question it was given,
+and the design shipped with a fault that arrived on a timetable.&lt;/p&gt;
+&lt;p&gt;Every crossing in a design has an answer to the meaning question. Write that
+answer in a comment beside the code, because the next person to
+touch it will otherwise see two flops, recognise the shape, and assume the
+thinking was done.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/soc-intermediate-04-rtl-synthesis-and-timing-closure.html"&gt;Article I-04: RTL synthesis and timing closure&lt;/a&gt;&lt;/em&gt;
+&lt;em&gt;Next: Intermediate Article 06, SoC verification with UVM&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Electronics"></category><category term="RTL"></category><category term="CDC"></category><category term="Metastability"></category><category term="Synchronisers"></category><category term="FIFO"></category><category term="Verification"></category><category term="ASIC"></category></entry><entry><title>A 3D printed thin-cut stop for the Festool rail</title><link href="http://lizard-spock.co.uk/festool-rail-thin-cut-jig.html" rel="alternate"></link><published>2026-09-27T00:00:00+01:00</published><updated>2026-09-27T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-09-27:/festool-rail-thin-cut-jig.html</id><summary type="html">&lt;p&gt;A small printed clip that hooks into the T-slot on the back of a Festool guide rail and gives a repeatable 165mm strip, with the width embossed on top.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Cutting a stack of strips the same width with a guide rail means measuring and marking every one. This clip removes the measuring. It hooks into the T-slot along the back edge of a Festool FS rail, wraps around that edge, and returns under the rail as a thin leg. The end of the leg is a stop: push the edge of the board against it and the rail's cutting edge sits 165mm in.&lt;/p&gt;
 &lt;p&gt;&lt;img alt="Jig, three quarter view" src="http://lizard-spock.co.uk/view_iso.png"&gt;&lt;/p&gt;
 &lt;p&gt;Looking along the rail, the key sits in the top slot and the C wraps the back edge. The leg under the rail should match the thickness of the board being cut, so it stands on the bench and holds up the back of the rail instead of letting it tip. The model makes the leg 0.3mm thinner than the material so it never lifts the rail. The one I printed has a 6mm leg, for 6.3mm stock.&lt;/p&gt;
 &lt;p&gt;&lt;img alt="End view along the rail, jig in blue" src="http://lizard-spock.co.uk/view_end.png"&gt;&lt;/p&gt;
@@ -760,7 +1062,7 @@ changed, for reasons nobody recorded. That fraction is your actual risk, and it
 is countable in an afternoon.&lt;/p&gt;
 &lt;hr&gt;
 &lt;p&gt;&lt;em&gt;Previous: &lt;a href="http://lizard-spock.co.uk/soc-intermediate-03-pipeline-design-and-hazards.html"&gt;Article I-03: Pipeline design and hazards&lt;/a&gt;&lt;/em&gt;
-&lt;em&gt;Next: Intermediate Article 05, Clock domain crossing techniques&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Electronics"></category><category term="RTL"></category><category term="Synthesis"></category><category term="Static Timing Analysis"></category><category term="SDC"></category><category term="Timing Closure"></category><category term="ASIC"></category><category term="FPGA"></category></entry><entry><title>Digital Design 02: Pull-up and pull-down networks</title><link href="http://lizard-spock.co.uk/digital-design-02-pull-up-and-pull-down-networks.html" rel="alternate"></link><published>2026-08-19T00:00:00+01:00</published><updated>2026-08-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-19:/digital-design-02-pull-up-and-pull-down-networks.html</id><summary type="html">&lt;p&gt;Why a static CMOS gate is always inverting, how series and parallel transistor networks turn into NAND and NOR, why NOR2 is the slower of the pair, and where the extra two transistors in an AND gate go.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/DigitalDesign/Article02/00-pullup-pulldown-hero-HQ.png"&gt;&lt;img alt="An output wire strung between a supply rail and a ground rail, with a closed switch pulling it up and an open switch below it, and arrows pointing up to the supply and down to ground" src="http://lizard-spock.co.uk/images/DigitalDesign/Article02/00-pullup-pulldown-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;em&gt;Next: &lt;a href="http://lizard-spock.co.uk/soc-intermediate-05-clock-domain-crossing-techniques.html"&gt;Article I-05: Clock domain crossing techniques&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="Engineering"></category><category term="SoC"></category><category term="Hardware"></category><category term="Electronics"></category><category term="RTL"></category><category term="Synthesis"></category><category term="Static Timing Analysis"></category><category term="SDC"></category><category term="Timing Closure"></category><category term="ASIC"></category><category term="FPGA"></category></entry><entry><title>Digital Design 02: Pull-up and pull-down networks</title><link href="http://lizard-spock.co.uk/digital-design-02-pull-up-and-pull-down-networks.html" rel="alternate"></link><published>2026-08-19T00:00:00+01:00</published><updated>2026-08-19T00:00:00+01:00</updated><author><name>morganp</name></author><id>tag:lizard-spock.co.uk,2026-08-19:/digital-design-02-pull-up-and-pull-down-networks.html</id><summary type="html">&lt;p&gt;Why a static CMOS gate is always inverting, how series and parallel transistor networks turn into NAND and NOR, why NOR2 is the slower of the pair, and where the extra two transistors in an AND gate go.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://lizard-spock.co.uk/images/DigitalDesign/Article02/00-pullup-pulldown-hero-HQ.png"&gt;&lt;img alt="An output wire strung between a supply rail and a ground rail, with a closed switch pulling it up and an open switch below it, and arrows pointing up to the supply and down to ground" src="http://lizard-spock.co.uk/images/DigitalDesign/Article02/00-pullup-pulldown-hero-900w.png"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Series: Digital Design Fundamentals | Article 2&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2&gt;The AND gate that was not there&lt;/h2&gt;
