@@ -444,4 +444,4 @@ is countable in an afternoon.
 ---
 
 *Previous: [Article I-03: Pipeline design and hazards]({filename}../2026-08-16_SoC_Intermediate_03_Pipeline_Hazards/2026-08-16_SoC_Intermediate_03_Pipeline_Hazards.md)*
-*Next: Intermediate Article 05, Clock domain crossing techniques*
+*Next: [Article I-05: Clock domain crossing techniques]({filename}../2026-10-03_SoC_Intermediate_05_Clock_Domain_Crossing/2026-10-03_SoC_Intermediate_05_Clock_Domain_Crossing.md)*

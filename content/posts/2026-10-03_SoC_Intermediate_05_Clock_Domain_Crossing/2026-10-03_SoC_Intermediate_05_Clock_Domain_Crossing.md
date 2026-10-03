@@ -1,11 +1,11 @@
 Title: SoC Intermediate 05: Clock domain crossing techniques
-Date: 2026-08-24
+Date: 2026-10-03
 Category: Engineering
 Tags: SoC, Hardware, Electronics, RTL, CDC, Metastability, Synchronisers, FIFO, Verification, ASIC
 Slug: soc-intermediate-05-clock-domain-crossing-techniques
 Author: morganp
 Summary: Why a bus can cross a clock domain through correct synchronisers and still deliver a value that never existed, and the structures that prevent it: metastability and the two-flop MTBF, toggle synchronisers, handshakes, Gray-coded pointers, asynchronous FIFOs, reset crossings, and reconvergence.
-Status: draft
+Status: published
 
 [![Two clock domains on a system on chip beating at different rhythms, joined by a bridge carrying synchroniser, handshake and FIFO structures between them]({static}/images/SoC/ArticleI05/00-two-domains-hero-900w.png)]({static}/images/SoC/ArticleI05/00-two-domains-hero-HQ.png)
 
@@ -25,8 +25,8 @@ The crossing had been reviewed. Every bit of that counter went through a proper
 two-flop synchroniser in the destination domain. The clock domain crossing
 (CDC) tool reported no unsynchronised crossings anywhere in the block.
 
-This article is about what those two flops actually buy, what they do not buy,
-and how to pick the right structure for each kind of crossing. It targets
+This article covers the protection those two flops give, the protection they do
+not give, and how to pick the right structure for each kind of crossing. It targets
 engineers writing register transfer level (RTL) code that spans more than one
 clock, and anybody who has been handed a CDC report and a list of waivers and
 asked whether the design is safe.
@@ -49,7 +49,8 @@ resolve one way or the other.
 It does resolve. The balance is unstable, and the internal feedback amplifies
 whichever way it tips, exponentially. That exponential is the entire basis of
 synchroniser design, because it means the probability of still being undecided
-falls off exponentially with the time you allow.
+falls off exponentially with the time you allow. The mean time between failures
+(MTBF) follows from that probability.
 
 ```
               e^(t_r / tau)
@@ -61,15 +62,13 @@ MTBF  =  ---------------------------
 it. `tau` and `T0` characterise the flop and come from the library. The two
 frequencies set how often the opportunity to fail arises.
 
-Put illustrative numbers in. With `tau` of 20 ps, a destination clock of
-500 MHz, data changing at 10 MHz, and a single flop leaving 0.3 ns of slack for
-resolution, the exponent is 15 and the mean time between failures is about half
-a minute. That is not a design, it is a fault generator.
+Put illustrative numbers in. With `tau` of 20 ps, `T0` of 20 ps, a destination
+clock of 500 MHz, data changing at 10 MHz, and a single flop leaving 0.3 ns of
+slack for resolution, the exponent is 15 and the MTBF is about half a minute. That is not a design, it is a fault generator.
 
-Add a second flop and the resolution time gains most of a clock period. The
-exponent moves from 15 to around 115, and since `e` to the 100 is roughly ten
-to the 43, the mean time between failures leaves the domain of engineering
-entirely.
+Add a second flop and the resolution time gains a full clock period, 2 ns at
+500 MHz. The exponent moves from 15 to 115, and since `e` to the 100 is
+roughly ten to the 43, the MTBF leaves the domain of engineering entirely.
 
 Two things follow, and both matter. The failure rate can be made arbitrarily
 small, and it can never be made zero. Metastability is managed, not eliminated,
@@ -117,17 +116,18 @@ some there. Real flows mark the structure explicitly, through a synchroniser
 cell from the library, a naming convention the CDC tool recognises, or a
 constraint that keeps the pair together.
 
-The cost is latency, and it is worth being precise about how much.
+The cost is latency: the output follows the input by one to two destination
+cycles.
 
 ```wavedrom
 {
   "signal": [
     {"name": "dst_clk",    "wave": "P..........."},
     {"name": "src_signal", "wave": "0..1........"},
-    {"name": "sync_ff1",   "wave": "0....1......"},
-    {"name": "sync_ff2",   "wave": "0......1...."}
+    {"name": "sync_ff1",   "wave": "0...1......."},
+    {"name": "sync_ff2",   "wave": "0....1......"}
   ],
-  "head": {"text": "One to two destination cycles of latency, and the transition is what survives"}
+  "head": {"text": "Up to two destination cycles of latency through the synchroniser"}
 }
 ```
 
@@ -218,15 +218,15 @@ value. A number the source counter never held, and never will.
 
 [![A multi-bit bus crossing between two clock domains where individual bits land in different destination cycles, producing a captured value that matches neither the old nor the new source value]({static}/images/SoC/ArticleI05/02-multibit-incoherence-900w.png)]({static}/images/SoC/ArticleI05/02-multibit-incoherence-HQ.png)
 
-Here is the reframe. A synchroniser does not transfer data. It protects one bit
-against one flop's uncertainty, and that is the entire scope of what it does.
+A synchroniser does not transfer data. It protects one bit
+against one flop's uncertainty, and that is its entire scope.
 Nothing about it coordinates one bit with another, so the moment two bits are
 supposed to mean something together, the two-flop structure has no opinion and
 provides no protection.
 
 Metastability is the part of CDC that has a standard answer. Coherency is the
-part that has to be designed, crossing by crossing, and it is where the bugs
-that survive to silicon come from. That is also why the CDC tool was quiet: it
+part that has to be designed, crossing by crossing, and the bugs that survive
+to silicon come from there. That is also why the CDC tool was quiet: it
 was asked whether the crossings were synchronised, and they were.
 
 It explains the eleven hours too. The bad read needs a carry across many bits
@@ -240,7 +240,7 @@ the bench, and it happens in the field on a schedule.
 ## Structures that preserve meaning
 
 Once the problem is stated as coherency, the choice of structure follows from
-what the signals mean together.
+the combined meaning of the signals.
 
 | What is crossing | Structure | Why |
 |---|---|---|
@@ -248,7 +248,7 @@ what the signals mean together.
 | An event or pulse | Toggle synchroniser | Turns a moment into a state |
 | A register-like value, written occasionally | Request and acknowledge handshake | Data held stable while it is read |
 | A counter or pointer | Gray code plus synchronisers | Only one bit changes per step |
-| A stream of data | Asynchronous FIFO | Decouples rates as well as clocks |
+| A stream of data | Asynchronous first in, first out buffer (FIFO) | Decouples rates as well as clocks |
 | A value that is cheap to derive | Recompute in the destination | The best crossing is no crossing |
 
 **Handshake.** The source presents the data and asserts request. The data does
@@ -329,7 +329,7 @@ digraph AsyncFifo {
 Note which way each pointer travels. The write pointer is synchronised into the
 read domain to compute empty, and the read pointer into the write domain to
 compute full. Both are late by a synchroniser delay, and the direction of that
-staleness is what makes the design safe: full is computed from a read pointer
+staleness keeps the design safe: full is computed from a read pointer
 that may be older than reality, so the FIFO can only declare itself full early,
 never late. Empty is conservative in the same direction. Getting either
 comparison backwards produces a FIFO that overruns once a week.
@@ -409,7 +409,7 @@ flag the unsafe shapes: unsynchronised multi-bit buses, combinational logic
 inside synchronisers, reconvergent paths, clock multiplexers, generated clocks,
 and reset crossings. On a large SoC they will find thousands, most benign.
 
-That volume is what makes waivers dangerous. A waiver reading "known crossing"
+That volume makes waivers dangerous. A waiver reading "known crossing"
 records only that somebody looked. A waiver should carry the argument: why the
 crossing is safe, what property makes it safe, and what change would break it.
 
@@ -422,8 +422,7 @@ RTL around them has changed.
 Simulation will not cover the gap. Standard simulation samples on ideal edges
 and shows none of this. Randomising clock ratios and injecting synchroniser
 delay in the model finds a useful fraction, and formal CDC analysis finds more,
-but the structural argument for each crossing is what actually makes the design
-safe.
+but the structural argument for each crossing makes the design safe.
 
 ---
 
@@ -436,7 +435,7 @@ safe.
 3. Reserve the two-flop synchroniser for single-bit levels, and calculate the
    stage count against library `tau` and the real frequencies rather than
    assuming two is always enough.
-4. Never synchronise the bits of a bus independently, and treat any bus
+4. Do not synchronise the bits of a bus independently, and treat any bus
    arriving at more than one synchroniser as a bug until proven otherwise.
 5. Give every clock domain its own reset synchroniser and check the deassertion
    edge specifically.
@@ -455,12 +454,12 @@ The useful question at a CDC review is not "is this crossing synchronised". It
 is "what do these signals mean together, and what structure preserves that".
 
 The counter needed a handshake or a Gray code, and it got two flops per bit
-because two flops per bit is what CDC looks like in most people's heads. The
+because most people picture CDC as two flops per bit. The
 review asked the wrong question, the tool answered the question it was given,
 and the design shipped with a fault that arrived on a timetable.
 
-Every crossing in a design has an answer to the meaning question. It is worth
-writing that answer in a comment beside the code, because the next person to
+Every crossing in a design has an answer to the meaning question. Write that
+answer in a comment beside the code, because the next person to
 touch it will otherwise see two flops, recognise the shape, and assume the
 thinking was done.
 
