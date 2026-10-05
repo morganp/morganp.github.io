@@ -19,6 +19,10 @@ SUMMARY_MAX_LENGTH = 20
 # Theme
 
 #THEME = 'simple-bootstrap'
+
+# Vendored copy of Pelican's notmyidea theme plus the dark-mode CSS. Tracked in
+# Git so every machine builds the same site, whatever is in the venv.
+THEME = 'themes/lizard-spock'
 # https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3
 
 # --------------8<---------------------
