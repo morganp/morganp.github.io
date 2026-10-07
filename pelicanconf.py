@@ -43,7 +43,8 @@ STATIC_PATHS = ['images', 'pdf', 'models', 'extra', 'drum_rudiments', 'wavedrom-
 # Defaults plus macOS clutter and the extensionless Jekyll leftover at
 # content/posts/_, none of which should be copied into the built site.
 IGNORE_FILES = ['**/.*', '.DS_Store', '_']
-EXTRA_PATH_METADATA = {'extra/custom.css': {'path': 'static/custom.css'}}
+EXTRA_PATH_METADATA = {'extra/custom.css': {'path': 'static/custom.css'},
+                       'extra/ads.txt': {'path': 'ads.txt'}}
 STYLESHEET_URL = '/static/custom.css'
 
 # If we want to create static pages,
