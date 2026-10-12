@@ -466,4 +466,4 @@ thinking was done.
 ---
 
 *Previous: [Article I-04: RTL synthesis and timing closure]({filename}../2026-08-28_SoC_Intermediate_04_Synthesis_Timing/2026-08-28_SoC_Intermediate_04_Synthesis_Timing.md)*
-*Next: Intermediate Article 06, SoC verification with UVM*
+*Next: [Article I-06: SoC verification with UVM]({filename}../2026-10-10_SoC_Intermediate_06_UVM_Verification/2026-10-10_SoC_Intermediate_06_UVM_Verification.md)*
