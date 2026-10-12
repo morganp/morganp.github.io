@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Intermediate 06: SoC verification with UVM</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+                        <meta name="google-adsense-account" content="ca-pub-3722123143991195">
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3722123143991195"
+                             crossorigin="anonymous"></script>
+    <meta name="description" content="Why a green regression proves only what its checkers can notice, and how a UVM environment is built so that agents, scoreboards, assertions and..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./soc-intermediate-06-soc-verification-with-uvm.html" rel="bookmark"
+             title="Permalink to SoC Intermediate 06: SoC verification with UVM">SoC Intermediate 06: SoC verification with UVM</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-10-12T00:00:00+01:00">
+                Published: Mon 12 October 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/rtl.html">RTL</a> <a href="./tag/uvm.html">UVM</a> <a href="./tag/verification.html">Verification</a> <a href="./tag/systemverilog.html">SystemVerilog</a> <a href="./tag/coverage.html">Coverage</a> <a href="./tag/asic.html">ASIC</a> </p>        
+</footer><!-- /.post-info -->        <p><a href="./images/SoC/ArticleI06/00-verification-environment-hero-HQ.png"><img alt="A verification environment around an SoC block: three stimulus sources feed the chip and three observers watch its outputs" src="./images/SoC/ArticleI06/00-verification-environment-hero-900w.png"></a></p>
+<p><em>Series: Intermediate SoC Design | Article 6 of 10</em></p>
+<hr>
+<h2>The regression that stayed green</h2>
+<p>The regression had been green for eleven weeks. Forty thousand tests ran every night against the DMA (direct memory access) controller, every scoreboard matched, and the coverage report sat at ninety-eight percent. Then the first firmware build that chained descriptors hung the block on its first transfer.</p>
+<p>The descriptor started eight bytes below a 4 KB boundary. An AXI (Advanced eXtensible Interface) burst may not cross that boundary, so the controller had to split the first burst in two. The splitting logic had run millions of times with start addresses far from a boundary. It had never run this close to one with a length this large.</p>
+<p>Nothing in the environment was broken. The tests were legal, the checkers were correct for the cases they covered, and the report was accurate. The environment never asked the question.</p>
+<p>This article explains how a UVM (Universal Verification Methodology) environment is built, why its checkers and coverage decide what a green result means, and how to read a verification plan critically. It targets engineers who write or review SoC (system on chip) testbenches, and anyone handed a regression report and asked whether a block is ready.</p>
+<hr>
+<h2>Why directed tests run out</h2>
+<p>A directed test checks a scenario the engineer already thought of. A typical DMA test follows a fixed script:</p>
+<ol>
+<li>Reset the DMA.</li>
+<li>Program the source address.</li>
+<li>Program the destination address.</li>
+<li>Program the length.</li>
+<li>Start the transfer.</li>
+<li>Check the completion interrupt.</li>
+</ol>
+<p>This test is useful and it is not enough. It covers one path through a space with many dimensions, and the combinations nobody listed are the ones that fail:</p>
+<ul>
+<li>Backpressure during the last AXI beat</li>
+<li>An interrupt masked while completion occurs</li>
+<li>A descriptor crossing a 4 KB boundary</li>
+<li>Reset during an active transfer</li>
+<li>Two channels contending for the same target</li>
+<li>An error response halfway through a burst</li>
+</ul>
+<p>Constrained-random generation explores that space instead. The testbench builds many legal variations of the stimulus, and checkers and coverage decide whether the variations meant anything. Random does not mean unplanned: the constraints and the coverage model encode the verification intent.</p>
+<div class="highlight"><pre><span></span><code><span class="k">constraint</span><span class="w"> </span><span class="n">legal_dma_c</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">length</span><span class="w"> </span><span class="ow">inside</span><span class="w"> </span><span class="p">{[</span><span class="mi">1</span><span class="o">:</span><span class="mi">4096</span><span class="p">]};</span>
+<span class="w">    </span><span class="n">src_addr</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">dst_addr</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">burst_len</span><span class="w"> </span><span class="ow">inside</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Randomisation earns its place on the awkward cases: address alignment and boundaries, backpressure insertion, interrupt masking, reset timing, arbitration weights, error responses and descriptor chain shapes.</p>
+<hr>
+<h2>Anatomy of a UVM environment</h2>
+<p>UVM is a SystemVerilog class library for building reusable constrained-random environments. It separates three jobs: generating stimulus, driving it onto pins, and judging the result.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_1115ae1a412915b2d760a704ff1c3276.svg"></p>
+<p>The DUT (device under test) is the block being verified. Each agent bundles a sequencer, a driver and a monitor for one interface, so the protocol knowledge lives in one reusable place. An APB (Advanced Peripheral Bus) agent drops into any project that has an APB port.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uvm_test</code></td>
+<td>Selects the scenario and configures the environment</td>
+</tr>
+<tr>
+<td><code>uvm_env</code></td>
+<td>Holds the reusable verification components</td>
+</tr>
+<tr>
+<td><code>uvm_agent</code></td>
+<td>Bundles the driver, sequencer and monitor for one protocol</td>
+</tr>
+<tr>
+<td><code>uvm_sequence</code></td>
+<td>Generates a stream of transactions</td>
+</tr>
+<tr>
+<td><code>uvm_sequencer</code></td>
+<td>Arbitrates sequence items on their way to a driver</td>
+</tr>
+<tr>
+<td><code>uvm_driver</code></td>
+<td>Turns transactions into pin-level activity</td>
+</tr>
+<tr>
+<td><code>uvm_monitor</code></td>
+<td>Watches pins and publishes transactions</td>
+</tr>
+<tr>
+<td><code>uvm_scoreboard</code></td>
+<td>Compares expected and observed results</td>
+</tr>
+</tbody>
+</table>
+<p>Stimulus is described at transaction level. A sequence item represents one abstract AXI write, with the legal ranges written as constraints:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">axi_write_item</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequence_item</span><span class="p">;</span>
+<span class="w">    </span><span class="k">rand</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="mi">31</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">addr</span><span class="p">;</span>
+<span class="w">    </span><span class="k">rand</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="mi">7</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w">  </span><span class="n">len</span><span class="p">;</span>
+<span class="w">    </span><span class="k">rand</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w">  </span><span class="n">size</span><span class="p">;</span>
+<span class="w">    </span><span class="k">rand</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w">  </span><span class="n">qos</span><span class="p">;</span>
+<span class="w">    </span><span class="k">rand</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="mi">31</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">data</span><span class="p">[];</span>
+
+<span class="w">    </span><span class="k">constraint</span><span class="w"> </span><span class="n">aligned_c</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">addr</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mb">2&#39;b00</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">constraint</span><span class="w"> </span><span class="n">length_c</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">len</span><span class="w"> </span><span class="ow">inside</span><span class="w"> </span><span class="p">{[</span><span class="mi">0</span><span class="o">:</span><span class="mi">15</span><span class="p">]};</span>
+<span class="w">        </span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kt">int</span><span class="p">&#39;(</span><span class="n">len</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="no">`uvm_object_utils</span><span class="p">(</span><span class="n">axi_write_item</span><span class="p">)</span>
+<span class="kd">endclass</span>
+</code></pre></div>
+
+<p>The driver turns this item into AXI handshakes. The monitor turns observed handshakes back into transaction objects, so the scoreboard and the coverage collector work on the same abstract view as the sequences.</p>
+<p>UVM components move through phases in a fixed order:</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_955a4aeceba99cfac9b4a586ea26f0e5.svg"></p>
+<p>Components are created in <code>build_phase</code> and wired together in <code>connect_phase</code>. Active stimulus runs in <code>run_phase</code>, and the remaining phases collect and report results. The methodology is verbose, and that verbosity buys reuse: AXI, APB, interrupt, reset and memory agents carry from one project to the next.</p>
+<hr>
+<h2>Checking is the hard part</h2>
+<p>Stimulus is the easy half of verification. A random sequence generates thousands of transactions an hour, and none of them mean anything until something judges the outcome.</p>
+<p>The three roles stay separate on purpose. The driver sends legal or deliberately illegal stimulus and never decides whether the DUT behaved correctly. The monitor observes and never changes a pin. The scoreboard compares the observed result with a prediction.</p>
+<p>The prediction comes from a reference model. A model works at a useful level of abstraction and does not mirror the RTL (register transfer level) cycle by cycle. For a FIFO (first in, first out buffer) the model is a queue:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">fifo_model</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="mi">31</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">q</span><span class="p">[$];</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">push</span><span class="p">(</span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="mi">31</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+<span class="w">        </span><span class="n">q</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="mi">31</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">pop</span><span class="p">();</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">pop_front</span><span class="p">();</span>
+<span class="w">    </span><span class="k">endfunction</span>
+<span class="kd">endclass</span>
+</code></pre></div>
+
+<p>For a DMA controller the model is larger. It fetches descriptors, increments addresses, applies byte enables, handles errors and updates interrupt status. It predicts architectural results, such as which bytes land where and which interrupt rises, and leaves the pipeline timing to the RTL.</p>
+<p>Assertions add checks that run on every cycle. They suit local rules that must always hold, such as a bus protocol, an arbiter grant or a state machine transition. AXI requires a valid payload to stay stable while it waits for the other side:</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_fd78e7d57608de81f3d0f03c24697a86.svg"></p>
+<div class="highlight"><pre><span></span><code><span class="k">property</span><span class="w"> </span><span class="n">valid_payload_stable</span><span class="p">;</span>
+<span class="w">    </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">ACLK</span><span class="p">)</span><span class="w"> </span><span class="k">disable</span><span class="w"> </span><span class="k">iff</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ARESETn</span><span class="p">)</span>
+<span class="w">    </span><span class="n">AWVALID</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">AWREADY</span><span class="w"> </span><span class="o">|=&gt;</span><span class="w"> </span><span class="n">AWVALID</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">$</span><span class="n">stable</span><span class="p">(</span><span class="n">AWADDR</span><span class="p">);</span>
+<span class="k">endproperty</span>
+
+<span class="k">assert</span><span class="w"> </span><span class="k">property</span><span class="w"> </span><span class="p">(</span><span class="n">valid_payload_stable</span><span class="p">)</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="no">`uvm_error</span><span class="p">(</span><span class="s">&quot;AXI&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;AW payload changed while stalled&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Every checker in the environment answers a question somebody wrote down. A test passes when none of those questions finds a difference. That proves the checkers saw nothing wrong, and says nothing about the bugs no checker was written to see.</p>
+<p><a href="./images/SoC/ArticleI06/01-checker-gap-HQ.png"><img alt="Three checkpoint gates in a row with a bug walking through the gap beside them, showing a defect that no checker covers" src="./images/SoC/ArticleI06/01-checker-gap-900w.png"></a></p>
+<p>Apply that to the hung DMA. The scoreboard compared data and interrupt status, and both were correct for every transfer that finished. The hung transfer never finished, so it never produced a result to compare. The environment had no check that told slow from stuck, and no assertion on the 4 KB rule. A liveness timeout would have flagged the hang on the first night. A protocol assertion would have flagged the first bad burst.</p>
+<hr>
+<h2>Coverage and the verification plan</h2>
+<p>Coverage reports what the tests exercised. Code coverage records which lines and branches of the RTL executed. Functional coverage records whether the scenarios in the verification plan happened, and it needs the engineer to define them as bins.</p>
+<div class="highlight"><pre><span></span><code><span class="k">covergroup</span><span class="w"> </span><span class="n">axi_burst_cg</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">sample</span><span class="p">(</span><span class="n">axi_write_item</span><span class="w"> </span><span class="n">item</span><span class="p">);</span>
+<span class="w">    </span><span class="nl">burst_len:</span><span class="w"> </span><span class="k">coverpoint</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">len</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">bins</span><span class="w"> </span><span class="n">single</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+<span class="w">        </span><span class="k">bins</span><span class="w"> </span><span class="n">short</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{[</span><span class="mi">1</span><span class="o">:</span><span class="mi">3</span><span class="p">]};</span>
+<span class="w">        </span><span class="k">bins</span><span class="w"> </span><span class="n">long</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="p">{[</span><span class="mi">4</span><span class="o">:</span><span class="mi">15</span><span class="p">]};</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nl">burst_size:</span><span class="w"> </span><span class="k">coverpoint</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">bins</span><span class="w"> </span><span class="n">word</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>
+<span class="w">        </span><span class="k">bins</span><span class="w"> </span><span class="n">dword</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">3</span><span class="p">};</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nl">qos:</span><span class="w"> </span><span class="k">coverpoint</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">qos</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">bins</span><span class="w"> </span><span class="n">low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{[</span><span class="mi">0</span><span class="o">:</span><span class="mi">3</span><span class="p">]};</span>
+<span class="w">        </span><span class="k">bins</span><span class="w"> </span><span class="n">mid</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{[</span><span class="mi">4</span><span class="o">:</span><span class="mi">11</span><span class="p">]};</span>
+<span class="w">        </span><span class="k">bins</span><span class="w"> </span><span class="n">high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{[</span><span class="mi">12</span><span class="o">:</span><span class="mi">15</span><span class="p">]};</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nl">len_x_size:</span><span class="w"> </span><span class="k">cross</span><span class="w"> </span><span class="n">burst_len</span><span class="p">,</span><span class="w"> </span><span class="n">burst_size</span><span class="p">;</span>
+<span class="k">endgroup</span>
+</code></pre></div>
+
+<p>The report in the opening story sat at ninety-eight percent of the bins somebody defined. No bin existed for a start address within one burst of a 4 KB boundary. A coverage number measures progress against the bins that exist, so the quality of the bins limits the quality of the number.</p>
+<p>A verification plan fixes that by working from requirements. Each requirement maps to the method that proves it:</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AXI writes support INCR bursts</td>
+<td>Random AXI sequence and coverage</td>
+</tr>
+<tr>
+<td>DMA raises a completion interrupt</td>
+<td>Scoreboard and interrupt monitor</td>
+</tr>
+<tr>
+<td>An illegal descriptor reports an error</td>
+<td>Directed error test and assertion</td>
+</tr>
+<tr>
+<td>Reset clears an active channel</td>
+<td>Reset stress sequence and register checks</td>
+</tr>
+<tr>
+<td>No payload changes under stall</td>
+<td>AXI protocol assertions</td>
+</tr>
+<tr>
+<td>No burst crosses a 4 KB boundary</td>
+<td>Protocol assertion and an address-offset cross</td>
+</tr>
+</tbody>
+</table>
+<p>Write the plan before the random tests. Without it, coverage numbers turn decorative, and a table like the one above shows which requirement has no row.</p>
+<hr>
+<h2>Beyond the block</h2>
+<p>A block-level environment checks one design in isolation. Subsystem and full-chip verification add concerns that no single block owns:</p>
+<ul>
+<li>Register address maps</li>
+<li>Bus decode errors</li>
+<li>Interrupt routing</li>
+<li>Boot ROM and firmware sequences</li>
+<li>Power domain isolation</li>
+<li>Reset ordering</li>
+<li>Coherency and DMA interactions</li>
+<li>Performance counters and QoS (quality of service)</li>
+</ul>
+<p>Full-chip simulation is slow, so teams spread the work across several platforms. Block-level UVM covers the detail, subsystem tests cover the connections, and emulation and FPGA prototypes run firmware at a speed simulation cannot reach. The checkers matter at every level, and each platform needs its own answer to which check would notice a failure.</p>
+<hr>
+<h2>Verification checklist</h2>
+<ol>
+<li>Write a verification plan before writing random tests.</li>
+<li>Use reusable agents for standard protocols.</li>
+<li>Keep monitors passive and free of side effects.</li>
+<li>Put expected behaviour in scoreboards or reference models.</li>
+<li>Add a liveness timeout wherever a scoreboard waits for a result.</li>
+<li>Track functional coverage against requirements, not against the bins that happen to exist.</li>
+<li>Add assertions for local invariants and protocol rules.</li>
+<li>Run seed regression and preserve failing seeds.</li>
+<li>Treat every waiver as a reviewed engineering decision.</li>
+</ol>
+<p>Before trusting a green report, pick one bug the design could plausibly have and trace which checker would catch it. When no checker would, the report needs another row, not more tests.</p>
+<hr>
+<p><em>Previous: <a href="./soc-intermediate-05-clock-domain-crossing-techniques.html">Article I-05: Clock domain crossing techniques</a></em>
+<em>Next: Intermediate Article 07, DMA controller architecture</em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
