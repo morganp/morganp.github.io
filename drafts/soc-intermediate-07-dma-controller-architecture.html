@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Intermediate 07: DMA controller architecture</title>
+                        <link rel="stylesheet" href="../theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                        <meta name="google-adsense-account" content="ca-pub-3722123143991195">
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3722123143991195"
+                             crossorigin="anonymous"></script>
+    <meta name="description" content="How a DMA engine moves data without the CPU, from descriptor chains and burst splitting to channel arbitration, and why a completion interrupt..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="../">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="../pages/about.html">About</a></li>
+                                                        <li><a href="../category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="../category/music.html">Music</a></li>
+                                                        <li><a href="../category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="../category/photography.html">Photography</a></li>
+                                                        <li><a href="../category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="../category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="../category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="../category/programming.html">Programming</a></li>
+                                                                        <li><a href="../category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="../drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="../wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="../fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="../amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="../openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="../stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="../drafts/soc-intermediate-07-dma-controller-architecture.html" rel="bookmark"
+             title="Permalink to SoC Intermediate 07: DMA controller architecture">SoC Intermediate 07: DMA controller architecture</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-10-17T00:00:00+01:00">
+                Published: Sat 17 October 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="../author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="../category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="../tag/soc.html">SoC</a> <a href="../tag/hardware.html">Hardware</a> <a href="../tag/electronics.html">Electronics</a> <a href="../tag/rtl.html">RTL</a> <a href="../tag/dma.html">DMA</a> <a href="../tag/axi.html">AXI</a> <a href="../tag/cache.html">Cache</a> <a href="../tag/scatter-gather.html">Scatter-Gather</a> </p>        
+</footer><!-- /.post-info -->        <p><em>Series: Intermediate SoC Design | Article 7 of 10</em></p>
+<hr>
+<h2>The packet that arrived intact and read as garbage</h2>
+<p>The completion interrupt fired. The descriptor status read done, and the length field matched the frame on the wire. The driver passed the buffer up the network stack, and the stack dropped the frame because of a bad header.</p>
+<p>A hex dump showed the first 64 bytes belonging to the previous packet. Every later byte belonged to the new one. The DMA engine had written all of them.</p>
+<p>This article explains how a DMA (direct memory access) controller moves data without the CPU (central processing unit). It covers register-programmed transfers, descriptor chains, burst formation and channel arbitration. It targets engineers who design a DMA engine, and engineers who write the driver that programs one.</p>
+<hr>
+<h2>Why a copy loop loses</h2>
+<p>A processor copies memory one word at a time:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">len</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="w">    </span><span class="n">dst</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</code></pre></div>
+
+<p>Each iteration executes a load, a store and a loop branch. The data passes through the register file and the data cache, and it displaces lines the program still needs. The core spends power and issue slots on work that transforms no data.</p>
+<p>A DMA engine moves the copy into hardware. Software describes the transfer, and the engine runs it as AXI (Advanced eXtensible Interface) read bursts, a buffer, and AXI write bursts. The CPU receives one interrupt at the end.</p>
+<p>The simplest engine takes the description through registers:</p>
+<table>
+<thead>
+<tr>
+<th>Offset</th>
+<th>Register</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0x00</code></td>
+<td><code>CTRL</code></td>
+<td>Enable, start and interrupt enable bits</td>
+</tr>
+<tr>
+<td><code>0x04</code></td>
+<td><code>STATUS</code></td>
+<td>Busy, done and error flags</td>
+</tr>
+<tr>
+<td><code>0x08</code></td>
+<td><code>SRC_ADDR</code></td>
+<td>Source address</td>
+</tr>
+<tr>
+<td><code>0x0C</code></td>
+<td><code>DST_ADDR</code></td>
+<td>Destination address</td>
+</tr>
+<tr>
+<td><code>0x10</code></td>
+<td><code>LEN_BYTES</code></td>
+<td>Transfer length in bytes</td>
+</tr>
+<tr>
+<td><code>0x14</code></td>
+<td><code>BURST_CFG</code></td>
+<td>Maximum burst length and QoS (quality of service) value</td>
+</tr>
+<tr>
+<td><code>0x18</code></td>
+<td><code>IRQ_STATUS</code></td>
+<td>Interrupt flags, write one to clear</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>IRQ_STATUS</code> flags clear when software writes a 1 to them. Software writes back only the bits it handled, so a completion that arrives between the read and the write keeps its flag.</p>
+<p>Register programming suits one large transfer and fails on continuous traffic. A gigabit Ethernet port receives about 81,000 frames a second at 1500 bytes. Each frame would cost an interrupt, four register writes and a start command, and the engine sits idle between frames while software catches up.</p>
+<hr>
+<h2>Descriptors and scatter-gather</h2>
+<p>A descriptor moves the transfer description out of registers and into memory. Software builds a list of descriptors and gives the engine the address of the first one.</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">dma_desc</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">src</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">dst</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">control</span><span class="p">;</span><span class="w">   </span><span class="cm">/* version, OWN, DONE, ERROR, IRQ_ON_DONE */</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">next</span><span class="p">;</span><span class="w">      </span><span class="cm">/* address of the next descriptor, 0 ends the chain */</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>The engine fetches a descriptor, runs the transfer and follows <code>next</code> until it reads zero. Software and engine never share a register for each transfer, so the engine runs back to back.</p>
+<p>Operating systems rarely hand a driver one large contiguous buffer. A 4000-byte frame arrives in three 1536-byte buffers, and the last one holds 928 bytes. Scatter-gather lets one chain of descriptors place that logical stream across non-contiguous memory.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_6eaea16046e68803647204a549ca0ea5.svg"></p>
+<p>The <code>control</code> word carries the handshake between software and engine. Software sets the OWN bit when a descriptor is ready. The engine clears OWN and sets DONE or ERROR when the transfer ends, and it writes the descriptor back to memory. Software scans for descriptors it owns again and recycles them without reading an engine register.</p>
+<p>A version field and reserved bits in <code>control</code> let a later engine extend the format. Old drivers keep working because they never set the new bits.</p>
+<hr>
+<h2>Inside the engine</h2>
+<h3>Read engine, FIFO and write engine</h3>
+<p>A memory-to-memory engine has two halves that run independently. The read engine issues AXI read bursts and pushes the returning data into a FIFO (first in, first out buffer). The write engine pops the FIFO and issues AXI write bursts.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_f6051c7d306a29014cbcddb9a88805e3.svg"></p>
+<p>The two AXI ports are a manager port for reads and a manager port for writes. Older AXI documents call a manager a master and a subordinate a slave. The signal names are unchanged.</p>
+<p>The FIFO decouples read latency from write latency. Without it, every stall on the read side would stall the write side, and the reverse.</p>
+<p><img alt="WaveDrom timing diagram" src="../images/wavedrom/wavedrom_2ba306064ecf103ac0b62f992e7669e7.svg"></p>
+<p>Two limits set the FIFO depth. Many designs start a write burst only when the FIFO holds every beat of it, so the write channel never idles halfway through a burst. The FIFO must also cover the read latency. A read latency of 40 cycles on a 128-bit bus needs 40 beats of 16 bytes, or 640 bytes, to keep the interconnect busy.</p>
+<h3>Burst formation</h3>
+<p>Burst quality sets DMA throughput, and the engine must emit legal AXI for any address and length that software supplies. An AXI burst must not cross a 4 KB boundary. The engine splits at the boundary:</p>
+<div class="highlight"><pre><span></span><code><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">addr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xFFF</span><span class="p">);</span><span class="w">          </span><span class="cm">/* distance to the next 4 KB boundary */</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bytes</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">remaining</span><span class="p">)</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remaining</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bytes</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">max_burst</span><span class="p">)</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max_burst</span><span class="p">;</span>
+</code></pre></div>
+
+<p>The descriptor in the previous article started eight bytes below a boundary. The first burst carries those eight bytes, and the second starts exactly on the boundary.</p>
+<p>Unaligned addresses need byte strobes. Take a copy of 35 bytes from <code>0x1003</code> to <code>0x8005</code> on a 32-bit bus. The source offset within a word is 3 and the destination offset is 1, so the engine rotates the data by two byte lanes between the read and the write. The read side issues 10 word reads from <code>0x1000</code>. The write side issues 9 word writes from <code>0x8004</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Write word</th>
+<th>Address</th>
+<th>Byte strobes</th>
+<th>Bytes written</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>First</td>
+<td><code>0x8004</code></td>
+<td><code>1110</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td>Middle (7 words)</td>
+<td><code>0x8008</code> to <code>0x8023</code></td>
+<td><code>1111</code></td>
+<td>28</td>
+</tr>
+<tr>
+<td>Last</td>
+<td><code>0x8024</code></td>
+<td><code>1111</code></td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>The total is 35 bytes. The read and write sides see different beat counts, which is another reason the FIFO sits between them.</p>
+<hr>
+<h2>Sharing the engine between channels</h2>
+<p>A multi-channel controller shares one read engine and one write engine. The arbiter decides which channel issues next, and its policy sets latency and fairness.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_1f40b4d7d164484588c9a4d042b16b18.svg"></p>
+<p>Four policies cover most designs:</p>
+<ul>
+<li>Fixed priority serves the highest channel first and can starve the rest.</li>
+<li>Round-robin gives each channel a turn and shares bandwidth equally.</li>
+<li>Weighted round-robin gives each channel a share in proportion to its weight.</li>
+<li>Bandwidth or deadline reservation guarantees a rate or a latency to a channel.</li>
+</ul>
+<p>Real-time streams need the last option. A display fetch that arrives late shows as a glitch even when the average bandwidth is fine, so a fair share does not protect it.</p>
+<p>Bound the outstanding transactions for each channel. Each outstanding read reserves FIFO space for its returning data, so the bound also sets the FIFO depth. Without a bound, one busy channel fills the interconnect and starves the others.</p>
+<hr>
+<h2>Where the DMA and the CPU disagree about memory</h2>
+<p>The frame in the opening was intact in memory. The CPU read a stale copy from its data cache.</p>
+<p>The driver had read the header of the previous packet from this buffer, so the first 64-byte cache line stayed in the cache. The DMA engine wrote the new frame straight to memory, and the cache was not told. The CPU read the first line from the cache and every later line from memory.</p>
+<p><img alt="FSM diagram" src="../images/fsm/fsm_7d7e858f67c0a79fcd868921fe5a02eb.svg"></p>
+<p>The completion interrupt reports that the DMA engine finished writing memory. It makes no statement about the CPU cache. A DMA engine is a second manager on the interconnect, and it sees memory without the caches.</p>
+<p>On a non-coherent interconnect, software closes the gap with cache maintenance:</p>
+<ul>
+<li>Before the DMA engine reads a CPU-produced buffer, the CPU cleans the cache lines to memory.</li>
+<li>After the DMA engine writes a buffer, the CPU invalidates the cache lines before it reads them.</li>
+</ul>
+<p>A coherent interconnect lets the DMA engine snoop the CPU caches and removes most of these calls, at the cost of coherent port support in the fabric.</p>
+<p>The same view of memory governs faults. The engine must handle each of these without hanging:</p>
+<ul>
+<li>An AXI subordinate error response or a decode error response on a data burst.</li>
+<li>A fault while fetching a descriptor.</li>
+<li>A misaligned descriptor or an illegal length.</li>
+<li>A channel disabled in the middle of a transfer.</li>
+</ul>
+<p>On a fault, the engine stops the channel, records the cause in <code>STATUS</code>, raises an error interrupt and waits for software to reset the channel. A DMA engine that hangs on one bad descriptor can hang the whole system.</p>
+<p>A DMA engine also reads and writes memory without CPU supervision, so a faulty or hostile peripheral can reach any address. An IOMMU (input-output memory management unit) translates and restricts the addresses each device can issue, using a stream identifier for the requester. Per-channel address limits and secure or non-secure attributes narrow the access further.</p>
+<hr>
+<h2>Programming the engine and checking it</h2>
+<p>A typical descriptor-mode sequence in a driver:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Pseudocode */</span>
+<span class="n">desc</span><span class="o">-&gt;</span><span class="n">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_dma_addr</span><span class="p">;</span>
+<span class="n">desc</span><span class="o">-&gt;</span><span class="n">dst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dst_dma_addr</span><span class="p">;</span>
+<span class="n">desc</span><span class="o">-&gt;</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="n">desc</span><span class="o">-&gt;</span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DMA_CTRL_OWN</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">DMA_CTRL_IRQ_ON_DONE</span><span class="p">;</span>
+<span class="n">desc</span><span class="o">-&gt;</span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="n">dma_sync_desc_for_device</span><span class="p">(</span><span class="n">desc</span><span class="p">);</span>
+<span class="n">writel</span><span class="p">(</span><span class="n">desc_dma_addr</span><span class="p">,</span><span class="w"> </span><span class="n">DMA_HEAD</span><span class="p">);</span>
+<span class="n">writel</span><span class="p">(</span><span class="n">DMA_CTRL_ENABLE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">DMA_CTRL_START</span><span class="p">,</span><span class="w"> </span><span class="n">DMA_CTRL</span><span class="p">);</span>
+</code></pre></div>
+
+<p>The cache maintenance calls depend on the operating system and on whether the DMA port is coherent.</p>
+<p>Check a design against this list:</p>
+<ol>
+<li>Define the alignment and 4 KB boundary rules for every descriptor.</li>
+<li>Reserve a version field and spare bits in the descriptor.</li>
+<li>Handle every AXI error response and stop the channel on a fault.</li>
+<li>Bound the outstanding transactions for each channel.</li>
+<li>Clear interrupt flags by writing one to the bits handled.</li>
+<li>Verify reset in the middle of an active transfer.</li>
+<li>Document the cache maintenance each buffer direction needs.</li>
+<li>Place an IOMMU or an equivalent address limit in front of every DMA manager port.</li>
+</ol>
+<p>Before trusting a driver, find the line that invalidates the cache after the DMA engine writes a receive buffer.</p>
+<hr>
+<p><em>Previous: <a href="../soc-intermediate-06-soc-verification-with-uvm.html">Article I-06: SoC verification with UVM</a></em>
+<em>Next: Intermediate Article 08, interrupt controllers in depth</em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
