@@ -291,4 +291,4 @@ Before trusting a green report, pick one bug the design could plausibly have and
 ---
 
 *Previous: [Article I-05: Clock domain crossing techniques]({filename}../2026-10-03_SoC_Intermediate_05_Clock_Domain_Crossing/2026-10-03_SoC_Intermediate_05_Clock_Domain_Crossing.md)*
-*Next: Intermediate Article 07, DMA controller architecture*
+*Next: [Article I-07: DMA controller architecture]({filename}../2026-10-17_SoC_Intermediate_07_DMA_Controller/2026-10-17_SoC_Intermediate_07_DMA_Controller.md)*
