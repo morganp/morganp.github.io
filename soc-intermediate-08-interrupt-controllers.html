@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>SoC Intermediate 08: Interrupt controllers in depth</title>
+                        <link rel="stylesheet" href="./theme/css/main.css" />
+                                <link rel="stylesheet" type="text/css" href="/static/custom.css" />
+                                <link href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Lizard-Spock Atom Feed" />
+                        <meta name="google-adsense-account" content="ca-pub-3722123143991195">
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3722123143991195"
+                             crossorigin="anonymous"></script>
+    <meta name="description" content="How an interrupt controller turns device events into ordered CPU exceptions, from pending and active state to priority, GIC routing and latency,..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="./">Lizard-Spock</a></h1>
+                        <nav><ul>
+                                                <li><a href="./pages/about.html">About</a></li>
+                                                        <li><a href="./category/home-garden.html">Home & Garden</a></li>
+                                                        <li><a href="./category/music.html">Music</a></li>
+                                                        <li><a href="./category/outdoor.html">Outdoor</a></li>
+                                                        <li><a href="./category/photography.html">Photography</a></li>
+                                                        <li><a href="./category/woodwork.html">Woodwork</a></li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tech &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                        <li><a href="./category/engineering.html">Engineering</a></li>
+                                                                        <li><a href="./category/hardware-homelab.html">Hardware & Homelab</a></li>
+                                                                        <li><a href="./category/programming.html">Programming</a></li>
+                                                                        <li><a href="./category/unix-tools.html">Unix & Tools</a></li>
+                                                </ul>
+                                        </li>
+                                        <li class="nav-dropdown">
+                                                <a href="#" aria-haspopup="true">Tools &#9662;</a>
+                                                <ul class="dropdown-menu">
+                                                                <li><a href="./drum_rudiments/">Drum Rudiments</a></li>
+                                                                <li><a href="./wavedrom-editor/">Wavedrom Editor</a></li>
+                                                                <li><a href="./fretdrom-editor/">Fretdrom Editor</a></li>
+                                                                <li><a href="./amba-explorer/">AMBA Explorer</a></li>
+                                                                <li><a href="./openscad-gui/">OpenSCAD GUI</a></li>
+                                                                <li><a href="./stem-academy/">STEM Academy</a></li>
+                                                </ul>
+                                        </li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="./soc-intermediate-08-interrupt-controllers.html" rel="bookmark"
+             title="Permalink to SoC Intermediate 08: Interrupt controllers in depth">SoC Intermediate 08: Interrupt controllers in depth</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2026-11-20T00:00:00+00:00">
+                Published: Fri 20 November 2026
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="./author/morganp.html">morganp</a>
+                </address>
+        <p>In <a href="./category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="./tag/soc.html">SoC</a> <a href="./tag/hardware.html">Hardware</a> <a href="./tag/electronics.html">Electronics</a> <a href="./tag/rtl.html">RTL</a> <a href="./tag/interrupts.html">Interrupts</a> <a href="./tag/gic.html">GIC</a> <a href="./tag/nvic.html">NVIC</a> <a href="./tag/arm.html">Arm</a> </p>        
+</footer><!-- /.post-info -->        <p><em>Series: Intermediate SoC Design | Article 8 of 10</em></p>
+<hr>
+<h2>The handler that never returned</h2>
+<p>A timer expires, a UART (universal asynchronous receiver-transmitter) receives a byte, or a DMA (direct memory access) transfer completes, all while the CPU (central processing unit) runs unrelated code. The interrupt controller collects these requests and turns them into an ordered series of CPU exceptions.</p>
+<p>A fault in that ordering seldom points at the controller. The serial console stopped echoing keys. The board still answered the debugger, and every halt landed in the same place: the UART interrupt handler. The interrupt counter for that line climbed by hundreds of thousands a second.</p>
+<p>The handler did its job each time. It read the receive register, wrote EOI (end of interrupt) to the interrupt controller and returned. The interrupt fired again before the interrupted program ran a single instruction.</p>
+<p>This article explains how an interrupt controller in an SoC (system on chip) records, masks, prioritises, routes and completes each request. It covers pending and active state, level and edge sensitivity, priority, the Arm NVIC and GIC, and interrupt latency.</p>
+<hr>
+<h2>From a wire to an exception</h2>
+<p>A device requests attention by driving an IRQ (interrupt request) line. The interrupt controller sits between those lines and the CPU, and it tracks a state for every interrupt it owns.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inactive</td>
+<td>No request is outstanding</td>
+</tr>
+<tr>
+<td>Pending</td>
+<td>The controller has seen the request and the CPU has not accepted it</td>
+</tr>
+<tr>
+<td>Active</td>
+<td>The CPU has accepted the interrupt and its handler is running</td>
+</tr>
+<tr>
+<td>Active and pending</td>
+<td>The handler is running and a new request has arrived</td>
+</tr>
+</tbody>
+</table>
+<p>Two more controls decide whether a pending interrupt reaches the CPU. An enable bit for each interrupt masks it from delivery. A priority value orders it against the other pending interrupts.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_568c2ebc7f7c7435d73b34ccc30c412a.svg"></p>
+<p>The CPU acknowledges an interrupt by reading an acknowledge register. The read returns the interrupt number and moves the interrupt from pending to active. The handler services the device, and the EOI write tells the controller the handler has finished.</p>
+<p>The active state stops the controller delivering the same interrupt twice while its handler runs. It also gives the controller a running priority to compare against each new request.</p>
+<hr>
+<h2>Level and edge sensitivity</h2>
+<p>The controller samples each input in one of two ways, and the choice sets the meaning of a request.</p>
+<p>A level-sensitive input reports a condition. The device holds the line high while the condition lasts, and the controller keeps the interrupt pending for as long as it sees the line high. Software ends the request by clearing the condition in the device.</p>
+<p>An edge-sensitive input reports an event. The controller latches a rising edge into the pending bit and holds it there until the CPU acknowledges the interrupt. The line can fall straight away.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_4ecfbd2a9e7378e790fc8859eba66639.svg"></p>
+<p>Level-sensitive interrupts recover from a missed request. If a handler returns with the condition still present, the line is still high and the interrupt fires again.</p>
+<p>Edge-sensitive interrupts lose events in two ways. A second edge that arrives while the interrupt is already pending merges with the first, so a driver that counts interrupts undercounts events. A pulse narrower than one controller clock period can fall between two samples and never set the pending bit. The input synchroniser from <a href="./soc-intermediate-05-clock-domain-crossing-techniques.html">article I-05</a> needs each pulse to last longer than that period.</p>
+<p>Several devices can share one level-sensitive line, because the line stays high while any of them needs service. Each driver on a shared line reads its own device status first and returns at once when its device did not raise the request. Edge-sensitive lines do not share well, because an edge that arrives while the line is already high never appears.</p>
+<h3>Two state machines, two acknowledgements</h3>
+<p>The UART in the opening drove a level-sensitive line. Its handler cleared the controller and left the device asserting.</p>
+<p>A 16550-compatible UART raises one interrupt output for several causes: received data, an empty transmit buffer, and receiver line status errors such as an overrun. Each cause clears in a different way. A read of the receive buffer clears the received-data cause. Only a read of the line status register clears an overrun.</p>
+<p>The handler read the receive buffer and never read the line status register. The overrun cause stayed set, so the UART kept its interrupt line high. When the CPU acknowledged, the controller still saw the line high, and the interrupt became active and pending. The EOI write ended the active state and left the interrupt pending, and the CPU took it again at once.</p>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_afdaa4a1c673ea6b877f4169a2b2cc6b.svg"></p>
+<p>An interrupt has state in two places, the device and the controller. The EOI write acknowledges the controller and says nothing to the device. A handler must clear the cause in the device first and write EOI second.</p>
+<p>The fixed handler reads the UART interrupt identification register in a loop. It services each cause the register reports, and it writes EOI only when the register reports no interrupt pending.</p>
+<hr>
+<h2>Inside the controller</h2>
+<p>A controller for a few dozen inputs has five parts, and larger controllers repeat the same parts at scale.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_8db8dc509de401527e28ace603a5e39a.svg"></p>
+<ul>
+<li>Input logic synchronises each line and detects a level or an edge.</li>
+<li>Pending bits record requests, and software can also set or clear them through registers.</li>
+<li>Enable bits mask each interrupt.</li>
+<li>A priority selector picks the highest-priority interrupt that is both pending and enabled.</li>
+<li>Routing logic delivers the winner to one CPU or to a set of CPUs.</li>
+</ul>
+<p>A flat compare across hundreds of priorities does not meet timing, so large controllers build the selector as a tree of comparators and pipeline it. The pipeline adds a few cycles of latency. It also means the best candidate can change between the signal to the CPU and the acknowledge read. A GIC answers that read with interrupt number 1023, the spurious interrupt, when nothing is pending by the time the read arrives.</p>
+<h3>Priority and pre-emption</h3>
+<p>Arm controllers use a lower number for a higher priority. Take three pending interrupts:</p>
+<table>
+<thead>
+<tr>
+<th>Interrupt</th>
+<th>Device</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>44</td>
+<td>Timer</td>
+<td><code>0x40</code></td>
+</tr>
+<tr>
+<td>32</td>
+<td>Ethernet</td>
+<td><code>0x80</code></td>
+</tr>
+<tr>
+<td>51</td>
+<td>UART</td>
+<td><code>0xA0</code></td>
+</tr>
+</tbody>
+</table>
+<p>The controller delivers the timer first. If the timer fires while the Ethernet handler runs, it pre-empts that handler, because <code>0x40</code> beats the running priority of <code>0x80</code>. The UART waits behind both.</p>
+<p>A controller implements only the upper bits of the 8-bit priority field. A Cortex-M part with 3 priority bits has 8 levels, from <code>0x00</code> to <code>0xE0</code> in steps of <code>0x20</code>, and the lower 5 bits read as zero.</p>
+<p>Priority grouping splits the implemented bits into two fields. The upper field, the group priority, decides pre-emption. The lower field, the subpriority, orders interrupts inside one group that are pending at the same moment, and never causes pre-emption. A GIC sets the split with its binary point register, and a Cortex-M sets it with the <code>PRIGROUP</code> field.</p>
+<p>Equal priorities cause latency surprises. Two interrupts at the same group priority never pre-empt each other, so a slow handler delays every other interrupt at its level for its full run time. Give every interrupt a defined reset priority, and assign the real values on purpose.</p>
+<hr>
+<h2>Two controllers, two design points</h2>
+<h3>NVIC on Cortex-M</h3>
+<p>The NVIC (Nested Vectored Interrupt Controller) is part of the Cortex-M processor. It favours short, predictable latency over routing across many cores.</p>
+<ul>
+<li>A vector table in memory holds one handler address for each interrupt, so the core branches straight to the right handler.</li>
+<li>Hardware stacks eight registers on entry: R0 to R3, R12, the LR (link register), the PC (program counter) and xPSR, the program status register. A handler can be an ordinary C function.</li>
+<li>Tail-chaining starts the next pending handler without unstacking and restacking the registers in between.</li>
+<li>Late arrival lets a higher-priority interrupt that arrives during stacking take over the entry already in progress.</li>
+</ul>
+<p>The NVIC has no EOI register. Exception return completes the interrupt: the handler returns by loading a special <code>EXC_RETURN</code> value into the PC, and the NVIC clears the active state. A Cortex-M3 or Cortex-M4 enters a handler in 12 cycles with zero-wait-state memory, and a tail-chain takes 6 cycles.</p>
+<p>Software masks interrupts through two core registers. <code>PRIMASK</code> blocks every interrupt with a configurable priority. <code>BASEPRI</code>, from Armv7-M onwards, blocks every interrupt with a priority value equal to or greater than its own, so critical sections can leave the most urgent interrupts running.</p>
+<h3>GIC on Cortex-A</h3>
+<p>The GIC (Generic Interrupt Controller) serves application-class SoCs with many cores. GICv3 splits it into three parts.</p>
+<p><img alt="FSM diagram" src="./images/fsm/fsm_94a359006f25943894056cb8eba69cd3.svg"></p>
+<ul>
+<li>The distributor holds the enable, priority and routing state of every shared interrupt.</li>
+<li>A redistributor for each core holds the state of that core's private interrupts, and it receives the interrupts the distributor routes to the core.</li>
+<li>The CPU interface in each core presents the highest-priority interrupt to the core. It holds the priority mask, the acknowledge register and the EOI register.</li>
+</ul>
+<p>Software reaches the CPU interface through system registers. A handler reads <code>ICC_IAR1_EL1</code> to acknowledge an interrupt and get its number, then writes the same number to <code>ICC_EOIR1_EL1</code> when it finishes.</p>
+<p>Interrupt numbers fall into four classes:</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Numbers</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SGI (software-generated interrupt)</td>
+<td>0 to 15</td>
+<td>A write by one core to signal another core</td>
+</tr>
+<tr>
+<td>PPI (private peripheral interrupt)</td>
+<td>16 to 31</td>
+<td>A device private to one core, such as its generic timer</td>
+</tr>
+<tr>
+<td>SPI (shared peripheral interrupt)</td>
+<td>32 to 1019</td>
+<td>An SoC device wired to the distributor</td>
+</tr>
+<tr>
+<td>LPI (locality-specific peripheral interrupt)</td>
+<td>8192 and up</td>
+<td>A message write from a device</td>
+</tr>
+</tbody>
+</table>
+<p>A GIC shared peripheral interrupt has no connection to the SPI serial bus. The two terms share an acronym.</p>
+<p>LPIs carry PCIe (Peripheral Component Interconnect Express) MSIs (message-signalled interrupts). The device writes an event identifier to the ITS (Interrupt Translation Service), and the ITS maps the device and event to an LPI number and a target redistributor. No wire connects the device to the controller.</p>
+<p>Each shared interrupt has a routing register, <code>GICD_IROUTER</code>, that names one core by its affinity value or lets the distributor choose any one participating core. Route a device interrupt to the core that runs its driver, so the handler finds the driver data already in that core's cache. Linux exposes this choice as IRQ affinity.</p>
+<p>A hypervisor owns the physical GIC. When a physical interrupt belongs to a guest, the hypervisor writes a virtual interrupt into a list register, <code>ICH_LR&lt;n&gt;_EL2</code>. The guest then acknowledges and completes the interrupt through a virtual CPU interface, without a trap to the hypervisor. GICv4 goes further and lets the ITS deliver virtual LPIs straight to a running guest.</p>
+<hr>
+<h2>Where the latency goes</h2>
+<p>Interrupt latency runs from the device event to the first useful instruction of the handler. Each stage on the way adds to it:</p>
+<ol>
+<li>The device logic detects the condition and drives its line.</li>
+<li>The input synchroniser adds two or three controller clock cycles.</li>
+<li>The priority selector picks the interrupt, and the CPU interface signals the core.</li>
+<li>The core waits while interrupts are masked, or while a handler of equal or higher priority runs.</li>
+<li>The core completes or abandons the current instruction and takes the exception.</li>
+<li>The handler code and data miss in the cache and the TLB (translation lookaside buffer).</li>
+<li>The OS (operating system) dispatches from its common entry code to the driver handler.</li>
+</ol>
+<p><img alt="WaveDrom timing diagram" src="./images/wavedrom/wavedrom_92746ec03fd4d3c9e6cba94e67f5d35d.svg"></p>
+<p>The hardware stages, 1 to 3, cost tens of cycles. Stages 4, 6 and 7 dominate on an application processor, and they vary from one event to the next. The worst case matters more than the average, because a deadline fails on one late event.</p>
+<p>Measure latency on real hardware with a GPIO (general-purpose input/output) pin and a scope. Drive the interrupt source from a signal the scope can also see, set a GPIO pin high in the first line of the ISR (interrupt service routine), and measure the time between the two edges. Repeat for thousands of events with cold caches and a loaded OS, and record the maximum.</p>
+<p>A timer does the same job inside the chip. Capture a free-running counter at the event, read the counter in the handler, and log the difference.</p>
+<hr>
+<h2>Clearing order, and a checklist</h2>
+<p>Most interrupt bugs show one of two symptoms: the interrupt never arrives, or the CPU never leaves the handler.</p>
+<table>
+<thead>
+<tr>
+<th>Cause</th>
+<th>Symptom</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Handler writes EOI and leaves the device status set</td>
+<td>CPU never leaves the handler on a level-sensitive line</td>
+</tr>
+<tr>
+<td>Handler clears the device and never writes EOI</td>
+<td>The interrupt, and every interrupt at its priority or lower, never arrives again</td>
+</tr>
+<tr>
+<td>Edge pulse narrower than one controller clock period</td>
+<td>Interrupt arrives some of the time, or never</td>
+</tr>
+<tr>
+<td>Driver on a shared line skips the check for its own device</td>
+<td>The wrong driver claims the request and the real device stays asserted</td>
+</tr>
+<tr>
+<td>Priority mask left at a level that blocks the interrupt</td>
+<td>Interrupt never arrives</td>
+</tr>
+<tr>
+<td>Interrupt routed to a core that is offline, or asleep without a wake path</td>
+<td>Interrupt never arrives</td>
+</tr>
+<tr>
+<td>Device reasserts the condition before the handler returns</td>
+<td>Handler runs again at once, which is correct when there is new work</td>
+</tr>
+</tbody>
+</table>
+<p>Check a design against this list:</p>
+<ol>
+<li>Document level or edge sensitivity for every interrupt.</li>
+<li>Make device status bits write-one-to-clear, so software clears only the bits it handled.</li>
+<li>Avoid read-to-clear status where two pieces of software can read the same register.</li>
+<li>Define a reset priority for every interrupt and document the policy for changing it.</li>
+<li>Clear the cause in the device before writing EOI.</li>
+<li>Verify the pending, active and EOI sequence, including the active and pending state.</li>
+<li>Test interrupts during reset, sleep and clock gating.</li>
+<li>Measure latency with real cache and OS conditions, and record the worst case.</li>
+<li>Require every driver on a shared line to identify its own device.</li>
+</ol>
+<p>Before trusting a handler, find the line that clears the cause in the device, and check that it runs before the EOI write.</p>
+<hr>
+<p><em>Previous: <a href="./soc-intermediate-07-dma-controller-architecture.html">Article I-07: DMA controller architecture</a></em>
+<em>Next: Intermediate Article 09, memory-mapped I/O and Linux device drivers</em></p>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="http://lizard-spock.co.uk/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="https://buymeacoffee.com/lizardspock">Buy Me a Coffee</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
