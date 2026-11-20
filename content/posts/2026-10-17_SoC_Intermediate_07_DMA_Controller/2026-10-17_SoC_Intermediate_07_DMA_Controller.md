@@ -289,4 +289,4 @@ Before trusting a driver, find the line that invalidates the cache after the DMA
 ---
 
 *Previous: [Article I-06: SoC verification with UVM]({filename}../2026-10-10_SoC_Intermediate_06_UVM_Verification/2026-10-10_SoC_Intermediate_06_UVM_Verification.md)*
-*Next: Intermediate Article 08, interrupt controllers in depth*
+*Next: [Article I-08: Interrupt controllers in depth]({filename}../2026-11-04_SoC_Intermediate_08_Interrupt_Controllers/2026-11-04_SoC_Intermediate_08_Interrupt_Controllers.md)*
